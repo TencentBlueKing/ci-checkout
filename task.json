@@ -1,0 +1,345 @@
+{
+  "atomCode": "gitCommonTest",
+  "execution": {
+    "language": "java",
+    "minimumVersion": "1.8",
+    "demands": [],
+    "target": "java -jar git.jar"
+  },
+  "input": {
+    "repositoryUrl": {
+      "label": "代码库链接",
+      "default": "",
+      "placeholder": "请输入代码库URL",
+      "type": "vuex-input",
+      "desc": "",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false
+    },
+    "ticketId": {
+      "label": "代码库凭证",
+      "placeholder": "请选中对应凭证",
+      "type": "select-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "optionsConf": {
+        "searchable": true,
+        "multiple": false,
+        "url": "/ticket/api/user/credentials/{projectId}/hasPermissionList?permission=USE&page=1&pageSize=10000",
+        "paramId": "credentialId",
+        "paramName": "credentialId",
+        "itemTargetUrl": "/console/ticket/{projectId}/",
+        "itemText": "添加新的凭证",
+        "hasAddItem": true
+      }
+    },
+    "accessToken": {
+      "label": "oauth的 access token",
+      "placeholder": "请选中对应凭证",
+      "type": "vuex-input",
+      "inputType": "password",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": true
+    },
+    "username": {
+      "label": "",
+      "placeholder": "请选中对应凭证",
+      "type": "vuex-input",
+      "inputType": "password",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": true,
+      "isSensitive": false
+    },
+    "password": {
+      "label": "",
+      "placeholder": "请选中对应凭证",
+      "type": "vuex-input",
+      "inputType": "password",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": true,
+      "isSensitive": true
+    },
+    "pullType": {
+      "label": "指定拉取方式",
+      "default": "BRANCH",
+      "type": "select-input",
+      "required": true,
+      "optionsConf": {
+        "searchable": true
+      },
+      "options": [
+        {
+          "id": "BRANCH",
+          "name": "BRANCH"
+        },
+        {
+          "id": "TAG",
+          "name": "TAG"
+        },
+        {
+          "id": "COMMIT_ID",
+          "name": "COMMIT_ID"
+        }
+      ]
+    },
+    "refName": {
+      "label": "分支/TAG/COMMIT",
+      "default": "master",
+      "placeholder": "请输入",
+      "type": "vuex-input",
+      "desc": "",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false
+    },
+    "localPath": {
+      "label": "代码保存路径",
+      "default": "",
+      "placeholder": "请填写工作空间相对目录，不填则默认为工作空间根目录",
+      "type": "vuex-input",
+      "desc": "当前流水线存在多个代码拉取插件，你需设置此字段以解决冲突问题",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false
+    },
+    "paramMode": {
+      "label": "",
+      "default": "SIMPLE",
+      "type": "enum-input",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "list": [
+        {
+          "label": "简单模式",
+          "value": "SIMPLE"
+        },
+        {
+          "label": "高级模式",
+          "value": "ADVANCE"
+        }
+      ]
+    },
+    "includePath": {
+      "label": "代码库拉取相对子路径",
+      "default": "",
+      "placeholder": "请填写代码库相对目录，多个用逗号分隔",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    },
+    "excludePath": {
+      "label": "排除代码库以下路径",
+      "default": "",
+      "placeholder": "请填写代码库相对目录，多个用逗号分隔",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    },
+    "fetchDepth": {
+      "label": "git fetch的depth参数值",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    },
+    "strategy": {
+      "label": "拉取策略",
+      "default": "REVERT_UPDATE",
+      "type": "enum-input",
+      "desc": "Revert Update: 增量,每次先\"git reset --hard HEAD\",再\"git pull\"\n\n Fresh Checkout: 全量,每次都会全新clone代码,之前会delete整个工作空间\n\n Increment Update: 增量,只使用\"git pull\",并不清除冲突及历史缓存文件  ",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "list": [
+        {
+          "label": "Revert Update",
+          "value": "REVERT_UPDATE"
+        },
+        {
+          "label": "Fresh Checkout",
+          "value": "FRESH_CHECKOUT"
+        },
+        {
+          "label": "Increment Update",
+          "value": "INCREMENT_UPDATE"
+        }
+      ],
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    },
+    "enableSubmodule": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "启用Submodule",
+      "desc": "勾选则启用外链，不勾选则不启用",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    },
+    "enableSubmoduleRemote": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "执行git submodule update后面是否带上--remote参数",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          },
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    },
+    "enableVirtualMergeBranch": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "MR事件触发时执行Pre-Merge",
+      "desc": "我们会在MR事件触发时尝试Merge源分支到目标分支，冲突将直接判定为失败",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    },
+    "enableAutoCrlf": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否开启AutoCrlf",
+      "desc": "选中则执行git config core.autocrlf true, 否则为false",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    },
+    "enableGitClean": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否开启Git Clean",
+      "desc": "选中则执行git clean, 删除未进行版本管理的文件",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "strategy",
+            "value": "REVERT_UPDATE"
+          },
+          {
+            "key": "paramMode",
+            "value": "ADVANCE"
+          }
+        ]
+      }
+    }
+  }
+}
