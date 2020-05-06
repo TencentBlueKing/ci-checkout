@@ -1,6 +1,8 @@
 package com.tencent.devops
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bk.devops.atom.AtomContext
+import com.tencent.bk.devops.atom.common.Constants
 import com.tencent.bk.devops.atom.pojo.StringData
 import com.tencent.bk.devops.atom.spi.AtomService
 import com.tencent.bk.devops.atom.spi.TaskAtom
@@ -9,7 +11,9 @@ import com.tencent.devops.pojo.GitCodeAtomParam
 import com.tencent.devops.scm.CodeGitPullCodeSetting
 import com.tencent.devops.scm.IPullCodeSetting
 import com.tencent.devops.utils.shell.CommonShellUtils
+import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
+import java.io.File
 
 @AtomService(paramClass = GitCodeAtomParam::class)
 class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
@@ -31,7 +35,8 @@ class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
         atomContext.result.data["bk_repo_local_path_${param.pipelineTaskId}"] = StringData(param.localPath ?: "")
         atomContext.result.data["bk_repo_code_url_${param.pipelineTaskId}"] = StringData(param.repositoryUrl)
         atomContext.result.data["bk_repo_auth_type_${param.pipelineTaskId}"] = StringData(getAuthType(param))
-        atomContext.result.data["bk_repo_container_id_${param.pipelineTaskId}"] = StringData(atomContext.allParameters["pipeline.job.id"]?.toString() ?: "")
+        atomContext.result.data["bk_repo_container_id_${param.pipelineTaskId}"] = StringData(atomContext.allParameters["pipeline.job.id"]?.toString()
+                ?: "")
     }
 
     private fun getAuthType(param: GitCodeAtomParam): String {
@@ -42,13 +47,9 @@ class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
     }
 
     private fun showEnvVariable() {
-        try {
-            CommonShellUtils.execute("set")
-            CommonShellUtils.execute("whoami")
-            CommonShellUtils.execute("git version")
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        CommonShellUtils.execute("set")
+        CommonShellUtils.execute("whoami")
+        CommonShellUtils.execute(script = "git version", failExit = true)
     }
 
     private fun getPullCodeSetting(
