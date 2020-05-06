@@ -1,5 +1,5 @@
 {
-  "atomCode": "gitCommonTest",
+  "atomCode": "git",
   "execution": {
     "language": "java",
     "minimumVersion": "1.8",
