@@ -35,4 +35,4 @@ jobs:
       uses: eskatos/gradle-command-action@v1
       with:
         gradle-version: 4.8.1
-        arguments: clean buildZip -DmavenRepoUrl=http://maven.aliyun.com/nexus/content/groups/public/ -DMAVEN_CRED_USERNAME=zanyzhao -DMAVEN_CRED_PASSWORD=${{ secrets.GITHUB_TOKEN }}
+        arguments: clean buildZip -DmavenRepoUrl=https://repo1.maven.org/maven2/ -DMAVEN_CRED_USERNAME=zanyzhao -DMAVEN_CRED_PASSWORD=${{ secrets.GITHUB_TOKEN }}
