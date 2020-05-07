@@ -54,6 +54,8 @@ def mavenCredPassword = getValue("mavenCredPassword", getProperty("MAVEN_CRED_PA
 repositories {
     def mavenRepoUrl = getValue("mavenRepoUrl", MAVEN_REPO_URL)
     println("mavenRepoUrl=" + mavenRepoUrl)
+    println("mavenCredUserName=" + mavenCredUserName)
+    println("mavenCredPassword=" + mavenCredPassword)
     mavenLocal()
     maven {
         url "https://maven.pkg.github.com/ci-plugins/java-plugin-sdk"
