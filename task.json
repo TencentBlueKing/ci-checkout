@@ -1,6 +1,7 @@
 {
   "atomCode": "git",
   "execution": {
+    "packagePath": "git.jar",
     "language": "java",
     "minimumVersion": "1.8",
     "demands": [],
