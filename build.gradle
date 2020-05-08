@@ -48,8 +48,8 @@ static def getValue(String key, Object defaultValue) {
     return value
 }
 
-def mavenCredUserName = getValue("mavenCredUserName", System.getProperty("MAVEN_CRED_USERNAME"))
-def mavenCredPassword = getValue("mavenCredPassword", System.getProperty("MAVEN_CRED_PASSWORD"))
+def mavenCredUserName = getValue("mavenCredUserName", getProperty("MAVEN_CRED_USERNAME"))
+def mavenCredPassword = getValue("mavenCredPassword", getProperty("MAVEN_CRED_PASSWORD"))
 
 repositories {
     def mavenRepoUrl = getValue("mavenRepoUrl", MAVEN_REPO_URL)
