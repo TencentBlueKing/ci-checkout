@@ -1,8 +1,6 @@
 package com.tencent.devops
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bk.devops.atom.AtomContext
-import com.tencent.bk.devops.atom.common.Constants
 import com.tencent.bk.devops.atom.pojo.StringData
 import com.tencent.bk.devops.atom.spi.AtomService
 import com.tencent.bk.devops.atom.spi.TaskAtom
@@ -11,9 +9,7 @@ import com.tencent.devops.pojo.GitCodeAtomParam
 import com.tencent.devops.scm.CodeGitPullCodeSetting
 import com.tencent.devops.scm.IPullCodeSetting
 import com.tencent.devops.utils.shell.CommonShellUtils
-import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
-import java.io.File
 
 @AtomService(paramClass = GitCodeAtomParam::class)
 class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
