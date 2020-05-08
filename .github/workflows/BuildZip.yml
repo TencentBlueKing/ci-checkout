@@ -1,16 +1,10 @@
-# This is a basic workflow to help you get started with Actions
-
 name: BuildZip
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+    - 'v*'
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
   build:
@@ -36,3 +30,23 @@ jobs:
       with:
         gradle-version: 4.8.1
         arguments: clean buildZip -DmavenCredUserName=zanyzhao -DmavenCredPassword=${{ secrets.GITHUB_TOKEN }}
+    - run: tree
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: ${{ github.ref }}
+        draft: true
+        prerelease: true
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./bkci.tar.gz
+        asset_name: bkci.tar.gz
+        asset_content_type: application/gzip
