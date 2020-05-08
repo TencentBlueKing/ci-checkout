@@ -31,7 +31,8 @@ class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
         atomContext.result.data["bk_repo_local_path_${param.pipelineTaskId}"] = StringData(param.localPath ?: "")
         atomContext.result.data["bk_repo_code_url_${param.pipelineTaskId}"] = StringData(param.repositoryUrl)
         atomContext.result.data["bk_repo_auth_type_${param.pipelineTaskId}"] = StringData(getAuthType(param))
-        atomContext.result.data["bk_repo_container_id_${param.pipelineTaskId}"] = StringData(atomContext.allParameters["pipeline.job.id"]?.toString() ?: "")
+        atomContext.result.data["bk_repo_container_id_${param.pipelineTaskId}"] = StringData(atomContext.allParameters?.get("pipeline.job.id")
+            ?: "")
     }
 
     private fun getAuthType(param: GitCodeAtomParam): String {
