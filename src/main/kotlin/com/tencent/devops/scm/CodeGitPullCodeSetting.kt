@@ -1,5 +1,6 @@
 package com.tencent.devops.scm
 
+import com.tencent.devops.enums.AuthType
 import com.tencent.devops.enums.CodePullStrategy
 import com.tencent.devops.enums.GitPullModeType
 import com.tencent.devops.enums.ticket.CredentialType
@@ -12,22 +13,19 @@ open class CodeGitPullCodeSetting(
 ) : IPullCodeSetting {
 
     override fun pullCode(): Map<String, String>? {
-
-        // 优先取传过来的access token拉取
-        if (!params.accessToken.isNullOrBlank()) {
-            return doOauthPullCode(listOf(params.accessToken!!))
-        }
-
-        // 优先取传过来的access token拉取
-        if (!params.username.isNullOrBlank()) {
-            return doHttpPullCode(listOf(params.username!!, params.password ?: ""))
-        }
-        val credentialResult = getCredential(params.ticketId)
-        return when (credentialResult?.second) {
-            CredentialType.ACCESSTOKEN -> doOauthPullCode(credentialResult.first)
-            CredentialType.USERNAME_PASSWORD -> doHttpPullCode(credentialResult.first)
-            CredentialType.SSH_PRIVATEKEY -> doPullCodeSSH(credentialResult.first)
-            else -> doPullCode()
+        return when (params.authType) {
+            AuthType.ACCESSTOKEN -> {
+                doOauthPullCode(listOf(params.accessToken!!))
+            }
+            AuthType.TICKET -> {
+                val credentialResult = getCredential(params.ticketId)
+                when (credentialResult?.second) {
+                    CredentialType.ACCESSTOKEN -> doOauthPullCode(credentialResult.first)
+                    CredentialType.USERNAME_PASSWORD -> doHttpPullCode(credentialResult.first)
+                    CredentialType.SSH_PRIVATEKEY -> doPullCodeSSH(credentialResult.first)
+                    else -> doPullCode()
+                }
+            }
         }
     }
 

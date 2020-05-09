@@ -1,6 +1,7 @@
 {
   "atomCode": "git",
   "execution": {
+    "packagePath": "git.jar",
     "language": "java",
     "minimumVersion": "1.8",
     "demands": [],
@@ -17,6 +18,25 @@
       "disabled": false,
       "hidden": false,
       "isSensitive": false
+    },
+    "authType": {
+      "label": "授权类型",
+      "default": "TICKET",
+      "type": "enum-input",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "list": [
+        {
+          "label": "凭证",
+          "value": "TICKET"
+        },
+        {
+          "label": "access token",
+          "value": "ACCESSTOKEN"
+        }
+      ]
     },
     "ticketId": {
       "label": "代码库凭证",
@@ -36,10 +56,19 @@
         "itemTargetUrl": "/console/ticket/{projectId}/",
         "itemText": "添加新的凭证",
         "hasAddItem": true
+      },
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "authType",
+            "value": "TICKET"
+          }
+        ]
       }
     },
     "accessToken": {
-      "label": "oauth的 access token",
+      "label": "access token",
       "placeholder": "请选中对应凭证",
       "type": "vuex-input",
       "inputType": "password",
@@ -47,11 +76,20 @@
       "required": false,
       "disabled": false,
       "hidden": false,
-      "isSensitive": true
+      "isSensitive": true,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "authType",
+            "value": "ACCESSTOKEN"
+          }
+        ]
+      }
     },
     "username": {
-      "label": "",
-      "placeholder": "请选中对应凭证",
+      "label": "账号",
+      "placeholder": "请输入账号",
       "type": "vuex-input",
       "inputType": "password",
       "desc": "",
@@ -61,8 +99,8 @@
       "isSensitive": false
     },
     "password": {
-      "label": "",
-      "placeholder": "请选中对应凭证",
+      "label": "密码",
+      "placeholder": "请输入密码",
       "type": "vuex-input",
       "inputType": "password",
       "desc": "",

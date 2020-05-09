@@ -2,6 +2,7 @@ package com.tencent.devops.pojo
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.tencent.bk.devops.atom.pojo.AtomBaseParam
+import com.tencent.devops.enums.AuthType
 import com.tencent.devops.enums.CodePullStrategy
 import com.tencent.devops.enums.GitPullModeType
 import lombok.Data
@@ -24,6 +25,7 @@ class GitCodeAtomParam : AtomBaseParam() {
     var excludePath: String? = ""
     var fetchDepth: Int? = null
     var enableGitClean: Boolean = true
+    var authType: AuthType = AuthType.TICKET
     var accessToken: String? = null
     var username: String? = null
     var password: String? = null
