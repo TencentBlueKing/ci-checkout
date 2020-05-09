@@ -1,7 +1,15 @@
 buildscript {
+    def mavenRepoUrl = System.getProperty("mavenRepoUrl")
+    if (mavenRepoUrl == null) {
+        mavenRepoUrl = System.getenv("mavenRepoUrl")
+    }
+    if (mavenRepoUrl == null) {
+        mavenRepoUrl = MAVEN_REPO_URL
+    }
+    println("mavenRepoUrl=" + mavenRepoUrl)
     repositories {
         mavenLocal()
-        maven { url "http://mirrors.cloud.tencent.com/nexus/repository/maven-public/" }
+        maven { url mavenRepoUrl }
     }
 
     dependencies {
@@ -29,13 +37,13 @@ apply plugin: "application"
 group 'com.tencent.bk.devops'
 
 
-def getValue(String key, String defaultValue) {
+static def getValue(String key, Object defaultValue) {
     def value = System.getProperty(key)
     if (value == null) {
         value = System.getenv(key)
     }
     if (value == null) {
-        value = defaultValue
+        value = defaultValue.toString()
     }
     return value
 }
@@ -44,6 +52,8 @@ def mavenCredUserName = getValue("mavenCredUserName", getProperty("MAVEN_CRED_US
 def mavenCredPassword = getValue("mavenCredPassword", getProperty("MAVEN_CRED_PASSWORD"))
 
 repositories {
+    def mavenRepoUrl = getValue("mavenRepoUrl", MAVEN_REPO_URL)
+    println("mavenRepoUrl=" + mavenRepoUrl)
     mavenLocal()
     maven {
         url "https://maven.pkg.github.com/ci-plugins/java-plugin-sdk"
@@ -52,7 +62,7 @@ repositories {
             password = mavenCredPassword
         }
     }
-    maven { url "http://mirrors.cloud.tencent.com/nexus/repository/maven-public/" }
+    maven { url mavenRepoUrl }
 }
 
 dependencies {
