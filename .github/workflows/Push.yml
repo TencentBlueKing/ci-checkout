@@ -35,8 +35,8 @@ jobs:
         gradle-version: 4.8.1
         arguments: clean buildZip -DmavenCredUserName=${{ secrets.NAME }} -DmavenCredPassword=${{ secrets.GITHUB_TOKEN }}
     - name: Upload a Build Artifact
-    uses: actions/upload-artifact@v2
-    with:
-      name: ${{ env.FILENAME }}.zip
-      # A file, directory or wildcard pattern that describes what to upload
-      path: ./build/distributions/${{ env.FILENAME }}.zip
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.FILENAME }}.zip
+        # A file, directory or wildcard pattern that describes what to upload
+        path: ./build/distributions/${{ env.FILENAME }}.zip
