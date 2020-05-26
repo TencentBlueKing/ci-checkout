@@ -97,7 +97,7 @@ open class GitUpdateTask constructor(
             ""
         }
 
-        CommonShellUtils.execute("git fetch $fetchOption", workspace)
+        CommonShellUtils.execute("git fetch $fetchOption", workspace, failExit = true)
     }
 
     private fun isSameProject(url: String, targetUrl: String?): Boolean {
