@@ -107,15 +107,15 @@ open class GitUpdateTask constructor(
     private fun checkout() {
         when (atomParam.pullType) {
             GitPullModeType.BRANCH -> {
-                checkoutBranch(atomParam.refName!!)
+                checkoutBranch(atomParam.refName)
             }
 
             GitPullModeType.TAG -> {
-                checkoutTag(atomParam.refName!!)
+                checkoutTag(atomParam.refName)
             }
 
             GitPullModeType.COMMIT_ID -> {
-                checkoutCommitId(atomParam.refName!!)
+                checkoutCommitId(atomParam.refName)
             }
         }
     }
@@ -313,7 +313,7 @@ open class GitUpdateTask constructor(
     private fun getUrlHost(url: String): String? {
         try {
             val actualUrl = url.trim()
-            if (actualUrl.startsWith("http")) return URL(actualUrl).host
+            if (actualUrl.startsWith("http") || actualUrl.startsWith("https")) return URL(actualUrl).host
             return actualUrl.substring("git@".length, actualUrl.indexOf(":"))
         } catch (e: Exception) {
             logger.warn("获取git代码库主机信息失败: $url")
@@ -336,10 +336,10 @@ open class GitUpdateTask constructor(
 
     private fun getGitUrlHostAndPath(urlStr: String): Pair<String?, String?> {
         val matches = Regex("""git@(.*):(.*).git""").find(urlStr)
-        return matches!!.groupValues[1] to matches!!.groupValues[2]
+        return matches!!.groupValues[1] to matches.groupValues[2]
     }
 
-    private fun checkLocalGitRepo() {
+    fun checkLocalGitRepo() {
         if (File(workspace, ".git").exists()) {
             val localUrl = CommonShellUtils.execute("git config --get remote.origin.url", workspace, failExit = false).trim()
             if (localUrl.isBlank()) {

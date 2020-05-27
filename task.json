@@ -35,6 +35,10 @@
         {
           "label": "access token",
           "value": "ACCESSTOKEN"
+        },
+        {
+          "label": "username/password",
+          "value": "USERNAME_PASSWORD"
         }
       ]
     },
@@ -91,12 +95,20 @@
       "label": "账号",
       "placeholder": "请输入账号",
       "type": "vuex-input",
-      "inputType": "password",
       "desc": "",
       "required": false,
       "disabled": false,
-      "hidden": true,
-      "isSensitive": false
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "authType",
+            "value": "USERNAME_PASSWORD"
+          }
+        ]
+      }
     },
     "password": {
       "label": "密码",
@@ -106,8 +118,17 @@
       "desc": "",
       "required": false,
       "disabled": false,
-      "hidden": true,
-      "isSensitive": true
+      "hidden": false,
+      "isSensitive": true,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "authType",
+            "value": "USERNAME_PASSWORD"
+          }
+        ]
+      }
     },
     "pullType": {
       "label": "指定拉取方式",

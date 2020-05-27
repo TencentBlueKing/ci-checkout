@@ -26,6 +26,9 @@ open class CodeGitPullCodeSetting(
                     else -> doPullCode()
                 }
             }
+            AuthType.USERNAME_PASSWORD -> {
+                doHttpPullCode(listOf(params.username!!, params.password!!))
+            }
         }
     }
 
