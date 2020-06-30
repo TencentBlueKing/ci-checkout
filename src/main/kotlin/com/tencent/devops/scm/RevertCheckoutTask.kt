@@ -14,6 +14,7 @@ class RevertCheckoutTask(
 ) {
 
     override fun preUpdate() {
+        checkLocalGitRepo()
         if (File(workspace, ".git").exists()) {
             CommonShellUtils.execute("git reset --hard", workspace)
             if (atomParam.enableGitClean) CommonShellUtils.execute("git clean -xdf", workspace)

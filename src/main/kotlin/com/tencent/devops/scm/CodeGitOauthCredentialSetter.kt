@@ -21,7 +21,7 @@ class CodeGitOauthCredentialSetter constructor(private val token: String) : GitC
             } else {
                 u.path
             }
-            return "http://oauth2:$token@$host/$path"
+            return "${u.protocol}://oauth2:$token@$host/$path"
         } catch (t: Throwable) {
             logger.warn("Fail to get the oauth credential url for $url", t)
         }
