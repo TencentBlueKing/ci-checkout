@@ -31,7 +31,7 @@ jobs:
       uses: eskatos/gradle-command-action@v1
       with:
         gradle-version: 4.8.1
-        arguments: clean buildZip -DmavenCredUserName=${{ secrets.NAME }} -DmavenCredPassword=${{ secrets.GITHUB_TOKEN }} -DmavenRepoUrl="http://maven.aliyun.com/nexus/content/groups/public/"
+        arguments: clean buildZip -DmavenCredUserName=${{ secrets.NAME }} -DmavenCredPassword=${{ secrets.GITHUB_TOKEN }} -DmavenRepoUrl=http://maven.aliyun.com/nexus/content/groups/public/
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
