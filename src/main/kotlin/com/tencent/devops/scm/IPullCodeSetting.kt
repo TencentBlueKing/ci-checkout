@@ -1,6 +1,9 @@
 package com.tencent.devops.scm
 
 import com.tencent.devops.enums.ticket.CredentialType
+import com.tencent.devops.pojo.BK_CI_GIT_REPO_BRANCH
+import com.tencent.devops.pojo.BK_CI_GIT_REPO_CODE_PATH
+import com.tencent.devops.pojo.BK_CI_GIT_REPO_URL
 import com.tencent.devops.pojo.GitCodeAtomParam
 import com.tencent.devops.utils.shell.CredentialUtils
 
@@ -21,6 +24,9 @@ interface IPullCodeSetting {
         if (null != performEnv) {
             env.putAll(performEnv)
         }
+        env[BK_CI_GIT_REPO_URL] = params.repositoryUrl
+        env[BK_CI_GIT_REPO_BRANCH] = params.refName
+        env[BK_CI_GIT_REPO_CODE_PATH] = params.localPath ?: ""
         return env
     }
 }

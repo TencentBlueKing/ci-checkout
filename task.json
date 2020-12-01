@@ -400,5 +400,19 @@
         ]
       }
     }
+  },
+  "output": {
+    "BK_CI_GIT_REPO_URL": {
+      "type": "string",
+      "description": "代码库的URL"
+    },
+    "BK_CI_GIT_REPO_BRANCH": {
+      "type": "string",
+      "description": "当前代码库分支"
+    },
+    "BK_CI_GIT_REPO_CODE_PATH": {
+      "type": "string",
+      "description": "当前代码库本地存放路径"
+    }
   }
 }
