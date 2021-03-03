@@ -179,6 +179,8 @@ open class GitUpdateTask constructor(
 
     private fun checkoutTag(tag: String) {
         println("Checkout to tag $tag")
+        CommonShellUtils.execute("git tag -d $tag", workspace)
+        CommonShellUtils.execute("git fetch origin $tag", workspace)
         CommonShellUtils.execute("git checkout $tag", workspace)
     }
 

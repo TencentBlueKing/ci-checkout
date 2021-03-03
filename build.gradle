@@ -9,6 +9,8 @@ buildscript {
     println("mavenRepoUrl=" + mavenRepoUrl)
     repositories {
         mavenLocal()
+        mavenCentral()
+        jcenter()
         maven { url mavenRepoUrl }
     }
 
@@ -36,37 +38,24 @@ apply plugin: "com.github.johnrengelman.shadow"
 apply plugin: "application"
 group 'com.tencent.bk.devops'
 
-
-static def getValue(String key, Object defaultValue) {
-    def value = System.getProperty(key)
-    if (value == null) {
-        value = System.getenv(key)
-    }
-    if (value == null) {
-        value = defaultValue.toString()
-    }
-    return value
-}
-
-def mavenCredUserName = getValue("mavenCredUserName", getProperty("MAVEN_CRED_USERNAME"))
-def mavenCredPassword = getValue("mavenCredPassword", getProperty("MAVEN_CRED_PASSWORD"))
-
 repositories {
-    def mavenRepoUrl = getValue("mavenRepoUrl", MAVEN_REPO_URL)
-    println("mavenRepoUrl=" + mavenRepoUrl)
-    mavenLocal()
-    maven {
-        url "https://maven.pkg.github.com/ci-plugins/java-plugin-sdk"
-        credentials {
-            username = mavenCredUserName
-            password = mavenCredPassword
-        }
+    def mavenRepoUrl = System.getProperty("mavenRepoUrl")
+    if (mavenRepoUrl == null) {
+        mavenRepoUrl = System.getenv("mavenRepoUrl")
     }
+    if (mavenRepoUrl == null) {
+        mavenRepoUrl = MAVEN_REPO_URL
+    }
+    println("all project mavenRepoUrl=" + mavenRepoUrl)
+
+    mavenLocal()
+    mavenCentral()
+    jcenter()
     maven { url mavenRepoUrl }
 }
 
 dependencies {
-    compile "com.tencent.bk.devops.atom:java-plugin-sdk:1.0.3"
+    compile "com.tencent.devops.ci-plugins:java-plugin-sdk:1.0.4"
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     ktlint "com.github.shyiko:ktlint:0.34.2"
     compile group: 'com.squareup.okhttp3', name: 'okhttp'

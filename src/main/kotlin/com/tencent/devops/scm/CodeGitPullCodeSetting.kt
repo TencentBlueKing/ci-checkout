@@ -22,7 +22,11 @@ open class CodeGitPullCodeSetting(
                 when (credentialResult?.second) {
                     CredentialType.ACCESSTOKEN -> doOauthPullCode(credentialResult.first)
                     CredentialType.USERNAME_PASSWORD -> doHttpPullCode(credentialResult.first)
+                    CredentialType.TOKEN_USERNAME_PASSWORD -> doHttpPullCode(credentialResult.first.subList(1, 3))
                     CredentialType.SSH_PRIVATEKEY -> doPullCodeSSH(credentialResult.first)
+                    CredentialType.TOKEN_SSH_PRIVATEKEY -> doPullCodeSSH(
+                        credentialResult.first.subList(1, credentialResult.first.size)
+                    )
                     else -> doPullCode()
                 }
             }

@@ -10,7 +10,7 @@ object CommonShellUtils {
         script: String,
         dir: File? = null,
         runtimeVariables: Map<String, String> = mapOf(),
-        failExit: Boolean = false
+        failExit: Boolean = true
     ): String {
         println("[execute script]: ${SensitiveLineParser.onParseLine(script)}")
         return try {
