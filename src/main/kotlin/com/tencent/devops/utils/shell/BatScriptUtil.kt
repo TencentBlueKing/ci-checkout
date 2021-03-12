@@ -56,7 +56,6 @@ object BatScriptUtil {
             file.writeText(command.toString(), charset)
             return CommandLineUtils.execute("cmd.exe /C \"${file.canonicalPath}\"", dir, true)
         } catch (e: Throwable) {
-            logger.warn("Fail to execute bat script", e)
             throw e
         }
     }

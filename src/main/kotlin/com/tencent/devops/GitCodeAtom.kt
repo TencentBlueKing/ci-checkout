@@ -1,6 +1,7 @@
 package com.tencent.devops
 
 import com.tencent.bk.devops.atom.AtomContext
+import com.tencent.bk.devops.atom.common.Status
 import com.tencent.bk.devops.atom.pojo.StringData
 import com.tencent.bk.devops.atom.spi.AtomService
 import com.tencent.bk.devops.atom.spi.TaskAtom
@@ -15,24 +16,30 @@ import org.slf4j.LoggerFactory
 class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
 
     override fun execute(atomContext: AtomContext<GitCodeAtomParam>) {
-        showEnvVariable()
-        val param = atomContext.param
-        logger.info("context param: ${JsonUtil.toJson(param)}")
-        val env = getPullCodeSetting(param).pullCode()
-        env?.forEach { t, u -> atomContext.result.data[t] = StringData(u) }
+        try {
+            showEnvVariable()
+            val param = atomContext.param
+            logger.info("context param: ${JsonUtil.toJson(param)}")
+            val env = getPullCodeSetting(param).pullCode()
+            env?.forEach { t, u -> atomContext.result.data[t] = StringData(u) }
 
-        // 添加代码库信息支持codecc扫描
-        if (param.noScmVariable == true) {
-            return
+            // 添加代码库信息支持codecc扫描
+            if (param.noScmVariable == true) {
+                return
+            }
+
+            atomContext.result.data["bk_repo_taskId_${param.pipelineTaskId}"] = StringData(param.pipelineTaskId ?: "")
+            atomContext.result.data["bk_repo_type_${param.pipelineTaskId}"] = StringData("GIT")
+            atomContext.result.data["bk_repo_local_path_${param.pipelineTaskId}"] = StringData(param.localPath ?: "")
+            atomContext.result.data["bk_repo_code_url_${param.pipelineTaskId}"] = StringData(param.repositoryUrl)
+            atomContext.result.data["bk_repo_auth_type_${param.pipelineTaskId}"] = StringData(getAuthType(param))
+            atomContext.result.data["bk_repo_container_id_${param.pipelineTaskId}"] = StringData(
+                atomContext.allParameters["pipeline.job.id"]?.toString() ?: ""
+            )
+        } catch (e: Exception) {
+            atomContext.result.message = e.message
+            atomContext.result.status = Status.failure
         }
-
-        atomContext.result.data["bk_repo_taskId_${param.pipelineTaskId}"] = StringData(param.pipelineTaskId ?: "")
-        atomContext.result.data["bk_repo_type_${param.pipelineTaskId}"] = StringData("GIT")
-        atomContext.result.data["bk_repo_local_path_${param.pipelineTaskId}"] = StringData(param.localPath ?: "")
-        atomContext.result.data["bk_repo_code_url_${param.pipelineTaskId}"] = StringData(param.repositoryUrl)
-        atomContext.result.data["bk_repo_auth_type_${param.pipelineTaskId}"] = StringData(getAuthType(param))
-        atomContext.result.data["bk_repo_container_id_${param.pipelineTaskId}"] = StringData(atomContext.allParameters["pipeline.job.id"]?.toString()
-                ?: "")
     }
 
     private fun getAuthType(param: GitCodeAtomParam): String {
@@ -43,7 +50,6 @@ class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
     }
 
     private fun showEnvVariable() {
-        CommonShellUtils.execute("set")
         CommonShellUtils.execute("whoami")
         CommonShellUtils.execute(script = "git version", failExit = true)
     }

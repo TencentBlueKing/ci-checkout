@@ -63,7 +63,6 @@ object ShellUtil {
         try {
             return CommandLineUtils.execute(command, sourceDir, true)
         } catch (e: Throwable) {
-            logger.info("Fail to run the command: $command")
             throw e
         }
     }

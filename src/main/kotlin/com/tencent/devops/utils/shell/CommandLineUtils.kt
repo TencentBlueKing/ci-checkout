@@ -1,12 +1,14 @@
 package com.tencent.devops.utils.shell
 
 import com.tencent.devops.enums.utils.OSType
+import com.tencent.devops.exception.GitExecuteException
 import com.tencent.devops.pojo.utils.AgentEnv
-import java.io.File
 import org.apache.commons.exec.CommandLine
+import org.apache.commons.exec.ExecuteException
 import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
 import org.slf4j.LoggerFactory
+import java.io.File
 
 object CommandLineUtils {
 
@@ -21,6 +23,7 @@ object CommandLineUtils {
     fun execute(command: String, workspace: File?, print2Logger: Boolean, prefix: String = "", printException: Boolean = false): String {
 
         val result = StringBuffer()
+        val errorResult = StringBuilder()
 
         val cmdLine = CommandLine.parse(command)
         val executor = CommandLineExecutor()
@@ -38,6 +41,7 @@ object CommandLineUtils {
                     println(tmpLine)
                 }
                 result.append(tmpLine).append("\n")
+                errorResult.append(tmpLine).append("|")
             }
         }
 
@@ -52,6 +56,7 @@ object CommandLineUtils {
                     System.err.println(tmpLine)
                 }
                 result.append(tmpLine).append("\n")
+                errorResult.append(tmpLine).append("|")
             }
         }
         executor.streamHandler = PumpStreamHandler(outputStream, errorStream)
@@ -60,9 +65,19 @@ object CommandLineUtils {
             if (exitCode != 0) {
                 throw RuntimeException("$prefix Script command execution failed with exit code($exitCode)")
             }
+        } catch (t: ExecuteException) {
+            if (printException) logger.warn("Fail to execute the command($command)", t)
+            if (errorResult.isNotEmpty()) {
+                val errorMessage = if (errorResult.length >= 256) {
+                    errorResult.substring(0, 256)
+                } else {
+                    errorResult.toString()
+                }
+                throw GitExecuteException(errorMessage)
+            }
+            throw t
         } catch (t: Throwable) {
             if (printException) logger.warn("Fail to execute the command($command)", t)
-            if (print2Logger) logger.error("$prefix Fail to execute the command($command): ${t.message}")
             throw t
         }
         return result.toString()
