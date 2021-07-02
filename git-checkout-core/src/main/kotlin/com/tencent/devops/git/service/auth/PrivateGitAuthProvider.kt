@@ -25,14 +25,24 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.devops.git.enums
+package com.tencent.devops.git.service.auth
 
-enum class AuthType {
-    TICKET,
-    ACCESS_TOKEN,
-    USERNAME_PASSWORD,
-    START_USER_TOKEN,
-    // 工蜂专有授权类型
-    PERSONAL_ACCESS_TOKEN,
-    EMPTY
+import com.tencent.devops.git.exception.ParamInvalidException
+import com.tencent.devops.git.pojo.AuthInfo
+
+/**
+ * 工蜂personal_access_token方式授权
+ */
+class PrivateGitAuthProvider(
+    private val token: String?
+) : IGitAuthProvider {
+    override fun getAuthInfo(): AuthInfo {
+        if (token.isNullOrBlank()) {
+            throw ParamInvalidException(errorMsg = "accessToken不能为空")
+        }
+        return AuthInfo(
+            username = "private",
+            password = token
+        )
+    }
 }

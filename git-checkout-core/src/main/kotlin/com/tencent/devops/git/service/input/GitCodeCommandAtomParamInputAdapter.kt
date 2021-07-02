@@ -39,6 +39,7 @@ import com.tencent.devops.git.pojo.input.GitCodeCommandAtomParamInput
 import com.tencent.devops.git.service.auth.CredentialGitAuthProvider
 import com.tencent.devops.git.service.auth.EmptyGitAuthProvider
 import com.tencent.devops.git.service.auth.OauthGitAuthProvider
+import com.tencent.devops.git.service.auth.PrivateGitAuthProvider
 import com.tencent.devops.git.service.auth.UserNameGitAuthProvider
 import com.tencent.devops.git.service.auth.UserTokenGitAuthProvider
 import com.tencent.devops.git.service.helper.IInputAdapter
@@ -74,6 +75,7 @@ class GitCodeCommandAtomParamInputAdapter(
                     userId = pipelineStartUserName,
                     devopsApi = devopsApi
                 )
+                AuthType.PERSONAL_ACCESS_TOKEN -> PrivateGitAuthProvider(token = accessToken)
                 else -> EmptyGitAuthProvider()
             }
             val authInfo = authProvider.getAuthInfo()
