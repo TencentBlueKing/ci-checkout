@@ -33,6 +33,7 @@ import com.tencent.devops.git.enums.PullStrategy
 import com.tencent.devops.git.pojo.GitSourceSettings
 import com.tencent.devops.git.service.GitCommandManager
 import com.tencent.devops.git.util.AgentEnv.getOS
+import com.tencent.devops.git.util.GitUtil
 import java.io.File
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
@@ -68,7 +69,7 @@ class GitDirectoryHelper(
         when {
             !File(repositoryPath, ".git").exists() ->
                 remove = false
-            !com.tencent.devops.git.util.GitUtil.isSameRepository(
+            !GitUtil.isSameRepository(
                 repositoryUrl = repositoryUrl,
                 otherRepositoryUrl = git.tryGetFetchUrl(),
                 hostNameList = compatibleHostList

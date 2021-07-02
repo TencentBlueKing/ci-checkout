@@ -36,7 +36,9 @@ import com.tencent.devops.git.enums.PullType
 import com.tencent.devops.git.exception.ApiException
 import com.tencent.devops.git.exception.ParamInvalidException
 import com.tencent.devops.git.pojo.GitSourceSettings
+import com.tencent.devops.git.pojo.api.RepositoryType
 import com.tencent.devops.git.pojo.input.GitCodeAtomParamInput
+import com.tencent.devops.git.service.auth.RepositoryGitAuthProvider
 import com.tencent.devops.git.service.helper.IInputAdapter
 import com.tencent.devops.git.util.EnvHelper
 import com.tencent.devops.git.util.GitUtil
@@ -57,11 +59,11 @@ class GitCodeAtomParamInputAdapter(
     override fun getInputs(): GitSourceSettings {
         with(input) {
             // 1. 获取仓库信息
-            val repositoryType = com.tencent.devops.git.pojo.api.RepositoryType.valueOf(repositoryType)
+            val repositoryType = RepositoryType.valueOf(repositoryType)
             val repositoryId = when (repositoryType) {
-                com.tencent.devops.git.pojo.api.RepositoryType.ID -> repositoryHashId
+                RepositoryType.ID -> repositoryHashId
                     ?: throw ParamInvalidException(errorMsg = "代码库ID不能为空")
-                com.tencent.devops.git.pojo.api.RepositoryType.NAME -> repositoryName
+                RepositoryType.NAME -> repositoryName
                 ?: throw ParamInvalidException(errorMsg = "代码库名称不能为空")
                 else ->
                     throw ParamInvalidException(errorMsg = "代码库类型错误")
@@ -112,7 +114,7 @@ class GitCodeAtomParamInputAdapter(
                 GitUtil.isSameRepository(
                     repositoryUrl = repository.url,
                     otherRepositoryUrl = hookTargetUrl,
-                    hostNameList = hostNameList
+                    hostNameList = compatibleHostList
                 ) &&
                 (hookEventType == CodeEventType.PULL_REQUEST.name || hookEventType == CodeEventType.MERGE_REQUEST.name)
             if (preMerge) {
@@ -121,7 +123,7 @@ class GitCodeAtomParamInputAdapter(
             }
 
             // 4. 得到授权信息
-            val authInfo = com.tencent.devops.git.service.auth.RepositoryGitAuthProvider(
+            val authInfo = RepositoryGitAuthProvider(
                 repository = repository,
                 devopsApi = devopsApi
             ).getAuthInfo()
@@ -130,11 +132,6 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
 
-            val usernameConfig = if (authInfo.username == null || authInfo.username == "oauth2") {
-                repository.userName
-            } else {
-                authInfo.username
-            }
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,
                 pipelineId = pipelineId,
@@ -170,8 +167,8 @@ class GitCodeAtomParamInputAdapter(
                 sourceRepositoryUrl = hookSourceUrl ?: "",
                 sourceBranchName = hookSourceBranch ?: "",
                 autoCrlf = autoCrlf,
-                usernameConfig = usernameConfig,
-                compatibleHostList = hostNameList,
+                usernameConfig = pipelineStartUserName,
+                compatibleHostList = compatibleHostList,
                 enableTrace = enableTrace
             )
         }

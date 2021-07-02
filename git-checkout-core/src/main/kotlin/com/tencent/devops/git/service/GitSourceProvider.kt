@@ -39,6 +39,8 @@ import com.tencent.devops.git.service.handler.GitSubmodulesHandler
 import com.tencent.devops.git.service.handler.HandlerExecutionChain
 import com.tencent.devops.git.service.handler.InitRepoHandler
 import com.tencent.devops.git.service.handler.PrepareWorkspaceHandler
+import com.tencent.devops.git.util.EnvHelper
+import com.tencent.devops.git.util.GitUtil
 import java.io.File
 import org.slf4j.LoggerFactory
 
@@ -54,9 +56,9 @@ class GitSourceProvider(
     fun getSource() {
         with(settings) {
             logger.info("Syncing repository: ${settings.repositoryUrl}")
-            com.tencent.devops.git.util.EnvHelper.addEnvVariable(BK_CI_GIT_REPO_URL, settings.repositoryUrl)
-            val repositoryName = com.tencent.devops.git.util.GitUtil.getServerInfo(settings.repositoryUrl).repositoryName
-            com.tencent.devops.git.util.EnvHelper.addEnvVariable(BK_CI_GIT_REPO_NAME, repositoryName)
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_URL, settings.repositoryUrl)
+            val repositoryName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_NAME, repositoryName)
             if (preMerge) {
                 if (sourceRepositoryUrl.isBlank() || sourceBranchName.isBlank()) {
                     preMerge = false

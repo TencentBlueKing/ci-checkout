@@ -60,7 +60,7 @@ class GitCheckoutRunner {
             } else {
                 sourceProvider.getSource()
                 EnvHelper.getEnvVariables().forEach { (k, v) ->
-                    atomContext.result.data[k] = StringData(StringUtils.trimVaribale(v))
+                    atomContext.result.data[k] = StringData(StringUtils.trimVariable(v))
                 }
             }
         } catch (e: TaskExecuteException) {
@@ -77,7 +77,7 @@ class GitCheckoutRunner {
         } finally {
             // 权限的环境变量都需要保存,在postAction阶段需要清理
             EnvHelper.getAuthEnv().forEach { (k, v) ->
-                atomContext.result.data[k] = StringData(StringUtils.trimVaribale(v))
+                atomContext.result.data[k] = StringData(StringUtils.trimVariable(v))
             }
             monitorData.endTime = System.currentTimeMillis()
             atomContext.result.monitorData = monitorData

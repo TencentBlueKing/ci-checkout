@@ -36,8 +36,11 @@ import com.tencent.devops.git.enums.PullType
 import com.tencent.devops.git.exception.ParamInvalidException
 import com.tencent.devops.git.pojo.GitSourceSettings
 import com.tencent.devops.git.pojo.input.GitCodeCommandAtomParamInput
+import com.tencent.devops.git.service.auth.CredentialGitAuthProvider
+import com.tencent.devops.git.service.auth.EmptyGitAuthProvider
 import com.tencent.devops.git.service.auth.OauthGitAuthProvider
 import com.tencent.devops.git.service.auth.UserNameGitAuthProvider
+import com.tencent.devops.git.service.auth.UserTokenGitAuthProvider
 import com.tencent.devops.git.service.helper.IInputAdapter
 import com.tencent.devops.git.util.EnvHelper
 import java.io.File
@@ -63,15 +66,15 @@ class GitCodeCommandAtomParamInputAdapter(
             val authProvider = when (authType) {
                 AuthType.ACCESS_TOKEN -> OauthGitAuthProvider(token = accessToken)
                 AuthType.USERNAME_PASSWORD -> UserNameGitAuthProvider(username = username, password = password)
-                AuthType.TICKET -> com.tencent.devops.git.service.auth.CredentialGitAuthProvider(
+                AuthType.TICKET -> CredentialGitAuthProvider(
                     credentialId = ticketId,
                     devopsApi = devopsApi
                 )
-                AuthType.START_USER_TOKEN -> com.tencent.devops.git.service.auth.UserTokenGitAuthProvider(
+                AuthType.START_USER_TOKEN -> UserTokenGitAuthProvider(
                     userId = pipelineStartUserName,
                     devopsApi = devopsApi
                 )
-                else -> com.tencent.devops.git.service.auth.EmptyGitAuthProvider()
+                else -> EmptyGitAuthProvider()
             }
             val authInfo = authProvider.getAuthInfo()
 

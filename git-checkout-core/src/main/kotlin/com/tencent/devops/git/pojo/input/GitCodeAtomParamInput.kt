@@ -38,6 +38,7 @@ data class GitCodeAtomParamInput(
     val pipelineId: String = "",
     val pipelineTaskId: String = "",
     val pipelineBuildId: String = "",
+    val pipelineStartUserName: String = "",
     val postEntryParam: String? = "false",
 
     var repositoryType: String = RepositoryType.ID.name,
@@ -74,6 +75,6 @@ data class GitCodeAtomParamInput(
     // 重试时检出的commitId
     var retryStartPoint: String? = "",
     var persistCredentials: Boolean,
-    var hostNameList: List<String>? = null,
+    var compatibleHostList: List<String>? = null,
     var enableTrace: Boolean? = false
 )

@@ -33,7 +33,7 @@ object StringUtils {
 
     private const val MAX_VAR_LENGTH = 4000
 
-    fun trimVaribale(variable: String): String {
+    fun trimVariable(variable: String): String {
         return variable.substring(0, min(variable.length, MAX_VAR_LENGTH))
     }
 }

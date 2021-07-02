@@ -34,6 +34,7 @@ import com.tencent.devops.git.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.devops.git.enums.PullType
 import com.tencent.devops.git.pojo.CheckoutInfo
 import com.tencent.devops.git.pojo.GitSourceSettings
+import com.tencent.devops.git.util.GitUtil
 
 class RefHelper(
     private val settings: GitSourceSettings
@@ -112,14 +113,14 @@ class RefHelper(
 
     fun getMergeInfo(): String {
         with(settings) {
-            return if (com.tencent.devops.git.util.GitUtil.isSameRepository(
+            return if (GitUtil.isSameRepository(
                     repositoryUrl = repositoryUrl,
                     otherRepositoryUrl = sourceRepositoryUrl,
                     hostNameList = compatibleHostList
                 )
             ) {
                 // if code_git enable pre_push, executing `git merge FETCH_HEAD`
-                if (com.tencent.devops.git.util.GitUtil.isPrePushBranch(sourceBranchName)) {
+                if (GitUtil.isPrePushBranch(sourceBranchName)) {
                     FETCH_HEAD
                 } else {
                     "$ORIGIN_REMOTE_NAME/$sourceBranchName"
@@ -130,7 +131,7 @@ class RefHelper(
         }
     }
 
-    private fun GitSourceSettings.isAddSourceRef() = preMerge && com.tencent.devops.git.util.GitUtil.isSameRepository(
+    private fun GitSourceSettings.isAddSourceRef() = preMerge && GitUtil.isSameRepository(
         repositoryUrl = repositoryUrl,
         otherRepositoryUrl = sourceRepositoryUrl,
         hostNameList = compatibleHostList

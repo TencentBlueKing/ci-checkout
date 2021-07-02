@@ -89,6 +89,6 @@ data class CheckoutAtomParamInput(
     // 重试时检出的commitId
     var retryStartPoint: String? = "",
     var persistCredentials: Boolean,
-    var hostNameList: List<String>? = null,
+    var compatibleHostList: List<String>? = null,
     var enableTrace: Boolean? = false
 )

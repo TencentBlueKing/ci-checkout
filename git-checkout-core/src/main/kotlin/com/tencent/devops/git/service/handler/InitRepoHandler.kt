@@ -30,6 +30,7 @@ package com.tencent.devops.git.service.handler
 import com.tencent.devops.git.constant.GitConstants
 import com.tencent.devops.git.pojo.GitSourceSettings
 import com.tencent.devops.git.service.GitCommandManager
+import com.tencent.devops.git.util.GitUtil
 import java.io.File
 import org.slf4j.LoggerFactory
 
@@ -66,7 +67,7 @@ class InitRepoHandler(
             git.init()
             git.remoteAdd(GitConstants.ORIGIN_REMOTE_NAME, repositoryUrl)
             // if source repository is fork repo, adding devops-virtual-origin
-            if (preMerge && !com.tencent.devops.git.util.GitUtil.isSameRepository(
+            if (preMerge && !GitUtil.isSameRepository(
                     repositoryUrl = repositoryUrl,
                     otherRepositoryUrl = sourceRepositoryUrl,
                     hostNameList = compatibleHostList
@@ -76,7 +77,7 @@ class InitRepoHandler(
             }
         } else {
             git.remoteSetUrl(GitConstants.ORIGIN_REMOTE_NAME, repositoryUrl)
-            if (preMerge && !com.tencent.devops.git.util.GitUtil.isSameRepository(
+            if (preMerge && !GitUtil.isSameRepository(
                     repositoryUrl = repositoryUrl,
                     otherRepositoryUrl = sourceRepositoryUrl,
                     hostNameList = compatibleHostList

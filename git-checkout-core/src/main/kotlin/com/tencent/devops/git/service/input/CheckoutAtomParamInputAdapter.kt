@@ -30,6 +30,8 @@ package com.tencent.devops.git.service.input
 import com.tencent.devops.git.pojo.GitSourceSettings
 import com.tencent.devops.git.pojo.api.RepositoryType
 import com.tencent.devops.git.pojo.input.CheckoutAtomParamInput
+import com.tencent.devops.git.pojo.input.GitCodeAtomParamInput
+import com.tencent.devops.git.pojo.input.GitCodeCommandAtomParamInput
 import com.tencent.devops.git.service.helper.IInputAdapter
 
 class CheckoutAtomParamInputAdapter(
@@ -48,11 +50,12 @@ class CheckoutAtomParamInputAdapter(
     }
 
     private fun CheckoutAtomParamInput.byRepositoryIdOrName() = GitCodeAtomParamInputAdapter(
-        com.tencent.devops.git.pojo.input.GitCodeAtomParamInput(
+        GitCodeAtomParamInput(
             bkWorkspace = bkWorkspace,
             pipelineId = pipelineId,
             pipelineTaskId = pipelineTaskId,
             pipelineBuildId = pipelineBuildId,
+            pipelineStartUserName = pipelineStartUserName,
             postEntryParam = postEntryParam,
 
             repositoryType = repositoryType,
@@ -86,13 +89,13 @@ class CheckoutAtomParamInputAdapter(
             hookTargetUrl = hookTargetUrl,
             retryStartPoint = retryStartPoint,
             persistCredentials = persistCredentials,
-            hostNameList = hostNameList,
+            compatibleHostList = compatibleHostList,
             enableTrace = enableTrace
         )
     ).getInputs()
 
     private fun CheckoutAtomParamInput.byRepositoryUrl() = GitCodeCommandAtomParamInputAdapter(
-        com.tencent.devops.git.pojo.input.GitCodeCommandAtomParamInput(
+        GitCodeCommandAtomParamInput(
             bkWorkspace = bkWorkspace,
             pipelineId = pipelineId,
             pipelineTaskId = pipelineTaskId,
@@ -132,7 +135,7 @@ class CheckoutAtomParamInputAdapter(
             hookTargetUrl = hookTargetUrl,
             retryStartPoint = retryStartPoint,
             persistCredentials = persistCredentials,
-            hostNameList = hostNameList,
+            hostNameList = compatibleHostList,
             enableTrace = enableTrace
         )
     ).getInputs()
