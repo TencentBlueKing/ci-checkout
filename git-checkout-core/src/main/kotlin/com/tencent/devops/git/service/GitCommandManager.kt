@@ -310,13 +310,15 @@ class GitCommandManager(
         doFetch(args = args)
     }
 
-    fun lfsFetch(refSpec: List<String>, remoteName: String) {
-        val args = mutableListOf("lfs", "fetch", remoteName)
-        args.addAll(refSpec)
-        doFetch(args = args)
+    fun lfsFetch() {
+        doFetch(args = listOf("lfs", "fetch"))
     }
 
-    private fun doFetch(args: MutableList<String>) {
+    fun lfsCheckout() {
+        execGit(args = listOf("lfs", "checkout"))
+    }
+
+    private fun doFetch(args: List<String>) {
         // add runtime env to git env
         gitEnv.putAll(EnvHelper.getAuthEnv())
         RetryHelper().execute {

@@ -34,11 +34,12 @@ import java.io.File
 import org.junit.After
 import org.junit.Ignore
 import org.junit.Test
+import java.nio.file.Files
 
 @Ignore
 class GitSourceProviderTest {
 
-    private var workspace: File = File("/tmp/git-checkout")
+    private var workspace: File = Files.createTempDirectory("git-checkout").toFile()
 
     @Test
     fun getSource() {

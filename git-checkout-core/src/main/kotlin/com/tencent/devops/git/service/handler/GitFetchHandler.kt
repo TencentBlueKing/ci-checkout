@@ -67,13 +67,6 @@ class GitFetchHandler(
                 remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME,
                 preMerge = preMerge
             )
-
-            if (lfs) {
-                git.lfsFetch(
-                    refSpec = refHelper.getSourceLfsRefSpec(),
-                    remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
-                )
-            }
         }
     }
 
@@ -89,12 +82,5 @@ class GitFetchHandler(
             remoteName = GitConstants.ORIGIN_REMOTE_NAME,
             preMerge = preMerge
         )
-
-        if (lfs) {
-            git.lfsFetch(
-                refSpec = refHelper.getLfsRefSpec(),
-                remoteName = GitConstants.ORIGIN_REMOTE_NAME
-            )
-        }
     }
 }

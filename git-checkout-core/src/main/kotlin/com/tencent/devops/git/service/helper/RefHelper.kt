@@ -68,26 +68,6 @@ class RefHelper(
                 "refs/remotes/$DEVOPS_VIRTUAL_REMOTE_NAME/${settings.sourceBranchName}")
     }
 
-    fun getLfsRefSpec(): List<String> {
-        with(settings) {
-            return when (pullType) {
-                PullType.BRANCH -> {
-                    val refSpec = mutableListOf("refs/remotes/$ORIGIN_REMOTE_NAME/$ref")
-                    if (isAddSourceRef()) {
-                        refSpec.add("refs/remotes/$ORIGIN_REMOTE_NAME/$sourceBranchName")
-                    }
-                    refSpec
-                }
-                PullType.TAG, PullType.COMMIT_ID ->
-                    listOf(ref)
-            }
-        }
-    }
-
-    fun getSourceLfsRefSpec(): List<String> {
-        return listOf("refs/remotes/$DEVOPS_VIRTUAL_REMOTE_NAME/${settings.sourceBranchName}")
-    }
-
     fun getCheckInfo(): CheckoutInfo {
         with(settings) {
             return when (pullType) {

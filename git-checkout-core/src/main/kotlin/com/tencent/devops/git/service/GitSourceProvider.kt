@@ -34,6 +34,7 @@ import com.tencent.devops.git.pojo.GitSourceSettings
 import com.tencent.devops.git.service.handler.GitAuthHandler
 import com.tencent.devops.git.service.handler.GitCheckoutAndMergeHandler
 import com.tencent.devops.git.service.handler.GitFetchHandler
+import com.tencent.devops.git.service.handler.GitLfsHandler
 import com.tencent.devops.git.service.handler.GitLogHandler
 import com.tencent.devops.git.service.handler.GitSubmodulesHandler
 import com.tencent.devops.git.service.handler.HandlerExecutionChain
@@ -77,6 +78,7 @@ class GitSourceProvider(
                     GitFetchHandler(settings, git),
                     GitCheckoutAndMergeHandler(settings, git),
                     GitSubmodulesHandler(settings, git),
+                    GitLfsHandler(settings, git),
                     GitLogHandler(settings, git, devopsApi)
                 )
             )
