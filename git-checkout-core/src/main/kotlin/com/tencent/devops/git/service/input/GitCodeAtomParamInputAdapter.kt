@@ -171,7 +171,6 @@ class GitCodeAtomParamInputAdapter(
                 sourceBranchName = hookSourceBranch ?: "",
                 autoCrlf = autoCrlf,
                 usernameConfig = usernameConfig,
-                userEmailConfig = "$usernameConfig@tencent.com",
                 compatibleHostList = hostNameList,
                 enableTrace = enableTrace
             )

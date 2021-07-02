@@ -133,7 +133,6 @@ class GitCodeCommandAtomParamInputAdapter(
                 sourceBranchName = hookSourceBranch ?: "",
                 autoCrlf = autoCrlf,
                 usernameConfig = pipelineStartUserName,
-                userEmailConfig = "$pipelineStartUserName@tencent.com",
                 compatibleHostList = hostNameList,
                 enableTrace = enableTrace
             )
