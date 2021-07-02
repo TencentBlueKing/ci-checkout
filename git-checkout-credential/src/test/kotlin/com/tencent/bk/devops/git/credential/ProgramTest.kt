@@ -40,7 +40,7 @@ class ProgramTest {
 
     @Test
     fun innerMain() {
-        GitHelper.configAdd(
+        GitHelper.config(
             configKey = Constants.GIT_CREDENTIAL_COMPATIBLEHOST,
             configValue = "git.example.com,git.example2.com",
             configScope = ConfigScope.GLOBAL

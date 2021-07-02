@@ -30,43 +30,40 @@ package com.tencent.devops.git.service
 import com.tencent.devops.git.api.MockDevopsApi
 import com.tencent.devops.git.enums.ScmType
 import com.tencent.devops.git.pojo.GitSourceSettings
-import java.io.File
 import org.junit.After
-import org.junit.Ignore
 import org.junit.Test
+import java.io.File
 import java.nio.file.Files
 
-@Ignore
 class GitSourceProviderTest {
 
     private var workspace: File = Files.createTempDirectory("git-checkout").toFile()
+    private val settings = GitSourceSettings(
+        bkWorkspace = workspace.absolutePath,
+        pipelineId = "001",
+        pipelineBuildId = "122",
+        pipelineTaskId = "1243",
+        scmType = ScmType.CODE_GIT,
+        repositoryUrl = "https://github.com/ci-plugins/git.git",
+        repositoryPath = workspace.absolutePath,
+        ref = "master",
+        clean = true,
+        fetchDepth = 1,
+        lfs = true,
+        preMerge = false,
+        submodules = true,
+        persistCredentials = true
+    )
+    private val devopsApi = MockDevopsApi()
 
     @Test
     fun getSource() {
-        val settings = GitSourceSettings(
-            bkWorkspace = workspace.absolutePath,
-            pipelineId = "001",
-            pipelineBuildId = "122",
-            pipelineTaskId = "1243",
-            scmType = ScmType.CODE_GIT,
-            repositoryUrl = "https://github.com/ci-plugins/git.git",
-            repositoryPath = workspace.absolutePath,
-            username = "mingshewhe",
-            password = "ere",
-            ref = "master",
-            clean = true,
-            fetchDepth = 1,
-            lfs = false,
-            preMerge = false,
-            submodules = true,
-            persistCredentials = true
-        )
-        val devopsApi = MockDevopsApi()
         GitSourceProvider(settings = settings, devopsApi = devopsApi).getSource()
     }
 
     @After
     fun after() {
+        GitSourceProvider(settings = settings, devopsApi = devopsApi).cleanUp()
         if (workspace.exists()) {
             workspace.deleteRecursively()
         }

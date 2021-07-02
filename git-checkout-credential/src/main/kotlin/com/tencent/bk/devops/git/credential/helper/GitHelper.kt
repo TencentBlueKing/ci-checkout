@@ -56,12 +56,12 @@ object GitHelper {
         return output.stdOut
     }
 
-    fun configAdd(
+    fun config(
         configKey: String,
         configValue: String,
         configScope: ConfigScope = ConfigScope.LOCAL
     ) {
-        execGit(listOf("config", configScope.option, "--add", configKey, configValue))
+        execGit(listOf("config", configScope.option, configKey, configValue))
     }
 
     fun configFileAdd(
@@ -133,7 +133,6 @@ object GitHelper {
             }
         }
 
-        executor.workingDirectory = File(System.getenv("bkWorkspace"))
         executor.streamHandler = PumpStreamHandler(outputStream, errorStream, inputStream)
 
         if (allowAllExitCodes) {

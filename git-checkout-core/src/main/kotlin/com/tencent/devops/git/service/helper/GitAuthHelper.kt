@@ -29,7 +29,6 @@ package com.tencent.devops.git.service.helper
 
 import com.tencent.devops.git.constant.GitConstants
 import com.tencent.devops.git.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
-import com.tencent.devops.git.constant.GitConstants.GIT_CREDENTIAL_USEHTTPPATH
 import com.tencent.devops.git.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.devops.git.enums.GitConfigScope
 import com.tencent.devops.git.exception.ParamInvalidException
@@ -40,12 +39,12 @@ import com.tencent.devops.git.util.CommandUtil
 import com.tencent.devops.git.util.EnvHelper
 import com.tencent.devops.git.util.GitUtil
 import com.tencent.devops.git.util.SSHAgentUtils
-import java.io.File
-import java.net.URL
-import java.nio.file.Paths
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.net.URL
+import java.nio.file.Paths
 
 @Suppress("ALL")
 class GitAuthHelper(
@@ -63,8 +62,8 @@ class GitAuthHelper(
     private val xdgConfigHome = Paths.get(
         System.getProperty("user.home"),
         "git-checkout-credential",
-        System.getenv(GitConstants.BK_CI_BUILD_ID),
-        System.getenv(GitConstants.VM_SEQ_ID),
+        System.getenv(GitConstants.BK_CI_BUILD_ID) ?: "",
+        System.getenv(GitConstants.VM_SEQ_ID) ?: "",
         ".config"
     ).normalize().toString()
     private val xdfConfigPath = Paths.get(xdgConfigHome, "git", "config").normalize().toString()
@@ -75,10 +74,14 @@ class GitAuthHelper(
         if (!xdgConfigParentFile.exists()) {
             xdgConfigParentFile.mkdirs()
         }
+        EnvHelper.addEnvVariable(XDG_CONFIG_HOME, xdgConfigHome)
+        git.setEnvironmentVariable(XDG_CONFIG_HOME, xdgConfigHome)
     }
 
     private fun configureHttp() {
-        if (!serverInfo.httpProtocol || settings.username.isNullOrBlank() || settings.password.isNullOrBlank()) {
+        if (!serverInfo.httpProtocol ||
+            settings.username.isNullOrBlank() ||
+            settings.password.isNullOrBlank()) {
             return
         }
         if (!settings.compatibleHostList.isNullOrEmpty()) {
@@ -88,10 +91,6 @@ class GitAuthHelper(
                 configScope = GitConfigScope.GLOBAL
             )
         }
-        git.config(
-            configKey = GIT_CREDENTIAL_USEHTTPPATH,
-            configValue = "true"
-        )
 
         store()
         insteadOf()
@@ -104,7 +103,6 @@ class GitAuthHelper(
         }
         val credentialJarFile = File(credentialJarParentFile, "git-checkout-credential.jar")
         copyCredentialJarFile(credentialJarParentFile = credentialJarParentFile, credentialJarFile = credentialJarFile)
-        EnvHelper.addEnvVariable(XDG_CONFIG_HOME, xdgConfigHome)
         with(URL(settings.repositoryUrl).toURI()) {
             CommandUtil.execute(
                 executable = getJavaFilePath(),
@@ -116,8 +114,7 @@ class GitAuthHelper(
                     "devopsStore"
                 ),
                 runtimeEnv = mapOf(
-                    XDG_CONFIG_HOME to xdgConfigHome,
-                    "bkWorkspace" to settings.bkWorkspace
+                    XDG_CONFIG_HOME to xdgConfigHome
                 ),
                 inputStream = CredentialArguments(
                     protocol = scheme,
@@ -236,8 +233,7 @@ class GitAuthHelper(
                     "devopsErase"
                 ),
                 runtimeEnv = mapOf(
-                    "XDG_CONFIG_HOME" to xdgConfigHome,
-                    "bkWorkspace" to settings.bkWorkspace
+                    XDG_CONFIG_HOME to xdgConfigHome
                 ),
                 inputStream = CredentialArguments(
                     protocol = scheme,
@@ -248,7 +244,7 @@ class GitAuthHelper(
         }
         // 删除配置文件
         if (File(xdgConfigHome).exists()) {
-            File(xdgConfigHome).mkdirs()
+            File(xdgConfigHome).deleteRecursively()
         }
     }
 }

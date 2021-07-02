@@ -53,7 +53,6 @@ object GitConstants {
     const val GIT_CREDENTIAL_HELPER = "credential.helper"
     const val GIT_TRACE = "GIT_TRACE"
     const val GIT_CREDENTIAL_COMPATIBLEHOST = "credential.compatibleHost"
-    const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
 
     // auth env
     const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
