@@ -97,6 +97,7 @@ object CommandUtil {
         try {
             // 系统环境变量 + 运行时环境变量
             val env = EnvironmentUtils.getProcEnvironment()
+            println("env:$env")
             env.putAll(runtimeEnv)
             val exitCode = executor.execute(command, env)
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
