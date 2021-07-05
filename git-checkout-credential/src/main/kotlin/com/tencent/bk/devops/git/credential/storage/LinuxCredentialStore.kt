@@ -31,12 +31,16 @@ import java.util.concurrent.TimeUnit
 
 class LinuxCredentialStore : ICredentialStore {
 
+    companion object {
+        private const val MAX_JOB_RUN_DAYS = 7L // Job运行最大天数
+    }
+
     override fun getCredentialHelper(): String {
         return "cache"
     }
 
     override fun getCredentialOptions(): List<String> {
         // job最大运行时间是7天,这里缓存也保留7天
-        return listOf("--timeout", "${TimeUnit.DAYS.toMinutes(7).toInt()}")
+        return listOf("--timeout", "${TimeUnit.DAYS.toMinutes(MAX_JOB_RUN_DAYS).toInt()}")
     }
 }
