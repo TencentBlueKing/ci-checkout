@@ -64,7 +64,7 @@ class GitCommandManager(
     )
 
     init {
-        if (!lfs) {
+        if (lfs) {
             gitEnv[GIT_LFS_SKIP_SMUDGE] = "1"
         }
     }
