@@ -29,6 +29,7 @@ package com.tencent.devops.git.service.helper
 
 import com.tencent.devops.git.constant.GitConstants
 import com.tencent.devops.git.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
+import com.tencent.devops.git.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.devops.git.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.devops.git.enums.GitConfigScope
 import com.tencent.devops.git.exception.ParamInvalidException
@@ -114,7 +115,8 @@ class GitAuthHelper(
                     "devopsStore"
                 ),
                 runtimeEnv = mapOf(
-                    XDG_CONFIG_HOME to xdgConfigHome
+                    XDG_CONFIG_HOME to xdgConfigHome,
+                    GIT_REPO_PATH to settings.repositoryPath
                 ),
                 inputStream = CredentialArguments(
                     protocol = scheme,
@@ -233,7 +235,8 @@ class GitAuthHelper(
                     "devopsErase"
                 ),
                 runtimeEnv = mapOf(
-                    XDG_CONFIG_HOME to xdgConfigHome
+                    XDG_CONFIG_HOME to xdgConfigHome,
+                    GIT_REPO_PATH to settings.repositoryPath
                 ),
                 inputStream = CredentialArguments(
                     protocol = scheme,

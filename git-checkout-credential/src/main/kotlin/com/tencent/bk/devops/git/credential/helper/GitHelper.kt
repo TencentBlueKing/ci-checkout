@@ -28,11 +28,13 @@
 package com.tencent.bk.devops.git.credential.helper
 
 import com.tencent.bk.devops.git.credential.ConfigScope
+import com.tencent.bk.devops.git.credential.Constants.GIT_REPO_PATH
 import java.io.InputStream
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.DefaultExecutor
 import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
+import java.io.File
 
 object GitHelper {
 
@@ -132,6 +134,7 @@ object GitHelper {
             }
         }
 
+        executor.workingDirectory = File(System.getenv(GIT_REPO_PATH) ?: ".")
         executor.streamHandler = PumpStreamHandler(outputStream, errorStream, inputStream)
 
         if (allowAllExitCodes) {

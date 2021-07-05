@@ -35,4 +35,5 @@ object Constants {
     const val GIT_CREDENTIAL_COMPATIBLEHOST = "credential.compatibleHost"
     const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
     const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
+    const val GIT_REPO_PATH = "GIT_REPO_PATH"
 }
