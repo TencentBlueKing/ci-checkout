@@ -41,6 +41,6 @@ class LinuxCredentialStore : ICredentialStore {
 
     override fun getCredentialOptions(): List<String> {
         // job最大运行时间是7天,这里缓存也保留7天
-        return listOf("--timeout", "${TimeUnit.DAYS.toMinutes(MAX_JOB_RUN_DAYS).toInt()}")
+        return listOf("--timeout", "${TimeUnit.DAYS.toSeconds(MAX_JOB_RUN_DAYS).toInt()}")
     }
 }
