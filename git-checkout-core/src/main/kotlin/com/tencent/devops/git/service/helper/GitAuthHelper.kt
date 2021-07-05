@@ -39,12 +39,12 @@ import com.tencent.devops.git.util.CommandUtil
 import com.tencent.devops.git.util.EnvHelper
 import com.tencent.devops.git.util.GitUtil
 import com.tencent.devops.git.util.SSHAgentUtils
-import org.apache.commons.codec.digest.DigestUtils
-import org.apache.commons.io.FileUtils
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL
 import java.nio.file.Paths
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.FileUtils
+import org.slf4j.LoggerFactory
 
 @Suppress("ALL")
 class GitAuthHelper(

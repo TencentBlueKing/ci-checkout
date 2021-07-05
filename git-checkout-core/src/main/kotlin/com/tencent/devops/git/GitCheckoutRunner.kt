@@ -49,6 +49,7 @@ class GitCheckoutRunner {
     }
 
     fun <T : AtomBaseParam> run(inputAdapter: IInputAdapter, atomContext: AtomContext<T>) {
+        logger.info("git-checkout-core version:${javaClass.`package`.implementationVersion}")
         val monitorData = MonitorData()
         monitorData.startTime = System.currentTimeMillis()
 

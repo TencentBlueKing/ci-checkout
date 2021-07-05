@@ -27,6 +27,8 @@
 
 package com.tencent.bk.devops.git.credential.storage
 
+import java.util.concurrent.TimeUnit
+
 class LinuxCredentialStore : ICredentialStore {
 
     override fun getCredentialHelper(): String {
@@ -34,6 +36,7 @@ class LinuxCredentialStore : ICredentialStore {
     }
 
     override fun getCredentialOptions(): List<String> {
-        return listOf("--timeout", "900")
+        // job最大运行时间是7天,这里缓存也保留7天
+        return listOf("--timeout", "${TimeUnit.DAYS.toMinutes(7).toInt()}")
     }
 }

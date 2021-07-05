@@ -30,10 +30,10 @@ package com.tencent.devops.git.service
 import com.tencent.devops.git.api.MockDevopsApi
 import com.tencent.devops.git.enums.ScmType
 import com.tencent.devops.git.pojo.GitSourceSettings
-import org.junit.After
-import org.junit.Test
 import java.io.File
 import java.nio.file.Files
+import org.junit.After
+import org.junit.Test
 
 class GitSourceProviderTest {
 
