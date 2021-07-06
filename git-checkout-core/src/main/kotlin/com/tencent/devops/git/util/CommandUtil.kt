@@ -80,7 +80,7 @@ object CommandUtil {
                     return
                 }
                 val tmpLine = SensitiveLineParser.onParseLine(line)
-                if (printLogger) {
+                if (printLogger && !allowAllExitCodes) {
                     System.err.println("  $tmpLine")
                 }
                 errOuts.add(tmpLine)
