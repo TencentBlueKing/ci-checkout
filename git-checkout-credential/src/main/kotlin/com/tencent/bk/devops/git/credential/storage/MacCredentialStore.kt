@@ -36,7 +36,8 @@ class MacCredentialStore : ICredentialStore {
         val credentialHelper = lazy {
             GitHelper.tryConfigGet(
                 configKey = GIT_CREDENTIAL_HELPER,
-                configValueRegex = "osxkeychain"
+                configValueRegex = "osxkeychain",
+                configScope = null
             )
         }
     }
