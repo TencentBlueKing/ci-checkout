@@ -35,7 +35,6 @@ import com.tencent.devops.git.service.GitCommandManager
 import com.tencent.devops.git.util.AgentEnv.getOS
 import com.tencent.devops.git.util.GitUtil
 import java.io.File
-import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 
 @Suppress("TooGenericExceptionCaught")
@@ -104,7 +103,7 @@ class GitDirectoryHelper(
         repositoryFile.listFiles()?.forEach {
             try {
                 logger.info("delete the file: ${it.canonicalPath}")
-                FileUtils.forceDelete(it)
+                it.deleteRecursively()
             } catch (e: Exception) {
                 logger.error("delete file fail: ${it.canonicalPath}, ${e.message} (${it.exists()}")
                 if (getOS() != OSType.WINDOWS) {

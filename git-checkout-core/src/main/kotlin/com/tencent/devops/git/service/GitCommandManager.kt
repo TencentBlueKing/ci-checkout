@@ -120,7 +120,7 @@ class GitCommandManager(
 
     fun configExists(
         configKey: String,
-        configValueRegex: String?,
+        configValueRegex: String? = null,
         configScope: GitConfigScope = GitConfigScope.LOCAL,
         configFile: String? = null
     ): Boolean {

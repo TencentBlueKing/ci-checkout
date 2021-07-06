@@ -155,10 +155,16 @@ class GitAuthHelper(
 
     private fun insteadOf() {
         val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
-        git.tryConfigUnset(
-            configKey = "git@$${serverInfo.hostName}:.insteadof",
-            configScope = GitConfigScope.GLOBAL
-        )
+        if (git.configExists(
+                configKey = "git@${serverInfo.hostName}:.insteadof",
+                configScope = GitConfigScope.GLOBAL
+            )
+        ) {
+            git.tryConfigUnset(
+                configKey = "git@${serverInfo.hostName}:.insteadof",
+                configScope = GitConfigScope.GLOBAL
+            )
+        }
         git.configAdd(
             configKey = insteadOfKey,
             configValue = "git@${serverInfo.hostName}:",
@@ -167,10 +173,16 @@ class GitAuthHelper(
         )
         // 配置其他域名权限
         settings.compatibleHostList?.filter { it != serverInfo.hostName }?.forEach { otherHostName ->
-            git.tryConfigUnset(
-                configKey = "git@$otherHostName:.insteadof",
-                configScope = GitConfigScope.GLOBAL
-            )
+            if (git.configExists(
+                    configKey = "git@$otherHostName:.insteadof",
+                    configScope = GitConfigScope.GLOBAL
+                )
+            ) {
+                git.tryConfigUnset(
+                    configKey = "git@$otherHostName:.insteadof",
+                    configScope = GitConfigScope.GLOBAL
+                )
+            }
             git.configAdd(
                 configKey = insteadOfKey,
                 configValue = "git@$otherHostName:",
