@@ -103,6 +103,7 @@ class GitDirectoryHelper(
         val repositoryFile = File(repositoryPath)
         repositoryFile.listFiles()?.forEach {
             try {
+                logger.info("delete the file: ${it.canonicalPath}")
                 FileUtils.forceDelete(it)
             } catch (e: Exception) {
                 logger.error("delete file fail: ${it.canonicalPath}, ${e.message} (${it.exists()}")

@@ -28,10 +28,10 @@
 package com.tencent.bk.devops.git.credential
 
 import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_ID
+import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_HELPER_VALUEREGEX
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_USEHTTPPATH
-import com.tencent.bk.devops.git.credential.Constants.VM_SEQ_ID
 import com.tencent.bk.devops.git.credential.Constants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 import com.tencent.bk.devops.git.credential.helper.SystemHelper
@@ -228,7 +228,7 @@ class Program(
 
     private fun convertDevopsHost(host: String): String {
         val buildId = System.getenv(BK_CI_BUILD_ID)
-        val vmSeqId = System.getenv(VM_SEQ_ID)
+        val vmSeqId = System.getenv(BK_CI_BUILD_JOB_ID)
         val builder = StringBuilder()
         if (!buildId.isNullOrBlank()) {
             builder.append(buildId).append(".")

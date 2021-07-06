@@ -64,7 +64,7 @@ class GitAuthHelper(
         System.getProperty("user.home"),
         "git-checkout-credential",
         System.getenv(GitConstants.BK_CI_BUILD_ID) ?: "",
-        System.getenv(GitConstants.VM_SEQ_ID) ?: "",
+        System.getenv(GitConstants.BK_CI_BUILD_JOB_ID) ?: "",
         ".config"
     ).normalize().toString()
     private val xdfConfigPath = Paths.get(xdgConfigHome, "git", "config").normalize().toString()
@@ -156,9 +156,8 @@ class GitAuthHelper(
     private fun insteadOf() {
         val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
         git.tryConfigUnset(
-            configKey = insteadOfKey,
-            configScope = GitConfigScope.FILE,
-            configFile = xdfConfigPath
+            configKey = "git@$${serverInfo.hostName}:.insteadof",
+            configScope = GitConfigScope.GLOBAL
         )
         git.configAdd(
             configKey = insteadOfKey,
@@ -168,6 +167,10 @@ class GitAuthHelper(
         )
         // 配置其他域名权限
         settings.compatibleHostList?.filter { it != serverInfo.hostName }?.forEach { otherHostName ->
+            git.tryConfigUnset(
+                configKey = "git@$otherHostName:.insteadof",
+                configScope = GitConfigScope.GLOBAL
+            )
             git.configAdd(
                 configKey = insteadOfKey,
                 configValue = "git@$otherHostName:",

@@ -40,6 +40,7 @@ import com.tencent.devops.git.service.handler.GitSubmodulesHandler
 import com.tencent.devops.git.service.handler.HandlerExecutionChain
 import com.tencent.devops.git.service.handler.InitRepoHandler
 import com.tencent.devops.git.service.handler.PrepareWorkspaceHandler
+import com.tencent.devops.git.service.helper.GitAuthHelper
 import com.tencent.devops.git.util.EnvHelper
 import com.tencent.devops.git.util.GitUtil
 import java.io.File
@@ -97,7 +98,7 @@ class GitSourceProvider(
                 return
             }
             val git = GitCommandManager(workingDirectory = workingDirectory, lfs = false)
-            val authHelper = com.tencent.devops.git.service.helper.GitAuthHelper(git = git, settings = settings)
+            val authHelper = GitAuthHelper(git = git, settings = settings)
             authHelper.removeAuth()
         }
     }
