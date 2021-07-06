@@ -41,9 +41,14 @@ object GitHelper {
     fun tryConfigGet(
         configKey: String,
         configValueRegex: String? = null,
-        configScope: ConfigScope = ConfigScope.LOCAL
+        configScope: ConfigScope? = ConfigScope.LOCAL
     ): String? {
-        val args = mutableListOf("config", configScope.option, "--get", configKey)
+        val args = mutableListOf("config")
+        if (configScope != null) {
+            args.add(configScope.option)
+        }
+        args.add("--get")
+        args.add(configKey)
         if (!configValueRegex.isNullOrBlank()) {
             args.add(configValueRegex)
         }

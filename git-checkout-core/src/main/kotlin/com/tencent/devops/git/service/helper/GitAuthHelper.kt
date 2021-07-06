@@ -260,9 +260,13 @@ class GitAuthHelper(
                 ).convertInputStream()
             )
         }
-        // 删除配置文件
-        if (File(xdgConfigHome).exists()) {
-            File(xdgConfigHome).deleteRecursively()
+        val xdgConfigPath = Paths.get(
+            System.getProperty("user.home"),
+            "git-checkout-credential",
+            System.getenv(GitConstants.BK_CI_BUILD_ID) ?: ""
+        ).normalize().toString()
+        if (File(xdgConfigPath).exists()) {
+            File(xdgConfigPath).deleteRecursively()
         }
     }
 }

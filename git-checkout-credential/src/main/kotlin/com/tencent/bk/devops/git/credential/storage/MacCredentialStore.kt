@@ -27,7 +27,6 @@
 
 package com.tencent.bk.devops.git.credential.storage
 
-import com.tencent.bk.devops.git.credential.ConfigScope
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 
@@ -37,8 +36,7 @@ class MacCredentialStore : ICredentialStore {
         val credentialHelper = lazy {
             GitHelper.tryConfigGet(
                 configKey = GIT_CREDENTIAL_HELPER,
-                configValueRegex = "osxkeychain",
-                configScope = ConfigScope.SYSTEM
+                configValueRegex = "osxkeychain"
             )
         }
     }
