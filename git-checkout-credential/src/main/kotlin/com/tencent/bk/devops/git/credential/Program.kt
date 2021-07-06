@@ -31,7 +31,6 @@ import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_ID
 import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_HELPER_VALUEREGEX
-import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_USEHTTPPATH
 import com.tencent.bk.devops.git.credential.Constants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 import com.tencent.bk.devops.git.credential.helper.SystemHelper
@@ -70,10 +69,6 @@ class Program(
     private fun store() {
         val credentialArguments = readInput()
         val credentialStore = StorageProvider.getCredentialStorage()
-        GitHelper.config(
-            configKey = GIT_CREDENTIAL_USEHTTPPATH,
-            configValue = "true"
-        )
         val compatibleHost = GitHelper.tryConfigGet(
             configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
             configScope = ConfigScope.GLOBAL

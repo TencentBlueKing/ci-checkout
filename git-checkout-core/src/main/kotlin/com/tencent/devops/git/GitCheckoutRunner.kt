@@ -38,6 +38,7 @@ import com.tencent.devops.git.constant.GitConstants
 import com.tencent.devops.git.exception.TaskExecuteException
 import com.tencent.devops.git.service.GitSourceProvider
 import com.tencent.devops.git.service.helper.IInputAdapter
+import com.tencent.devops.git.service.helper.VersionHelper.getCheckoutCoreVersion
 import com.tencent.devops.git.util.EnvHelper
 import com.tencent.devops.git.util.StringUtils
 import org.slf4j.LoggerFactory
@@ -49,6 +50,7 @@ class GitCheckoutRunner {
     }
 
     fun <T : AtomBaseParam> run(inputAdapter: IInputAdapter, atomContext: AtomContext<T>) {
+        logger.info("git-checkout-core version： ${getCheckoutCoreVersion()}")
         logger.info("git-checkout-core version： ${javaClass.`package`.implementationVersion}")
         val monitorData = MonitorData()
         monitorData.startTime = System.currentTimeMillis()

@@ -111,7 +111,9 @@ subprojects {
     jar {
         manifest {
             attributes(
-                    "Implementation-Version": "$project.version"
+                    "name": "com/tencent/devops/git",
+                    "Specification-Version" : "$project.version",
+                    "Implementation-Version": System.getProperty("BK_CI_BUILD_NUM") ?: ""
             )
         }
     }
