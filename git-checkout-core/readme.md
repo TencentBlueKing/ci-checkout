@@ -1,6 +1,5 @@
-# git-checkout-sdk
-git拉取SDK，对git命令进行包装，其他git插件可以直接引用这个SDK拉取代码
-# 新特性
+git拉取SDK，对git命令进行包装，其他git插件可以直接引用拉取代码
+# 特性
 - 性能优化
   - fetch支持拉取指定深度，默认为0，拉取所有提交。指定fetch深度，只会fetch当前的分支，其他分支不会同步
   - 不开启lfs功能，不再checkout大文件
@@ -22,7 +21,7 @@ git拉取SDK，对git命令进行包装，其他git插件可以直接引用这�
 ## 引入
 ### gradle
 ```
-compile("com.tencent.bk.devops:git-checkout-sdk:${version}")
+compile("com.tencent.bk.devops:git-checkout-core:${version}")
 ```
 ## 输入适配
 需要输入的参数含义:
