@@ -54,8 +54,6 @@ data class CredentialArguments(
         Trace.writeLine("protocol:$protocol")
         Trace.writeLine("host:$devopsHost")
         Trace.writeLine("path:$path")
-        Trace.writeLine("username:$username")
-        Trace.writeLine("password:$password")
         return builder.toString()
     }
 
