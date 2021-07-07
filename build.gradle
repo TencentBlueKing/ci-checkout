@@ -66,9 +66,9 @@ subprojects {
     }
     def snapshot = System.getProperty("snapshot")
     if (snapshot == "true") {
-        version = version as String + "-SNAPSHOT"
+        version = version + "-SNAPSHOT"
     } else {
-        version = version as String + "-RELEASE"
+        version = version + "-RELEASE"
     }
 
     configurations {
