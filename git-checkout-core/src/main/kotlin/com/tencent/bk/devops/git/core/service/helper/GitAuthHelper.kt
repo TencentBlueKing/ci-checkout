@@ -238,6 +238,11 @@ class GitAuthHelper(
     }
 
     override fun removeAuth() {
+        if (!serverInfo.httpProtocol ||
+            settings.username.isNullOrBlank() ||
+            settings.password.isNullOrBlank()) {
+            return
+        }
         // 删除凭证
         with(URL(settings.repositoryUrl).toURI()) {
             CommandUtil.execute(

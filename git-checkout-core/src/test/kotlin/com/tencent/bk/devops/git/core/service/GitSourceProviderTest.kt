@@ -33,10 +33,8 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import java.io.File
 import java.nio.file.Files
 import org.junit.After
-import org.junit.Ignore
 import org.junit.Test
 
-@Ignore
 class GitSourceProviderTest {
 
     private var workspace: File = Files.createTempDirectory("git-checkout").toFile()

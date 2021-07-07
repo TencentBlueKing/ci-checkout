@@ -112,7 +112,7 @@ subprojects {
         manifest {
             attributes(
                     "Specification-Version" : "$project.version",
-                    "Implementation-Version": System.getenv("BK_CI_BUILD_NUM") ?: ""
+                    "Implementation-Version": System.getenv("BK_CI_BUILD_NO") ?: ""
             )
         }
     }
