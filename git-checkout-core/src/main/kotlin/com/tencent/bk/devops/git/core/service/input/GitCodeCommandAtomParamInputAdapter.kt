@@ -77,7 +77,7 @@ class GitCodeCommandAtomParamInputAdapter(
                     devopsApi = devopsApi
                 )
                 AuthType.PERSONAL_ACCESS_TOKEN -> PrivateGitAuthProvider(
-                    token = accessToken
+                    token = personalAccessToken
                 )
                 else -> EmptyGitAuthProvider()
             }

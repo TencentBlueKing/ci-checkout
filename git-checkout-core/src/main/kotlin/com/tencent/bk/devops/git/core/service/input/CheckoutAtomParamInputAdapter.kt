@@ -109,6 +109,7 @@ class CheckoutAtomParamInputAdapter(
             accessToken = accessToken,
             username = username,
             password = password,
+            personalAccessToken = personalAccessToken,
             localPath = localPath,
             strategy = strategy,
             enableSubmodule = enableSubmodule,
