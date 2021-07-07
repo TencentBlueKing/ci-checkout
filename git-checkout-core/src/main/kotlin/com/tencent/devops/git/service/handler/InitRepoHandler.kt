@@ -28,6 +28,7 @@
 package com.tencent.devops.git.service.handler
 
 import com.tencent.devops.git.constant.GitConstants
+import com.tencent.devops.git.enums.GitConfigScope
 import com.tencent.devops.git.pojo.GitSourceSettings
 import com.tencent.devops.git.service.GitCommandManager
 import com.tencent.devops.git.util.GitUtil
@@ -100,8 +101,8 @@ class InitRepoHandler(
         if (!userEmailConfig.isNullOrBlank()) {
             git.config(configKey = "user.email", configValue = userEmailConfig!!)
         }
-        git.config(configKey = "http.sslverify", configValue = "false")
-        git.config(configKey = "http.postBuffer", configValue = "524288000")
+        git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.GLOBAL)
+        git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.GLOBAL)
         git.config(configKey = "gc.auto", configValue = "0")
     }
 
