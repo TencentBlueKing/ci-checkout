@@ -238,6 +238,14 @@ class GitAuthHelper(
     }
 
     override fun removeAuth() {
+        val xdgConfigPath = Paths.get(
+            System.getProperty("user.home"),
+            "git-checkout-credential",
+            System.getenv(GitConstants.BK_CI_BUILD_ID) ?: ""
+        ).normalize().toString()
+        if (File(xdgConfigPath).exists()) {
+            File(xdgConfigPath).deleteRecursively()
+        }
         if (!serverInfo.httpProtocol ||
             settings.username.isNullOrBlank() ||
             settings.password.isNullOrBlank()) {
@@ -264,14 +272,6 @@ class GitAuthHelper(
                     path = path.removePrefix("/")
                 ).convertInputStream()
             )
-        }
-        val xdgConfigPath = Paths.get(
-            System.getProperty("user.home"),
-            "git-checkout-credential",
-            System.getenv(GitConstants.BK_CI_BUILD_ID) ?: ""
-        ).normalize().toString()
-        if (File(xdgConfigPath).exists()) {
-            File(xdgConfigPath).deleteRecursively()
         }
     }
 }

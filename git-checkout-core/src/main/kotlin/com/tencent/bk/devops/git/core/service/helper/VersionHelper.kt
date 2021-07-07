@@ -3,8 +3,9 @@ package com.tencent.bk.devops.git.core.service.helper
 object VersionHelper {
 
     fun getCheckoutCoreVersion(): String {
-        val implementationVersion = javaClass.`package`.implementationVersion
-        val specificationVersion = javaClass.`package`.specificationVersion
+        val pack = Package.getPackage("com.tencent.bk.devops.git.core")
+        val implementationVersion = pack.implementationVersion
+        val specificationVersion = pack.specificationVersion
         val version = StringBuffer()
         if (specificationVersion != null) {
             version.append(specificationVersion).append(".")
