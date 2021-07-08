@@ -76,5 +76,8 @@ data class GitCodeAtomParamInput(
     var retryStartPoint: String? = "",
     var persistCredentials: Boolean,
     var compatibleHostList: List<String>? = null,
-    var enableTrace: Boolean? = false
+    var enableTrace: Boolean? = false,
+
+    var usernameConfig: String? = "",
+    var userEmailConfig: String? = ""
 )

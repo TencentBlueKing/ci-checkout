@@ -90,7 +90,9 @@ class CheckoutAtomParamInputAdapter(
             retryStartPoint = retryStartPoint,
             persistCredentials = persistCredentials,
             compatibleHostList = compatibleHostList,
-            enableTrace = enableTrace
+            enableTrace = enableTrace,
+            usernameConfig = usernameConfig,
+            userEmailConfig = userEmailConfig
         )
     ).getInputs()
 
@@ -137,7 +139,9 @@ class CheckoutAtomParamInputAdapter(
             retryStartPoint = retryStartPoint,
             persistCredentials = persistCredentials,
             hostNameList = compatibleHostList,
-            enableTrace = enableTrace
+            enableTrace = enableTrace,
+            usernameConfig = usernameConfig,
+            userEmailConfig = userEmailConfig
         )
     ).getInputs()
 }

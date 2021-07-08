@@ -140,7 +140,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 sourceRepositoryUrl = hookSourceUrl ?: "",
                 sourceBranchName = hookSourceBranch ?: "",
                 autoCrlf = autoCrlf,
-                usernameConfig = pipelineStartUserName,
+                usernameConfig = usernameConfig,
+                userEmailConfig = userEmailConfig,
                 compatibleHostList = hostNameList,
                 enableTrace = enableTrace
             )
