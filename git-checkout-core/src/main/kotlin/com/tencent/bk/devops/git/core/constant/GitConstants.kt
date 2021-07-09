@@ -39,6 +39,7 @@ object GitConstants {
     // system
     const val BK_CI_BUILD_ID = "BK_CI_BUILD_ID"
     const val BK_CI_BUILD_JOB_ID = "BK_CI_BUILD_JOB_ID"
+    const val BK_CI_PIPELINE_ID = "BK_CI_PIPELINE_ID"
 
     const val ORIGIN_REMOTE_NAME = "origin"
     const val DEVOPS_VIRTUAL_REMOTE_NAME = "devops-virtual-origin"

@@ -63,7 +63,7 @@ class GitAuthHelper(
     private val xdgConfigHome = Paths.get(
         System.getProperty("user.home"),
         "git-checkout-credential",
-        System.getenv(GitConstants.BK_CI_BUILD_ID) ?: "",
+        System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: "",
         ".config"
     ).normalize().toString()
     private val xdfConfigPath = Paths.get(xdgConfigHome, "git", "config").normalize().toString()
@@ -153,38 +153,38 @@ class GitAuthHelper(
     }
 
     private fun insteadOf() {
+        httpInsteadOfGit(host = serverInfo.hostName)
+
+        // 配置其他域名权限
+        settings.compatibleHostList?.filter { it != serverInfo.hostName }?.forEach { otherHostName ->
+            httpInsteadOfGit(host = otherHostName)
+        }
+    }
+
+    private fun httpInsteadOfGit(host: String) {
         val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
+        // 把全局的insteadOf先去掉
         if (git.configExists(
-                configKey = "url.git@${serverInfo.hostName}:.insteadof",
+                configKey = "url.git@$host:.insteadof",
                 configScope = GitConfigScope.GLOBAL
             )
         ) {
             git.tryConfigUnset(
-                configKey = "url.git@${serverInfo.hostName}:.insteadof",
+                configKey = "url.git@$host:.insteadof",
                 configScope = GitConfigScope.GLOBAL
             )
         }
-        git.configAdd(
-            configKey = insteadOfKey,
-            configValue = "git@${serverInfo.hostName}:",
-            configScope = GitConfigScope.FILE,
-            configFile = xdfConfigPath
-        )
-        // 配置其他域名权限
-        settings.compatibleHostList?.filter { it != serverInfo.hostName }?.forEach { otherHostName ->
-            if (git.configExists(
-                    configKey = "url.git@$otherHostName:.insteadof",
-                    configScope = GitConfigScope.GLOBAL
-                )
-            ) {
-                git.tryConfigUnset(
-                    configKey = "url.git@$otherHostName:.insteadof",
-                    configScope = GitConfigScope.GLOBAL
-                )
-            }
+        // 如果没有配置使用http替换ssh,配置
+        if (!git.configExists(
+                configKey = insteadOfKey,
+                configValueRegex = "git@$host:",
+                configScope = GitConfigScope.FILE,
+                configFile = xdfConfigPath
+            )
+        ) {
             git.configAdd(
                 configKey = insteadOfKey,
-                configValue = "git@$otherHostName:",
+                configValue = "git@$host:",
                 configScope = GitConfigScope.FILE,
                 configFile = xdfConfigPath
             )
@@ -237,14 +237,6 @@ class GitAuthHelper(
     }
 
     override fun removeAuth() {
-        val xdgConfigPath = Paths.get(
-            System.getProperty("user.home"),
-            "git-checkout-credential",
-            System.getenv(GitConstants.BK_CI_BUILD_ID) ?: ""
-        ).normalize().toString()
-        if (File(xdgConfigPath).exists()) {
-            File(xdgConfigPath).deleteRecursively()
-        }
         if (!serverInfo.httpProtocol ||
             settings.username.isNullOrBlank() ||
             settings.password.isNullOrBlank()) {
