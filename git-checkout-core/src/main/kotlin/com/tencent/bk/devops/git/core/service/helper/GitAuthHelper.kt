@@ -74,14 +74,6 @@ class GitAuthHelper(
         if (!xdgConfigParentFile.exists()) {
             xdgConfigParentFile.mkdirs()
         }
-        EnvHelper.addEnvVariable(
-            XDG_CONFIG_HOME, Paths.get(
-                "\$HOME",
-                "git-checkout-credential",
-                System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: "",
-                ".config"
-            ).normalize().toString()
-        )
         git.setEnvironmentVariable(XDG_CONFIG_HOME, xdgConfigHome)
     }
 
