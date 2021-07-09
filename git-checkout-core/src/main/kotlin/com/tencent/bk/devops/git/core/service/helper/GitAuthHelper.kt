@@ -76,7 +76,7 @@ class GitAuthHelper(
         }
         EnvHelper.addEnvVariable(
             XDG_CONFIG_HOME, Paths.get(
-                "~",
+                "\$HOME",
                 "git-checkout-credential",
                 System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: "",
                 ".config"

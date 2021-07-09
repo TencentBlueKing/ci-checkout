@@ -64,7 +64,7 @@ object EnvHelper {
 
     fun getAuthEnv(): Map<String, String> {
         return listOf(
-            XDG_CONFIG_HOME, AUTH_SOCKET_VAR, AGENT_PID_VAR, AUTH_SOCKET_VAR2, AGENT_PID_VAR2
+            AUTH_SOCKET_VAR, AGENT_PID_VAR, AUTH_SOCKET_VAR2, AGENT_PID_VAR2
         ).filter { env[it] != null }.associateBy({ it }, { env[it]!! })
     }
 
