@@ -19,8 +19,7 @@ class GitLfsHandler(
                 return
             }
             logger.groupStart("Fetching lfs")
-            git.lfsFetch()
-            git.lfsCheckout()
+            git.lfsPull()
             logger.groupEnd("")
         }
     }

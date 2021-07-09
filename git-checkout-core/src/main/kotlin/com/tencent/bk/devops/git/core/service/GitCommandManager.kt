@@ -307,12 +307,8 @@ class GitCommandManager(
         doFetch(args = args)
     }
 
-    fun lfsFetch() {
-        doFetch(args = listOf("lfs", "fetch"))
-    }
-
-    fun lfsCheckout() {
-        execGit(args = listOf("lfs", "checkout"))
+    fun lfsPull() {
+        doFetch(args = listOf("lfs", "pull"))
     }
 
     private fun doFetch(args: List<String>) {
