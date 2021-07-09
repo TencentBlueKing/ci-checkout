@@ -138,16 +138,28 @@ class Program(
         val pathToJar =
             File(Program::class.java.protectionDomain.codeSource.location.toURI().schemeSpecificPart).absolutePath
 
-        configureGit(host = credentialArguments.originHost, pathToJava = pathToJava, pathToJar = pathToJar)
+        configureGit(
+            protocol = credentialArguments.protocol,
+            host = credentialArguments.originHost,
+            pathToJava = pathToJava,
+            pathToJar = pathToJar
+        )
         // 兼容的host都需要配置自定义凭证
         if (!compatibleHost.isNullOrBlank()) {
-            compatibleHost.split(",").filter { it != credentialArguments.originHost }.forEach { host ->
-                configureGit(host = host, pathToJava = pathToJava, pathToJar = pathToJar)
+            compatibleHost.split(",").forEach { host ->
+                listOf("https", "http").forEach { protocol ->
+                    configureGit(
+                        protocol = protocol,
+                        host = host,
+                        pathToJava = pathToJava,
+                        pathToJar = pathToJar
+                    )
+                }
             }
         }
     }
 
-    private fun configureGit(host: String, pathToJava: String, pathToJar: String) {
+    private fun configureGit(protocol: String, host: String, pathToJava: String, pathToJar: String) {
         val xdgConfigHome = System.getenv(XDG_CONFIG_HOME) ?: return
         val xdgConfigParentFile = File(xdgConfigHome, "git")
         if (!xdgConfigParentFile.exists()) {
@@ -156,7 +168,7 @@ class Program(
         val xdgConfigPath = File(xdgConfigParentFile, "config").absolutePath
 
         val credentialValue = GitHelper.configFileGet(
-            configKey = "credential.$host.helper",
+            configKey = "credential.$protocol://$host.helper",
             configValueRegex = GIT_CREDENTIAL_HELPER_VALUEREGEX,
             filePath = xdgConfigPath
         )
@@ -165,7 +177,7 @@ class Program(
         }
         // 先禁用其他凭证，再启用自定义凭证
         GitHelper.configFileAdd(
-            configKey = "credential.$host.helper",
+            configKey = "credential.$protocol://$host.helper",
             configValue = if (SystemHelper.isWindows()) {
                 "\"\""
             } else {
@@ -174,7 +186,7 @@ class Program(
             filePath = xdgConfigPath
         )
         GitHelper.configFileAdd(
-            configKey = "credential.$host.helper",
+            configKey = "credential.$protocol://$host.helper",
             configValue = "!'$pathToJava' -jar '$pathToJar'",
             filePath = xdgConfigPath,
             add = true

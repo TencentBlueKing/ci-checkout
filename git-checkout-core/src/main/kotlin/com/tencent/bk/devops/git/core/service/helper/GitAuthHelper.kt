@@ -64,7 +64,6 @@ class GitAuthHelper(
         System.getProperty("user.home"),
         "git-checkout-credential",
         System.getenv(GitConstants.BK_CI_BUILD_ID) ?: "",
-        System.getenv(GitConstants.BK_CI_BUILD_JOB_ID) ?: "",
         ".config"
     ).normalize().toString()
     private val xdfConfigPath = Paths.get(xdgConfigHome, "git", "config").normalize().toString()
