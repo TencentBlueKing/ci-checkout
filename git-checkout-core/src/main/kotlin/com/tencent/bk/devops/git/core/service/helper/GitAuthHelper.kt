@@ -74,8 +74,7 @@ class GitAuthHelper(
         if (!xdgConfigParentFile.exists()) {
             xdgConfigParentFile.mkdirs()
         }
-        EnvHelper.addEnvVariable(XDG_CONFIG_HOME, xdgConfigHome)
-        git.setEnvironmentVariable(
+        EnvHelper.addEnvVariable(
             XDG_CONFIG_HOME, Paths.get(
                 "~",
                 "git-checkout-credential",
@@ -83,6 +82,7 @@ class GitAuthHelper(
                 ".config"
             ).normalize().toString()
         )
+        git.setEnvironmentVariable(XDG_CONFIG_HOME, xdgConfigHome)
     }
 
     private fun configureHttp() {
