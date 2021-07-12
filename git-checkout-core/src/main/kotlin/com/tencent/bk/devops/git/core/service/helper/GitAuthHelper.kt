@@ -37,7 +37,6 @@ import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.CommandUtil
-import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.SSHAgentUtils
 import java.io.File
@@ -74,14 +73,6 @@ class GitAuthHelper(
         if (!xdgConfigParentFile.exists()) {
             xdgConfigParentFile.mkdirs()
         }
-        EnvHelper.addEnvVariable(
-            XDG_CONFIG_HOME, Paths.get(
-                "\$HOME",
-                "git-checkout-credential",
-                System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: "",
-                ".config"
-            ).normalize().toString()
-        )
         git.setEnvironmentVariable(XDG_CONFIG_HOME, xdgConfigHome)
     }
 

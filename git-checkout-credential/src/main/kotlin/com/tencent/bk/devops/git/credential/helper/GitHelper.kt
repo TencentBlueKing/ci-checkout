@@ -70,6 +70,20 @@ object GitHelper {
         execGit(listOf("config", configScope.option, configKey, configValue))
     }
 
+    fun configAdd(
+        configKey: String,
+        configValue: String,
+        configScope: ConfigScope = ConfigScope.LOCAL,
+        add: Boolean = false
+    ) {
+        val args = mutableListOf("config", configScope.option)
+        if (add) {
+            args.add("--add")
+        }
+        args.addAll(listOf(configKey, configValue))
+        execGit(args = args)
+    }
+
     fun configFileAdd(
         configKey: String,
         configValue: String,

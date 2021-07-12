@@ -144,6 +144,12 @@ class Program(
             pathToJava = pathToJava,
             pathToJar = pathToJar
         )
+        configureLocal(
+            protocol = credentialArguments.protocol,
+            host = credentialArguments.originHost,
+            pathToJava = pathToJava,
+            pathToJar = pathToJar
+        )
         // 兼容的host都需要配置自定义凭证
         if (!compatibleHost.isNullOrBlank()) {
             compatibleHost.split(",").forEach { host ->
@@ -189,6 +195,31 @@ class Program(
             configKey = "credential.$protocol://$host.helper",
             configValue = "!'$pathToJava' -jar '$pathToJar'",
             filePath = xdgConfigPath,
+            add = true
+        )
+    }
+
+    private fun configureLocal(protocol: String, host: String, pathToJava: String, pathToJar: String) {
+        val credentialValue = GitHelper.tryConfigGet(
+            configKey = "credential.$protocol://$host.helper",
+            configValueRegex = GIT_CREDENTIAL_HELPER_VALUEREGEX
+        )
+        if (!credentialValue.isNullOrBlank()) {
+            return
+        }
+        // 先禁用其他凭证，再启用自定义凭证
+        GitHelper.configAdd(
+            configKey = "credential.$protocol://$host.helper",
+            configValue = if (SystemHelper.isWindows()) {
+                "\"\""
+            } else {
+                ""
+            },
+            add = true
+        )
+        GitHelper.configAdd(
+            configKey = "credential.$protocol://$host.helper",
+            configValue = "!'$pathToJava' -jar '$pathToJar'",
             add = true
         )
     }
