@@ -182,7 +182,7 @@ class Program(
             return
         }
         // 先禁用其他凭证，再启用自定义凭证
-        GitHelper.configFileAdd(
+        /*GitHelper.configFileAdd(
             configKey = "credential.$protocol://$host.helper",
             configValue = if (SystemHelper.isWindows()) {
                 "\"\""
@@ -190,7 +190,7 @@ class Program(
                 ""
             },
             filePath = xdgConfigPath
-        )
+        )*/
         GitHelper.configFileAdd(
             configKey = "credential.$protocol://$host.helper",
             configValue = "!'$pathToJava' -jar '$pathToJar'",
@@ -208,7 +208,7 @@ class Program(
             return
         }
         // 先禁用其他凭证，再启用自定义凭证
-        GitHelper.configAdd(
+        /*GitHelper.configAdd(
             configKey = "credential.$protocol://$host.helper",
             configValue = if (SystemHelper.isWindows()) {
                 "\"\""
@@ -216,7 +216,7 @@ class Program(
                 ""
             },
             add = true
-        )
+        )*/
         GitHelper.configAdd(
             configKey = "credential.$protocol://$host.helper",
             configValue = "!'$pathToJava' -jar '$pathToJar'",
