@@ -335,7 +335,7 @@ class GitCommandManager(
     }
 
     fun checkout(ref: String, startPoint: String) {
-        val args = mutableListOf("checkout", "--progress", "--force")
+        val args = mutableListOf("checkout", "--force")
         if (startPoint.isBlank()) {
             args.add(ref)
         } else {
