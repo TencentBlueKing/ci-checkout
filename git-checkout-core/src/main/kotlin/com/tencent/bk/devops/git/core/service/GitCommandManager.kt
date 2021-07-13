@@ -345,7 +345,7 @@ class GitCommandManager(
     }
 
     fun merge(ref: String) {
-        execGit(args = listOf("merge", "--progress", ref))
+        execGit(args = listOf("merge", ref))
     }
 
     fun log(maxCount: Int = 1, revisionRange: String = ""): List<CommitLogInfo> {
