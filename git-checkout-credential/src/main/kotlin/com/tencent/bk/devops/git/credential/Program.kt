@@ -33,7 +33,6 @@ import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEH
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_HELPER_VALUEREGEX
 import com.tencent.bk.devops.git.credential.Constants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.credential.helper.GitHelper
-import com.tencent.bk.devops.git.credential.helper.SystemHelper
 import com.tencent.bk.devops.git.credential.storage.StorageProvider
 import java.io.BufferedReader
 import java.io.File
