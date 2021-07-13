@@ -74,7 +74,7 @@ class Program(
             configScope = ConfigScope.GLOBAL
         )
         // 同一服务多个域名时，需要保存不同域名的凭证
-        if (!compatibleHost.isNullOrBlank()) {
+        if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(credentialArguments.originHost)) {
             compatibleHost.split(",").forEach { host ->
                 listOf("https", "http").forEach { protocol ->
                     credentialStore.store(
@@ -116,7 +116,7 @@ class Program(
             configScope = ConfigScope.GLOBAL
         )
         // 同一服务多个域名时，需要保存不同域名的凭证
-        if (!compatibleHost.isNullOrBlank()) {
+        if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(credentialArguments.originHost)) {
             compatibleHost.split(",").forEach { host ->
                 listOf("https", "http").forEach { protocol ->
                     credentialStore.erase(

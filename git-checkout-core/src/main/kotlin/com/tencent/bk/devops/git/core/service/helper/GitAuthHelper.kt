@@ -82,10 +82,11 @@ class GitAuthHelper(
             settings.password.isNullOrBlank()) {
             return
         }
-        if (!settings.compatibleHostList.isNullOrEmpty()) {
+        val compatibleHostList = settings.compatibleHostList
+        if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
             git.config(
                 configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
-                configValue = settings.compatibleHostList!!.joinToString(","),
+                configValue = compatibleHostList.joinToString(","),
                 configScope = GitConfigScope.GLOBAL
             )
         }
@@ -154,8 +155,11 @@ class GitAuthHelper(
         httpInsteadOfGit(host = serverInfo.hostName)
 
         // 配置其他域名权限
-        settings.compatibleHostList?.filter { it != serverInfo.hostName }?.forEach { otherHostName ->
-            httpInsteadOfGit(host = otherHostName)
+        val compatibleHostList = settings.compatibleHostList
+        if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
+            compatibleHostList.filter { it != serverInfo.hostName }.forEach { otherHostName ->
+                httpInsteadOfGit(host = otherHostName)
+            }
         }
     }
 
@@ -172,7 +176,7 @@ class GitAuthHelper(
                 configScope = GitConfigScope.GLOBAL
             )
         }
-        // 如果没有配置使用http替换ssh,配置
+        // 如果没有配置使用http替换ssh配置
         if (!git.configExists(
                 configKey = insteadOfKey,
                 configValueRegex = "git@$host:",
