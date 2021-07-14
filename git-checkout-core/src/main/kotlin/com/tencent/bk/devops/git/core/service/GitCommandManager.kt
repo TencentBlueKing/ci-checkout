@@ -352,7 +352,7 @@ class GitCommandManager(
         val args = mutableListOf(
             "log",
             "-$maxCount",
-            "--pretty='format:${GitConstants.GIT_LOG_FORMAT}'"
+            "--pretty=format:${GitConstants.GIT_LOG_FORMAT}"
         )
         if (revisionRange.isNotBlank()) {
             args.add(revisionRange)
