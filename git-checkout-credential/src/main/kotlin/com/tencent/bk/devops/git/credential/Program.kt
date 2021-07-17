@@ -153,6 +153,12 @@ class Program(
             configValue = "!'$pathToJava' -jar '$pathToJar'",
             filePath = xdgConfigPath
         )
+
+        GitHelper.config(
+            configKey = GIT_CREDENTIAL_HELPER,
+            configValue = "!'$pathToJava' -jar '$pathToJar'",
+            configScope = ConfigScope.LOCAL
+        )
     }
 
     private fun readInput(): CredentialArguments {
