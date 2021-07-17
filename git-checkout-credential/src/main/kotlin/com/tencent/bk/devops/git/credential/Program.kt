@@ -146,7 +146,7 @@ class Program(
 
     private fun configureGit(pathToJava: String, pathToJar: String) {
         val xdgConfigHome = System.getenv(XDG_CONFIG_HOME) ?: return
-        val xdgConfigPath = Paths.get(xdgConfigHome, ".config", "git", "config").normalize().toString()
+        val xdgConfigPath = Paths.get(xdgConfigHome, "git", "config").normalize().toString()
 
         GitHelper.configFileAdd(
             configKey = GIT_CREDENTIAL_HELPER,
