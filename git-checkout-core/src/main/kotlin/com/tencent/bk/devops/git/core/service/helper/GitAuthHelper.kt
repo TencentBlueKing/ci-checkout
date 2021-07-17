@@ -113,7 +113,6 @@ class GitAuthHelper(
                     "devopsStore"
                 ),
                 runtimeEnv = mapOf(
-                    XDG_CONFIG_HOME to xdgConfigHome,
                     GIT_REPO_PATH to settings.repositoryPath
                 ),
                 inputStream = CredentialArguments(
@@ -256,7 +255,6 @@ class GitAuthHelper(
                     "devopsErase"
                 ),
                 runtimeEnv = mapOf(
-                    XDG_CONFIG_HOME to xdgConfigHome,
                     GIT_REPO_PATH to settings.repositoryPath
                 ),
                 inputStream = CredentialArguments(

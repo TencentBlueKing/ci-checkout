@@ -28,12 +28,11 @@
 package com.tencent.bk.devops.git.credential
 
 object Constants {
+    const val BK_CI_PIPELINE_ID = "BK_CI_PIPELINE_ID"
     const val BK_CI_BUILD_ID = "BK_CI_BUILD_ID"
     const val BK_CI_BUILD_JOB_ID = "BK_CI_BUILD_JOB_ID"
     const val GIT_CREDENTIAL_HELPER = "credential.helper"
     const val GIT_CREDENTIAL_HELPER_VALUEREGEX = "git-checkout-credential"
     const val GIT_CREDENTIAL_COMPATIBLEHOST = "credential.compatibleHost"
-    const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
-    const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
     const val GIT_REPO_PATH = "GIT_REPO_PATH"
 }

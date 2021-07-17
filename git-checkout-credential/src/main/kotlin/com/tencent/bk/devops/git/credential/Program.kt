@@ -27,11 +27,11 @@
 
 package com.tencent.bk.devops.git.credential
 
-import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_ID
 import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_JOB_ID
+import com.tencent.bk.devops.git.credential.Constants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEHOST
+import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_HELPER_VALUEREGEX
-import com.tencent.bk.devops.git.credential.Constants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 import com.tencent.bk.devops.git.credential.storage.StorageProvider
 import java.io.BufferedReader
@@ -89,7 +89,7 @@ class Program(
             }
         }
         credentialStore.store(credentialArguments.convertInputStream())
-        install(credentialArguments = credentialArguments, compatibleHost = compatibleHost)
+        install()
     }
 
     private fun get() {
@@ -130,7 +130,7 @@ class Program(
         }
     }
 
-    private fun install(credentialArguments: CredentialArguments, compatibleHost: String?) {
+    private fun install() {
         val javaHome = System.getProperty("java.home")
         val javaExecutable = File(javaHome, "bin/java")
         val pathToJava = javaExecutable.absolutePath
@@ -138,88 +138,24 @@ class Program(
             File(Program::class.java.protectionDomain.codeSource.location.toURI().schemeSpecificPart).absolutePath
 
         configureGit(
-            protocol = credentialArguments.protocol,
-            host = credentialArguments.originHost,
             pathToJava = pathToJava,
             pathToJar = pathToJar
         )
-        configureLocal(
-            protocol = credentialArguments.protocol,
-            host = credentialArguments.originHost,
-            pathToJava = pathToJava,
-            pathToJar = pathToJar
-        )
-        // 兼容的host都需要配置自定义凭证
-        if (!compatibleHost.isNullOrBlank()) {
-            compatibleHost.split(",").forEach { host ->
-                listOf("https", "http").forEach { protocol ->
-                    configureGit(
-                        protocol = protocol,
-                        host = host,
-                        pathToJava = pathToJava,
-                        pathToJar = pathToJar
-                    )
-                }
-            }
-        }
     }
 
-    private fun configureGit(protocol: String, host: String, pathToJava: String, pathToJar: String) {
-        val xdgConfigHome = System.getenv(XDG_CONFIG_HOME) ?: return
-        val xdgConfigParentFile = File(xdgConfigHome, "git")
-        if (!xdgConfigParentFile.exists()) {
-            xdgConfigParentFile.mkdirs()
-        }
-        val xdgConfigPath = File(xdgConfigParentFile, "config").absolutePath
-
-        val credentialValue = GitHelper.configFileGet(
-            configKey = "credential.$protocol://$host.helper",
-            configValueRegex = GIT_CREDENTIAL_HELPER_VALUEREGEX,
-            filePath = xdgConfigPath
-        )
-        if (!credentialValue.isNullOrBlank()) {
-            return
-        }
-        // 先禁用其他凭证，再启用自定义凭证
-        /*GitHelper.configFileAdd(
-            configKey = "credential.$protocol://$host.helper",
-            configValue = if (SystemHelper.isWindows()) {
-                "\"\""
-            } else {
-                ""
-            },
-            filePath = xdgConfigPath
-        )*/
-        GitHelper.configFileAdd(
-            configKey = "credential.$protocol://$host.helper",
-            configValue = "!'$pathToJava' -jar '$pathToJar'",
-            filePath = xdgConfigPath,
-            add = true
-        )
-    }
-
-    private fun configureLocal(protocol: String, host: String, pathToJava: String, pathToJar: String) {
+    private fun configureGit(pathToJava: String, pathToJar: String) {
         val credentialValue = GitHelper.tryConfigGet(
-            configKey = "credential.$protocol://$host.helper",
-            configValueRegex = GIT_CREDENTIAL_HELPER_VALUEREGEX
+            configKey = GIT_CREDENTIAL_HELPER,
+            configValueRegex = GIT_CREDENTIAL_HELPER_VALUEREGEX,
+            configScope = ConfigScope.GLOBAL
         )
         if (!credentialValue.isNullOrBlank()) {
             return
         }
-        // 先禁用其他凭证，再启用自定义凭证
-        /*GitHelper.configAdd(
-            configKey = "credential.$protocol://$host.helper",
-            configValue = if (SystemHelper.isWindows()) {
-                "\"\""
-            } else {
-                ""
-            },
-            add = true
-        )*/
-        GitHelper.configAdd(
-            configKey = "credential.$protocol://$host.helper",
+        GitHelper.config(
+            configKey = GIT_CREDENTIAL_HELPER,
             configValue = "!'$pathToJava' -jar '$pathToJar'",
-            add = true
+            configScope = ConfigScope.GLOBAL
         )
     }
 
@@ -264,7 +200,7 @@ class Program(
     }
 
     private fun convertDevopsHost(host: String): String {
-        val buildId = System.getenv(BK_CI_BUILD_ID)
+        val buildId = System.getenv(BK_CI_PIPELINE_ID)
         val vmSeqId = System.getenv(BK_CI_BUILD_JOB_ID)
         val builder = StringBuilder()
         if (!buildId.isNullOrBlank()) {

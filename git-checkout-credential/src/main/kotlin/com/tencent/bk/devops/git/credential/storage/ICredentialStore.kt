@@ -43,7 +43,8 @@ interface ICredentialStore {
             inputStream = input
         ).stdOuts
         if (stdOuts.isEmpty()) {
-            return null
+            // 返回空的账号密码
+            return "username=\"\"\npassword=\"\"\n"
         }
         return stdOuts.joinToString("\n")
     }
