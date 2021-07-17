@@ -63,7 +63,7 @@ class GitAuthHelper(
         credentialHome,
         System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: ""
     ).normalize().toString()
-    private val xdgConfigPath = Paths.get(xdgConfigHome, ".config", "git", "config").normalize().toString()
+    private val xdgConfigPath = Paths.get(xdgConfigHome, "git", "config").normalize().toString()
     private val credentialJarPath = File(credentialHome, "git-checkout-credential.jar").absolutePath
 
     init {
