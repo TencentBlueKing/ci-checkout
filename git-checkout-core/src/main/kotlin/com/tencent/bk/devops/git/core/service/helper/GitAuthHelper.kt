@@ -59,17 +59,15 @@ class GitAuthHelper(
     private val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
 
     private val credentialHome = File(System.getProperty("user.home"), "git-checkout-credential").absolutePath
-    private val xdgConfigHome = Paths.get(
-        System.getProperty("user.home"),
-        "git-checkout-credential",
-        System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: "",
-        ".config"
+    private val xdgConfigHome = System.getenv(XDG_CONFIG_HOME) ?: Paths.get(
+        credentialHome,
+        System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: ""
     ).normalize().toString()
-    private val xdfConfigPath = Paths.get(xdgConfigHome, "git", "config").normalize().toString()
+    private val xdgConfigPath = Paths.get(xdgConfigHome, ".config", "git", "config").normalize().toString()
     private val credentialJarPath = File(credentialHome, "git-checkout-credential.jar").absolutePath
 
     init {
-        val xdgConfigParentFile = File(xdfConfigPath).parentFile
+        val xdgConfigParentFile = File(xdgConfigPath).parentFile
         if (!xdgConfigParentFile.exists()) {
             xdgConfigParentFile.mkdirs()
         }
@@ -113,6 +111,7 @@ class GitAuthHelper(
                     "devopsStore"
                 ),
                 runtimeEnv = mapOf(
+                    XDG_CONFIG_HOME to xdgConfigHome,
                     GIT_REPO_PATH to settings.repositoryPath
                 ),
                 inputStream = CredentialArguments(
@@ -180,14 +179,14 @@ class GitAuthHelper(
                 configKey = insteadOfKey,
                 configValueRegex = "git@$host:",
                 configScope = GitConfigScope.FILE,
-                configFile = xdfConfigPath
+                configFile = xdgConfigPath
             )
         ) {
             git.configAdd(
                 configKey = insteadOfKey,
                 configValue = "git@$host:",
                 configScope = GitConfigScope.FILE,
-                configFile = xdfConfigPath
+                configFile = xdgConfigPath
             )
         }
     }
@@ -204,7 +203,7 @@ class GitAuthHelper(
         git.tryConfigUnset(
             configKey = insteadOfKey,
             configScope = GitConfigScope.FILE,
-            configFile = xdfConfigPath
+            configFile = xdgConfigPath
         )
         listOf(
             "http://${serverInfo.hostName}/",
@@ -214,7 +213,7 @@ class GitAuthHelper(
                 configKey = insteadOfKey,
                 configValue = it,
                 configScope = GitConfigScope.FILE,
-                configFile = xdfConfigPath
+                configFile = xdgConfigPath
             )
         }
 
@@ -224,7 +223,7 @@ class GitAuthHelper(
                     configKey = insteadOfKey,
                     configValue = "$protocol://$otherHostName/",
                     configScope = GitConfigScope.FILE,
-                    configFile = xdfConfigPath
+                    configFile = xdgConfigPath
                 )
             }
         }
@@ -255,6 +254,7 @@ class GitAuthHelper(
                     "devopsErase"
                 ),
                 runtimeEnv = mapOf(
+                    XDG_CONFIG_HOME to xdgConfigHome,
                     GIT_REPO_PATH to settings.repositoryPath
                 ),
                 inputStream = CredentialArguments(
