@@ -5,7 +5,7 @@
     "language": "java",
     "minimumVersion": "1.8",
     "demands": [],
-    "target": "java -jar git.jar"
+    "target": "$bk_java_path -jar git.jar"
   },
   "input": {
     "repositoryUrl": {
