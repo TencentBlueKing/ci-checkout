@@ -79,6 +79,11 @@ class GitCodeCommandAtomParamInputAdapter(
                 AuthType.PERSONAL_ACCESS_TOKEN -> PrivateGitAuthProvider(
                     token = personalAccessToken
                 )
+                AuthType.AUTH_USER_TOKEN ->
+                    UserTokenGitAuthProvider(
+                        userId = authUserId,
+                        devopsApi = devopsApi
+                    )
                 else -> EmptyGitAuthProvider()
             }
             val authInfo = authProvider.getAuthInfo()

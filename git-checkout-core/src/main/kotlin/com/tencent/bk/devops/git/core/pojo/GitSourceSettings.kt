@@ -114,6 +114,11 @@ data class GitSourceSettings(
     var excludeSubPath: String? = "",
 
     /**
+     * 指定授权用户
+     */
+    var authUserId: String? = "",
+
+    /**
      * if auth type is oauth, the username value is oauth2.
      */
     val username: String? = null,

@@ -51,6 +51,7 @@ data class GitCodeCommandAtomParamInput(
     var username: String? = null,
     var password: String? = null,
     var personalAccessToken: String? = null,
+    var authUserId: String? = null,
 
     var localPath: String? = null,
     var strategy: String = PullStrategy.REVERT_UPDATE.name,

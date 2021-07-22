@@ -34,5 +34,7 @@ enum class AuthType {
     START_USER_TOKEN,
     // 工蜂专有授权类型
     PERSONAL_ACCESS_TOKEN,
-    EMPTY
+    EMPTY,
+    // 指定授权用户
+    AUTH_USER_TOKEN
 }

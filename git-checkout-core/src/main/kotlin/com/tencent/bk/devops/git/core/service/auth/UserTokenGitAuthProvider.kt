@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.auth
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.exception.ApiException
+import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import org.slf4j.LoggerFactory
@@ -37,7 +38,7 @@ import org.slf4j.LoggerFactory
  * 根据userId获取oauth2 token
  */
 class UserTokenGitAuthProvider(
-    private val userId: String,
+    private val userId: String?,
     private val devopsApi: IDevopsApi
 ) : IGitAuthProvider {
 
@@ -46,6 +47,9 @@ class UserTokenGitAuthProvider(
     }
 
     override fun getAuthInfo(): AuthInfo {
+        if (userId.isNullOrBlank()) {
+            throw ParamInvalidException(errorMsg = "授权用户ID不能为空")
+        }
         val result = devopsApi.getOauthToken(userId = userId)
         if (result.isNotOk() || result.data == null) {
             logger.error("Fail to get the token($userId) because of ${result.message}")
