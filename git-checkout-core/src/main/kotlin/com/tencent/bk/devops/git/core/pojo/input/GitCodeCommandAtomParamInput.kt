@@ -90,5 +90,6 @@ data class GitCodeCommandAtomParamInput(
     var enableTrace: Boolean? = false,
 
     var usernameConfig: String? = "",
-    var userEmailConfig: String? = ""
+    var userEmailConfig: String? = "",
+    var enablePartialClone: Boolean? = false
 )

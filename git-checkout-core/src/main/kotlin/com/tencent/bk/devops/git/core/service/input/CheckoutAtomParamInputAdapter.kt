@@ -92,7 +92,8 @@ class CheckoutAtomParamInputAdapter(
             compatibleHostList = compatibleHostList,
             enableTrace = enableTrace,
             usernameConfig = usernameConfig,
-            userEmailConfig = userEmailConfig
+            userEmailConfig = userEmailConfig,
+            enablePartialClone = enablePartialClone
         )
     ).getInputs()
 
@@ -142,7 +143,8 @@ class CheckoutAtomParamInputAdapter(
             hostNameList = compatibleHostList,
             enableTrace = enableTrace,
             usernameConfig = usernameConfig,
-            userEmailConfig = userEmailConfig
+            userEmailConfig = userEmailConfig,
+            enablePartialClone = enablePartialClone
         )
     ).getInputs()
 }

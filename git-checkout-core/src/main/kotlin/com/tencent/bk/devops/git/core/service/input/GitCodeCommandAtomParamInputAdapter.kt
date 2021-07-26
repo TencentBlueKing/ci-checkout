@@ -46,7 +46,6 @@ import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import java.io.File
-import org.slf4j.LoggerFactory
 
 class GitCodeCommandAtomParamInputAdapter(
     private val input: GitCodeCommandAtomParamInput
@@ -54,7 +53,6 @@ class GitCodeCommandAtomParamInputAdapter(
 
     companion object {
         private val devopsApi = DevopsApi()
-        private val logger = LoggerFactory.getLogger(GitCodeCommandAtomParamInputAdapter::class.java)
     }
 
     @Suppress("ALL")
@@ -148,7 +146,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 usernameConfig = usernameConfig,
                 userEmailConfig = userEmailConfig,
                 compatibleHostList = hostNameList,
-                enableTrace = enableTrace
+                enableTrace = enableTrace,
+                enablePartialClone = enablePartialClone
             )
         }
     }

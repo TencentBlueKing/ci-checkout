@@ -170,7 +170,8 @@ class GitCodeAtomParamInputAdapter(
                 usernameConfig = usernameConfig,
                 userEmailConfig = userEmailConfig,
                 compatibleHostList = compatibleHostList,
-                enableTrace = enableTrace
+                enableTrace = enableTrace,
+                enablePartialClone = enablePartialClone
             )
         }
     }
