@@ -53,8 +53,8 @@ class GitCheckoutRunner {
         logger.info("git-checkout-core version： ${getCheckoutCoreVersion()}")
         val monitorData = MonitorData()
         monitorData.startTime = System.currentTimeMillis()
-        val settings = inputAdapter.getInputs()
         try {
+            val settings = inputAdapter.getInputs()
             val sourceProvider = GitSourceProvider(settings = settings, devopsApi = DevopsApi())
             if (settings.postEntryParam == "True") {
                 sourceProvider.cleanUp()
@@ -76,7 +76,7 @@ class GitCheckoutRunner {
             atomContext.result.message = ignore.message
             atomContext.result.status = Status.failure
         } finally {
-            if (settings.postEntryParam != "True") {
+            if (atomContext.param.postEntryParam != "True") {
                 // 权限的环境变量都需要保存,在postAction阶段需要清理
                 EnvHelper.getAuthEnv().forEach { (k, v) ->
                     atomContext.result.data[k] = StringData(StringUtils.trimVariable(v))

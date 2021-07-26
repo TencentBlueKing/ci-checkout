@@ -108,6 +108,10 @@ class InitRepoHandler(
         git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.GLOBAL)
         git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.GLOBAL)
         git.config(configKey = "gc.auto", configValue = "0")
+        initParitalClone()
+    }
+
+    private fun GitSourceSettings.initParitalClone() {
         if (enablePartialClone == true && git.isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
             // 如果开启部分克隆,那么浅克隆应该关闭
             settings.fetchDepth = 0

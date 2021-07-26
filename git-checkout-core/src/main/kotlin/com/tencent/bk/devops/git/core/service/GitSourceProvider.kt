@@ -61,11 +61,7 @@ class GitSourceProvider(
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_URL, settings.repositoryUrl)
             val repositoryName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_NAME, repositoryName)
-            if (preMerge) {
-                if (sourceRepositoryUrl.isBlank() || sourceBranchName.isBlank()) {
-                    preMerge = false
-                }
-            }
+            preMerge = preMerge && sourceRepositoryUrl.isNotBlank() && sourceBranchName.isNotBlank()
 
             logger.info("Working directory is: $repositoryPath")
             val workingDirectory = File(repositoryPath)
