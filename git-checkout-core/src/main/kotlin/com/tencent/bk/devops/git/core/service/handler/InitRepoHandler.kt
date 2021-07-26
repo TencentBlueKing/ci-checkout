@@ -28,6 +28,10 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
+import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -66,7 +70,7 @@ class InitRepoHandler(
     private fun GitSourceSettings.initRepository() {
         if (!File(repositoryPath, ".git").exists()) {
             git.init()
-            git.remoteAdd(GitConstants.ORIGIN_REMOTE_NAME, repositoryUrl)
+            git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
             // if source repository is fork repo, adding devops-virtual-origin
             if (preMerge && !GitUtil.isSameRepository(
                     repositoryUrl = repositoryUrl,
@@ -74,18 +78,18 @@ class InitRepoHandler(
                     hostNameList = compatibleHostList
                 )
             ) {
-                git.remoteAdd(GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
+                git.remoteAdd(DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
             }
         } else {
-            git.remoteSetUrl(GitConstants.ORIGIN_REMOTE_NAME, repositoryUrl)
+            git.remoteSetUrl(ORIGIN_REMOTE_NAME, repositoryUrl)
             if (preMerge && !GitUtil.isSameRepository(
                     repositoryUrl = repositoryUrl,
                     otherRepositoryUrl = sourceRepositoryUrl,
                     hostNameList = compatibleHostList
                 )
             ) {
-                git.remoteRemove(GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME)
-                git.remoteAdd(GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
+                git.remoteRemove(DEVOPS_VIRTUAL_REMOTE_NAME)
+                git.remoteAdd(DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
             }
         }
         git.remoteList()
@@ -104,6 +108,27 @@ class InitRepoHandler(
         git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.GLOBAL)
         git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.GLOBAL)
         git.config(configKey = "gc.auto", configValue = "0")
+        if (enablePartialClone == true && git.isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
+            // 如果开启部分克隆,那么浅克隆应该关闭
+            settings.fetchDepth = 0
+            git.config(configKey = "remote.$ORIGIN_REMOTE_NAME.promisor", configValue = "true")
+            git.config(
+                configKey = "remote.$ORIGIN_REMOTE_NAME.partialclonefilter",
+                configValue = FilterValueEnum.TREELESS.value
+            )
+            if (preMerge && !GitUtil.isSameRepository(
+                    repositoryUrl = repositoryUrl,
+                    otherRepositoryUrl = sourceRepositoryUrl,
+                    hostNameList = compatibleHostList
+                )
+            ) {
+                git.config(configKey = "remote.$DEVOPS_VIRTUAL_REMOTE_NAME.promisor", configValue = "true")
+                git.config(
+                    configKey = "remote.$DEVOPS_VIRTUAL_REMOTE_NAME.partialclonefilter",
+                    configValue = FilterValueEnum.TREELESS.value
+                )
+            }
+        }
     }
 
     /**

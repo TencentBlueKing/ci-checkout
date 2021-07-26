@@ -115,4 +115,6 @@ object GitConstants {
 
     const val GIT_LOG_FORMAT = "%H|%cn|%ct|%cd|%an|%s"
     const val GIT_LOG_MAX_COUNT = 50
+
+    const val SUPPORT_PARTIAL_CLONE_GIT_VERSION = "2.22.0"
 }

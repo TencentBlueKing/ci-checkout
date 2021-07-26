@@ -40,13 +40,14 @@ import com.tencent.bk.devops.git.core.exception.RetryException
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.GitOutput
 import com.tencent.bk.devops.git.core.service.helper.RetryHelper
+import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import com.tencent.devops.git.log.LogType
-import java.io.File
 import org.slf4j.LoggerFactory
+import java.io.File
 
 @Suppress("ALL")
 class GitCommandManager(
@@ -62,6 +63,7 @@ class GitCommandManager(
         GIT_TERMINAL_PROMPT to "0",
         GCM_INTERACTIVE to "Never"
     )
+    private var gitVersion = 0L
 
     init {
         if (lfs) {
@@ -70,6 +72,8 @@ class GitCommandManager(
     }
 
     fun getGitVersion(): String {
+        val version = execGit(listOf("--version")).stdOut
+        gitVersion = VersionHelper.computeGitVersion(version)
         return execGit(listOf("--version")).stdOut
     }
 
@@ -387,6 +391,13 @@ class GitCommandManager(
             printLogger = false
         )
         return output.stdOut.trim().isNotBlank()
+    }
+
+    fun isAtLeastVersion(requestedVersion: String): Boolean {
+        return VersionHelper.isAtLeastVersion(
+            gitVersion = gitVersion,
+            requestedVersion = VersionHelper.computeGitVersion(requestedVersion)
+        )
     }
 
     private fun execGit(

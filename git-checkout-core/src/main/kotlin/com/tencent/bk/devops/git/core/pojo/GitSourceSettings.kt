@@ -72,7 +72,7 @@ data class GitSourceSettings(
     /**
      * The depth when fetching
      */
-    val fetchDepth: Int = 0,
+    var fetchDepth: Int = 0,
 
     /**
      * 是否只fetch配置的分支
@@ -165,5 +165,10 @@ data class GitSourceSettings(
     /**
      * 是否开启调试功能
      */
-    var enableTrace: Boolean? = false
+    var enableTrace: Boolean? = false,
+
+    /**
+     * 是否开启部分克隆,部分克隆只有git版本大于2.22.0才可以使用
+     */
+    var enablePartialClone: Boolean? = false
 )
