@@ -53,9 +53,9 @@ open class CodeGitPullCodeSetting(
         } else {
             null
         }
-        SSHAgentUtils(privateKey, passPhrase).addIdentity()
+        val sshParams = SSHAgentUtils(privateKey, passPhrase).addIdentity()
         val credentialSetter = CodeGitSshCredentialSetter(privateKey, passPhrase)
-        return performTask(credentialSetter)
+        return performTask(credentialSetter).plus(sshParams)
     }
 
     private fun doOauthPullCode(credentials: List<String>): Map<String, String>? {

@@ -54,3 +54,11 @@ gradle clean buildZip
 
 1. GitCodeAtom：代码入口
 2. GitUpdateTask：执行git命令
+
+## 四、FAQ
+1. 使用ssh方式拉代码，出现Host key verification failed. fatal: Could not read from remote repository.错误，如果检查公私钥正确的情况下，在构建机中~/.ssh/config增加
+```shell
+# hostName是拉取的代码库域名
+Host hostName
+  StrictHostKeyChecking no
+```

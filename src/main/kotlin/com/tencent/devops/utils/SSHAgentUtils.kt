@@ -10,7 +10,6 @@ import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.lang.RuntimeException
 import java.nio.file.Files
 import java.nio.file.attribute.PosixFilePermissions
 import java.util.concurrent.TimeUnit
@@ -28,33 +27,29 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
     fun addIdentity(): Map<String, String> {
         var keyFile: File? = null
         var askPass: File? = null
+        var sshAgentFile: File? = null
+        var sshAddFile: File? = null
         try {
-            val (sshAgentFile, sshAddFile) = if (AgentEnv.getOS() == OSType.WINDOWS) {
-                val sshAgentFile = File.createTempFile("ssh-agent", ".bat")
-                sshAgentFile.setExecutable(true, true)
-                sshAgentFile.writeText("@echo off\n\"${getWindowsSshExecutable("ssh-agent.exe")}\"")
+            if (AgentEnv.getOS() == OSType.WINDOWS) {
+                sshAgentFile = createWindowsSshAgent()
 
                 keyFile = File.createTempFile("private_key_", ".key")
                 keyFile.writeText(privateKey)
-                val sshAddFile = File.createTempFile("ssh-add-", ".bat")
-                sshAddFile.setExecutable(true, true)
-                sshAddFile.writeText("@echo off\n\"${getWindowsSshExecutable("ssh-add.exe")} \" \"${keyFile.absolutePath}\"")
+
+                sshAddFile = createWindowsSshAddFile(keyFile)
 
                 askPass = if (passPhrase != null) createWindowsAskpassScript() else null
                 Pair(sshAgentFile, sshAddFile)
             } else {
-                val sshAgentFile = File.createTempFile("ssh-agent", ".sh")
-                sshAgentFile.setExecutable(true, true)
-                sshAgentFile.writeText("#!/bin/sh\nssh-agent")
+                sshAgentFile = createUnixSshAgent()
 
                 val perms = PosixFilePermissions.fromString("rw-------")
                 val fileAttributes = PosixFilePermissions
                     .asFileAttribute(perms)
                 keyFile = Files.createTempFile("private_key_", ".key", fileAttributes).toFile()
                 keyFile.writeText(privateKey)
-                val sshAddFile = File.createTempFile("ssh-add-", ".sh")
-                sshAddFile.setExecutable(true, true)
-                sshAddFile.writeText("#!/bin/sh\nssh-add ${keyFile.absolutePath}")
+
+                sshAddFile = createUnixSshAddFile(keyFile)
 
                 askPass = if (passPhrase != null) createUnixAskpassScript() else null
                 Pair(sshAgentFile, sshAddFile)
@@ -75,11 +70,71 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         } catch (t: Throwable) {
             logger.warn("Fail to add the ssh key to ssh-agent", t)
         } finally {
-            keyFile?.delete()
-            askPass?.delete()
+            deleteTempFile(sshAgentFile)
+            deleteTempFile(sshAddFile)
+            deleteTempFile(keyFile)
+            deleteTempFile(askPass)
+
         }
 
         return mapOf()
+    }
+
+    private fun createWindowsSshAgent(): File {
+        val sshAgentFile = File.createTempFile("ssh-agent", ".bat")
+        sshAgentFile.setExecutable(true, true)
+        sshAgentFile.writeText("@echo off\n\"${getWindowsSshExecutable("ssh-agent.exe")}\"")
+        return sshAgentFile
+    }
+
+    private fun createWindowsSshAddFile(keyFile: File): File {
+        val sshAddFile = File.createTempFile("ssh-add-", ".bat")
+        sshAddFile.setExecutable(true, true)
+        sshAddFile.writeText("@echo off\n\"${getWindowsSshExecutable("ssh-add.exe")}\" " +
+            "\"${keyFile.absolutePath}\"")
+        return sshAddFile
+    }
+
+    private fun createWindowsAskpassScript(): File {
+        val askpass = File.createTempFile("askpass_", ".bat")
+        logger.info("Create the askpass file(${askpass.absolutePath})")
+        askpass.writeText("@echo off\n@echo %SSH_PASSPHRASE%")
+        askpass.setExecutable(true, true)
+        return askpass
+    }
+
+    private fun createUnixSshAgent(): File {
+        val sshAgentFile = File.createTempFile("ssh-agent", ".sh")
+        sshAgentFile.setExecutable(true, true)
+        sshAgentFile.writeText("#!/bin/sh\nssh-agent")
+        return sshAgentFile
+    }
+
+    private fun createUnixSshAddFile(keyFile: File): File {
+        val sshAddFile = File.createTempFile("ssh-add-", ".sh")
+        sshAddFile.setExecutable(true, true)
+        sshAddFile.writeText("#!/bin/sh\nssh-add ${keyFile.absolutePath}")
+        return sshAddFile
+    }
+
+    /**
+     * Creates a self-deleting script for SSH_ASKPASS. Self-deleting to be able to detect a wrong passphrase.
+     */
+    private fun createUnixAskpassScript(): File {
+        val perms = PosixFilePermissions.fromString("rwx------")
+        val fileAttributes = PosixFilePermissions
+            .asFileAttribute(perms)
+        val askpass = Files.createTempFile("askpass_", ".sh", fileAttributes).toFile()
+        logger.info("Create the askpass file(${askpass.absolutePath})")
+        askpass.writeText("#!/bin/sh\necho \"\$SSH_PASSPHRASE\"\nrm \"$0\"\n")
+        executeCommand("chmod +x ${askpass.absolutePath}", null)
+        return askpass
+    }
+
+    private fun deleteTempFile(tempFile: File?) {
+        if (tempFile != null && tempFile.exists()) {
+            tempFile.delete()
+        }
     }
 
     private fun executeCommand(commandLine: String, env: Map<String, String>?): String {
@@ -146,28 +201,6 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         return agentOutput.substring(pos, end)
     }
 
-    /**
-     * Creates a self-deleting script for SSH_ASKPASS. Self-deleting to be able to detect a wrong passphrase.
-     */
-    private fun createUnixAskpassScript(): File {
-        val perms = PosixFilePermissions.fromString("rwx------")
-        val fileAttributes = PosixFilePermissions
-            .asFileAttribute(perms)
-        val askpass = Files.createTempFile("askpass_", ".sh", fileAttributes).toFile()
-        logger.info("Create the askpass file(${askpass.absolutePath})")
-        askpass.writeText("#!/bin/sh\necho \"\$SSH_PASSPHRASE\"\nrm \"$0\"\n")
-        executeCommand("chmod +x ${askpass.absolutePath}", null)
-        return askpass
-    }
-
-    private fun createWindowsAskpassScript(): File {
-        val askpass = File.createTempFile("askpass_", ".bat")
-        askpass.setExecutable(true, true)
-        logger.info("Create the askpass file(${askpass.absolutePath})")
-        askpass.writeText("@ECHO %SSH_PASSPHRASE%\nDEL \"" + askpass.getAbsolutePath() + "\"\n")
-        return askpass
-    }
-
     private fun getWindowsSshExecutable(cmd: String): File {
         // First check the GIT_SSH environment variable
         var sshexe = getFileFromEnv("GIT_SSH", "")
@@ -191,7 +224,7 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         if (sshexe != null && sshexe.exists()) {
             return sshexe
         }
-        throw RuntimeException(
+        throw IllegalArgumentException(
             "ssh executable not found. " +
                 "The plugin only supports official git client http://git-scm.com/download/win"
         )
