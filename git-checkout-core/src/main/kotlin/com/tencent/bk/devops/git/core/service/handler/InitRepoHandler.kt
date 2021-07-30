@@ -30,6 +30,9 @@ package com.tencent.bk.devops.git.core.service.handler
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
+import com.tencent.bk.devops.git.core.enums.FilterValueEnum
+import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -102,9 +105,34 @@ class InitRepoHandler(
         if (!userEmailConfig.isNullOrBlank()) {
             git.config(configKey = "user.email", configValue = userEmailConfig!!)
         }
-        git.config(configKey = "http.sslverify", configValue = "false")
-        git.config(configKey = "http.postBuffer", configValue = "524288000")
+        git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.GLOBAL)
+        git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.GLOBAL)
         git.config(configKey = "gc.auto", configValue = "0")
+        initPartialClone()
+    }
+
+    private fun GitSourceSettings.initPartialClone() {
+        if (enablePartialClone == true && git.isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
+            // 如果开启部分克隆,那么浅克隆应该关闭
+            settings.fetchDepth = 0
+            git.config(configKey = "remote.$ORIGIN_REMOTE_NAME.promisor", configValue = "true")
+            git.config(
+                configKey = "remote.$ORIGIN_REMOTE_NAME.partialclonefilter",
+                configValue = FilterValueEnum.TREELESS.value
+            )
+            if (preMerge && !GitUtil.isSameRepository(
+                    repositoryUrl = repositoryUrl,
+                    otherRepositoryUrl = sourceRepositoryUrl,
+                    hostNameList = compatibleHostList
+                )
+            ) {
+                git.config(configKey = "remote.$DEVOPS_VIRTUAL_REMOTE_NAME.promisor", configValue = "true")
+                git.config(
+                    configKey = "remote.$DEVOPS_VIRTUAL_REMOTE_NAME.partialclonefilter",
+                    configValue = FilterValueEnum.TREELESS.value
+                )
+            }
+        }
     }
 
     /**
