@@ -30,6 +30,7 @@ package com.tencent.bk.devops.git.core.pojo
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.util.GitUtil
 
 data class GitSourceSettings(
 
@@ -171,4 +172,11 @@ data class GitSourceSettings(
      * 是否开启部分克隆,部分克隆只有git版本大于2.22.0才可以使用
      */
     var enablePartialClone: Boolean? = false
-)
+) {
+    val sourceRepoUrlEqualsRepoUrl: Boolean
+        get() = GitUtil.isSameRepository(
+            repositoryUrl = repositoryUrl,
+            otherRepositoryUrl = sourceRepositoryUrl,
+            hostNameList = compatibleHostList
+        )
+}

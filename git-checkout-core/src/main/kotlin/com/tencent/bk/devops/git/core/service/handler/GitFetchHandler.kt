@@ -31,7 +31,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
-import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
 
 class GitFetchHandler(
@@ -54,12 +53,7 @@ class GitFetchHandler(
     }
 
     private fun GitSourceSettings.fetchSourceRepository() {
-        if (preMerge && !GitUtil.isSameRepository(
-                repositoryUrl = repositoryUrl,
-                otherRepositoryUrl = sourceRepositoryUrl,
-                hostNameList = compatibleHostList
-            )
-        ) {
+        if (preMerge && !sourceRepoUrlEqualsRepoUrl) {
             val refSpec = refHelper.getSourceRefSpec()
             git.fetch(
                 refSpec = refSpec,

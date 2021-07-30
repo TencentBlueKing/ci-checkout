@@ -96,12 +96,7 @@ class RefHelper(
 
     fun getMergeInfo(): String {
         with(settings) {
-            return if (GitUtil.isSameRepository(
-                    repositoryUrl = repositoryUrl,
-                    otherRepositoryUrl = sourceRepositoryUrl,
-                    hostNameList = compatibleHostList
-                )
-            ) {
+            return if (sourceRepoUrlEqualsRepoUrl) {
                 // if code_git enable pre_push, executing `git merge FETCH_HEAD`
                 if (GitUtil.isPrePushBranch(sourceBranchName)) {
                     FETCH_HEAD
@@ -114,9 +109,5 @@ class RefHelper(
         }
     }
 
-    private fun GitSourceSettings.isAddSourceRef() = preMerge && GitUtil.isSameRepository(
-        repositoryUrl = repositoryUrl,
-        otherRepositoryUrl = sourceRepositoryUrl,
-        hostNameList = compatibleHostList
-    )
+    private fun GitSourceSettings.isAddSourceRef() = preMerge && sourceRepoUrlEqualsRepoUrl
 }

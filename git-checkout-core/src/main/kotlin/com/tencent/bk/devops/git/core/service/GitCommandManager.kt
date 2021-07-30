@@ -308,7 +308,10 @@ class GitCommandManager(
         enablePartialClone: Boolean? = false
     ) {
         val args = mutableListOf("fetch", "--prune", "--progress", "--no-recurse-submodules")
-        if (enablePartialClone == true) {
+        /**
+         * 如果git版本大于2.20.0,并且开启部分克隆，则忽略浅克隆
+         */
+        if (enablePartialClone == true && isAtLeastVersion(GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
             args.add("--filter=${FilterValueEnum.TREELESS.value}")
         } else {
             if (fetchDepth > 0 && !preMerge) {

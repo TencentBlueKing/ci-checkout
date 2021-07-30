@@ -54,14 +54,14 @@ class InitRepoHandler(
             logger.groupStart("Initializing the repository")
             val gitVersion = git.getGitVersion()
             git.setEnvironmentVariable(GitConstants.GIT_HTTP_USER_AGENT, "git/$gitVersion (landun-git-checkout)")
-            if (settings.enableTrace == true) {
-                git.setEnvironmentVariable(GitConstants.GIT_TRACE, "1")
-            }
             initRepository()
             initConfig()
             initSparseCheckout()
             if (lfs) {
                 git.lfsInstall()
+            }
+            if (settings.enableTrace == true) {
+                git.setEnvironmentVariable(GitConstants.GIT_TRACE, "1")
             }
             logger.groupEnd("")
         }
@@ -72,21 +72,13 @@ class InitRepoHandler(
             git.init()
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
             // if source repository is fork repo, adding devops-virtual-origin
-            if (preMerge && !GitUtil.isSameRepository(
-                    repositoryUrl = repositoryUrl,
-                    otherRepositoryUrl = sourceRepositoryUrl,
-                    hostNameList = compatibleHostList
-                )
+            if (preMerge && !sourceRepoUrlEqualsRepoUrl
             ) {
                 git.remoteAdd(DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
             }
         } else {
             git.remoteSetUrl(ORIGIN_REMOTE_NAME, repositoryUrl)
-            if (preMerge && !GitUtil.isSameRepository(
-                    repositoryUrl = repositoryUrl,
-                    otherRepositoryUrl = sourceRepositoryUrl,
-                    hostNameList = compatibleHostList
-                )
+            if (preMerge && !sourceRepoUrlEqualsRepoUrl
             ) {
                 git.remoteRemove(DEVOPS_VIRTUAL_REMOTE_NAME)
                 git.remoteAdd(DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
@@ -113,8 +105,6 @@ class InitRepoHandler(
 
     private fun GitSourceSettings.initPartialClone() {
         if (enablePartialClone == true && git.isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
-            // 如果开启部分克隆,那么浅克隆应该关闭
-            settings.fetchDepth = 0
             git.config(configKey = "remote.$ORIGIN_REMOTE_NAME.promisor", configValue = "true")
             git.config(
                 configKey = "remote.$ORIGIN_REMOTE_NAME.partialclonefilter",
