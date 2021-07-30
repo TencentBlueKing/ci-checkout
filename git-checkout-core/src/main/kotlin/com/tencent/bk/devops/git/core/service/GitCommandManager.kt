@@ -309,7 +309,7 @@ class GitCommandManager(
     ) {
         val args = mutableListOf("fetch", "--prune", "--progress", "--no-recurse-submodules")
         if (enablePartialClone == true) {
-            args.add("--filter=${FilterValueEnum.TREELESS}")
+            args.add("--filter=${FilterValueEnum.TREELESS.value}")
         } else {
             if (fetchDepth > 0 && !preMerge) {
                 args.add("--depth=$fetchDepth")
