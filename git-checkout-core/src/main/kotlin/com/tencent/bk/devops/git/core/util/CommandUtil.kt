@@ -58,7 +58,9 @@ object CommandUtil {
         printLogger: Boolean = true
     ): GitOutput {
         val executor = CommandLineExecutor()
-        executor.workingDirectory = workingDirectory
+        if (workingDirectory != null) {
+            executor.workingDirectory = workingDirectory
+        }
         val stdOuts = mutableListOf<String>()
         val errOuts = mutableListOf<String>()
         val outputStream = object : GitLogOutputStream(logType) {
