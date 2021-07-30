@@ -32,13 +32,13 @@ import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitOutput
 import com.tencent.bk.devops.plugin.pojo.ErrorType
+import com.tencent.bk.devops.plugin.script.CommandLineExecutor
 import com.tencent.bk.devops.plugin.script.SensitiveLineParser
 import com.tencent.devops.git.log.GitLogOutputStream
 import com.tencent.devops.git.log.LogType
 import java.io.File
 import java.io.InputStream
 import org.apache.commons.exec.CommandLine
-import org.apache.commons.exec.DefaultExecutor
 import org.apache.commons.exec.ExecuteException
 import org.apache.commons.exec.PumpStreamHandler
 import org.apache.commons.exec.environment.EnvironmentUtils
@@ -57,7 +57,7 @@ object CommandUtil {
         logType: LogType = LogType.TEXT,
         printLogger: Boolean = true
     ): GitOutput {
-        val executor = DefaultExecutor()
+        val executor = CommandLineExecutor()
         executor.workingDirectory = workingDirectory
         val stdOuts = mutableListOf<String>()
         val errOuts = mutableListOf<String>()

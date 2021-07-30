@@ -65,7 +65,8 @@ class GitFetchHandler(
                 refSpec = refSpec,
                 fetchDepth = fetchDepth,
                 remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME,
-                preMerge = preMerge
+                preMerge = preMerge,
+                enablePartialClone = enablePartialClone
             )
         }
     }
@@ -80,7 +81,8 @@ class GitFetchHandler(
             refSpec = refSpec,
             fetchDepth = fetchDepth,
             remoteName = GitConstants.ORIGIN_REMOTE_NAME,
-            preMerge = preMerge
+            preMerge = preMerge,
+            enablePartialClone = enablePartialClone
         )
     }
 }

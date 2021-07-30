@@ -58,7 +58,7 @@ class GitAuthHelper(
 
     private val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
 
-    private val credentialHome = File(System.getProperty("user.home"), "git-checkout-credential").absolutePath
+    private val credentialHome = File(System.getProperty("user.home"), ".checkout").absolutePath
     private val xdgConfigHome = System.getenv(XDG_CONFIG_HOME) ?: Paths.get(
         credentialHome,
         System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: ""

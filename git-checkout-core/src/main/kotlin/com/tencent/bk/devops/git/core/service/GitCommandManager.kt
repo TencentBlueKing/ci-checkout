@@ -33,6 +33,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
+import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
@@ -46,8 +47,8 @@ import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import com.tencent.devops.git.log.LogType
-import org.slf4j.LoggerFactory
 import java.io.File
+import org.slf4j.LoggerFactory
 
 @Suppress("ALL")
 class GitCommandManager(
@@ -299,13 +300,24 @@ class GitCommandManager(
         execGit(args = args)
     }
 
-    fun fetch(refSpec: List<String>, fetchDepth: Int, remoteName: String, preMerge: Boolean) {
+    fun fetch(
+        refSpec: List<String>,
+        fetchDepth: Int,
+        remoteName: String,
+        preMerge: Boolean,
+        enablePartialClone: Boolean? = false
+    ) {
         val args = mutableListOf("fetch", "--prune", "--progress", "--no-recurse-submodules")
-        if (fetchDepth > 0 && !preMerge) {
-            args.add("--depth=$fetchDepth")
-        } else if (File(File(workingDirectory, ".git"), "shallow").exists()) {
-            args.add("--unshallow")
+        if (enablePartialClone == true) {
+            args.add("--filter=${FilterValueEnum.TREELESS}")
+        } else {
+            if (fetchDepth > 0 && !preMerge) {
+                args.add("--depth=$fetchDepth")
+            } else if (File(File(workingDirectory, ".git"), "shallow").exists()) {
+                args.add("--unshallow")
+            }
         }
+
         args.add(remoteName)
         args.addAll(refSpec)
         doFetch(args = args)
