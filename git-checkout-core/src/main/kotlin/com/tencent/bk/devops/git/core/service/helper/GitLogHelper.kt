@@ -80,8 +80,7 @@ class GitLogHelper(
         )
         saveBuildMaterial(commitMaterial = commitMaterial)
         EnvHelper.addLogEnv(
-            commitMaterial = commitMaterial,
-            elementId = settings.pipelineTaskId
+            commitMaterial = commitMaterial
         )
     }
 

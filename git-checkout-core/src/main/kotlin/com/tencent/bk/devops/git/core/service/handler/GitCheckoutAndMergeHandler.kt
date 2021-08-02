@@ -50,6 +50,11 @@ class GitCheckoutAndMergeHandler(
         logger.groupStart("Checking out the ref ${checkoutInfo.ref}")
         git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
         val afterCheckoutLog = getHeadLog(git)
+        // 保存切换前的commitId，当重试时需要切到这个commitId点
+        EnvHelper.addEnvVariable(
+            key = GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_ID + "_" + settings.pipelineTaskId,
+            value = afterCheckoutLog?.commitId ?: ""
+        )
         logger.groupEnd("")
         if (settings.preMerge) {
             val mergeRef = refHelper.getMergeInfo()

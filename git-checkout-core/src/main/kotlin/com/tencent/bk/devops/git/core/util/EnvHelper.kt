@@ -49,13 +49,11 @@ object EnvHelper {
     }
 
     fun addLogEnv(
-        commitMaterial: CommitMaterial,
-        elementId: String
+        commitMaterial: CommitMaterial
     ) {
         env[BK_CI_GIT_REPO_CUR_COMMITS] = commitMaterial.commitIds.joinToString(PARAM_SEPARATOR)
         env[BK_CI_GIT_REPO_LAST_COMMIT_ID] = commitMaterial.lastCommitId ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_ID] = commitMaterial.newCommitId ?: ""
-        env[BK_CI_GIT_REPO_HEAD_COMMIT_ID + "_" + elementId] = commitMaterial.newCommitId ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT] = commitMaterial.newCommitComment ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR] = commitMaterial.newCommitAuthor ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER] = commitMaterial.newCommitAuthor ?: ""
