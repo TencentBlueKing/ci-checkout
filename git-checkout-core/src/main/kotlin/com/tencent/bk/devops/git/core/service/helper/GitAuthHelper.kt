@@ -32,14 +32,11 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPA
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
-import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
-import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
-import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.SSHAgentUtils
 import org.apache.commons.codec.digest.DigestUtils
@@ -61,11 +58,7 @@ class GitAuthHelper(
 
     private val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
 
-    private val credentialHome = if (AgentEnv.getOS() == OSType.WINDOWS) {
-        File(System.getProperty("user.home"), ".checkout").absolutePath
-    } else {
-        File("/data/landun/.checkout").absolutePath
-    }
+    private val credentialHome = File(System.getProperty("user.home"), ".checkout").absolutePath
     private val xdgConfigHome = System.getenv(XDG_CONFIG_HOME) ?: Paths.get(
         credentialHome,
         System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: ""
@@ -79,7 +72,6 @@ class GitAuthHelper(
             xdgConfigParentFile.mkdirs()
         }
         git.setEnvironmentVariable(XDG_CONFIG_HOME, xdgConfigHome)
-        EnvHelper.addEnvVariable(XDG_CONFIG_HOME, xdgConfigHome)
     }
 
     private fun configureHttp() {
