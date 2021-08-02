@@ -17,9 +17,7 @@ class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
 
     override fun execute(atomContext: AtomContext<GitCodeAtomParam>) {
         try {
-            showEnvVariable()
             val param = atomContext.param
-            logger.info("context param: ${JsonUtil.toJson(param)}")
             val env = getPullCodeSetting(param).pullCode()
             env?.forEach { t, u -> atomContext.result.data[t] = StringData(u) }
 
@@ -47,11 +45,6 @@ class GitCodeAtom : TaskAtom<GitCodeAtomParam> {
         if (!param.username.isNullOrBlank()) return "HTTP"
         if (param.repositoryUrl.toUpperCase().startsWith("HTTP")) return "HTTP"
         return "SSH"
-    }
-
-    private fun showEnvVariable() {
-        CommonShellUtils.execute("whoami")
-        CommonShellUtils.execute(script = "git version", failExit = true)
     }
 
     private fun getPullCodeSetting(
