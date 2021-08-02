@@ -78,7 +78,7 @@ class GitAuthHelper(
         if (AgentEnv.getOS() != OSType.WINDOWS) {
             System.getenv(XDG_CONFIG_HOME) ?: EnvHelper.addEnvVariable(
                 XDG_CONFIG_HOME, Paths.get(
-                    "\$HOME",
+                    "~",
                     ".checkout",
                     System.getenv(GitConstants.BK_CI_PIPELINE_ID) ?: ""
                 ).normalize().toString()
