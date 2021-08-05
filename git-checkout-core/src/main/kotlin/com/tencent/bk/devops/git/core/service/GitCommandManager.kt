@@ -311,7 +311,7 @@ class GitCommandManager(
         /**
          * 如果git版本大于2.20.0,并且开启部分克隆，则忽略浅克隆
          */
-        if (enablePartialClone == true && isAtLeastVersion(GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
+        if (enablePartialClone == true && isAtLeastVersion(2, 22, 0, 0)) {
             args.add("--filter=${FilterValueEnum.TREELESS.value}")
         } else {
             if (fetchDepth > 0 && !preMerge) {
@@ -408,10 +408,10 @@ class GitCommandManager(
         return output.stdOut.trim().isNotBlank()
     }
 
-    fun isAtLeastVersion(requestedVersion: String): Boolean {
+    fun isAtLeastVersion(major: Int, minor: Int, rev: Int, bugfix: Int): Boolean {
         return VersionHelper.isAtLeastVersion(
             gitVersion = gitVersion,
-            requestedVersion = VersionHelper.computeGitVersion(requestedVersion)
+            requestedVersion = VersionHelper.computeVersionFromBits(major, minor, rev, bugfix)
         )
     }
 

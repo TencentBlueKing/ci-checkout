@@ -46,7 +46,7 @@ object VersionHelper {
     }
 
     // AABBCCDD where AA=major, BB=minor, CC=rev, DD=bugfix
-    private fun computeVersionFromBits(major: Int, minor: Int, rev: Int, bugfix: Int): Long {
+    fun computeVersionFromBits(major: Int, minor: Int, rev: Int, bugfix: Int): Long {
         return major * 1000000L + minor * 10000L + rev * 100L + bugfix
     }
 
