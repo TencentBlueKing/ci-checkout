@@ -63,6 +63,9 @@ class PrepareWorkspaceHandler(
                         repositoryPath = repositoryPath
                     )
                 }
+                if (isExisting) {
+                    logger.info("download from cache repository success")
+                }
             }
             // Prepare existing directory, otherwise recreate
             if (isExisting) {
