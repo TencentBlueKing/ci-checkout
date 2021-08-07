@@ -166,12 +166,16 @@ data class GitSourceSettings(
     /**
      * 是否开启调试功能
      */
-    var enableTrace: Boolean? = false,
+    val enableTrace: Boolean? = false,
 
     /**
      * 是否开启部分克隆,部分克隆只有git版本大于2.22.0才可以使用
      */
-    var enablePartialClone: Boolean? = false
+    var enablePartialClone: Boolean? = false,
+    /**
+     * 缓存路径:自定义的制品库路径,保存仓库的.git压缩文件
+     */
+    val cachePath: String? = ""
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(

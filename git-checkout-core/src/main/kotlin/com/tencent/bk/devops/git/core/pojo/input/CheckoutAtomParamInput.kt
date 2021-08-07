@@ -92,9 +92,13 @@ data class CheckoutAtomParamInput(
     var retryStartPoint: String? = "",
     var persistCredentials: Boolean,
     var compatibleHostList: List<String>? = null,
-    var enableTrace: Boolean? = false,
+    val enableTrace: Boolean? = false,
 
     var usernameConfig: String? = "",
     var userEmailConfig: String? = "",
-    var enablePartialClone: Boolean? = false
+    val enablePartialClone: Boolean? = false,
+    /**
+     * 缓存路径:自定义的制品库路径,保存仓库的.git压缩文件
+     */
+    val cachePath: String? = ""
 )

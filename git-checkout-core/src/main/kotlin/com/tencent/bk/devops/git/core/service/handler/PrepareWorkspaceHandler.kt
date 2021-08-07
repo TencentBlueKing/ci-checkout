@@ -30,7 +30,9 @@ package com.tencent.bk.devops.git.core.service.handler
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitDirectoryHelper
+import com.tencent.bk.devops.git.core.service.helper.IBkRepoHelper
 import java.io.File
+import java.util.ServiceLoader
 import org.slf4j.LoggerFactory
 
 class PrepareWorkspaceHandler(
@@ -50,6 +52,16 @@ class PrepareWorkspaceHandler(
             if (!workingDirectory.exists()) {
                 isExisting = false
                 workingDirectory.mkdirs()
+            }
+            // 如果仓库不存在,并且配置了缓存路径,则先从缓存路径下载.git文件
+            if (!isExisting && !File(repositoryPath, ".git").exists() && !cachePath.isNullOrBlank()) {
+                val bkRepoHelperOptional = ServiceLoader.load(IBkRepoHelper::class.java).findFirst()
+                bkRepoHelperOptional.ifPresent { bkRepoHelper ->
+                    isExisting = bkRepoHelper.downloadCacheRepo(
+                        cachePath = cachePath,
+                        repositoryPath = repositoryPath
+                    )
+                }
             }
             // Prepare existing directory, otherwise recreate
             if (isExisting) {

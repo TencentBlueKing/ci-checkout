@@ -93,7 +93,8 @@ class CheckoutAtomParamInputAdapter(
             enableTrace = enableTrace,
             usernameConfig = usernameConfig,
             userEmailConfig = userEmailConfig,
-            enablePartialClone = enablePartialClone
+            enablePartialClone = enablePartialClone,
+            cachePath = cachePath
         )
     ).getInputs()
 
@@ -144,7 +145,8 @@ class CheckoutAtomParamInputAdapter(
             enableTrace = enableTrace,
             usernameConfig = usernameConfig,
             userEmailConfig = userEmailConfig,
-            enablePartialClone = enablePartialClone
+            enablePartialClone = enablePartialClone,
+            cachePath = cachePath
         )
     ).getInputs()
 }
