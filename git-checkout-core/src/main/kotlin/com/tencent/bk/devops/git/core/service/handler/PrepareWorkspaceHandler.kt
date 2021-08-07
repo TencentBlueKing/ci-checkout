@@ -63,9 +63,12 @@ class PrepareWorkspaceHandler(
                         repositoryPath = repositoryPath
                     )
                 }
-                if (isExisting) {
-                    logger.info("download from cache repository success")
+                val downloadResult = if (isExisting) {
+                    "success"
+                } else {
+                    "failed"
                 }
+                logger.info("download from cache repository $downloadResult")
             }
             // Prepare existing directory, otherwise recreate
             if (isExisting) {

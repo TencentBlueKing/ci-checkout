@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.constant
 
 import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 
+@SuppressWarnings("MagicNumber")
 object GitConstants {
 
     // error code

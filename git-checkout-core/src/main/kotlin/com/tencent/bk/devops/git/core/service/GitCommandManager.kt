@@ -33,6 +33,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.OSType
@@ -311,7 +312,7 @@ class GitCommandManager(
         /**
          * 如果git版本大于2.20.0,并且开启部分克隆，则忽略浅克隆
          */
-        if (enablePartialClone == true && isAtLeastVersion(2, 22, 0, 0)) {
+        if (enablePartialClone == true && isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
             args.add("--filter=${FilterValueEnum.TREELESS.value}")
         } else {
             if (fetchDepth > 0 && !preMerge) {
@@ -408,10 +409,10 @@ class GitCommandManager(
         return output.stdOut.trim().isNotBlank()
     }
 
-    fun isAtLeastVersion(major: Int, minor: Int, rev: Int, bugfix: Int): Boolean {
+    fun isAtLeastVersion(requestedVersion: Long): Boolean {
         return VersionHelper.isAtLeastVersion(
             gitVersion = gitVersion,
-            requestedVersion = VersionHelper.computeVersionFromBits(major, minor, rev, bugfix)
+            requestedVersion = requestedVersion
         )
     }
 
