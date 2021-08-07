@@ -55,7 +55,7 @@ class PrepareWorkspaceHandler(
             }
             // 如果仓库不存在,并且配置了缓存路径,则先从缓存路径下载.git文件
             if (!File(repositoryPath, ".git").exists() && !cachePath.isNullOrBlank()) {
-                logger.info("download from cache repository: $cachePath")
+                logger.groupStart("download from cache repository: $cachePath")
                 val bkRepoHelper = ServiceLoader.load(IBkRepoHelper::class.java).firstOrNull()
                 if (bkRepoHelper != null) {
                     isExisting = bkRepoHelper.downloadCacheRepo(
@@ -69,6 +69,7 @@ class PrepareWorkspaceHandler(
                     "failed"
                 }
                 logger.info("download from cache repository $downloadResult")
+                logger.groupEnd("")
             }
             // Prepare existing directory, otherwise recreate
             if (isExisting) {
