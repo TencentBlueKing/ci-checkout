@@ -94,7 +94,7 @@ enum class GitErrors(
     ),
     HttpsRepositoryNotFound(
         regex = Regex(
-            "fatal: repository '(.+)' not found"
+            "(fatal: repository '(.+)' not found)|(fatal: .* Git repository not found)"
         ),
         description = GitErrorsText.get().httpsRepositoryNotFound
     ),
