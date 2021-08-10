@@ -60,7 +60,8 @@ class PrepareWorkspaceHandler(
                 if (bkRepoHelper != null) {
                     isExisting = bkRepoHelper.downloadCacheRepo(
                         cachePath = cachePath,
-                        repositoryPath = repositoryPath
+                        repositoryPath = repositoryPath,
+                        repositoryUrl = repositoryUrl
                     )
                 }
                 val downloadResult = if (isExisting) {

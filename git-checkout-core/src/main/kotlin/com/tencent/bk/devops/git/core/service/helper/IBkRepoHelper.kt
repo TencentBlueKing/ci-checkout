@@ -36,5 +36,9 @@ interface IBkRepoHelper {
      * @param repositoryPath 下载后存储的目录
      * @return 返回下载是否成功
      */
-    fun downloadCacheRepo(cachePath: String, repositoryPath: String): Boolean
+    fun downloadCacheRepo(
+        cachePath: String,
+        repositoryPath: String,
+        repositoryUrl: String
+    ): Boolean
 }

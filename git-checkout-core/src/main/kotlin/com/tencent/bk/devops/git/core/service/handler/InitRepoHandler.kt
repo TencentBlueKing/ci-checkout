@@ -57,9 +57,6 @@ class InitRepoHandler(
             initRepository()
             initConfig()
             initSparseCheckout()
-            if (lfs) {
-                git.lfsInstall()
-            }
             if (settings.enableTrace == true) {
                 git.setEnvironmentVariable(GitConstants.GIT_TRACE, "1")
             }
