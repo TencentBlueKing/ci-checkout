@@ -76,6 +76,7 @@ class CheckoutAtomParamInputAdapter(
             includePath = includePath,
             excludePath = excludePath,
             fetchDepth = fetchDepth,
+            fetchRefSpec = fetchRefSpec,
             enableGitClean = enableGitClean,
             enableGitCleanIgnore = enableGitCleanIgnore,
             enableGitLfs = enableGitLfs,
