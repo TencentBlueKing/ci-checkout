@@ -52,8 +52,6 @@ class InitRepoHandler(
         with(settings) {
             // Initialize the repository
             logger.groupStart("Initializing the repository")
-            val gitVersion = git.getGitVersion()
-            git.setEnvironmentVariable(GitConstants.GIT_HTTP_USER_AGENT, "git/$gitVersion (landun-git-checkout)")
             initRepository()
             initConfig()
             initSparseCheckout()

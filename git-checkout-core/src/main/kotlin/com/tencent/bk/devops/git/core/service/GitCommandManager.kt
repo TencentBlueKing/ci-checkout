@@ -76,6 +76,7 @@ class GitCommandManager(
     fun getGitVersion(): String {
         val version = execGit(listOf("--version")).stdOut
         gitVersion = VersionHelper.computeGitVersion(version)
+        setEnvironmentVariable(GitConstants.GIT_HTTP_USER_AGENT, "git/$gitVersion (landun-git-checkout)")
         return execGit(listOf("--version")).stdOut
     }
 

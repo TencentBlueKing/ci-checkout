@@ -66,7 +66,7 @@ class GitFetchHandler(
     }
 
     private fun GitSourceSettings.fetchTargetRepository() {
-        val refSpec = if (fetchOnlyCurrentRef) {
+        val refSpec = if (enableFetchRefSpec) {
             refHelper.getRefSpec()
         } else {
             refHelper.getRefSpecForAllHistory()

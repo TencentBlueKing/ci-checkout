@@ -52,6 +52,11 @@ class RefHelper(
                     if (isAddSourceRef()) {
                         refSpec.add("+refs/heads/$sourceBranchName:refs/remotes/$ORIGIN_REMOTE_NAME/$sourceBranchName")
                     }
+                    if (!fetchRefSpec.isNullOrBlank()) {
+                        fetchRefSpec.split(",").forEach { branch ->
+                            refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
+                        }
+                    }
                     return refSpec
                 }
                 PullType.TAG ->

@@ -78,7 +78,12 @@ data class GitSourceSettings(
     /**
      * 是否只fetch配置的分支
      */
-    val fetchOnlyCurrentRef: Boolean = false,
+    val enableFetchRefSpec: Boolean = false,
+
+    /**
+     * 拉取指定的分支，以,分割
+     */
+    val fetchRefSpec: String? = null,
 
     /**
      * Indicates whether to fetch LFS objects

@@ -71,7 +71,8 @@ data class CheckoutAtomParamInput(
     var refName: String = "master",
 
     var fetchDepth: Int? = null,
-    var fetchOnlyCurrentRef: Boolean = false,
+    var enableFetchRefSpec: Boolean = false,
+    val fetchRefSpec: String? = null,
     var enableGitLfs: Boolean = false,
 
     var includePath: String? = "",
