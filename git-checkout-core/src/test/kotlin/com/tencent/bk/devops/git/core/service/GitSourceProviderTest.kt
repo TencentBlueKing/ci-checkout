@@ -47,7 +47,7 @@ class GitSourceProviderTest {
         repositoryUrl = "https://github.com/ci-plugins/git.git",
         repositoryPath = workspace.absolutePath,
         ref = "master",
-        clean = true,
+        enableGitClean = true,
         fetchDepth = 1,
         lfs = true,
         preMerge = false,

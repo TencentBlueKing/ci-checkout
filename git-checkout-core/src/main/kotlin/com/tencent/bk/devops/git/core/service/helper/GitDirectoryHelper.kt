@@ -77,7 +77,7 @@ class GitDirectoryHelper(
             else -> {
                 removeLockFile(repositoryPath)
                 try {
-                    if (clean) {
+                    if (enableGitClean) {
                         remove = clean()
                     }
                     if (remove) {
@@ -119,7 +119,7 @@ class GitDirectoryHelper(
 
     private fun clean(): Boolean {
         var remove = false
-        if (!git.tryClean()) {
+        if (!git.tryClean(settings.enableGitCleanIgnore)) {
             logger.info("The clean command failed. This might be caused by: " +
                 "1) path too long, " +
                 "2) permission issue, or " +

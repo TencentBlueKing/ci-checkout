@@ -69,7 +69,12 @@ data class GitSourceSettings(
     /**
      * Indicates whether to clean the repository
      */
-    val clean: Boolean,
+    val enableGitClean: Boolean,
+    /**
+     * 是否清理配置在.gitignore里面的文件
+     */
+    val enableGitCleanIgnore: Boolean? = true,
+
     /**
      * The depth when fetching
      */
@@ -88,12 +93,12 @@ data class GitSourceSettings(
     /**
      * Indicates whether to fetch LFS objects
      */
-    val lfs: Boolean = false,
+    val lfs: Boolean = true,
 
     /**
      * Indicates whether to checkout submodules
      */
-    val submodules: Boolean = false,
+    val submodules: Boolean = true,
 
     /**
      * Indicates whether to recursively checkout submodules
