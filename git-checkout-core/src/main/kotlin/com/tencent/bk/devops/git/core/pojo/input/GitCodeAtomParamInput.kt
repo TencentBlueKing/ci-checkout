@@ -59,7 +59,6 @@ data class GitCodeAtomParamInput(
     var includePath: String? = "",
     var excludePath: String? = "",
     var fetchDepth: Int? = null,
-    var enableFetchRefSpec: Boolean = false,
     val fetchRefSpec: String? = null,
     var enableGitClean: Boolean = true,
     var enableGitCleanIgnore: Boolean = true,

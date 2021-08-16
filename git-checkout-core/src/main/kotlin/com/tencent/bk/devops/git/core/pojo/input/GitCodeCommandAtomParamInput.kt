@@ -66,7 +66,6 @@ data class GitCodeCommandAtomParamInput(
     var refName: String = "master",
 
     var fetchDepth: Int? = null,
-    var enableFetchRefSpec: Boolean = false,
     val fetchRefSpec: String? = null,
     var enableGitLfs: Boolean = false,
 

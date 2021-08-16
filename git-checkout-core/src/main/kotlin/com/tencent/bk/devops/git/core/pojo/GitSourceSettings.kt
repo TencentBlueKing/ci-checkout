@@ -81,11 +81,6 @@ data class GitSourceSettings(
     var fetchDepth: Int = 0,
 
     /**
-     * 是否只fetch配置的分支
-     */
-    val enableFetchRefSpec: Boolean = false,
-
-    /**
      * 拉取指定的分支，以,分割
      */
     val fetchRefSpec: String? = null,
