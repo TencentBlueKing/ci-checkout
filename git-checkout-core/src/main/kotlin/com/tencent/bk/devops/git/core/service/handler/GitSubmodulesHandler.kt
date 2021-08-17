@@ -52,6 +52,9 @@ class GitSubmodulesHandler(
                 path = submodulesPath
             )
             git.submoduleForeach(command = "git config --local gc.auto 0", recursive = nestedSubmodules)
+            if (lfs) {
+                git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
+            }
             logger.groupEnd("")
         }
     }
