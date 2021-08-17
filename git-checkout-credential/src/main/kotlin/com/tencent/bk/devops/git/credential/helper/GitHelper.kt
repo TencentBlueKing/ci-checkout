@@ -132,7 +132,6 @@ object GitHelper {
     ): GitOutput {
         val executor = DefaultExecutor()
         val stdOuts = mutableListOf<String>()
-        val errOuts = StringBuilder()
         val outputStream = object : LogOutputStream() {
             override fun processLine(line: String?, level: Int) {
                 if (line == null) {
@@ -143,18 +142,8 @@ object GitHelper {
             }
         }
 
-        val errorStream = object : LogOutputStream() {
-            override fun processLine(line: String?, level: Int) {
-                if (line == null) {
-                    return
-                }
-                System.err.println(line)
-                errOuts.append(line)
-            }
-        }
-
         executor.workingDirectory = File(System.getenv(GIT_REPO_PATH) ?: ".")
-        executor.streamHandler = PumpStreamHandler(outputStream, errorStream, inputStream)
+        executor.streamHandler = PumpStreamHandler(outputStream, null, inputStream)
 
         if (allowAllExitCodes) {
             executor.setExitValues(null)
@@ -165,7 +154,7 @@ object GitHelper {
             val exitCode = executor.execute(command)
             return GitOutput(exitCode = exitCode, stdOuts = stdOuts)
         } finally {
-            IOHelper.closeQuietly(outputStream, errorStream, inputStream)
+            IOHelper.closeQuietly(outputStream, inputStream)
         }
     }
 }
