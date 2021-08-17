@@ -20,6 +20,9 @@ class GitLfsHandler(
             }
             logger.groupStart("Fetching lfs")
             git.lfsPull()
+            if (submodules) {
+                git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
+            }
             logger.groupEnd("")
         }
     }
