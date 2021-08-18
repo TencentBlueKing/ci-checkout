@@ -37,7 +37,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.exception.TaskExecuteException
 import com.tencent.bk.devops.git.core.service.GitSourceProvider
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
-import com.tencent.bk.devops.git.core.service.helper.VersionHelper.getCheckoutCoreVersion
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.StringUtils
 import com.tencent.bk.devops.plugin.pojo.ErrorType
@@ -50,7 +49,6 @@ class GitCheckoutRunner {
     }
 
     fun <T : AtomBaseParam> run(inputAdapter: IInputAdapter, atomContext: AtomContext<T>) {
-        logger.info("git-checkout-core version： ${getCheckoutCoreVersion()}")
         val monitorData = MonitorData()
         monitorData.startTime = System.currentTimeMillis()
         try {
