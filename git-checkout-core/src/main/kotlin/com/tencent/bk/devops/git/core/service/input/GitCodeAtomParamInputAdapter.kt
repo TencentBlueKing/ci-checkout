@@ -157,6 +157,7 @@ class GitCodeAtomParamInputAdapter(
                 submodules = enableSubmodule,
                 nestedSubmodules = enableSubmoduleRecursive ?: true,
                 submodulesPath = submodulePath ?: "",
+                submoduleRemote = enableSubmoduleRemote,
                 includeSubPath = includePath,
                 excludeSubPath = excludePath,
                 username = authInfo.username,

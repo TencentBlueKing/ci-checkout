@@ -77,7 +77,7 @@ class GitCommandManager(
         val version = execGit(listOf("--version")).stdOut
         gitVersion = VersionHelper.computeGitVersion(version)
         setEnvironmentVariable(GitConstants.GIT_HTTP_USER_AGENT, "git/$gitVersion (landun-git-checkout)")
-        return execGit(listOf("--version")).stdOut
+        return version
     }
 
     fun tryGetFetchUrl(): String {
@@ -295,10 +295,13 @@ class GitCommandManager(
         execGit(args = args, allowAllExitCodes = true)
     }
 
-    fun submoduleUpdate(recursive: Boolean, path: String) {
+    fun submoduleUpdate(recursive: Boolean, path: String, submoduleRemote: Boolean) {
         val args = mutableListOf("submodule", "update", "--init", "--force")
         if (recursive) {
             args.add("--recursive")
+        }
+        if (submoduleRemote) {
+            args.add("--remote")
         }
         if (path.isNotBlank()) {
             args.add(path)

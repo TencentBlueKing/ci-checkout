@@ -132,6 +132,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 lfs = enableGitLfs,
                 submodules = enableSubmodule,
                 nestedSubmodules = enableSubmoduleRecursive ?: true,
+                submoduleRemote = enableSubmoduleRemote,
                 submodulesPath = submodulePath ?: "",
                 includeSubPath = includePath,
                 excludeSubPath = excludePath,
