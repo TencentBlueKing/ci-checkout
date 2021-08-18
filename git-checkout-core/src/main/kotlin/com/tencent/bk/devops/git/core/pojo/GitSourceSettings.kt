@@ -80,6 +80,7 @@ data class GitSourceSettings(
      */
     var fetchDepth: Int = 0,
 
+    val enableFetchRefSpec: Boolean? = false,
     /**
      * 拉取指定的分支，以,分割
      */

@@ -158,6 +158,7 @@ class GitCodeAtomParamInputAdapter(
                 enableGitClean = enableGitClean,
                 enableGitCleanIgnore = enableGitCleanIgnore,
                 fetchDepth = fetchDepth ?: 0,
+                enableFetchRefSpec = enableFetchRefSpec,
                 fetchRefSpec = fetchRefSpec,
                 lfs = enableGitLfs,
                 submodules = enableSubmodule,
