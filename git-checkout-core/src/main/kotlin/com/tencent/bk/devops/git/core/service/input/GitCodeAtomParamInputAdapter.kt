@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.GitCodeAtomParamInput
+import com.tencent.bk.devops.git.core.service.auth.EmptyGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.RepositoryGitAuthProvider
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -122,11 +123,16 @@ class GitCodeAtomParamInputAdapter(
                 pullType = PullType.BRANCH.name
             }
 
-            // 4. 得到授权信息
-            val authInfo = RepositoryGitAuthProvider(
-                repository = repository,
-                devopsApi = devopsApi
-            ).getAuthInfo()
+            // 4. 得到授权信息,post action阶段不需要查询凭证
+            val authProvider = if (postEntryParam == "True") {
+                EmptyGitAuthProvider()
+            } else {
+                RepositoryGitAuthProvider(
+                    repository = repository,
+                    devopsApi = devopsApi
+                )
+            }
+            val authInfo = authProvider.getAuthInfo()
 
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)

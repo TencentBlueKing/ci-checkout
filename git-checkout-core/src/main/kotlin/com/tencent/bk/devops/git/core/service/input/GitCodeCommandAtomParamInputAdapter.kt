@@ -62,27 +62,31 @@ class GitCodeCommandAtomParamInputAdapter(
                 throw ParamInvalidException(errorMsg = "代码库url不能为空")
             }
 
-            // 获取鉴权信息
-            val authProvider = when (authType) {
-                AuthType.ACCESS_TOKEN -> OauthGitAuthProvider(token = accessToken)
-                AuthType.USERNAME_PASSWORD -> UserNameGitAuthProvider(username = username, password = password)
-                AuthType.TICKET -> CredentialGitAuthProvider(
-                    credentialId = ticketId,
-                    devopsApi = devopsApi
-                )
-                AuthType.START_USER_TOKEN -> UserTokenGitAuthProvider(
-                    userId = pipelineStartUserName,
-                    devopsApi = devopsApi
-                )
-                AuthType.PERSONAL_ACCESS_TOKEN -> PrivateGitAuthProvider(
-                    token = personalAccessToken
-                )
-                AuthType.AUTH_USER_TOKEN ->
-                    UserTokenGitAuthProvider(
-                        userId = authUserId,
+            // 获取鉴权信息,post action阶段不需要查询凭证
+            val authProvider = if (postEntryParam == "True") {
+                EmptyGitAuthProvider()
+            } else {
+                when (authType) {
+                    AuthType.ACCESS_TOKEN -> OauthGitAuthProvider(token = accessToken)
+                    AuthType.USERNAME_PASSWORD -> UserNameGitAuthProvider(username = username, password = password)
+                    AuthType.TICKET -> CredentialGitAuthProvider(
+                        credentialId = ticketId,
                         devopsApi = devopsApi
                     )
-                else -> EmptyGitAuthProvider()
+                    AuthType.START_USER_TOKEN -> UserTokenGitAuthProvider(
+                        userId = pipelineStartUserName,
+                        devopsApi = devopsApi
+                    )
+                    AuthType.PERSONAL_ACCESS_TOKEN -> PrivateGitAuthProvider(
+                        token = personalAccessToken
+                    )
+                    AuthType.AUTH_USER_TOKEN ->
+                        UserTokenGitAuthProvider(
+                            userId = authUserId,
+                            devopsApi = devopsApi
+                        )
+                    else -> EmptyGitAuthProvider()
+                }
             }
             val authInfo = authProvider.getAuthInfo()
 

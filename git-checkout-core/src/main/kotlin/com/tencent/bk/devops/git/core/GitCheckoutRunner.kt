@@ -76,12 +76,6 @@ class GitCheckoutRunner {
             atomContext.result.message = ignore.message
             atomContext.result.status = Status.failure
         } finally {
-            if (atomContext.param.postEntryParam != "True") {
-                // 权限的环境变量都需要保存,在postAction阶段需要清理
-                EnvHelper.getAuthEnv().forEach { (k, v) ->
-                    atomContext.result.data[k] = StringData(StringUtils.trimVariable(v))
-                }
-            }
             monitorData.endTime = System.currentTimeMillis()
             atomContext.result.monitorData = monitorData
         }
