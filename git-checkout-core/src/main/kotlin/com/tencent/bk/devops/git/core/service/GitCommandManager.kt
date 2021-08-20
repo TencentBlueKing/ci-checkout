@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SHALLOW_SINCE_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.OSType
@@ -314,20 +315,22 @@ class GitCommandManager(
         fetchDepth: Int,
         remoteName: String,
         preMerge: Boolean,
+        shallowSince: String? = null,
         enablePartialClone: Boolean? = false
     ) {
         val args = mutableListOf("fetch", "--prune", "--progress", "--no-recurse-submodules")
         /**
          * 如果git版本大于2.20.0,并且开启部分克隆，则忽略浅克隆
          */
-        if (enablePartialClone == true && isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
-            args.add("--filter=${FilterValueEnum.TREELESS.value}")
-        } else {
-            if (fetchDepth > 0 && !preMerge) {
+        when {
+            enablePartialClone == true && isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION) ->
+                args.add("--filter=${FilterValueEnum.TREELESS.value}")
+            !shallowSince.isNullOrBlank() && isAtLeastVersion(SUPPORT_SHALLOW_SINCE_GIT_VERSION) ->
+                args.add("--shallow-since=$shallowSince")
+            fetchDepth > 0 && !preMerge ->
                 args.add("--depth=$fetchDepth")
-            } else if (File(File(workingDirectory, ".git"), "shallow").exists()) {
+            File(File(workingDirectory, ".git"), "shallow").exists() ->
                 args.add("--unshallow")
-            }
         }
 
         args.add(remoteName)

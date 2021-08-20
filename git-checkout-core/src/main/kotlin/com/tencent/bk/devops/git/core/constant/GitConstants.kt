@@ -108,6 +108,7 @@ object GitConstants {
 
     // mr专用
     const val BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID = "BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID"
+    const val BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT = "BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT"
 
     const val PIPELINE_MATERIAL_URL = "pipeline.material.url"
     const val PIPELINE_MATERIAL_BRANCHNAME = "pipeline.material.branchName"
@@ -120,4 +121,5 @@ object GitConstants {
     const val GIT_LOG_MAX_COUNT = 50
 
     val SUPPORT_PARTIAL_CLONE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 22, 0, 0)
+    val SUPPORT_SHALLOW_SINCE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 11, 0, 0)
 }
