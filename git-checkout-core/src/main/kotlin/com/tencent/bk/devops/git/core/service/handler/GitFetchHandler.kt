@@ -65,7 +65,7 @@ class GitFetchHandler(
     private fun GitSourceSettings.calculateShallowSince(): String? {
         val baseCommitId = System.getenv(BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT)
         var shallowSince: String? = null
-        if (preMerge && fetchDepth > 0 && baseCommitId != null) {
+        if (preMerge && fetchDepth > 0 && !baseCommitId.isNullOrBlank()) {
             git.fetch(
                 refSpec = listOf(baseCommitId),
                 fetchDepth = 1,
@@ -94,7 +94,8 @@ class GitFetchHandler(
     }
 
     private fun GitSourceSettings.fetchTargetRepository(shallowSince: String?) {
-        val refSpec = if (enableFetchRefSpec == true) {
+        // 按照时间拉，必须是指定的分支,不然会报错
+        val refSpec = if (enableFetchRefSpec == true || !shallowSince.isNullOrBlank()) {
             refHelper.getRefSpec()
         } else {
             refHelper.getRefSpecForAllHistory()
