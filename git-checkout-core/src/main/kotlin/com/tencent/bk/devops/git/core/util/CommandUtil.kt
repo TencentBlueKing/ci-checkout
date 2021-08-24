@@ -46,6 +46,11 @@ import org.apache.commons.io.IOUtils
 
 object CommandUtil {
 
+    /**
+     * 最大的输出日志行数
+     */
+    private const val MAX_LOG_SIZE = 100
+
     @SuppressWarnings("LongParameterList")
     fun execute(
         workingDirectory: File? = null,
@@ -72,6 +77,9 @@ object CommandUtil {
                 if (printLogger) {
                     println("  $tmpLine")
                 }
+                if (stdOuts.size > MAX_LOG_SIZE) {
+                    stdOuts.clear()
+                }
                 stdOuts.add(tmpLine)
             }
         }
@@ -84,6 +92,9 @@ object CommandUtil {
                 val tmpLine = SensitiveLineParser.onParseLine(line)
                 if (printLogger && !allowAllExitCodes) {
                     System.err.println("  $tmpLine")
+                }
+                if (errOuts.size > MAX_LOG_SIZE) {
+                    errOuts.clear()
                 }
                 errOuts.add(tmpLine)
             }

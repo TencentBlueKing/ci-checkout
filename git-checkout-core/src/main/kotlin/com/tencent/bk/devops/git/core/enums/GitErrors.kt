@@ -65,8 +65,10 @@ enum class GitErrors(
     ),
     RemoteDisconnection(
         regex = Regex(
-            "(fatal: The remote end hung up unexpectedly)|" +
-                "(fatal: unable to access '(.+)': The requested URL returned error: 502)"
+            "(fatal: (the|The) remote end hung up unexpectedly)|" +
+                "(fatal: unable to access '(.+)': The requested URL returned error: 502)|" +
+                "(fatal: 远端意外挂断了)|" +
+                "(Git:Server is busy, please try again later)"
         ),
         description = GitErrorsText.get().remoteDisconnection,
         errorType = ErrorType.THIRD_PARTY,
