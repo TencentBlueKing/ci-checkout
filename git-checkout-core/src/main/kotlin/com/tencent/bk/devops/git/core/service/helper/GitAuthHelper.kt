@@ -237,7 +237,11 @@ class GitAuthHelper(
     }
 
     override fun removeAuth() {
-        if (!serverInfo.httpProtocol) {
+        if (!serverInfo.httpProtocol ||
+            settings.username.isNullOrBlank() ||
+            settings.password.isNullOrBlank() ||
+            !File(credentialJarPath).exists()
+        ) {
             return
         }
         // 删除凭证
