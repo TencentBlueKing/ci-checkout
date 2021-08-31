@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.RepositoryUtils
 import org.slf4j.LoggerFactory
 
@@ -80,6 +81,7 @@ class GitLogHelper(
         )
         saveBuildMaterial(commitMaterial = commitMaterial)
         EnvHelper.addLogEnv(
+            projectName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName,
             commitMaterial = commitMaterial
         )
     }

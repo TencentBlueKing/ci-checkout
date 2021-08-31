@@ -29,7 +29,17 @@ package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_CODE_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_TAG
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_ALIAS_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_BRANCH
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_CODE_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_URL
+import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_ALIASNAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_BRANCHNAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_URL
 import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
@@ -44,8 +54,8 @@ import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.RepositoryUtils
-import java.io.File
 import org.slf4j.LoggerFactory
+import java.io.File
 
 class GitCodeAtomParamInputAdapter(
     private val input: GitCodeAtomParamInput
@@ -137,6 +147,21 @@ class GitCodeAtomParamInputAdapter(
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_BRANCH, branchName)
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_TAG, tagName ?: "")
+
+            EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_URL, repository.url)
+            EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_NAME, repository.projectName)
+            EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_ALIAS_NAME, repository.aliasName)
+            EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_CODE_PATH, localPath ?: "")
+            EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_BRANCH, branchName)
+
+            EnvHelper.addEnvVariable("$PIPELINE_MATERIAL_URL.${repositoryConfig.getRepositoryId()}", repository.url)
+            EnvHelper.addEnvVariable("$PIPELINE_MATERIAL_BRANCHNAME.${repositoryConfig.getRepositoryId()}", ref)
+            EnvHelper.addEnvVariable(
+                key = "$PIPELINE_MATERIAL_ALIASNAME.${repositoryConfig.getRepositoryId()}",
+                value = repository.aliasName
+            )
 
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,

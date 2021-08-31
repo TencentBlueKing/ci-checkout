@@ -37,6 +37,10 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_LAST_COMMIT_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_CUR_COMMITS
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_HEAD_COMMIT_COMMENT
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_HEAD_COMMIT_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_LAST_COMMIT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.PARAM_SEPARATOR
 import com.tencent.bk.devops.git.core.pojo.api.CommitMaterial
 
@@ -49,8 +53,22 @@ object EnvHelper {
     }
 
     fun addLogEnv(
+        projectName: String,
         commitMaterial: CommitMaterial
     ) {
+        val envProjectName = projectName.replace("/", ".")
+        if (commitMaterial.lastCommitId != null) {
+            env["git.$envProjectName.last.commit"] = commitMaterial.lastCommitId
+        }
+        if (commitMaterial.newCommitId != null) {
+            env["git.$envProjectName.new.commit"] = commitMaterial.newCommitId
+        }
+
+        env[DEVOPS_GIT_REPO_CUR_COMMITS] = commitMaterial.commitIds.joinToString(PARAM_SEPARATOR)
+        env[DEVOPS_GIT_REPO_LAST_COMMIT_ID] = commitMaterial.lastCommitId ?: ""
+        env[DEVOPS_GIT_REPO_HEAD_COMMIT_ID] = commitMaterial.newCommitId ?: ""
+        env[DEVOPS_GIT_REPO_HEAD_COMMIT_COMMENT] = commitMaterial.newCommitComment ?: ""
+
         env[BK_CI_GIT_REPO_CUR_COMMITS] = commitMaterial.commitIds.joinToString(PARAM_SEPARATOR)
         env[BK_CI_GIT_REPO_LAST_COMMIT_ID] = commitMaterial.lastCommitId ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_ID] = commitMaterial.newCommitId ?: ""
