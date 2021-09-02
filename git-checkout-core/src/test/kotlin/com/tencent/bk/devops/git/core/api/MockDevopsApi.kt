@@ -64,4 +64,8 @@ class MockDevopsApi : IDevopsApi {
     override fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository> {
         return Result()
     }
+
+    override fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean> {
+        return Result(true)
+    }
 }

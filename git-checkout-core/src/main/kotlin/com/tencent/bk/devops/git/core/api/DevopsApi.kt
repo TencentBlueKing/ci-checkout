@@ -43,6 +43,7 @@ import com.tencent.bk.devops.plugin.utils.JsonUtil
 import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
 import org.slf4j.LoggerFactory
 
 class DevopsApi : IDevopsApi, BaseApi() {
@@ -63,7 +64,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun addCommit(commits: List<CommitData>): Result<Int> {
         val path = "/repository/api/build/commit/addCommit"
         val request = buildPost(path, getJsonRequest(commits), mutableMapOf())
-        val responseContent = request(request, "添加代码库commit信息失败")
+        val responseContent = retryRequest(request, "添加代码库commit信息失败", 1)
         return JsonUtil.to(responseContent, object : TypeReference<Result<Int>>() {})
     }
 
@@ -75,28 +76,28 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val path = "/repository/api/build/commit/getLatestCommit?pipelineId=$pipelineId&elementId=$elementId" +
             "&repoId=${repositoryConfig.getRepositoryId()}&repositoryType=${repositoryConfig.repositoryType.name}"
         val request = buildGet(path)
-        val responseContent = request(request, "获取最后一次代码commit信息失败")
+        val responseContent = retryRequest(request, "获取最后一次代码commit信息失败")
         return JsonUtil.to(responseContent, object : TypeReference<Result<List<CommitData>>>() {})
     }
 
     override fun saveBuildMaterial(materialList: List<PipelineBuildMaterial>): Result<Int> {
         val path = "/process/api/build/repository/saveBuildMaterial"
         val request = buildPost(path, getJsonRequest(materialList), mutableMapOf())
-        val responseContent = request(request, "添加源材料信息失败")
+        val responseContent = retryRequest(request, "添加源材料信息失败", 1)
         return JsonUtil.to(responseContent, object : TypeReference<Result<Int>>() {})
     }
 
     override fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo> {
         val path = "/ticket/api/build/credentials/$credentialId?publicKey=${encode(publicKey)}"
         val request = buildGet(path)
-        val responseContent = request(request, "获取凭据失败")
+        val responseContent = retryRequest(request, "获取凭据失败")
         return JsonUtil.to(responseContent, object : TypeReference<Result<CredentialInfo>>() {})
     }
 
     override fun getOauthToken(userId: String): Result<GitToken> {
         val path = "/repository/api/build/oauth/git/$userId"
         val request = buildGet(path)
-        val responseContent = request(request, "获取oauth认证信息失败")
+        val responseContent = retryRequest(request, "获取oauth认证信息失败")
         return JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
     }
 
@@ -105,12 +106,20 @@ class DevopsApi : IDevopsApi, BaseApi() {
             "repositoryId=${repositoryConfig.getURLEncodeRepositoryId()}&" +
             "repositoryType=${repositoryConfig.repositoryType.name}"
         val request = buildGet(path)
-        val responseContent = request(request, "获取代码库失败")
+        val responseContent = retryRequest(request, "获取代码库失败")
         return JsonUtil.to(responseContent, object : TypeReference<Result<Repository>>() {})
     }
 
-    override fun request(request: Request, errorMessage: String): String {
-        return RetryHelper().execute {
+    override fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean> {
+        val path = "/monitoring/api/build/atom/metrics/report/$atomCode"
+        val requestBody = RequestBody.create(JSON_CONTENT_TYPE, data)
+        val request = buildPost(path, requestBody, mutableMapOf())
+        val responseContent = retryRequest(request, "上报插件度量信息失败", 1)
+        return JsonUtil.to(responseContent, object : TypeReference<Result<Boolean>>() {})
+    }
+
+    private fun retryRequest(request: Request, errorMessage: String, maxAttempts: Int = 3): String {
+        return RetryHelper(maxAttempts = maxAttempts).execute {
             try {
                 okHttpClient.newCall(request).execute().use { response ->
                     val responseContent = response.body()?.string() ?: ""

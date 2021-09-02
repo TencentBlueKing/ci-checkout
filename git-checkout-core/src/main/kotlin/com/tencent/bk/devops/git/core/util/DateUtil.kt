@@ -8,8 +8,8 @@ object DateUtil {
 
     private val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
 
-    fun timestampToZoneDate(timestamp: Long): String {
-        return formatter.format(Date(timestamp))
+    fun format(timestamp: Long, pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
+        return SimpleDateFormat(pattern).format(Date(timestamp))
     }
 
     fun addDay(timestamp: Long, amount: Int): String {

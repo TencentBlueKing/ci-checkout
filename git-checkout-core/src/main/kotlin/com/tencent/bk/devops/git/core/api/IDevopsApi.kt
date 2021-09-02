@@ -52,4 +52,6 @@ interface IDevopsApi {
     fun getOauthToken(userId: String): Result<GitToken>
 
     fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository>
+
+    fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean>
 }

@@ -105,8 +105,8 @@ class GitCheckoutRunner {
                     buildId = pipelineBuildId,
                     taskId = pipelineTaskId,
                     url = settings?.repositoryUrl ?: "",
-                    startTime = DateUtil.timestampToZoneDate(startTime),
-                    endTime = DateUtil.timestampToZoneDate(endTime),
+                    startTime = DateUtil.format(startTime),
+                    endTime = DateUtil.format(endTime),
                     costTime = endTime - startTime
                 )
             }

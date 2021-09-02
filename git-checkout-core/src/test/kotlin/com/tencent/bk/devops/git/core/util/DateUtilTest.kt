@@ -6,10 +6,10 @@ import org.junit.Test
 class DateUtilTest {
 
     @Test
-    fun timestampToZoneDate() {
+    fun format() {
         Assert.assertEquals(
-            DateUtil.timestampToZoneDate(1629202335000L),
-            "2021-08-17T20:12:15+0800"
+            DateUtil.format(1629202335000L),
+            "2021-08-17 20:12:15"
         )
     }
 
