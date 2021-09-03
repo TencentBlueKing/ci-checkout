@@ -43,6 +43,7 @@ import com.tencent.bk.devops.git.core.service.helper.IGitMetricsHelper
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.util.DateUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.StringUtils
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import org.slf4j.LoggerFactory
@@ -95,16 +96,22 @@ class GitCheckoutRunner {
         startTime: Long,
         endTime: Long
     ) {
+        if (settings == null) {
+            return
+        }
         try {
             val metricsHelper = ServiceLoader.load(IGitMetricsHelper::class.java).firstOrNull()
             val atomCode = System.getenv(BK_CI_ATOM_CODE)
             val gitMetricsInfo = with(atomContext.param) {
                 GitMetricsInfo(
+                    atomCode = atomCode,
                     projectId = projectName,
                     pipelineId = pipelineId,
                     buildId = pipelineBuildId,
                     taskId = pipelineTaskId,
-                    url = settings?.repositoryUrl ?: "",
+                    scmType = settings.scmType.name,
+                    url = settings.repositoryUrl,
+                    projectName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName,
                     startTime = DateUtil.format(startTime),
                     endTime = DateUtil.format(endTime),
                     costTime = endTime - startTime
