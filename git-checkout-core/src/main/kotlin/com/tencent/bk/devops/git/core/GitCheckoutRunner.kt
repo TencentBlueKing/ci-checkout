@@ -58,9 +58,8 @@ class GitCheckoutRunner {
     fun <T : AtomBaseParam> run(inputAdapter: IInputAdapter, atomContext: AtomContext<T>) {
         val monitorData = MonitorData()
         val startTime = System.currentTimeMillis()
-        var settings: GitSourceSettings? = null
         try {
-            settings = inputAdapter.getInputs()
+            val settings = inputAdapter.getInputs()
             val sourceProvider = GitSourceProvider(settings = settings, devopsApi = DevopsApi())
             if (settings.postEntryParam == "True") {
                 sourceProvider.cleanUp()
@@ -86,7 +85,6 @@ class GitCheckoutRunner {
             monitorData.startTime = startTime
             monitorData.endTime = endTime
             atomContext.result.monitorData = monitorData
-            reportMetrics(atomContext, settings, startTime, endTime)
         }
     }
 
