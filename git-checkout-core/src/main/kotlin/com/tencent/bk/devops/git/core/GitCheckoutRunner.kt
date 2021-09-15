@@ -98,6 +98,7 @@ class GitCheckoutRunner {
         startTime: Long,
         endTime: Long
     ) {
+        logger.info("report metrics: $settings")
         if (settings == null) {
             return
         }
