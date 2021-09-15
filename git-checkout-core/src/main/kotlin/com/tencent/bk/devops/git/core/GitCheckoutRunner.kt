@@ -124,6 +124,7 @@ class GitCheckoutRunner {
                 metricsHelper.reportMetrics(atomCode = atomCode, metricsInfo = gitMetricsInfo)
             }
         } catch (ignore: Throwable) {
+            logger.info("report metrics error", ignore)
         }
     }
 }
