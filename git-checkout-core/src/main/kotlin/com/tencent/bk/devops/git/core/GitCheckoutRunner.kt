@@ -119,12 +119,10 @@ class GitCheckoutRunner {
                     costTime = endTime - startTime
                 )
             }
-            logger.info("report metrics: $metricsHelper, gitMetricsInfo:$gitMetricsInfo")
             if (metricsHelper != null && atomCode != null) {
-                metricsHelper.reportMetrics(atomCode = atomCode, metricsInfo = gitMetricsInfo)
+                metricsHelper.reportMetrics(atomCode = "git", metricsInfo = gitMetricsInfo)
             }
         } catch (ignore: Throwable) {
-            logger.info("report metrics error", ignore)
         }
     }
 }
