@@ -98,7 +98,6 @@ class GitCheckoutRunner {
         startTime: Long,
         endTime: Long
     ) {
-        logger.info("report metrics: $settings")
         if (settings == null) {
             return
         }
@@ -120,6 +119,7 @@ class GitCheckoutRunner {
                     costTime = endTime - startTime
                 )
             }
+            logger.info("report metrics: $metricsHelper, gitMetricsInfo:$gitMetricsInfo")
             if (metricsHelper != null && atomCode != null) {
                 metricsHelper.reportMetrics(atomCode = atomCode, metricsInfo = gitMetricsInfo)
             }
