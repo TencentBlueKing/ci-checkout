@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_CODE_PATH
@@ -162,6 +163,15 @@ class GitCodeAtomParamInputAdapter(
                 key = "$PIPELINE_MATERIAL_ALIASNAME.${repositoryConfig.getRepositoryId()}",
                 value = repository.aliasName
             )
+
+            // 添加代码库信息支持codecc扫描
+            EnvHelper.addEnvVariable("bk_repo_taskId_${input.pipelineTaskId}", input.pipelineTaskId)
+            EnvHelper.addEnvVariable("bk_repo_hashId_${input.pipelineTaskId}", input.repositoryHashId ?: "")
+            EnvHelper.addEnvVariable("bk_repo_name_${input.pipelineTaskId}", input.repositoryName ?: "")
+            EnvHelper.addEnvVariable("bk_repo_config_type_${input.pipelineTaskId}", input.repositoryType)
+            EnvHelper.addEnvVariable("bk_repo_type_${input.pipelineTaskId}", "GIT")
+            EnvHelper.addEnvVariable("bk_repo_local_path_${input.pipelineTaskId}", input.localPath ?: "")
+            EnvHelper.addEnvVariable("bk_repo_container_id_${input.pipelineTaskId}", System.getenv(BK_CI_BUILD_JOB_ID))
 
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,
