@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory
 @Suppress("ALL")
 class GitCommandManager(
     private val workingDirectory: File,
-    lfs: Boolean = false
+    val lfs: Boolean = false
 ) {
 
     companion object {
@@ -376,7 +376,7 @@ class GitCommandManager(
     }
 
     fun merge(ref: String) {
-        execGit(args = listOf("merge", ref))
+        execGit(args = listOf("-c", "filter.lfs.smudge=", "-c", "filter.lfs.required=false", "merge", ref))
     }
 
     fun log(maxCount: Int = 1, revisionRange: String = ""): List<CommitLogInfo> {
