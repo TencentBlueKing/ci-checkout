@@ -121,9 +121,9 @@ class GitAuthHelper(
                 configScope = GitConfigScope.GLOBAL
             )
         } else {
-            javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.bat")?.use { jarInputStream ->
+            javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.bat")?.use { inputStream ->
                 copyCredentialFile(
-                    sourceInputStream = jarInputStream,
+                    sourceInputStream = inputStream,
                     targetFile = File(credentialBatPath)
                 )
             }
