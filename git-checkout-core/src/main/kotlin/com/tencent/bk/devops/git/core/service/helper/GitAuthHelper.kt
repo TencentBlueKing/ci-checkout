@@ -47,7 +47,6 @@ import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.io.InputStream
 import java.net.URL
 
 @Suppress("ALL")
@@ -95,12 +94,10 @@ class GitAuthHelper(
         if (!credentialJarParentFile.exists()) {
             credentialJarParentFile.mkdirs()
         }
-        javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.jar")?.use { inputStream ->
-            copyCredentialFile(
-                sourceInputStream = inputStream,
-                targetFile = File(credentialJarPath)
-            )
-        }
+        copyCredentialFile(
+            sourceFilePath = "script/git-checkout-credential.jar",
+            targetFile = File(credentialJarPath)
+        )
 
         // 先卸载本地的git凭证,为了兼容历史配置
         git.tryConfigUnset(
@@ -108,12 +105,10 @@ class GitAuthHelper(
         )
 
         if (AgentEnv.getOS() != OSType.WINDOWS) {
-            javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.sh")?.use { inputStream ->
-                copyCredentialFile(
-                    sourceInputStream = inputStream,
-                    targetFile = File(credentialShellPath)
-                )
-            }
+            copyCredentialFile(
+                sourceFilePath = "script/git-checkout-credential.sh",
+                targetFile = File(credentialShellPath)
+            )
             // 安装
             git.config(
                 configKey = GIT_CREDENTIAL_HELPER,
@@ -121,12 +116,10 @@ class GitAuthHelper(
                 configScope = GitConfigScope.GLOBAL
             )
         } else {
-            javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.bat")?.use { inputStream ->
-                copyCredentialFile(
-                    sourceInputStream = inputStream,
-                    targetFile = File(credentialBatPath)
-                )
-            }
+            copyCredentialFile(
+                sourceFilePath = "script/git-checkout-credential.bat",
+                targetFile = File(credentialBatPath)
+            )
             // 安装
             git.config(
                 configKey = GIT_CREDENTIAL_HELPER,
@@ -161,15 +154,19 @@ class GitAuthHelper(
         }
     }
 
-    private fun copyCredentialFile(sourceInputStream: InputStream, targetFile: File) {
+    private fun copyCredentialFile(sourceFilePath: String, targetFile: File) {
         if (!targetFile.exists()) {
-            FileUtils.copyToFile(sourceInputStream, targetFile)
+            javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { sourceInputStream ->
+                FileUtils.copyToFile(sourceInputStream, targetFile)
+            }
         } else {
-            val newFileMd5 = DigestUtils.md5Hex(sourceInputStream)
+            val newFileMd5 = javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { DigestUtils.md5Hex(it) }
             val oldFileMd5 = targetFile.inputStream().use { DigestUtils.md5Hex(it) }
             if (newFileMd5 != oldFileMd5) {
                 targetFile.delete()
-                FileUtils.copyToFile(sourceInputStream, targetFile)
+                javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { sourceInputStream ->
+                    FileUtils.copyToFile(sourceInputStream, targetFile)
+                }
             }
         }
     }
