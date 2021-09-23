@@ -105,14 +105,14 @@ class GitAuthHelper(
         )
 
         if (AgentEnv.getOS() != OSType.WINDOWS) {
-            copyCredentialFile(
+            /*copyCredentialFile(
                 sourceFilePath = "script/git-checkout-credential.sh",
                 targetFile = File(credentialShellPath)
-            )
+            )*/
             // 安装
             git.config(
                 configKey = GIT_CREDENTIAL_HELPER,
-                configValue = "!sh '$credentialShellPath'",
+                configValue = "!'$credentialShellPath'",
                 configScope = GitConfigScope.GLOBAL
             )
         } else {
