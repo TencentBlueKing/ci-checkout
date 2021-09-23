@@ -30,16 +30,12 @@ package com.tencent.bk.devops.git.credential
 import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.credential.Constants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEHOST
-import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_HELPER
-import com.tencent.bk.devops.git.credential.Constants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 import com.tencent.bk.devops.git.credential.storage.StorageProvider
 import java.io.BufferedReader
-import java.io.File
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.PrintStream
-import java.nio.file.Paths
 import java.util.TreeMap
 
 class Program(
@@ -90,7 +86,6 @@ class Program(
             }
         }
         credentialStore.store(credentialArguments.convertInputStream())
-        install()
     }
 
     private fun get() {
@@ -129,36 +124,6 @@ class Program(
                 }
             }
         }
-    }
-
-    private fun install() {
-        val javaHome = System.getProperty("java.home")
-        val javaExecutable = File(javaHome, "bin/java")
-        val pathToJava = javaExecutable.absolutePath
-        val pathToJar =
-            File(Program::class.java.protectionDomain.codeSource.location.toURI().schemeSpecificPart).absolutePath
-
-        configureGit(
-            pathToJava = pathToJava,
-            pathToJar = pathToJar
-        )
-    }
-
-    private fun configureGit(pathToJava: String, pathToJar: String) {
-        val xdgConfigHome = System.getenv(XDG_CONFIG_HOME) ?: return
-        val xdgConfigPath = Paths.get(xdgConfigHome, "git", "config").normalize().toString()
-
-        GitHelper.configFileAdd(
-            configKey = GIT_CREDENTIAL_HELPER,
-            configValue = "!'$pathToJava' -jar '$pathToJar'",
-            filePath = xdgConfigPath
-        )
-
-        GitHelper.config(
-            configKey = GIT_CREDENTIAL_HELPER,
-            configValue = "!'$pathToJava' -jar '$pathToJar'",
-            configScope = ConfigScope.LOCAL
-        )
     }
 
     private fun readInput(): CredentialArguments {

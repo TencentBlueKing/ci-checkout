@@ -61,11 +61,11 @@ object GitConstants {
     const val GIT_REPO_PATH = "GIT_REPO_PATH"
 
     // auth env
-    const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
     const val AUTH_SOCKET_VAR = "SSH_AUTH_SOCK"
     const val AGENT_PID_VAR = "SSH_AGENT_PID"
     const val AUTH_SOCKET_VAR2 = "SSH2_AUTH_SOCK"
     const val AGENT_PID_VAR2 = "SSH2_AGENT_PID"
+    const val CREDENTIAL_JAVA_PATH = "credential_java_path"
 
     const val PARAM_SEPARATOR = ","
 
