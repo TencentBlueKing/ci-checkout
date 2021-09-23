@@ -95,9 +95,9 @@ class GitAuthHelper(
         if (!credentialJarParentFile.exists()) {
             credentialJarParentFile.mkdirs()
         }
-        javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.jar")?.use { jarInputStream ->
+        javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.jar")?.use { inputStream ->
             copyCredentialFile(
-                sourceInputStream = jarInputStream,
+                sourceInputStream = inputStream,
                 targetFile = File(credentialJarPath)
             )
         }
@@ -108,9 +108,9 @@ class GitAuthHelper(
         )
 
         if (AgentEnv.getOS() != OSType.WINDOWS) {
-            javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.sh")?.use { jarInputStream ->
+            javaClass.classLoader.getResourceAsStream("script/git-checkout-credential.sh")?.use { inputStream ->
                 copyCredentialFile(
-                    sourceInputStream = jarInputStream,
+                    sourceInputStream = inputStream,
                     targetFile = File(credentialShellPath)
                 )
             }
@@ -165,7 +165,7 @@ class GitAuthHelper(
         if (!targetFile.exists()) {
             FileUtils.copyToFile(sourceInputStream, targetFile)
         } else {
-            val newFileMd5 = sourceInputStream.use { DigestUtils.md5Hex(it) }
+            val newFileMd5 = DigestUtils.md5Hex(sourceInputStream)
             val oldFileMd5 = targetFile.inputStream().use { DigestUtils.md5Hex(it) }
             if (newFileMd5 != oldFileMd5) {
                 targetFile.delete()
