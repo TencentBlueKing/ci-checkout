@@ -82,8 +82,9 @@ class GitAuthHelper(
                 configScope = GitConfigScope.GLOBAL
             )
         }
-        EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$BK_CI_BUILD_JOB_ID", getJavaFilePath())
-        git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$BK_CI_BUILD_JOB_ID", getJavaFilePath())
+        val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
+        EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
+        git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         install()
         store()
         insteadOf()
@@ -105,16 +106,16 @@ class GitAuthHelper(
         )
 
         if (AgentEnv.getOS() != OSType.WINDOWS) {
-            /*copyCredentialFile(
+            copyCredentialFile(
                 sourceFilePath = "script/git-checkout-credential.sh",
                 targetFile = File(credentialShellPath)
-            )*/
+            )
             // 安装
-            /*git.config(
+            git.config(
                 configKey = GIT_CREDENTIAL_HELPER,
-                configValue = "!'$credentialShellPath'",
+                configValue = "'!bash $credentialShellPath'",
                 configScope = GitConfigScope.GLOBAL
-            )*/
+            )
         } else {
             copyCredentialFile(
                 sourceFilePath = "script/git-checkout-credential.bat",
