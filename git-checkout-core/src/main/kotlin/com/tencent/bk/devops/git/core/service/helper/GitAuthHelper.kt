@@ -110,11 +110,11 @@ class GitAuthHelper(
                 targetFile = File(credentialShellPath)
             )*/
             // 安装
-            git.config(
+            /*git.config(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValue = "!'$credentialShellPath'",
                 configScope = GitConfigScope.GLOBAL
-            )
+            )*/
         } else {
             copyCredentialFile(
                 sourceFilePath = "script/git-checkout-credential.bat",
