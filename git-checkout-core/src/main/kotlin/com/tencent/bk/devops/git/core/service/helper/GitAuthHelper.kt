@@ -106,7 +106,7 @@ class GitAuthHelper(
         )
 
         if (AgentEnv.getOS() != OSType.WINDOWS) {
-            copyCredentialFile(
+            /*copyCredentialFile(
                 sourceFilePath = "script/git-checkout-credential.sh",
                 targetFile = File(credentialShellPath)
             )
@@ -115,7 +115,7 @@ class GitAuthHelper(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValue = "!bash $credentialShellPath",
                 configScope = GitConfigScope.GLOBAL
-            )
+            )*/
         } else {
             copyCredentialFile(
                 sourceFilePath = "script/git-checkout-credential.bat",
