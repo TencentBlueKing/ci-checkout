@@ -35,12 +35,10 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
-import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
-import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -66,7 +64,6 @@ class GitAuthHelper(
     private val credentialHome = File(System.getProperty("user.home"), ".checkout").absolutePath
     private val credentialJarPath = File(credentialHome, "git-checkout-credential.jar").absolutePath
     private val credentialShellPath = File(credentialHome, "git-checkout-credential.sh").absolutePath
-    private val credentialBatPath = File(credentialHome, "git-checkout-credential.bat").absolutePath
     private val gitXdgConfigHome = Paths.get(credentialHome,
         System.getenv(BK_CI_PIPELINE_ID) ?: "",
         System.getenv(BK_CI_BUILD_JOB_ID) ?: ""
@@ -111,29 +108,16 @@ class GitAuthHelper(
             configKey = GIT_CREDENTIAL_HELPER
         )
 
-        if (AgentEnv.getOS() != OSType.WINDOWS) {
-            copyCredentialFile(
-                sourceFilePath = "script/git-checkout-credential.sh",
-                targetFile = File(credentialShellPath)
-            )
-            // 安装
-            git.config(
-                configKey = GIT_CREDENTIAL_HELPER,
-                configValue = "!bash $credentialShellPath",
-                configScope = GitConfigScope.GLOBAL
-            )
-        } else {
-            copyCredentialFile(
-                sourceFilePath = "script/git-checkout-credential.bat",
-                targetFile = File(credentialBatPath)
-            )
-            // 安装
-            git.config(
-                configKey = GIT_CREDENTIAL_HELPER,
-                configValue = "!bash '$credentialBatPath'",
-                configScope = GitConfigScope.GLOBAL
-            )
-        }
+        copyCredentialFile(
+            sourceFilePath = "script/git-checkout-credential.sh",
+            targetFile = File(credentialShellPath)
+        )
+        // 安装
+        git.config(
+            configKey = GIT_CREDENTIAL_HELPER,
+            configValue = "!bash $credentialShellPath",
+            configScope = GitConfigScope.GLOBAL
+        )
     }
 
     private fun store() {
