@@ -35,7 +35,7 @@ class RegexUtilTest {
 
     @Test
     fun parseLog() {
-        val expected = CommitLogInfo(
+        var expected = CommitLogInfo(
             commitId = "1fe7bc8b1350d22c3a26281a438edc3edb2bb170",
             committerName = "mingshewhe",
             commitTime = 1619403958,
@@ -50,6 +50,25 @@ class RegexUtilTest {
                     "|1619403958" +
                     "|2021-04-26 02:25:58" +
                     "|mingshewhe" +
+                    "|mr 2"
+            )
+        )
+
+        expected = CommitLogInfo(
+            commitId = "1fe7bc8b1350d22c3a26281a438edc3edb2bb170",
+            committerName = "mingshewhe(小明)",
+            commitTime = 1619403958,
+            authorName = "mingshewhe(小明)",
+            commitMessage = "mr 2"
+        )
+        Assert.assertEquals(
+            expected,
+            RegexUtil.parseLog(
+                "1fe7bc8b1350d22c3a26281a438edc3edb2bb170" +
+                    "|mingshewhe(小明)" +
+                    "|1619403958" +
+                    "|2021-04-26 02:25:58" +
+                    "|mingshewhe(小明)" +
                     "|mr 2"
             )
         )

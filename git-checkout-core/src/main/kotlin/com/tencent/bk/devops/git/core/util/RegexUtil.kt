@@ -34,9 +34,9 @@ object RegexUtil {
 
     private val LOG_PATTERN = Pattern.compile(
         "(?<commitId>[0-9a-f]{40})\\|" +
-            "(?<committerName>\\w+)\\|" +
+            "(?<committerName>.+)\\|" +
             "(?<commitTime>\\w+)\\|(.+)\\|" +
-            "(?<authorName>\\w+)\\|" +
+            "(?<authorName>.+)\\|" +
             "(?<commitMessage>.+)"
     )
 

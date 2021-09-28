@@ -270,7 +270,6 @@ class GitAuthHelper(
     }
 
     override fun removeSubmoduleAuth() {
-        logger.info("removing Temporarily XDG_CONFIG_HOME='$gitXdgConfigHome'")
         git.removeEnvironmentVariable(XDG_CONFIG_HOME)
         File(gitXdgConfigFile).deleteOnExit()
     }
