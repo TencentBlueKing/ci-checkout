@@ -32,8 +32,7 @@ import java.io.ByteArrayInputStream
 
 data class CredentialArguments(
     val protocol: String,
-    val originHost: String,
-    val devopsHost: String,
+    val host: String,
     val path: String? = null,
     val username: String? = null,
     val password: String? = null
@@ -41,7 +40,7 @@ data class CredentialArguments(
     override fun toString(): String {
         val builder = StringBuilder()
         builder.append("protocol=").append(protocol).append("\n")
-        builder.append("host=").append(devopsHost).append("\n")
+        builder.append("host=").append(host).append("\n")
         if (path != null) {
             builder.append("path=").append(path).append("\n")
         }
@@ -52,10 +51,8 @@ data class CredentialArguments(
             builder.append("password=").append(password).append("\n")
         }
         Trace.writeLine("protocol:$protocol")
-        Trace.writeLine("host:$devopsHost")
+        Trace.writeLine("host:$host")
         Trace.writeLine("path:$path")
         return builder.toString()
     }
-
-    fun convertInputStream() = ByteArrayInputStream(toString().toByteArray())
 }

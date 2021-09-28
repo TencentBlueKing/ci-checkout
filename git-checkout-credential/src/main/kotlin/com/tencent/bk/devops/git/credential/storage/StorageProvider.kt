@@ -27,39 +27,38 @@
 
 package com.tencent.bk.devops.git.credential.storage
 
+import com.microsoft.alm.secret.Credential
+import com.microsoft.alm.storage.SecretStore
+import com.microsoft.alm.storage.macosx.KeychainSecurityBackedCredentialStore
+import com.microsoft.alm.storage.windows.CredManagerBackedCredentialStore
 import com.tencent.bk.devops.git.credential.helper.SystemHelper
 
 object StorageProvider {
-    private val CREDENTIAL_STORE_CANDIDATES: List<ICredentialStore>
+    private val CREDENTIAL_STORE_CANDIDATES: List<SecretStore<Credential>>
 
     init {
-        val credentialStoreCandidates = mutableListOf<ICredentialStore>()
+        val credentialStoreCandidates = mutableListOf<SecretStore<Credential>>()
         if (SystemHelper.isWindows()) {
-            credentialStoreCandidates.add(WindowsCredentialStore())
+            credentialStoreCandidates.add(CredManagerBackedCredentialStore())
         }
         if (SystemHelper.isMac()) {
-            credentialStoreCandidates.add(MacCredentialStore())
+            credentialStoreCandidates.add(KeychainSecurityBackedCredentialStore())
         }
         if (SystemHelper.isLinux()) {
-            credentialStoreCandidates.add(LinuxCredentialStore())
+            credentialStoreCandidates.add(CacheBackedCredentialStore())
         }
         CREDENTIAL_STORE_CANDIDATES = credentialStoreCandidates
     }
 
-    fun getCredentialStorage(): ICredentialStore {
+    fun getCredentialStorage(): SecretStore<Credential> {
         var candidate = findSupportStore()
         if (candidate == null) {
-            candidate = StoreCredentialStore()
+            candidate = StoreBackedCredentialStore()
         }
         return candidate
     }
 
-    private fun findSupportStore(): ICredentialStore? {
-        CREDENTIAL_STORE_CANDIDATES.forEach { store ->
-            if (store.isSupport()) {
-                return store
-            }
-        }
-        return null
+    private fun findSupportStore(): SecretStore<Credential>? {
+        return CREDENTIAL_STORE_CANDIDATES.firstOrNull()
     }
 }
