@@ -45,14 +45,20 @@ class GitAuthHandler(
     override fun doHandle() {
         logger.groupStart("Setting up auth")
         authHelper.configureAuth()
+        if (settings.submodules) {
+            authHelper.configureSubmoduleAuth()
+        }
         logger.groupEnd("")
     }
 
     override fun afterHandle() {
+        logger.groupStart("removing auth")
         if (!settings.persistCredentials) {
-            logger.groupStart("removing auth")
             authHelper.removeAuth()
-            logger.groupEnd("")
         }
+        if (settings.submodules) {
+            authHelper.removeSubmoduleAuth()
+        }
+        logger.groupEnd("")
     }
 }

@@ -28,10 +28,12 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
@@ -48,6 +50,7 @@ import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL
+import java.nio.file.Paths
 
 @Suppress("ALL")
 class GitAuthHelper(
@@ -60,11 +63,15 @@ class GitAuthHelper(
     }
 
     private val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
-
     private val credentialHome = File(System.getProperty("user.home"), ".checkout").absolutePath
     private val credentialJarPath = File(credentialHome, "git-checkout-credential.jar").absolutePath
     private val credentialShellPath = File(credentialHome, "git-checkout-credential.sh").absolutePath
     private val credentialBatPath = File(credentialHome, "git-checkout-credential.bat").absolutePath
+    private val gitXdgConfigHome = Paths.get(credentialHome,
+        System.getenv(BK_CI_PIPELINE_ID),
+        System.getenv(BK_CI_BUILD_JOB_ID)
+    ).toString()
+    private val gitXdgConfigFile = Paths.get(gitXdgConfigHome, "git", "config").toString()
 
     private fun configureHttp() {
         if (!serverInfo.httpProtocol ||
@@ -87,7 +94,6 @@ class GitAuthHelper(
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         install()
         store()
-        insteadOf()
     }
 
     private fun install() {
@@ -106,7 +112,7 @@ class GitAuthHelper(
         )
 
         if (AgentEnv.getOS() != OSType.WINDOWS) {
-            /*copyCredentialFile(
+            copyCredentialFile(
                 sourceFilePath = "script/git-checkout-credential.sh",
                 targetFile = File(credentialShellPath)
             )
@@ -115,7 +121,7 @@ class GitAuthHelper(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValue = "!bash $credentialShellPath",
                 configScope = GitConfigScope.GLOBAL
-            )*/
+            )
         } else {
             copyCredentialFile(
                 sourceFilePath = "script/git-checkout-credential.bat",
@@ -173,39 +179,51 @@ class GitAuthHelper(
     }
 
     private fun insteadOf() {
-        httpInsteadOfGit(host = serverInfo.hostName)
+        if (serverInfo.httpProtocol) {
+            httpInsteadOfGit(host = serverInfo.hostName)
 
-        // 配置其他域名权限
-        val compatibleHostList = settings.compatibleHostList
-        if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
-            compatibleHostList.filter { it != serverInfo.hostName }.forEach { otherHostName ->
-                httpInsteadOfGit(host = otherHostName)
+            // 配置其他域名权限
+            val compatibleHostList = settings.compatibleHostList
+            if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
+                compatibleHostList.filter { it != serverInfo.hostName }.forEach { otherHostName ->
+                    httpInsteadOfGit(host = otherHostName)
+                }
+            }
+        } else {
+            gitInsteadOfHttp(host = serverInfo.hostName)
+
+            // 配置其他域名权限
+            val compatibleHostList = settings.compatibleHostList
+            if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
+                compatibleHostList.filter { it != serverInfo.hostName }.forEach { otherHostName ->
+                    gitInsteadOfHttp(host = otherHostName)
+                }
             }
         }
     }
 
     private fun httpInsteadOfGit(host: String) {
         val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
-        // 把全局的insteadOf先去掉
-        if (git.configExists(
-                configKey = "url.git@$host:.insteadof",
-                configScope = GitConfigScope.GLOBAL
-            )
-        ) {
-            git.tryConfigUnset(
-                configKey = "url.git@$host:.insteadof",
-                configScope = GitConfigScope.GLOBAL
-            )
-        }
-        // 如果没有配置使用http替换ssh配置
-        if (!git.configExists(
-                configKey = insteadOfKey,
-                configValueRegex = "git@$host:"
-            )
-        ) {
+        git.tryConfigUnset(
+            configKey = "url.git@$host:.insteadof",
+            configScope = GitConfigScope.GLOBAL
+        )
+        git.configAdd(
+            configKey = insteadOfKey,
+            configValue = "git@$host:",
+            configScope = GitConfigScope.FILE,
+            configFile = gitXdgConfigFile
+        )
+    }
+
+    private fun gitInsteadOfHttp(host: String) {
+        val insteadOfKey = "url.${serverInfo.origin}:.insteadOf"
+        listOf("http", "https").forEach { protocol ->
             git.configAdd(
                 configKey = insteadOfKey,
-                configValue = "git@$host:"
+                configValue = "$protocol://$host/",
+                configScope = GitConfigScope.FILE,
+                configFile = gitXdgConfigFile
             )
         }
     }
@@ -218,28 +236,6 @@ class GitAuthHelper(
             throw ParamInvalidException(errorMsg = "private key must not be empty")
         }
         SSHAgentUtils().addIdentity(privateKey = settings.privateKey, passPhrase = settings.passPhrase)
-        val insteadOfKey = "url.${serverInfo.origin}:.insteadOf"
-        git.tryConfigUnset(
-            configKey = insteadOfKey
-        )
-        listOf(
-            "http://${serverInfo.hostName}/",
-            "https://${serverInfo.hostName}/"
-        ).forEach {
-            git.configAdd(
-                configKey = insteadOfKey,
-                configValue = it
-            )
-        }
-
-        settings.compatibleHostList?.filter { it != serverInfo.hostName }?.forEach { otherHostName ->
-            listOf("http", "https").forEach { protocol ->
-                git.configAdd(
-                    configKey = insteadOfKey,
-                    configValue = "$protocol://$otherHostName/"
-                )
-            }
-        }
     }
 
     private fun getJavaFilePath() = File(System.getProperty("java.home"), "/bin/java").absolutePath
@@ -278,5 +274,17 @@ class GitAuthHelper(
                 ).convertInputStream()
             )
         }
+    }
+
+    override fun configureSubmoduleAuth() {
+        logger.info("Temporarily overriding XDG_CONFIG_HOME='$gitXdgConfigHome' for fetching submodules")
+        git.setEnvironmentVariable(XDG_CONFIG_HOME, gitXdgConfigHome)
+        insteadOf()
+    }
+
+    override fun removeSubmoduleAuth() {
+        logger.info("removing XDG_CONFIG_HOME='$gitXdgConfigHome'")
+        git.removeEnvironmentVariable(XDG_CONFIG_HOME)
+        File(gitXdgConfigFile).deleteOnExit()
     }
 }
