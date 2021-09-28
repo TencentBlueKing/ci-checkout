@@ -115,7 +115,7 @@ class GitAuthHelper(
         // 安装
         git.config(
             configKey = GIT_CREDENTIAL_HELPER,
-            configValue = "!bash $credentialShellPath",
+            configValue = "!bash '$credentialShellPath'",
             configScope = GitConfigScope.GLOBAL
         )
     }
