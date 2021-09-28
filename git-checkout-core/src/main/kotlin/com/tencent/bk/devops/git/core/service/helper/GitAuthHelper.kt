@@ -278,6 +278,9 @@ class GitAuthHelper(
 
     override fun configureSubmoduleAuth() {
         logger.info("Temporarily overriding XDG_CONFIG_HOME='$gitXdgConfigHome' for fetching submodules")
+        if (!File(gitXdgConfigFile).exists()) {
+            File(gitXdgConfigFile).parentFile.mkdirs()
+        }
         git.setEnvironmentVariable(XDG_CONFIG_HOME, gitXdgConfigHome)
         insteadOf()
     }
