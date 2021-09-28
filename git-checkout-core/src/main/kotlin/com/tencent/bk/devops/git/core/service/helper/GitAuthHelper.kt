@@ -68,8 +68,8 @@ class GitAuthHelper(
     private val credentialShellPath = File(credentialHome, "git-checkout-credential.sh").absolutePath
     private val credentialBatPath = File(credentialHome, "git-checkout-credential.bat").absolutePath
     private val gitXdgConfigHome = Paths.get(credentialHome,
-        System.getenv(BK_CI_PIPELINE_ID),
-        System.getenv(BK_CI_BUILD_JOB_ID)
+        System.getenv(BK_CI_PIPELINE_ID) ?: "",
+        System.getenv(BK_CI_BUILD_JOB_ID) ?: ""
     ).toString()
     private val gitXdgConfigFile = Paths.get(gitXdgConfigHome, "git", "config").toString()
 
@@ -286,7 +286,7 @@ class GitAuthHelper(
     }
 
     override fun removeSubmoduleAuth() {
-        logger.info("removing XDG_CONFIG_HOME='$gitXdgConfigHome'")
+        logger.info("removing Temporarily XDG_CONFIG_HOME='$gitXdgConfigHome'")
         git.removeEnvironmentVariable(XDG_CONFIG_HOME)
         File(gitXdgConfigFile).deleteOnExit()
     }
