@@ -74,6 +74,6 @@ class ProgramTest {
         val eraseInputStream = ByteArrayInputStream(eraseBuilder.toString().toByteArray())
         val eraseOutputStream = ByteArrayOutputStream()
         val eraseProgram = Program(standardIn = eraseInputStream, standardOut = PrintStream(eraseOutputStream))
-        eraseProgram.innerMain(arrayOf("erase"))
+        eraseProgram.innerMain(arrayOf("devopsErase"))
     }
 }

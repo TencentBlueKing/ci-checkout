@@ -28,11 +28,9 @@
 package com.tencent.bk.devops.git.credential
 
 import com.microsoft.alm.secret.Credential
-import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_JOB_ID
-import com.tencent.bk.devops.git.credential.Constants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.credential.helper.GitHelper
-import com.tencent.bk.devops.git.credential.storage.StorageProvider
+import com.tencent.bk.devops.git.credential.storage.CredentialStore
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -43,6 +41,8 @@ class Program(
     private val standardIn: InputStream,
     private val standardOut: PrintStream
 ) {
+
+    private val credentialStore = CredentialStore()
 
     fun innerMain(args: Array<String>) {
         if (args.isEmpty() || args[0].contains("?")) {
@@ -65,39 +65,40 @@ class Program(
 
     private fun store() {
         val credentialArguments = readInput()
-        val credentialStore = StorageProvider.getCredentialStorage()
         val compatibleHost = GitHelper.tryConfigGet(
             configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
             configScope = ConfigScope.GLOBAL
         )
-        // 同一服务多个域名时，需要保存不同域名的凭证
-        if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(credentialArguments.host)) {
-            compatibleHost.split(",").forEach { host ->
-                listOf("https", "http").forEach { protocol ->
-                    credentialStore.add(
-                        getTargetName(protocol, host),
-                        Credential(
-                            credentialArguments.username,
-                            credentialArguments.password
+
+        with(credentialArguments) {
+            credentialStore.add(
+                targetUri,
+                Credential(username, password)
+            )
+            // 同一服务多个域名时，需要保存不同域名的凭证
+            if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(credentialArguments.host)) {
+                compatibleHost.split(",").forEach { host ->
+                    listOf("https", "http").forEach { protocol ->
+                        credentialStore.add(
+                            copyArgs(protocol, host).targetUri,
+                            Credential(
+                                credentialArguments.username,
+                                credentialArguments.password
+                            )
                         )
-                    )
+                    }
                 }
             }
         }
-        with(credentialArguments) {
-            credentialStore.add(
-                getTargetName(protocol, host),
-                Credential(username, password)
-            )
-        }
-
     }
 
     private fun get() {
         with(readInput()) {
-            standardOut.print(StorageProvider.getCredentialStorage().get(
-                getTargetName(protocol, host)
-            ))
+            var credential = credentialStore.get(targetUri)
+            if (credential == null) {
+                credential = Credential.Empty
+            }
+            standardOut.print(setCredentials(credential!!))
         }
     }
 
@@ -106,9 +107,8 @@ class Program(
      */
     private fun erase() {
         with(readInput()) {
-            StorageProvider.getCredentialStorage().delete(getTargetName(protocol, host))
+            credentialStore.delete(targetUri)
         }
-
     }
 
     /**
@@ -116,17 +116,19 @@ class Program(
      */
     private fun devopsErase() {
         val credentialArguments = readInput()
-        val credentialStore = StorageProvider.getCredentialStorage()
-        credentialStore.delete(getTargetName(credentialArguments.protocol, credentialArguments.host))
+
         val compatibleHost = GitHelper.tryConfigGet(
             configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
             configScope = ConfigScope.GLOBAL
         )
-        // 同一服务多个域名时，需要保存不同域名的凭证
-        if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(credentialArguments.host)) {
-            compatibleHost.split(",").forEach { host ->
-                listOf("https", "http").forEach { protocol ->
-                    credentialStore.delete(getTargetName(protocol, host))
+        with(credentialArguments) {
+            credentialStore.delete(targetUri)
+            // 同一服务多个域名时，需要保存不同域名的凭证
+            if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(credentialArguments.host)) {
+                compatibleHost.split(",").forEach { host ->
+                    listOf("https", "http").forEach { protocol ->
+                        credentialStore.delete(copyArgs(protocol, host).targetUri)
+                    }
                 }
             }
         }
@@ -169,22 +171,5 @@ class Program(
             username = username,
             password = password
         )
-    }
-
-    private fun getTargetName(protocol: String, host: String): String {
-        val builder = StringBuilder(SecretsNamespace)
-        val buildId = System.getenv(BK_CI_PIPELINE_ID)
-        val vmSeqId = System.getenv(BK_CI_BUILD_JOB_ID)
-        if (!buildId.isNullOrBlank()) {
-            builder.append(":").append(buildId)
-        }
-        if (!vmSeqId.isNullOrBlank()) {
-            builder.append(":").append(vmSeqId)
-        }
-        return builder.append(":$protocol:$host").toString()
-    }
-
-    companion object {
-        private const val SecretsNamespace = "git"
     }
 }

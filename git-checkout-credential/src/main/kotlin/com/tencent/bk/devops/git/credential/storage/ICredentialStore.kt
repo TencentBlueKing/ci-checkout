@@ -27,76 +27,17 @@
 
 package com.tencent.bk.devops.git.credential.storage
 
+import com.microsoft.alm.secret.Credential
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 import com.tencent.bk.devops.git.credential.helper.GitOutput
 import java.io.InputStream
+import java.net.URI
 
 interface ICredentialStore {
-    /**
-     * 获取凭证
-     */
-    @SuppressWarnings("ReturnCount")
-    fun get(input: InputStream): String? {
-        val credentialHelper = getCredentialHelper() ?: return null
-        val stdOuts = GitHelper.invokeHelper(
-            args = listOf("credential-$credentialHelper", "get"),
-            inputStream = input
-        ).stdOuts
-        if (stdOuts.isEmpty()) {
-            // 返回空的账号密码
-            return "username=\"\"\npassword=\"\"\n"
-        }
-        return stdOuts.joinToString("\n")
-    }
 
-    /**
-     * 删除凭证
-     */
-    fun erase(input: InputStream): Boolean {
-        val credentialHelper = getCredentialHelper() ?: return false
-        return GitHelper.invokeHelper(
-            args = listOf("credential-$credentialHelper", "erase"),
-            inputStream = input
-        ).exitCode == 0
-    }
+    fun get(targetUri: URI): Credential?
 
-    /**
-     * 存储凭证
-     */
-    fun store(input: InputStream): Boolean {
-        val credentialHelper = getCredentialHelper() ?: return false
-        return invokeHelper(
-            credentialHelper = credentialHelper,
-            action = "store",
-            input = input
-        ).exitCode == 0
-    }
+    fun add(targetUri: URI, credential: Credential)
 
-    /**
-     * 系统是否支持此类型的凭证
-     */
-    fun isSupport(): Boolean {
-        return !getCredentialHelper().isNullOrBlank()
-    }
-
-    fun getCredentialHelper(): String?
-
-    fun getCredentialOptions(): List<String> = emptyList()
-
-    private fun invokeHelper(
-        credentialHelper: String,
-        action: String,
-        input: InputStream
-    ): GitOutput {
-        val args = mutableListOf("credential-$credentialHelper")
-        val options = getCredentialOptions()
-        if (options.isNotEmpty()) {
-            args.addAll(options)
-        }
-        args.add(action)
-        return GitHelper.invokeHelper(
-            args = args,
-            inputStream = input
-        )
-    }
+    fun delete(targetUri: URI)
 }

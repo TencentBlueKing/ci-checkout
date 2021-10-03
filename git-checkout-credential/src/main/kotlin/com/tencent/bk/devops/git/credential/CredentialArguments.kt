@@ -27,8 +27,10 @@
 
 package com.tencent.bk.devops.git.credential
 
+import com.microsoft.alm.secret.Credential
 import com.tencent.bk.devops.git.credential.helper.Trace
 import java.io.ByteArrayInputStream
+import java.net.URI
 
 data class CredentialArguments(
     val protocol: String,
@@ -37,6 +39,8 @@ data class CredentialArguments(
     val username: String? = null,
     val password: String? = null
 ) {
+    val targetUri get() = URI("$protocol://$host/")
+
     override fun toString(): String {
         val builder = StringBuilder()
         builder.append("protocol=").append(protocol).append("\n")
@@ -54,5 +58,25 @@ data class CredentialArguments(
         Trace.writeLine("host:$host")
         Trace.writeLine("path:$path")
         return builder.toString()
+    }
+
+    fun copyArgs(protocol: String, host: String): CredentialArguments {
+        return CredentialArguments(
+            protocol = protocol,
+            host = host,
+            path = path,
+            username = username,
+            password = password
+        )
+    }
+
+    fun setCredentials(credential: Credential): CredentialArguments {
+        return CredentialArguments(
+            protocol = protocol,
+            host = host,
+            path = path,
+            username = credential.Username,
+            password = credential.Password
+        )
     }
 }
