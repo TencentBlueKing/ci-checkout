@@ -29,7 +29,6 @@ package com.tencent.bk.devops.git.credential
 
 import com.microsoft.alm.secret.Credential
 import com.tencent.bk.devops.git.credential.helper.Trace
-import java.io.ByteArrayInputStream
 import java.net.URI
 
 data class CredentialArguments(

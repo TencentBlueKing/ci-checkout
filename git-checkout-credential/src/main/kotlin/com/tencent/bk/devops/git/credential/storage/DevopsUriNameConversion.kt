@@ -4,7 +4,7 @@ import com.microsoft.alm.secret.Secret
 import com.tencent.bk.devops.git.credential.Constants
 import java.net.URI
 
-class DevopsUriNameConversion: Secret.IUriNameConversion {
+class DevopsUriNameConversion : Secret.IUriNameConversion {
     override fun convert(targetUri: URI, namespace: String): String {
         val builder = StringBuilder(namespace)
         val buildId = System.getenv(Constants.BK_CI_PIPELINE_ID)

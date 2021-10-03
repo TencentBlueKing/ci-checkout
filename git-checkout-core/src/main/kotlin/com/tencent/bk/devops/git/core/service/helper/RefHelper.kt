@@ -52,23 +52,8 @@ class RefHelper(
                     return if (GitUtil.isPrePushBranch(ref)) {
                         listOf(ref)
                     } else {
-                        val refSpec = mutableListOf(
-                            "--no-tags",
-                            "+refs/heads/$ref:refs/remotes/$ORIGIN_REMOTE_NAME/$ref"
-                        )
-                        if (isAddSourceRef()) {
-                            refSpec.add(
-                                "+refs/heads/$sourceBranchName:refs/remotes/$ORIGIN_REMOTE_NAME/$sourceBranchName"
-                            )
-                        }
-                        fetchRefSpec?.split(",")?.filter {
-                            it != ref || it != sourceBranchName
-                        }?.forEach { branch ->
-                            refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
-                        }
-                        refSpec
+                        getBranchRef()
                     }
-
                 }
                 PullType.TAG ->
                     listOf("+refs/tags/$ref:refs/tags/$ref")
@@ -76,6 +61,24 @@ class RefHelper(
                     listOf(ref)
             }
         }
+    }
+
+    private fun GitSourceSettings.getBranchRef(): MutableList<String> {
+        val refSpec = mutableListOf(
+            "--no-tags",
+            "+refs/heads/$ref:refs/remotes/$ORIGIN_REMOTE_NAME/$ref"
+        )
+        if (isAddSourceRef()) {
+            refSpec.add(
+                "+refs/heads/$sourceBranchName:refs/remotes/$ORIGIN_REMOTE_NAME/$sourceBranchName"
+            )
+        }
+        fetchRefSpec?.split(",")?.filter {
+            it != ref || it != sourceBranchName
+        }?.forEach { branch ->
+            refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
+        }
+        return refSpec
     }
 
     fun getSourceRefSpec(): List<String> {

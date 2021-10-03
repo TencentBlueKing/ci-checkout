@@ -7,7 +7,7 @@ import java.io.ByteArrayInputStream
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
-class CacheSecureStore: ICredentialStore {
+class CacheSecureStore : ICredentialStore {
     companion object {
         private const val MAX_JOB_RUN_DAYS = 7L // Job运行最大天数
     }

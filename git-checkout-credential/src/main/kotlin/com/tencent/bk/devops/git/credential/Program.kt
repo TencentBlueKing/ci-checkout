@@ -35,6 +35,7 @@ import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.PrintStream
+import java.net.URI
 import java.util.TreeMap
 
 class Program(
@@ -65,28 +66,31 @@ class Program(
 
     private fun store() {
         val credentialArguments = readInput()
-        val compatibleHost = GitHelper.tryConfigGet(
-            configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
-            configScope = ConfigScope.GLOBAL
-        )
 
         with(credentialArguments) {
             credentialStore.add(
                 targetUri,
                 Credential(username, password)
             )
-            // 同一服务多个域名时，需要保存不同域名的凭证
-            if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(credentialArguments.host)) {
-                compatibleHost.split(",").forEach { host ->
-                    listOf("https", "http").forEach { protocol ->
-                        credentialStore.add(
-                            copyArgs(protocol, host).targetUri,
-                            Credential(
-                                credentialArguments.username,
-                                credentialArguments.password
-                            )
-                        )
-                    }
+            compatible { compatibleUri ->
+                credentialStore.add(
+                    compatibleUri,
+                    Credential(username, password)
+                )
+            }
+        }
+    }
+
+    private fun CredentialArguments.compatible(action: (URI) -> Unit) {
+        val compatibleHost = GitHelper.tryConfigGet(
+            configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
+            configScope = ConfigScope.GLOBAL
+        )
+        // 同一服务多个域名时，需要保存不同域名的凭证
+        if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(host)) {
+            compatibleHost.split(",").forEach { host ->
+                listOf("https", "http").forEach { protocol ->
+                    action.invoke(URI("$protocol://$host/"))
                 }
             }
         }
@@ -116,20 +120,10 @@ class Program(
      */
     private fun devopsErase() {
         val credentialArguments = readInput()
-
-        val compatibleHost = GitHelper.tryConfigGet(
-            configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
-            configScope = ConfigScope.GLOBAL
-        )
         with(credentialArguments) {
             credentialStore.delete(targetUri)
-            // 同一服务多个域名时，需要保存不同域名的凭证
-            if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(credentialArguments.host)) {
-                compatibleHost.split(",").forEach { host ->
-                    listOf("https", "http").forEach { protocol ->
-                        credentialStore.delete(copyArgs(protocol, host).targetUri)
-                    }
-                }
+            compatible { compatibleUri ->
+                credentialStore.delete(compatibleUri)
             }
         }
     }

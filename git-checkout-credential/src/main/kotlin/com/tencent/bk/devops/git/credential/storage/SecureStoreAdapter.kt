@@ -6,7 +6,7 @@ import java.net.URI
 
 class SecureStoreAdapter(
     private val backingStore: SecretStore<Credential>
-): ICredentialStore {
+) : ICredentialStore {
 
     companion object {
         private const val CREDENTIAL_NAMESPACE = "devops"

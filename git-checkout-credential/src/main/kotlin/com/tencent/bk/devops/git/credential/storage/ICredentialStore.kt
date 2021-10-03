@@ -28,9 +28,6 @@
 package com.tencent.bk.devops.git.credential.storage
 
 import com.microsoft.alm.secret.Credential
-import com.tencent.bk.devops.git.credential.helper.GitHelper
-import com.tencent.bk.devops.git.credential.helper.GitOutput
-import java.io.InputStream
 import java.net.URI
 
 interface ICredentialStore {

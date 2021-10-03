@@ -6,7 +6,7 @@ import com.microsoft.alm.storage.macosx.KeychainSecurityBackedCredentialStore
 import com.microsoft.alm.storage.windows.CredManagerBackedCredentialStore
 import java.net.URI
 
-class CredentialStore: ICredentialStore {
+class CredentialStore : ICredentialStore {
     private var backingStore: ICredentialStore? = null
 
     override fun get(targetUri: URI): Credential? {
