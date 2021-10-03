@@ -52,7 +52,9 @@ class RefHelper(
                     if (isAddSourceRef()) {
                         refSpec.add("+refs/heads/$sourceBranchName:refs/remotes/$ORIGIN_REMOTE_NAME/$sourceBranchName")
                     }
-                    fetchRefSpec?.split(",")?.forEach { branch ->
+                    fetchRefSpec?.split(",")?.filter {
+                        it != ref || it != sourceBranchName
+                    }?.forEach { branch ->
                         refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
                     }
                     return refSpec
