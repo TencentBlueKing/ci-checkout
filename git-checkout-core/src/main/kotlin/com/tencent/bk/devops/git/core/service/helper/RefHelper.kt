@@ -48,16 +48,27 @@ class RefHelper(
         with(settings) {
             return when (pullType) {
                 PullType.BRANCH -> {
-                    val refSpec = mutableListOf("--no-tags", "+refs/heads/$ref:refs/remotes/$ORIGIN_REMOTE_NAME/$ref")
-                    if (isAddSourceRef()) {
-                        refSpec.add("+refs/heads/$sourceBranchName:refs/remotes/$ORIGIN_REMOTE_NAME/$sourceBranchName")
+                    // 工蜂pre-push，直接按照分支拉取
+                    return if (GitUtil.isPrePushBranch(ref)) {
+                        listOf(ref)
+                    } else {
+                        val refSpec = mutableListOf(
+                            "--no-tags",
+                            "+refs/heads/$ref:refs/remotes/$ORIGIN_REMOTE_NAME/$ref"
+                        )
+                        if (isAddSourceRef()) {
+                            refSpec.add(
+                                "+refs/heads/$sourceBranchName:refs/remotes/$ORIGIN_REMOTE_NAME/$sourceBranchName"
+                            )
+                        }
+                        fetchRefSpec?.split(",")?.filter {
+                            it != ref || it != sourceBranchName
+                        }?.forEach { branch ->
+                            refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
+                        }
+                        refSpec
                     }
-                    fetchRefSpec?.split(",")?.filter {
-                        it != ref || it != sourceBranchName
-                    }?.forEach { branch ->
-                        refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
-                    }
-                    return refSpec
+
                 }
                 PullType.TAG ->
                     listOf("+refs/tags/$ref:refs/tags/$ref")
@@ -77,10 +88,13 @@ class RefHelper(
         with(settings) {
             return when (pullType) {
                 PullType.BRANCH -> {
-                    val startPoint = if (commit.isBlank()) {
-                        "refs/remotes/$ORIGIN_REMOTE_NAME/$ref"
-                    } else {
-                        commit
+                    val startPoint = when {
+                        GitUtil.isPrePushBranch(ref) ->
+                            "FETCH_HEAD"
+                        commit.isBlank() ->
+                            "refs/remotes/$ORIGIN_REMOTE_NAME/$ref"
+                        else ->
+                            commit
                     }
                     if (preMerge) {
                         CheckoutInfo(
@@ -102,7 +116,7 @@ class RefHelper(
     fun getMergeInfo(): String {
         with(settings) {
             return if (sourceRepoUrlEqualsRepoUrl) {
-                // if code_git enable pre_push, executing `git merge FETCH_HEAD`
+                // 工蜂开启pre-push，预合并需要执行 `git merge FETCH_HEAD`
                 if (GitUtil.isPrePushBranch(sourceBranchName)) {
                     FETCH_HEAD
                 } else {
