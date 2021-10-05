@@ -30,6 +30,7 @@ apply plugin: "com.github.johnrengelman.shadow"
 dependencies {
     compile "org.apache.commons:commons-exec:$commonExecVersion"
     implementation group: 'com.microsoft.alm', name: 'auth-secure-storage', version: '0.6.4'
+    implementation 'org.slf4j:slf4j-simple:1.7.21'
 }
 
 // 固定入口类 不要改

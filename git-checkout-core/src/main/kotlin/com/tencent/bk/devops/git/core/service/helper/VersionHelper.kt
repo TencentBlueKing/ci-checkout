@@ -1,20 +1,16 @@
 package com.tencent.bk.devops.git.core.service.helper
 
+import java.util.Properties
+
 @SuppressWarnings("MagicNumber")
 object VersionHelper {
 
     fun getCheckoutCoreVersion(): String {
-        val pack = this.javaClass.`package`
-        val implementationVersion = pack.implementationVersion
-        val specificationVersion = pack.specificationVersion
-        val version = StringBuffer()
-        if (specificationVersion != null) {
-            version.append(specificationVersion).append(".")
-        }
-        if (implementationVersion != null) {
-            version.append(implementationVersion)
-        }
-        return version.toString()
+        val properties = Properties()
+        properties.load(VersionHelper.javaClass.getResourceAsStream("core-version.properties"))
+        val version = properties["version"]
+        val buildNo = properties["buildNo"]
+        return "$version-$buildNo"
     }
 
     fun computeGitVersion(version: String): Long {

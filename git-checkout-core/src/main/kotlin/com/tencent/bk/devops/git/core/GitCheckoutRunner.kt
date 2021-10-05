@@ -41,6 +41,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitSourceProvider
 import com.tencent.bk.devops.git.core.service.helper.IGitMetricsHelper
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
+import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.DateUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -56,6 +57,7 @@ class GitCheckoutRunner {
     }
 
     fun <T : AtomBaseParam> run(inputAdapter: IInputAdapter, atomContext: AtomContext<T>) {
+        logger.info("git checkout core version: ${VersionHelper.getCheckoutCoreVersion()}")
         val monitorData = MonitorData()
         val startTime = System.currentTimeMillis()
         var settings: GitSourceSettings? = null

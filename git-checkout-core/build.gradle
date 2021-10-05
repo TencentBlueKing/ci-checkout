@@ -27,7 +27,7 @@
 
 dependencies {
     compile("com.tencent.devops.ci-plugins:java-plugin-sdk:1.0.9") {
-        exclude group:"com.squareup.okhttp3", module:"okhttp"
+        exclude group:'com.squareup.okhttp3', module:'okhttp'
     }
     compile "com.squareup.okhttp3:okhttp:3.12.0"
     compile "org.bouncycastle:bcprov-jdk16:1.46"
@@ -36,5 +36,14 @@ dependencies {
     compile "org.apache.commons:commons-lang3:3.12.0"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2"
 }
+
+task versionInfo(type: WriteProperties) {
+    outputFile 'src/main/resources/core-version.properties'
+    encoding = "UTF-8"
+    property 'version', version
+    property 'buildNo', System.getenv("BK_CI_BUILD_NO") ?: ""
+    property 'date', new Date().format('yyyy-MM-dd HH:mm:ss')
+}
+processResources.dependsOn versionInfo
 
 apply from: "$rootDir/task_deploy_to_maven.gradle"

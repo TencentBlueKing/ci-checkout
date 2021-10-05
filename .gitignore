@@ -16,3 +16,4 @@ output.json
 notes/
 *.apk
 git-checkout-credential.jar
+core-version.properties
