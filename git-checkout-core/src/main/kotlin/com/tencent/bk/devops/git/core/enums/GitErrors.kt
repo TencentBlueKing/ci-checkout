@@ -49,12 +49,6 @@ enum class GitErrors(
         ),
         description = GitErrorsText.get().sshAuthenticationFailed
     ),
-    SshPermissionDenied(
-        regex = Regex(
-            "fatal: Could not read from remote repository."
-        ),
-        description = GitErrorsText.get().sshPermissionDenied
-    ),
     HttpsAuthenticationFailed(
         regex = Regex(
             "(The requested URL returned error: 403)|" +
@@ -96,7 +90,9 @@ enum class GitErrors(
     ),
     HttpsRepositoryNotFound(
         regex = Regex(
-            "(fatal: repository '(.+)' not found)|(fatal: .* Git repository not found)"
+            "(fatal: repository '(.+)' not found)|" +
+                "(fatal: .* Git repository not found)|" +
+                "(fatal: 远程错误：Git repository not found)"
         ),
         description = GitErrorsText.get().httpsRepositoryNotFound
     ),
@@ -133,7 +129,7 @@ enum class GitErrors(
     ),
     NoExistingRemoteBranch(
         regex = Regex(
-            "(Your configuration specifies to merge with the ref '(.+)') ||" +
+            "(Your configuration specifies to merge with the ref '(.+)') |" +
                 "(fatal: '(.+)' is not a commit and a branch '(.+)' cannot be created from it)"
         ),
         description = GitErrorsText.get().noExistingRemoteBranch
