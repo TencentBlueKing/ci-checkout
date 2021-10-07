@@ -30,7 +30,7 @@ package com.tencent.bk.devops.git.core.service.auth
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 
-class UserNameGitAuthProvider(
+class UserNamePasswordGitAuthProvider(
     private val username: String?,
     private val password: String?
 ) : IGitAuthProvider {

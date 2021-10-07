@@ -29,37 +29,18 @@ package com.tencent.bk.devops.git.core.api
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bk.devops.atom.api.BaseApi
-import com.tencent.bk.devops.atom.exception.RemoteServiceException
-import com.tencent.bk.devops.git.core.exception.ExceptionTranslator
 import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
 import com.tencent.bk.devops.git.core.pojo.api.GitToken
 import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
-import com.tencent.bk.devops.git.core.service.helper.RetryHelper
+import com.tencent.bk.devops.git.core.util.HttpUtil.retryRequest
 import com.tencent.bk.devops.plugin.pojo.Result
 import com.tencent.bk.devops.plugin.utils.JsonUtil
-import java.util.concurrent.TimeUnit
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import okhttp3.RequestBody
-import org.slf4j.LoggerFactory
 
 class DevopsApi : IDevopsApi, BaseApi() {
-
-    companion object {
-        private const val connectTimeout = 5L
-        private const val readTimeout = 30L
-        private const val writeTimeout = 30L
-        private val logger = LoggerFactory.getLogger(DevopsApi::class.java)
-    }
-
-    private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(connectTimeout, TimeUnit.SECONDS)
-        .readTimeout(readTimeout, TimeUnit.SECONDS)
-        .writeTimeout(writeTimeout, TimeUnit.SECONDS)
-        .build()
 
     override fun addCommit(commits: List<CommitData>): Result<Int> {
         val path = "/repository/api/build/commit/addCommit"
@@ -116,25 +97,5 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val request = buildPost(path, requestBody, mutableMapOf())
         val responseContent = retryRequest(request, "上报插件度量信息失败", 1)
         return JsonUtil.to(responseContent, object : TypeReference<Result<Boolean>>() {})
-    }
-
-    private fun retryRequest(request: Request, errorMessage: String, maxAttempts: Int = 3): String {
-        return RetryHelper(maxAttempts = maxAttempts).execute {
-            try {
-                okHttpClient.newCall(request).execute().use { response ->
-                    val responseContent = response.body()?.string() ?: ""
-                    if (!response.isSuccessful) {
-                        logger.error(
-                            "Fail to request($request) with code ${response.code()} " +
-                                "message ${response.message()} and response $responseContent"
-                        )
-                        throw RemoteServiceException(errorMessage, response.code(), response.body()?.string() ?: "")
-                    }
-                    responseContent
-                }
-            } catch (ignore: Exception) {
-                throw ExceptionTranslator.apiExceptionTranslator(ignore)
-            }
-        }
     }
 }

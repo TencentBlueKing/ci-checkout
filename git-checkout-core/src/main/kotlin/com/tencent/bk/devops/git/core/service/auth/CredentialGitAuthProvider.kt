@@ -58,7 +58,7 @@ class CredentialGitAuthProvider(
                 if (credentialInfo.v2.isNullOrBlank()) {
                     throw ParamInvalidException(errorMsg = "the git credential password is empty")
                 }
-                UserNameGitAuthProvider(username = credentialInfo.v1, password = credentialInfo.v2)
+                UserNamePasswordGitAuthProvider(username = credentialInfo.v1, password = credentialInfo.v2)
             }
             CredentialType.TOKEN_USERNAME_PASSWORD -> {
                 if (credentialInfo.v2.isNullOrBlank()) {
@@ -67,7 +67,7 @@ class CredentialGitAuthProvider(
                 if (credentialInfo.v3.isNullOrBlank()) {
                     throw ParamInvalidException(errorMsg = "the git credential password is empty")
                 }
-                UserNameGitAuthProvider(username = credentialInfo.v2, password = credentialInfo.v3)
+                UserNamePasswordGitAuthProvider(username = credentialInfo.v2, password = credentialInfo.v3)
             }
             CredentialType.SSH_PRIVATEKEY -> {
                 if (credentialInfo.v1.isEmpty()) {

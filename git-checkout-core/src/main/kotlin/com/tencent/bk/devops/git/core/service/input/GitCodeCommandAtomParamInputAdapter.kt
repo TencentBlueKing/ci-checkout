@@ -36,11 +36,12 @@ import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.input.GitCodeCommandAtomParamInput
+import com.tencent.bk.devops.git.core.service.auth.AuthUserTokenGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.CredentialGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.EmptyGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.OauthGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.PrivateGitAuthProvider
-import com.tencent.bk.devops.git.core.service.auth.UserNameGitAuthProvider
+import com.tencent.bk.devops.git.core.service.auth.UserNamePasswordGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.UserTokenGitAuthProvider
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -68,7 +69,10 @@ class GitCodeCommandAtomParamInputAdapter(
             } else {
                 when (authType) {
                     AuthType.ACCESS_TOKEN -> OauthGitAuthProvider(token = accessToken)
-                    AuthType.USERNAME_PASSWORD -> UserNameGitAuthProvider(username = username, password = password)
+                    AuthType.USERNAME_PASSWORD -> UserNamePasswordGitAuthProvider(
+                        username = username,
+                        password = password
+                    )
                     AuthType.TICKET -> CredentialGitAuthProvider(
                         credentialId = ticketId,
                         devopsApi = devopsApi
@@ -81,8 +85,10 @@ class GitCodeCommandAtomParamInputAdapter(
                         token = personalAccessToken
                     )
                     AuthType.AUTH_USER_TOKEN ->
-                        UserTokenGitAuthProvider(
+                        AuthUserTokenGitAuthProvider(
+                            pipelineStartUserName = pipelineStartUserName,
                             userId = authUserId,
+                            repositoryUrl = repositoryUrl,
                             devopsApi = devopsApi
                         )
                     else -> EmptyGitAuthProvider()
