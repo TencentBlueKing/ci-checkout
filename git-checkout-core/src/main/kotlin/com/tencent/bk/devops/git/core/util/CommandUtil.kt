@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitOutput
+import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.script.CommandLineExecutor
 import com.tencent.bk.devops.plugin.script.SensitiveLineParser
@@ -118,7 +119,11 @@ object CommandUtil {
             val errorMsg = gitErrors?.description ?: "exec ${command.toStrings().joinToString(" ")} failed"
             val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
             val errorType = gitErrors?.errorType ?: ErrorType.USER
-            throw GitExecuteException(errorType = errorType, errorCode = errorCode, errorMsg = errorMsg)
+            throw GitExecuteException(
+                errorType = errorType,
+                errorCode = errorCode,
+                errorMsg = defaultResolver.resolveByMap(errorMsg, EnvHelper.getContextMap())
+            )
         } catch (ignore: Throwable) {
             throw GitExecuteException(
                 errorType = ErrorType.PLUGIN,
