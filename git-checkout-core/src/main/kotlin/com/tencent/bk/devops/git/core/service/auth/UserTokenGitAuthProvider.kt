@@ -32,6 +32,8 @@ import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
+import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 import org.slf4j.LoggerFactory
 
 /**
@@ -52,8 +54,13 @@ class UserTokenGitAuthProvider(
         }
         val result = devopsApi.getOauthToken(userId = userId)
         if (result.isNotOk() || result.data == null) {
-            logger.error("Fail to get the token($userId) because of ${result.message}")
-            throw ApiException(errorMsg = GitErrorsText.get().emptyAccessToken ?: "access token is empty")
+            throw ApiException(
+                errorMsg =
+                defaultResolver.resolveByMap(
+                    content = GitErrorsText.get().emptyAccessToken ?: "access token is empty",
+                    valueMap = EnvHelper.getContextMap()
+                )
+            )
         }
         return OauthGitAuthProvider(token = result.data!!.accessToken).getAuthInfo()
     }

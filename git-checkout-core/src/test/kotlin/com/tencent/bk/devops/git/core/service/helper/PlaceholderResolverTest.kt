@@ -1,6 +1,6 @@
 package com.tencent.bk.devops.git.core.service.helper
 
-import com.tencent.bk.devops.git.core.service.helper.PlaceholderResolver.Companion.defaultResolver
+import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 import org.junit.Assert
 import org.junit.Test
 import java.util.Properties

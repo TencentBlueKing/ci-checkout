@@ -48,6 +48,12 @@ object EnvHelper {
 
     private val env = mutableMapOf<String, String>()
 
+    private val copyOnThreadLocal = object : ThreadLocal<MutableMap<String, String>>() {
+        override fun initialValue(): MutableMap<String, String> {
+            return mutableMapOf()
+        }
+    }
+
     fun addSshAgent(agentEnv: Map<String, String>) {
         env.putAll(agentEnv)
     }
@@ -93,5 +99,21 @@ object EnvHelper {
 
     fun getEnvVariables(): Map<String, String> {
         return env
+    }
+
+    fun putContext(key: String, value: String) {
+        copyOnThreadLocal.get()[key] = value
+    }
+
+    fun remove(key: String) {
+        copyOnThreadLocal.get().remove(key)
+    }
+
+    fun clear() {
+        copyOnThreadLocal.remove()
+    }
+
+    fun getContextMap(): Map<String, String> {
+        return copyOnThreadLocal.get()
     }
 }

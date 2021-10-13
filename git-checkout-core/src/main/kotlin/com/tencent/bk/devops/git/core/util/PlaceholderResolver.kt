@@ -1,4 +1,4 @@
-package com.tencent.bk.devops.git.core.service.helper
+package com.tencent.bk.devops.git.core.util
 
 import java.util.Properties
 

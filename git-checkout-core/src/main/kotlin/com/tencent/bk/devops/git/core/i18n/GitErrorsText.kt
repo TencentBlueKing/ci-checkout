@@ -30,40 +30,22 @@ package com.tencent.bk.devops.git.core.i18n
 import java.util.Locale
 
 class GitErrorsText : TranslationBundle() {
-    var sshKeyAuditUnverified: String? = null
-    var sshAuthenticationFailed: String? = null
-    var sshPermissionDenied: String? = null
-    var httpsAuthenticationFailed: String? = null
-    var remoteDisconnection: String? = null
-    var hostDown: String? = null
-    var rebaseConflicts: String? = null
+    var authenticationFailed: String? = null
+    var remoteServerFailed: String? = null
     var mergeConflicts: String? = null
-    var httpsRepositoryNotFound: String? = null
-    var sshRepositoryNotFound: String? = null
-    var projectNotFound: String? = null
-    var branchDeletionFailed: String? = null
-    var revertConflicts: String? = null
-    var noMatchingRemoteBranch: String? = null
-    var noExistingRemoteBranch: String? = null
     var noSubmoduleMapping: String? = null
     var submoduleRepositoryDoesNotExist: String? = null
     var invalidSubmoduleSHA: String? = null
     var invalidMerge: String? = null
-    var branchAlreadyExists: String? = null
     var noMatchingBranch: String? = null
     var badRevision: String? = null
     var notAGitRepository: String? = null
     var cannotMergeUnrelatedHistories: String? = null
     var lfsAttributeDoesNotMatch: String? = null
     var errorDownloadingObject: String? = null
-    var invalidObjectName: String? = null
+    var lfsNotInstall: String? = null
     var lockFileAlreadyExists: String? = null
     var localChangesOverwritten: String? = null
-    var unresolvedConflicts: String? = null
-    var configLockFileAlreadyExists: String? = null
-    var remoteAlreadyExists: String? = null
-    var tagAlreadyExists: String? = null
-    var mergeWithLocalChanges: String? = null
     var noInitializeBranch: String? = null
     var emptyAccessToken: String? = null
     var emptyRepositoryHashId: String? = null
@@ -71,7 +53,7 @@ class GitErrorsText : TranslationBundle() {
 
     companion object {
         fun get(): GitErrorsText {
-            return lookupBundle(Locale.getDefault(), GitErrorsText::class.java)
+            return lookupBundle(Locale.SIMPLIFIED_CHINESE, GitErrorsText::class.java)
         }
     }
 }

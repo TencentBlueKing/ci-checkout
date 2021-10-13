@@ -36,9 +36,7 @@ class GitErrorsTextTest {
     @Test
     fun get() {
         Locale.setDefault(Locale.SIMPLIFIED_CHINESE)
-        Assert.assertEquals(GitErrorsText.get().sshKeyAuditUnverified, "SSH密钥未验证。")
-
-        Locale.setDefault(Locale.US)
-        Assert.assertEquals(GitErrorsText.get().sshKeyAuditUnverified, "The SSH key is unverified.")
+        Assert.assertEquals(GitErrorsText.get().authenticationFailed,
+            "授权失败,【\${userId}】没有仓库【\${repositoryUrl}】拉取代码权限。")
     }
 }

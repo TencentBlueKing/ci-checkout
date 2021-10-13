@@ -30,6 +30,8 @@ package com.tencent.bk.devops.git.core.service
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_URL
+import com.tencent.bk.devops.git.core.constant.GitConstants.ERROR_REPOSITORY_URL
+import com.tencent.bk.devops.git.core.constant.GitConstants.ERROR_USER_ID
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.handler.GitAuthHandler
 import com.tencent.bk.devops.git.core.service.handler.GitCheckoutAndMergeHandler
@@ -61,6 +63,8 @@ class GitSourceProvider(
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_URL, settings.repositoryUrl)
             val repositoryName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_NAME, repositoryName)
+            EnvHelper.putContext(ERROR_USER_ID, username ?: "")
+            EnvHelper.putContext(ERROR_REPOSITORY_URL, repositoryUrl)
             preMerge = preMerge && sourceRepositoryUrl.isNotBlank() && sourceBranchName.isNotBlank()
 
             logger.info("Working directory is: $repositoryPath")

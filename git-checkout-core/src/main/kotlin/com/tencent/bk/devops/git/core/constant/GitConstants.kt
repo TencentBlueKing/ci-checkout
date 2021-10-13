@@ -124,4 +124,8 @@ object GitConstants {
 
     val SUPPORT_PARTIAL_CLONE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 22, 0, 0)
     val SUPPORT_SHALLOW_SINCE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 11, 0, 0)
+
+    // context
+    const val ERROR_USER_ID = "error_user_id"
+    const val ERROR_REPOSITORY_URL = "error_repository_url"
 }

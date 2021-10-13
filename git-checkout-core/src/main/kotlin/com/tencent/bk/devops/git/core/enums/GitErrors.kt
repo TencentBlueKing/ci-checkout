@@ -37,139 +37,145 @@ enum class GitErrors(
     val errorType: ErrorType = ErrorType.USER,
     val errorCode: Int = GitConstants.CONFIG_ERROR
 ) {
-    SshKeyAuditUnverified(
-        regex = Regex(
-            "fatal: Could not read from remote repository."
-        ),
-        description = GitErrorsText.get().sshAuthenticationFailed
-    ),
-    SshAuthenticationFailed(
-        regex = Regex(
-            "fatal: Authentication failed"
-        ),
-        description = GitErrorsText.get().sshAuthenticationFailed
-    ),
-    HttpsAuthenticationFailed(
+    // fetch命令错误
+    AuthenticationFailed(
         regex = Regex(
             "(The requested URL returned error: 403)|" +
                 "(fatal: could not read Username for '(.+)': terminal prompts disabled)|" +
-                "fatal: Authentication failed for '(.+)'"
+                "(fatal: Authentication failed for '(.+)')|" +
+                "(fatal: Could not read from remote repository.)|" +
+                "(fatal: Authentication failed)|" +
+                "(fatal: '(.+) 鉴权失败')|" +
+                "(fatal: 无法读取远程仓库。)" +
+                "(fatal: repository '(.+)' not found)|" +
+                "(fatal: .* Git repository not found)|" +
+                "(fatal: 远程错误：Git repository not found)|" +
+                "(ERROR: Repository not found)|" +
+                "(fatal: remote error: Git:Project not found.)|" +
+                "(fatal: could not read Username for '(.+)': No such device or address)"
         ),
-        description = GitErrorsText.get().httpsAuthenticationFailed
+        description = GitErrorsText.get().authenticationFailed
     ),
-    RemoteDisconnection(
+    RemoteServerFailed(
         regex = Regex(
             "(fatal: (the|The) remote end hung up unexpectedly)|" +
                 "(fatal: unable to access '(.+)': The requested URL returned error: 502)|" +
                 "(fatal: 远端意外挂断了)|" +
-                "(Git:Server is busy, please try again later)"
+                "(Git:Server is busy, please try again later)|" +
+                "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)"
         ),
-        description = GitErrorsText.get().remoteDisconnection,
+        description = GitErrorsText.get().remoteServerFailed,
         errorType = ErrorType.THIRD_PARTY,
         errorCode = GitConstants.GIT_ERROR
     ),
-    HostDown(
+
+    // checkout命令错误
+    NoMatchingBranch(
         regex = Regex(
-            "fatal: unable to access '(.+)': Failed to connect to (.+): Host is down"
+            "(fatal: couldn't find remote ref (.+))|" +
+                "(fatal：无法找到远程引用 .+)|" +
+                "(Your configuration specifies to merge with the ref '(.+)') |" +
+                "(您的配置中指定要合并远程的引用 '(.+)')|" +
+                "(fatal: '(.+)' is not a commit and a branch '(.+)' cannot be created from it)|" +
+                "(fatal：'(.+)' 不是一个提交，不能基于它创建分支 '(.+)')|" +
+                "(error: pathspec '(.+)' did not match any file(s) known to git.)|" +
+                "(error：路径规格 '(.+)' 未匹配任何 git 已知文件)|" +
+                "(fatal: path '(.+)' does not exist .+)|" +
+                "(fatal：路径 '(.+)' 不存在)"
         ),
-        description = GitErrorsText.get().hostDown,
-        errorType = ErrorType.THIRD_PARTY,
-        errorCode = GitConstants.GIT_ERROR
+        description = GitErrorsText.get().noMatchingBranch
     ),
-    RebaseConflicts(
+    NoInitializeBranch(
         regex = Regex(
-            "Resolve all conflicts manually, mark them as resolved with"
+            "(fatal: You are on a branch yet to be born)|" +
+                "(fatal: 您位于一个尚未初始化的分支)"
         ),
-        description = GitErrorsText.get().rebaseConflicts
+        description = GitErrorsText.get().noInitializeBranch
     ),
+
+    // merge命令错误
     MergeConflicts(
         regex = Regex(
-            "(Merge conflict|Automatic merge failed; fix conflicts and then commit the result)"
+            "(Automatic merge failed; fix conflicts and then commit the result)|" +
+                "(Resolve all conflicts manually, mark them as resolved with)|" +
+                "(自动合并失败，修正冲突然后提交修正的结果。)"
         ),
         description = GitErrorsText.get().mergeConflicts
     ),
-    HttpsRepositoryNotFound(
+    InvalidMerge(
         regex = Regex(
-            "(fatal: repository '(.+)' not found)|" +
-                "(fatal: .* Git repository not found)|" +
-                "(fatal: 远程错误：Git repository not found)"
+            "(merge: (.+) - not something we can merge)|" +
+                "(merge：(.+) - 不能被合并)"
         ),
-        description = GitErrorsText.get().httpsRepositoryNotFound
+        description = GitErrorsText.get().invalidMerge
     ),
-    SshRepositoryNotFound(
+    CannotMergeUnrelatedHistories(
         regex = Regex(
-            "ERROR: Repository not found"
+            "(fatal: refusing to merge unrelated histories)|" +
+                "(fatal：拒绝合并无关的历史)"
         ),
-        description = GitErrorsText.get().sshRepositoryNotFound
+        description = GitErrorsText.get().cannotMergeUnrelatedHistories
     ),
-    ProjectNotFound(
+    LocalChangesOverwritten(
         regex = Regex(
-            "fatal: remote error: Git:Project not found."
+            "(error: Your local changes to the following files would be overwritten by merge:)|" +
+                "(error: Your local changes to the following files would be overwritten by checkout:)|" +
+                "(error: 您对下列文件的本地修改将被检出操作覆盖：)"
         ),
-        description = GitErrorsText.get().projectNotFound
+        description = GitErrorsText.get().localChangesOverwritten
     ),
-    BranchDeletionFailed(
-        regex = Regex(
-            "error: unable to delete '(.+)': remote ref does not exist"
-        ),
-        description = GitErrorsText.get().branchDeletionFailed
-    ),
-    RevertConflicts(
-        regex = Regex(
-            "error: could not revert .*"
-        ),
-        description = GitErrorsText.get().revertConflicts
-    ),
-    NoMatchingRemoteBranch(
-        regex = Regex(
-            "(There are no candidates for (rebasing|merging) among the refs that you just fetched.)|" +
-                "(fatal: couldn't find remote ref (.+))"
-        ),
-        description = GitErrorsText.get().noMatchingRemoteBranch
-    ),
-    NoExistingRemoteBranch(
-        regex = Regex(
-            "(Your configuration specifies to merge with the ref '(.+)') |" +
-                "(fatal: '(.+)' is not a commit and a branch '(.+)' cannot be created from it)"
-        ),
-        description = GitErrorsText.get().noExistingRemoteBranch
-    ),
+
+    // submodule命令错误
     NoSubmoduleMapping(
         regex = Regex(
-            "No submodule mapping found in .gitmodules for path '(.+)'"
+            "(No submodule mapping found in .gitmodules for path '(.+)')|" +
+                "(在 .gitmodules 中没有发现路径 '(.+)' 的子模组映射)"
         ),
         description = GitErrorsText.get().noSubmoduleMapping
     ),
     SubmoduleRepositoryDoesNotExist(
         regex = Regex(
-            "fatal: clone of '.+' into submodule path '(.+)' failed"
+            "(fatal: clone of '.+' into submodule path '(.+)' failed)|" +
+                "(fatal：无法克隆 '(.+)' 到子模组路径 '(.+)')"
         ),
         description = GitErrorsText.get().submoduleRepositoryDoesNotExist
     ),
     InvalidSubmoduleSHA(
         regex = Regex(
-            "Fetched in submodule path '(.+)', but it did not contain (.+). " +
-                "Direct fetching of that commit failed."
+            "(Fetched in submodule path '(.+)', but it did not contain (.+). " +
+                "Direct fetching of that commit failed.)|" +
+                "(获取了子模组路径 '(.+)'，但是它没有包含 (.+)。直接获取该提交失败。)"
         ),
         description = GitErrorsText.get().invalidSubmoduleSHA
     ),
-    InvalidMerge(
+
+    // lfs命令错误
+    LfsAttributeDoesNotMatch(
         regex = Regex(
-            "merge: (.+) - not something we can merge"
+            "The .+ attribute should be .+ but is .+"
         ),
-        description = GitErrorsText.get().invalidMerge
+        description = GitErrorsText.get().lfsAttributeDoesNotMatch
     ),
-    BranchAlreadyExists(
+    ErrorDownloadingObject(
         regex = Regex(
-            "fatal: A branch named '(.+)' already exists."
+            "Error downloading object: .*"
         ),
-        description = GitErrorsText.get().branchAlreadyExists
+        description = GitErrorsText.get().errorDownloadingObject
     ),
-    NoMatchingBranch(
+    LfsNotInstall(
         regex = Regex(
-            "error: pathspec '(.+)' did not match any file(s) known to git."
+            "The .+ attribute should be .+ but is .+"
         ),
-        description = GitErrorsText.get().noMatchingBranch
+        description = GitErrorsText.get().lfsNotInstall
+    ),
+
+    // 其他命令错误
+    LockFileAlreadyExists(
+        regex = Regex(
+            "(Another git process seems to be running in this repository, e.g.)|" +
+                "(error: could not lock config file (.+): File exists)"
+        ),
+        description = GitErrorsText.get().lockFileAlreadyExists
     ),
     BadRevision(
         regex = Regex(
@@ -183,77 +189,4 @@ enum class GitErrors(
         ),
         description = GitErrorsText.get().notAGitRepository
     ),
-    CannotMergeUnrelatedHistories(
-        regex = Regex(
-            "fatal: refusing to merge unrelated histories"
-        ),
-        description = GitErrorsText.get().cannotMergeUnrelatedHistories
-    ),
-    LfsAttributeDoesNotMatch(
-        regex = Regex(
-            "The .+ attribute should be .+ but is .+"
-        ),
-        description = GitErrorsText.get().lfsAttributeDoesNotMatch
-    ),
-    ErrorDownloadingObject(
-        regex = Regex(
-            "Error downloading object: .*"
-        ),
-        description = GitErrorsText.get().errorDownloadingObject
-    ),
-    InvalidObjectName(
-        regex = Regex(
-            "fatal: path '(.+)' does not exist .+"
-        ),
-        description = GitErrorsText.get().invalidObjectName
-    ),
-    LockFileAlreadyExists(
-        regex = Regex(
-            "Another git process seems to be running in this repository, e.g."
-        ),
-        description = GitErrorsText.get().lockFileAlreadyExists
-    ),
-    LocalChangesOverwritten(
-        regex = Regex(
-            "error: (?:Your local changes to the following|The following untracked working tree) files " +
-                "would be overwritten by checkout:"
-        ),
-        description = GitErrorsText.get().localChangesOverwritten
-    ),
-    UnresolvedConflicts(
-        regex = Regex(
-            "mark them as resolved using git add|fatal: Exiting because of an unresolved conflict"
-        ),
-        description = GitErrorsText.get().unresolvedConflicts
-    ),
-    ConfigLockFileAlreadyExists(
-        regex = Regex(
-            "error: could not lock config file (.+): File exists"
-        ),
-        description = GitErrorsText.get().configLockFileAlreadyExists
-    ),
-    RemoteAlreadyExists(
-        regex = Regex(
-            "fatal: remote (.+) already exists."
-        ),
-        description = GitErrorsText.get().remoteAlreadyExists
-    ),
-    TagAlreadyExists(
-        regex = Regex(
-            "fatal: tag '(.+)' already exists"
-        ),
-        description = GitErrorsText.get().tagAlreadyExists
-    ),
-    MergeWithLocalChanges(
-        regex = Regex(
-            "error: Your local changes to the following files would be overwritten by merge:"
-        ),
-        description = GitErrorsText.get().mergeWithLocalChanges
-    ),
-    NoInitializeBranch(
-        regex = Regex(
-            "fatal: You are on a branch yet to be born"
-        ),
-        description = GitErrorsText.get().noInitializeBranch
-    )
 }
