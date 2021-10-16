@@ -53,9 +53,7 @@ class Program(
         actions["devopsStore"] = { store() }
         actions["get"] = { get() }
         actions["fill"] = { get() }
-        actions["erase"] = { erase() }
         actions["devopsErase"] = { devopsErase() }
-        actions["reject"] = { erase() }
 
         args.forEach { arg ->
             if (actions.containsKey(arg)) {
@@ -103,15 +101,6 @@ class Program(
                 credential = Credential.Empty
             }
             standardOut.print(setCredentials(credential!!))
-        }
-    }
-
-    /**
-     * 只清理当前host
-     */
-    private fun erase() {
-        with(readInput()) {
-            credentialStore.delete(targetUri)
         }
     }
 
