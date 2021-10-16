@@ -44,6 +44,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_LAST
 import com.tencent.bk.devops.git.core.constant.GitConstants.PARAM_SEPARATOR
 import com.tencent.bk.devops.git.core.pojo.api.CommitMaterial
 
+@SuppressWarnings("TooManyFunctions")
 object EnvHelper {
 
     private val env = mutableMapOf<String, String>()
@@ -105,11 +106,15 @@ object EnvHelper {
         copyOnThreadLocal.get()[key] = value
     }
 
-    fun remove(key: String) {
+    fun getContext(key: String): String? {
+        return copyOnThreadLocal.get()[key]
+    }
+
+    fun removeContext(key: String) {
         copyOnThreadLocal.get().remove(key)
     }
 
-    fun clear() {
+    fun clearContext() {
         copyOnThreadLocal.remove()
     }
 

@@ -28,14 +28,16 @@
 package com.tencent.bk.devops.git.core.service.auth
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_CREDENTIAL_ID
 import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
 import com.tencent.bk.devops.git.core.pojo.api.CredentialType
 import com.tencent.bk.devops.git.core.util.DHUtil
-import java.util.Base64
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
+import java.util.Base64
 
 class CredentialGitAuthProvider(
     private val credentialId: String?,
@@ -48,6 +50,7 @@ class CredentialGitAuthProvider(
 
     override fun getAuthInfo(): AuthInfo {
         val credentialInfo = getCredential()
+        EnvHelper.putContext(CONTEXT_CREDENTIAL_ID, credentialId!!)
         val gitAuthProvider = when (credentialInfo.credentialType) {
             CredentialType.ACCESSTOKEN ->
                 OauthGitAuthProvider(credentialInfo.v1)

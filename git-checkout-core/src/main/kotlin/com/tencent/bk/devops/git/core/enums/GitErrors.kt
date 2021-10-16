@@ -28,7 +28,9 @@
 package com.tencent.bk.devops.git.core.enums
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_GIT_PROTOCOL
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 
 enum class GitErrors(
@@ -52,14 +54,18 @@ enum class GitErrors(
                 "(fatal: 远程错误：Git repository not found)|" +
                 "(ERROR: Repository not found)|" +
                 "(fatal: remote error: Git:Project not found.)|" +
-                "(fatal: could not read Username for '(.+)': No such device or address)"
+                "(fatal: could not read Username for '(.+)': No such device or address)|"
         ),
-        description = GitErrorsText.get().authenticationFailed
+        description = when (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL)) {
+            GitProtocolEnum.SSH.name -> GitErrorsText.get().sshAuthenticationFailed
+            else -> GitErrorsText.get().httpAuthenticationFailed
+        }
     ),
     RemoteServerFailed(
         regex = Regex(
             "(fatal: (the|The) remote end hung up unexpectedly)|" +
                 "(fatal: unable to access '(.+)': The requested URL returned error: 502)|" +
+                "(fatal: 远程错误：Internal server error)|" +
                 "(fatal: 远端意外挂断了)|" +
                 "(Git:Server is busy, please try again later)|" +
                 "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)"
@@ -68,20 +74,29 @@ enum class GitErrors(
         errorType = ErrorType.THIRD_PARTY,
         errorCode = GitConstants.GIT_ERROR
     ),
+    ConnectionTimeOut(
+        regex = Regex(
+            "ssh: connect to host (.+) port (\\d+): Connection timed out"
+        ),
+        description = GitErrorsText.get().connectionTimeOut
+    ),
 
     // checkout命令错误
     NoMatchingBranch(
         regex = Regex(
-            "(fatal: couldn't find remote ref (.+))|" +
-                "(fatal：无法找到远程引用 .+)|" +
-                "(Your configuration specifies to merge with the ref '(.+)') |" +
+            pattern = "(fatal: couldn't find remote ref .+)|" +
+                "(fatal: 无法找到远程引用 .+)|" +
+                "(Your configuration specifies to merge with the ref '(.+)')|" +
                 "(您的配置中指定要合并远程的引用 '(.+)')|" +
                 "(fatal: '(.+)' is not a commit and a branch '(.+)' cannot be created from it)|" +
-                "(fatal：'(.+)' 不是一个提交，不能基于它创建分支 '(.+)')|" +
-                "(error: pathspec '(.+)' did not match any file(s) known to git.)|" +
-                "(error：路径规格 '(.+)' 未匹配任何 git 已知文件)|" +
+                "(fatal: '.+' 不是一个提交，不能基于它创建分支 '.+')|" +
+                "(error: pathspec '(.+)' did not match any file\\(s\\) known to git)|" +
+                "(error: 路径规格 '(.+)' 未匹配任何 git 已知文件)|" +
                 "(fatal: path '(.+)' does not exist .+)|" +
-                "(fatal：路径 '(.+)' 不存在)"
+                "(fatal: 路径 '(.+)' 不存在)|" +
+                "(fatal: 引用不是一个树：(.+))|" +
+                "(fatal: reference is not a tree: (.+))",
+            options = setOf(RegexOption.IGNORE_CASE)
         ),
         description = GitErrorsText.get().noMatchingBranch
     ),
@@ -92,11 +107,23 @@ enum class GitErrors(
         ),
         description = GitErrorsText.get().noInitializeBranch
     ),
+    SparseCheckoutLeavesNoEntry(
+        regex = Regex(
+            "(error: Sparse checkout leaves no entry on working directory)"
+        ),
+        description = GitErrorsText.get().sparseCheckoutLeavesNoEntry
+    ),
+    BranchOrPathNameConflicts(
+        regex = Regex(
+            "(fatal: '(.+)' 既可以是一个本地文件，也可以是一个跟踪分支。)"
+        ),
+        description = GitErrorsText.get().branchOrPathNameConflicts
+    ),
 
     // merge命令错误
     MergeConflicts(
         regex = Regex(
-            "(Automatic merge failed; fix conflicts and then commit the result)|" +
+            "(Automatic merge failed; fix conflicts and then commit the result.)|" +
                 "(Resolve all conflicts manually, mark them as resolved with)|" +
                 "(自动合并失败，修正冲突然后提交修正的结果。)"
         ),
@@ -105,14 +132,14 @@ enum class GitErrors(
     InvalidMerge(
         regex = Regex(
             "(merge: (.+) - not something we can merge)|" +
-                "(merge：(.+) - 不能被合并)"
+                "(merge：.+ - 不能合并)"
         ),
         description = GitErrorsText.get().invalidMerge
     ),
     CannotMergeUnrelatedHistories(
         regex = Regex(
             "(fatal: refusing to merge unrelated histories)|" +
-                "(fatal：拒绝合并无关的历史)"
+                "(fatal: 拒绝合并无关的历史)"
         ),
         description = GitErrorsText.get().cannotMergeUnrelatedHistories
     ),
@@ -128,15 +155,18 @@ enum class GitErrors(
     // submodule命令错误
     NoSubmoduleMapping(
         regex = Regex(
-            "(No submodule mapping found in .gitmodules for path '(.+)')|" +
-                "(在 .gitmodules 中没有发现路径 '(.+)' 的子模组映射)"
+            "(fatal: No submodule mapping found in .gitmodules for path '(.+)')|" +
+                "(fatal: 在 .gitmodules 中没有发现路径 '(.+)' 的子模组映射)|" +
+                "(fatal: 在 .gitmodules 中未找到子模组 '(.+)' 的 url)|" +
+                "(fatal: No url found for submodule path '(.+)' in .gitmodules)"
         ),
         description = GitErrorsText.get().noSubmoduleMapping
     ),
     SubmoduleRepositoryDoesNotExist(
         regex = Regex(
-            "(fatal: clone of '.+' into submodule path '(.+)' failed)|" +
-                "(fatal：无法克隆 '(.+)' 到子模组路径 '(.+)')"
+            pattern = "(clone of '.+' into submodule path '(.+)' failed)|" +
+                "(fatal：无法克隆 '(.+)' 到子模组路径 '(.+)')",
+            options = setOf(RegexOption.IGNORE_CASE)
         ),
         description = GitErrorsText.get().submoduleRepositoryDoesNotExist
     ),
@@ -144,7 +174,9 @@ enum class GitErrors(
         regex = Regex(
             "(Fetched in submodule path '(.+)', but it did not contain (.+). " +
                 "Direct fetching of that commit failed.)|" +
-                "(获取了子模组路径 '(.+)'，但是它没有包含 (.+)。直接获取该提交失败。)"
+                "(获取了子模组路径 '(.+)'，但是它没有包含 (.+)。直接获取该提交失败。)|" +
+                "(无法在子模组路径 '(.+)' 中找到当前版本)|" +
+                "(fatal: Needed a single revision)"
         ),
         description = GitErrorsText.get().invalidSubmoduleSHA
     ),
@@ -158,13 +190,14 @@ enum class GitErrors(
     ),
     ErrorDownloadingObject(
         regex = Regex(
-            "Error downloading object: .*"
+            "(Error downloading object: .*)|" +
+                "(LFS: Repository or object not found: .+)|"
         ),
         description = GitErrorsText.get().errorDownloadingObject
     ),
     LfsNotInstall(
         regex = Regex(
-            "The .+ attribute should be .+ but is .+"
+            "git: 'lfs' is not a git command. See 'git --help'."
         ),
         description = GitErrorsText.get().lfsNotInstall
     ),
@@ -185,8 +218,19 @@ enum class GitErrors(
     ),
     NotAGitRepository(
         regex = Regex(
-            "fatal: [Nn]ot a git repository \\(or any of the parent directories\\): (.*)'"
+            "fatal: [Nn]ot a git repository \\(or any of the parent directories\\): .git"
         ),
         description = GitErrorsText.get().notAGitRepository
-    ),
+    );
+
+    companion object {
+        fun matchError(message: String): GitErrors? {
+            for (gitError in values()) {
+                if (gitError.regex.matches(message)) {
+                    return gitError
+                }
+            }
+            return null
+        }
+    }
 }

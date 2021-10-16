@@ -125,7 +125,9 @@ object GitConstants {
     val SUPPORT_PARTIAL_CLONE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 22, 0, 0)
     val SUPPORT_SHALLOW_SINCE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 11, 0, 0)
 
-    // context
-    const val ERROR_USER_ID = "error_user_id"
-    const val ERROR_REPOSITORY_URL = "error_repository_url"
+    // context 上下文，在错误信息中使用 @see GitErrorsText
+    const val CONTEXT_USER_ID = "context_user_id"
+    const val CONTEXT_REPOSITORY_URL = "context_repository_url"
+    const val CONTEXT_CREDENTIAL_ID = "context_credential_id"
+    const val CONTEXT_GIT_PROTOCOL = "context_git_protocol"
 }

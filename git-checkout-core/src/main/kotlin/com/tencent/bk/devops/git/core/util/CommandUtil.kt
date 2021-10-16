@@ -138,11 +138,7 @@ object CommandUtil {
     private fun parseError(stdErr: List<String>): GitErrors? {
         // 反向遍历,异常基本都是在最后几条
         stdErr.asReversed().forEach { err ->
-            for (gitError in GitErrors.values()) {
-                if (gitError.regex.matches(err)) {
-                    return gitError
-                }
-            }
+            return GitErrors.matchError(err) ?: return@forEach
         }
         return null
     }

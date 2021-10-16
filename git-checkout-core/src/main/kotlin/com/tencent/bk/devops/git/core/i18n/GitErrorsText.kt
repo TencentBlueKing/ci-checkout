@@ -30,8 +30,10 @@ package com.tencent.bk.devops.git.core.i18n
 import java.util.Locale
 
 class GitErrorsText : TranslationBundle() {
-    var authenticationFailed: String? = null
+    var httpAuthenticationFailed: String? = null
+    var sshAuthenticationFailed: String? = null
     var remoteServerFailed: String? = null
+    var connectionTimeOut: String? = null
     var mergeConflicts: String? = null
     var noSubmoduleMapping: String? = null
     var submoduleRepositoryDoesNotExist: String? = null
@@ -47,6 +49,8 @@ class GitErrorsText : TranslationBundle() {
     var lockFileAlreadyExists: String? = null
     var localChangesOverwritten: String? = null
     var noInitializeBranch: String? = null
+    var sparseCheckoutLeavesNoEntry: String? = null
+    var branchOrPathNameConflicts: String? = null
     var emptyAccessToken: String? = null
     var emptyRepositoryHashId: String? = null
     var emptyRepositoryName: String? = null

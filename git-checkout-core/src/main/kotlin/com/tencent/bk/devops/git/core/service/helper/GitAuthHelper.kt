@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
@@ -35,6 +36,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
+import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -78,6 +80,7 @@ class GitAuthHelper(
             return
         }
 
+        EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
         val compatibleHostList = settings.compatibleHostList
         if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
             git.config(
@@ -219,6 +222,7 @@ class GitAuthHelper(
         if (settings.privateKey.isNullOrBlank()) {
             throw ParamInvalidException(errorMsg = "private key must not be empty")
         }
+        EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
         SSHAgentUtils().addIdentity(privateKey = settings.privateKey, passPhrase = settings.passPhrase)
     }
 

@@ -51,8 +51,8 @@ class PlaceholderResolver {
 
     /**
      * 根据替换规则来替换指定模板中的占位符值
-     * @param content  要解析的字符串
-     * @param rule  解析规则回调
+     * @param content 要解析的字符串
+     * @param rule 解析规则回调
      * @return
      */
     fun resolveByRule(content: String, rule: (String) -> String): String {
@@ -79,7 +79,7 @@ class PlaceholderResolver {
      * valueMap = id -> 1; pid -> 2<br></br>
      * 经过解析返回 product:1:detail:2<br></br>
      *
-     * @param content  模板内容。
+     * @param content 模板内容。
      * @param valueMap 值映射
      * @return 替换完成后的字符串。
      */

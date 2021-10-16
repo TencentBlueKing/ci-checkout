@@ -27,8 +27,10 @@
 
 package com.tencent.bk.devops.git.core.service.auth
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
+import com.tencent.bk.devops.git.core.util.EnvHelper
 
 class UserNamePasswordGitAuthProvider(
     private val username: String?,
@@ -41,6 +43,7 @@ class UserNamePasswordGitAuthProvider(
         if (password.isNullOrBlank()) {
             throw ParamInvalidException(errorMsg = "password不能为空")
         }
+        EnvHelper.putContext(GitConstants.CONTEXT_USER_ID, username)
         return AuthInfo(
             username = username,
             password = password
