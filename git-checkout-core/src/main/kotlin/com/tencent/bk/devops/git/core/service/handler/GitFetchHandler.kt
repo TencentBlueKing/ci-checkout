@@ -56,7 +56,8 @@ class GitFetchHandler(
     }
 
     /**
-     * 如果启用了preMerge并且是浅克隆
+     * 如果启用了preMerge并且是浅克隆，在执行merge命令时会出现fatal: refusing to merge unrelated histories错误，
+     * 所以浅克隆按照深度拉取改成--shallow-since拉取
      * 1. 先fetch共同祖先
      * 2. 计算共同祖先提交时间点
      * 3. 按照提交时间点获取代码
@@ -68,10 +69,10 @@ class GitFetchHandler(
         if (preMerge && fetchDepth > 0 && !git.isAtLeastVersion(GitConstants.SUPPORT_SHALLOW_SINCE_GIT_VERSION)) {
             logger.warn("开启preMerge，并且指定depth,git版本需要大于2.18才会生效，否则使用的是全量拉取")
         }
-        if (preMerge && fetchDepth > 0 && !baseCommitId.isNullOrBlank()) {
+        if (canShallowSince(baseCommitId)) {
             git.fetch(
                 refSpec = listOf(baseCommitId),
-                fetchDepth = 1,
+                fetchDepth = 0,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME,
                 preMerge = false
             )
@@ -81,6 +82,10 @@ class GitFetchHandler(
         }
         return shallowSince
     }
+
+    private fun GitSourceSettings.canShallowSince(baseCommitId: String?) =
+        preMerge && fetchDepth > 0 && !baseCommitId.isNullOrBlank() &&
+            git.isAtLeastVersion(GitConstants.SUPPORT_SHALLOW_SINCE_GIT_VERSION)
 
     private fun GitSourceSettings.fetchSourceRepository(shallowSince: String?) {
         if (preMerge && !sourceRepoUrlEqualsRepoUrl) {

@@ -34,7 +34,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
-import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SHALLOW_SINCE_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.OSType
@@ -49,8 +48,8 @@ import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import com.tencent.devops.git.log.LogType
-import java.io.File
 import org.slf4j.LoggerFactory
+import java.io.File
 
 @Suppress("ALL")
 class GitCommandManager(
@@ -325,7 +324,7 @@ class GitCommandManager(
         when {
             enablePartialClone == true && isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION) ->
                 args.add("--filter=${FilterValueEnum.TREELESS.value}")
-            !shallowSince.isNullOrBlank() && isAtLeastVersion(SUPPORT_SHALLOW_SINCE_GIT_VERSION) -> {
+            !shallowSince.isNullOrBlank() -> {
                 // --shallow-since 参数只有在git protocol.version=2时才生效
                 args.add(0, "-c")
                 args.add(1, "protocol.version=2")

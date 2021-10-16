@@ -10,6 +10,9 @@ internal class VersionHelperTest {
         Assert.assertEquals(VersionHelper.computeGitVersion("git version 2.30.2.windows.1"), 2300201L)
         Assert.assertEquals(VersionHelper.computeGitVersion("git version 2.30.0.155.g66e871b"), 2300155L)
         Assert.assertEquals(VersionHelper.computeGitVersion("git version 2.19.1"), 2190100L)
+        Assert.assertEquals(VersionHelper.computeGitVersion(
+            "git version 2.30.1 (Apple Git-130)"), 2300100L
+        )
     }
 
     @Test
