@@ -65,6 +65,9 @@ class GitFetchHandler(
     private fun GitSourceSettings.calculateShallowSince(): String? {
         val baseCommitId = System.getenv(BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT)
         var shallowSince: String? = null
+        if (preMerge && fetchDepth > 0 && !git.isAtLeastVersion(GitConstants.SUPPORT_SHALLOW_SINCE_GIT_VERSION)) {
+            logger.warn("开启preMerge，并且指定depth,git版本需要大于2.18才会生效，否则使用的是全量拉取")
+        }
         if (preMerge && fetchDepth > 0 && !baseCommitId.isNullOrBlank()) {
             git.fetch(
                 refSpec = listOf(baseCommitId),

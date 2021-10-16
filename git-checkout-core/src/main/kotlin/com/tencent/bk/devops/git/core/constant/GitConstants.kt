@@ -123,7 +123,7 @@ object GitConstants {
     const val GIT_LOG_MAX_COUNT = 50
 
     val SUPPORT_PARTIAL_CLONE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 22, 0, 0)
-    val SUPPORT_SHALLOW_SINCE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 11, 0, 0)
+    val SUPPORT_SHALLOW_SINCE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 18, 0, 0)
 
     // context 上下文，在错误信息中使用 @see GitErrorsText
     const val CONTEXT_USER_ID = "context_user_id"

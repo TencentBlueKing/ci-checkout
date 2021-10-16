@@ -325,8 +325,12 @@ class GitCommandManager(
         when {
             enablePartialClone == true && isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION) ->
                 args.add("--filter=${FilterValueEnum.TREELESS.value}")
-            !shallowSince.isNullOrBlank() && isAtLeastVersion(SUPPORT_SHALLOW_SINCE_GIT_VERSION) ->
+            !shallowSince.isNullOrBlank() && isAtLeastVersion(SUPPORT_SHALLOW_SINCE_GIT_VERSION) -> {
+                // --shallow-since 参数只有在git protocol.version=2时才生效
+                args.add(0, "-c")
+                args.add(1, "protocol.version=2")
                 args.add("--shallow-since=$shallowSince")
+            }
             fetchDepth > 0 && !preMerge ->
                 args.add("--depth=$fetchDepth")
             File(File(workingDirectory, ".git"), "shallow").exists() ->
@@ -376,7 +380,7 @@ class GitCommandManager(
     }
 
     fun merge(ref: String) {
-        execGit(args = listOf("-c", "filter.lfs.smudge=", "-c", "filter.lfs.required=false", "merge", ref))
+        execGit(args = listOf("merge", ref))
     }
 
     fun log(maxCount: Int = 1, revisionRange: String = ""): List<CommitLogInfo> {
