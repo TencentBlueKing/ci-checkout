@@ -30,6 +30,7 @@ package com.tencent.bk.devops.git.core.service
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.GCM_INTERACTIVE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRESS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
@@ -70,6 +71,7 @@ class GitCommandManager(
     init {
         if (lfs) {
             gitEnv[GIT_LFS_SKIP_SMUDGE] = "1"
+            gitEnv[GIT_LFS_FORCE_PROGRESS] = "1"
         }
     }
 
