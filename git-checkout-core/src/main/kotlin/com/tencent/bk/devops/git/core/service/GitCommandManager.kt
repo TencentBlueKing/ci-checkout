@@ -285,7 +285,7 @@ class GitCommandManager(
             args.add("--recursive")
         }
         args.add(command)
-        execGit(args = args, allowAllExitCodes = true)
+        execGit(args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
     }
 
     fun submoduleForeach(command: List<String>, recursive: Boolean) {
