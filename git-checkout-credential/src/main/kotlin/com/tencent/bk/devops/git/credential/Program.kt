@@ -86,7 +86,7 @@ class Program(
         )
         // 同一服务多个域名时，需要保存不同域名的凭证
         if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(host)) {
-            compatibleHost.split(",").forEach { host ->
+            compatibleHost.split(",").filter { it != host }.forEach { host ->
                 listOf("https", "http").forEach { protocol ->
                     action.invoke(URI("$protocol://$host/"))
                 }

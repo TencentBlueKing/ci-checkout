@@ -26,6 +26,8 @@ class SecureStoreAdapter(
 
     override fun delete(targetUri: URI) {
         val targetName = uriNameConversion.convert(targetUri, CREDENTIAL_NAMESPACE)
-        backingStore.delete(targetName)
+        if (backingStore.get(targetName) != null) {
+            backingStore.delete(targetName)
+        }
     }
 }
