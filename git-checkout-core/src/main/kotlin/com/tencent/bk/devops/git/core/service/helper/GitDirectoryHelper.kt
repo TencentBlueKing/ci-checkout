@@ -32,6 +32,7 @@ import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.AgentEnv.getOS
+import com.tencent.bk.devops.git.core.util.FileUtils
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.plugin.script.CommandLineUtils
 import java.io.File
@@ -103,7 +104,7 @@ class GitDirectoryHelper(
         repositoryFile.listFiles()?.forEach {
             try {
                 logger.info("delete the file: ${it.canonicalPath}")
-                it.deleteRecursively()
+                FileUtils.forceDelete(it)
             } catch (e: Exception) {
                 logger.error("delete file fail: ${it.canonicalPath}, ${e.message} (${it.exists()}")
                 if (getOS() != OSType.WINDOWS) {

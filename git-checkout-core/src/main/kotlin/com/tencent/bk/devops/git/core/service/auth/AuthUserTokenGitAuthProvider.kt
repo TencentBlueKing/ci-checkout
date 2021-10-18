@@ -2,8 +2,12 @@ package com.tencent.bk.devops.git.core.service.auth
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.api.TGitApi
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_REPOSITORY_URL
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
+import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
+import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 
 /**
  * 指定用户名授权
@@ -22,7 +26,13 @@ class AuthUserTokenGitAuthProvider(
             val tGitApi = TGitApi(repositoryUrl = repositoryUrl, token = authInfo.password!!)
             if (!tGitApi.canViewProject(pipelineStartUserName)) {
                 throw ParamInvalidException(
-                    errorMsg = "流水线启动用户【$pipelineStartUserName】没有权限访问仓库【$repositoryUrl】"
+                    errorMsg = defaultResolver.resolveByMap(
+                        content = GitErrorsText.get().httpAuthenticationFailed!!,
+                        valueMap = mapOf(
+                            CONTEXT_USER_ID to pipelineStartUserName,
+                            CONTEXT_REPOSITORY_URL to repositoryUrl
+                        )
+                    )
                 )
             }
         }
