@@ -28,14 +28,16 @@
 package com.tencent.bk.devops.git.core.exception
 
 import com.tencent.bk.devops.atom.exception.RemoteServiceException
+import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.HttpStatus
+import com.tencent.bk.devops.plugin.pojo.ErrorType
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 object ExceptionTranslator {
 
-    private const val INTERNAL_SERVER_ERROR = 500
-
+    @SuppressWarnings("ComplexMethod")
     fun apiExceptionTranslator(exception: Throwable): RuntimeException {
         return when (exception) {
             is UnknownHostException, is ConnectException ->
@@ -48,10 +50,19 @@ object ExceptionTranslator {
                 }
             }
             is RemoteServiceException -> {
-                if (exception.httpStatus > INTERNAL_SERVER_ERROR) {
-                    RetryException(errorMsg = exception.message ?: "")
-                } else {
-                    ApiException(httpStatus = exception.httpStatus, errorMsg = exception.message ?: "")
+                when {
+                    exception.httpStatus >= HttpStatus.INTERNAL_SERVER_ERROR.statusCode ->
+                        RetryException(errorMsg = exception.message ?: "")
+                    exception.httpStatus >= HttpStatus.BAD_REQUEST.statusCode &&
+                        exception.httpStatus < HttpStatus.INTERNAL_SERVER_ERROR.statusCode ->
+                        ApiException(
+                            errorType = ErrorType.USER,
+                            errorCode = GitConstants.CONFIG_ERROR,
+                            httpStatus = exception.httpStatus,
+                            errorMsg = exception.message ?: ""
+                        )
+                    else ->
+                        ApiException(httpStatus = exception.httpStatus, errorMsg = exception.message ?: "")
                 }
             }
             else ->

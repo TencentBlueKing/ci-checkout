@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import org.slf4j.LoggerFactory
 
 class UserNamePasswordGitAuthProvider(
     private val username: String?,
@@ -44,9 +45,14 @@ class UserNamePasswordGitAuthProvider(
             throw ParamInvalidException(errorMsg = "password不能为空")
         }
         EnvHelper.putContext(GitConstants.CONTEXT_USER_ID, username)
+        logger.warn("使用【$username】的用户名密码拉取代码")
         return AuthInfo(
             username = username,
             password = password
         )
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(UserNamePasswordGitAuthProvider::class.java)
     }
 }

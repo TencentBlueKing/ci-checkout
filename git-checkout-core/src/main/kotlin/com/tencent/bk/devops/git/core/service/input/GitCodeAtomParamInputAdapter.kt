@@ -44,7 +44,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_UR
 import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
-import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
@@ -76,22 +75,15 @@ class GitCodeAtomParamInputAdapter(
                 RepositoryType.ID -> repositoryHashId
                     ?: throw ParamInvalidException(errorMsg = "代码库ID不能为空")
                 RepositoryType.NAME -> repositoryName
-                ?: throw ParamInvalidException(errorMsg = "代码库名称不能为空")
+                    ?: throw ParamInvalidException(errorMsg = "代码库名称不能为空")
                 else ->
                     throw ParamInvalidException(errorMsg = "代码库类型错误")
             }
             val repositoryConfig = RepositoryUtils.buildConfig(repositoryId, repositoryType)
-            val repository = try {
-                devopsApi.getRepository(repositoryConfig).data
-            } catch (e: ApiException) {
-                if (e.httpStatus == 404) {
-                    throw ApiException(
-                        errorMsg = "代码库${repositoryConfig.getRepositoryId()}不存在或已删除，" +
-                            "请联系当前流水线的管理人员检查代码库信息是否正确"
-                    )
-                }
-                throw e
-            } ?: throw ParamInvalidException(errorMsg = "repository ${repositoryConfig.getRepositoryId()} is not found")
+            val repository = devopsApi.getRepository(repositoryConfig).data
+                ?: throw ParamInvalidException(
+                    errorMsg = "repository ${repositoryConfig.getRepositoryId()} is not found"
+                )
             logger.info("get the repo:$repository")
 
             // 2. 确定分支和commit

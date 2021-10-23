@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT
+import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
@@ -103,7 +104,11 @@ class GitFetchHandler(
 
     private fun GitSourceSettings.fetchTargetRepository(shallowSince: String?) {
         // 按照时间拉，必须是指定的分支,不然会报错
-        val refSpec = if (enableFetchRefSpec == true || !shallowSince.isNullOrBlank()) {
+        val refSpec = if (
+            enableFetchRefSpec == true ||
+            !shallowSince.isNullOrBlank() ||
+                pullType != PullType.BRANCH
+        ) {
             refHelper.getRefSpec()
         } else {
             refHelper.getRefSpecForAllHistory()

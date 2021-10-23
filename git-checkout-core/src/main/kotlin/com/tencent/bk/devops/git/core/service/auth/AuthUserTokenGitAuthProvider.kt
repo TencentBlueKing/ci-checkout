@@ -27,7 +27,7 @@ class AuthUserTokenGitAuthProvider(
             if (!tGitApi.canViewProject(pipelineStartUserName)) {
                 throw ParamInvalidException(
                     errorMsg = defaultResolver.resolveByMap(
-                        content = GitErrorsText.get().httpAuthenticationFailed!!,
+                        content = GitErrorsText.get().startUserIdAuthenticationFailed!!,
                         valueMap = mapOf(
                             CONTEXT_USER_ID to pipelineStartUserName,
                             CONTEXT_REPOSITORY_URL to repositoryUrl

@@ -29,6 +29,9 @@ package com.tencent.bk.devops.git.core.api
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bk.devops.atom.api.BaseApi
+import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.HttpStatus
+import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
 import com.tencent.bk.devops.git.core.pojo.api.GitToken
@@ -36,6 +39,7 @@ import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
 import com.tencent.bk.devops.git.core.util.HttpUtil.retryRequest
+import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.pojo.Result
 import com.tencent.bk.devops.plugin.utils.JsonUtil
 import okhttp3.RequestBody
@@ -83,12 +87,25 @@ class DevopsApi : IDevopsApi, BaseApi() {
     }
 
     override fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository> {
-        val path = "/repository/api/build/repositories?" +
-            "repositoryId=${repositoryConfig.getURLEncodeRepositoryId()}&" +
-            "repositoryType=${repositoryConfig.repositoryType.name}"
-        val request = buildGet(path)
-        val responseContent = retryRequest(request, "获取代码库失败")
-        return JsonUtil.to(responseContent, object : TypeReference<Result<Repository>>() {})
+        try {
+            val path = "/repository/api/build/repositories?" +
+                "repositoryId=${repositoryConfig.getURLEncodeRepositoryId()}&" +
+                "repositoryType=${repositoryConfig.repositoryType.name}"
+            val request = buildGet(path)
+            val responseContent = retryRequest(request, "获取代码库失败")
+            return JsonUtil.to(responseContent, object : TypeReference<Result<Repository>>() {})
+        } catch (ignore: ApiException) {
+            if (ignore.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
+                throw ApiException(
+                    errorType = ErrorType.USER,
+                    errorCode = GitConstants.CONFIG_ERROR,
+                    httpStatus = ignore.httpStatus,
+                    errorMsg = "代码库${repositoryConfig.getRepositoryId()}不存在或已删除，" +
+                        "请联系当前流水线的管理人员检查代码库信息是否正确"
+                )
+            }
+            throw ignore
+        }
     }
 
     override fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean> {

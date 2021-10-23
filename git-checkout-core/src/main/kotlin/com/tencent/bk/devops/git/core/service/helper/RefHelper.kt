@@ -27,10 +27,16 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_WEBHOOK_REPO_URL
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.FETCH_HEAD
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
+import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -89,11 +95,15 @@ class RefHelper(
 
     fun getCheckInfo(): CheckoutInfo {
         with(settings) {
+            val hookCommitId = getHookCommitId()
             return when (pullType) {
                 PullType.BRANCH -> {
                     val startPoint = when {
                         GitUtil.isPrePushBranch(ref) ->
                             "FETCH_HEAD"
+                        hookCommitId != null -> {
+                            hookCommitId
+                        }
                         commit.isBlank() ->
                             "refs/remotes/$ORIGIN_REMOTE_NAME/$ref"
                         else ->
@@ -128,6 +138,25 @@ class RefHelper(
             } else {
                 "$DEVOPS_VIRTUAL_REMOTE_NAME/$sourceBranchName"
             }
+        }
+    }
+
+    /**
+     * 如果是事件触发，则切换到触发的commit点
+     */
+    private fun GitSourceSettings.getHookCommitId(): String? {
+        val hookBranch = System.getenv(BK_CI_HOOK_BRANCH)
+        val gitHookEventType = System.getenv(BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
+        val hookRepoUrl = System.getenv(BK_CI_REPO_WEBHOOK_REPO_URL)
+        val hookRevision = System.getenv(BK_CI_HOOK_REVISION)
+        val mrMergeCommitSha = System.getenv(BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA)
+        if (hookRepoUrl != repositoryUrl || hookBranch != ref) {
+            return null
+        }
+        return when (gitHookEventType) {
+            CodeEventType.MERGE_REQUEST_ACCEPT.name -> mrMergeCommitSha
+            CodeEventType.PUSH.name -> hookRevision
+            else -> null
         }
     }
 

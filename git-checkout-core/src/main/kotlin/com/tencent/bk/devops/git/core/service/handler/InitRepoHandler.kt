@@ -54,7 +54,6 @@ class InitRepoHandler(
             logger.groupStart("Initializing the repository")
             initRepository()
             initConfig()
-            initSparseCheckout()
             if (settings.enableTrace == true) {
                 git.setEnvironmentVariable(GitConstants.GIT_TRACE, "1")
             }
@@ -64,6 +63,7 @@ class InitRepoHandler(
 
     private fun GitSourceSettings.initRepository() {
         if (!File(repositoryPath, ".git").exists()) {
+            logger.warn("本次构建使用全量拉取")
             git.init()
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
             // if source repository is fork repo, adding devops-virtual-origin
@@ -117,6 +117,7 @@ class InitRepoHandler(
                     configValue = FilterValueEnum.TREELESS.value
                 )
             }
+            initSparseCheckout()
         }
     }
 

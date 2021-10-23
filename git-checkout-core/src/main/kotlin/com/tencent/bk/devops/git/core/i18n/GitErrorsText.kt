@@ -32,6 +32,7 @@ import java.util.Locale
 class GitErrorsText : TranslationBundle() {
     var httpAuthenticationFailed: String? = null
     var sshAuthenticationFailed: String? = null
+    var startUserIdAuthenticationFailed: String? = null
     var remoteServerFailed: String? = null
     var connectionTimeOut: String? = null
     var mergeConflicts: String? = null
@@ -52,8 +53,6 @@ class GitErrorsText : TranslationBundle() {
     var sparseCheckoutLeavesNoEntry: String? = null
     var branchOrPathNameConflicts: String? = null
     var emptyAccessToken: String? = null
-    var emptyRepositoryHashId: String? = null
-    var emptyRepositoryName: String? = null
 
     companion object {
         fun get(): GitErrorsText {

@@ -53,6 +53,7 @@ class UserTokenGitAuthProvider(
         if (userId.isNullOrBlank()) {
             throw ParamInvalidException(errorMsg = "授权用户ID不能为空")
         }
+        logger.warn("使用【$userId】的oauth拉取代码")
         val result = devopsApi.getOauthToken(userId = userId)
         if (result.isNotOk() || result.data == null) {
             throw ApiException(

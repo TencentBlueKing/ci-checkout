@@ -43,17 +43,21 @@ class TGitApi(
      * 判断用户是否有权限访问当前项目
      */
     fun canViewProject(username: String): Boolean {
-        val projectInfo = getProjectInfo()
-        // 公开项目，不需要校验
-        if (projectInfo.public) {
-            return true
+        return try {
+            val projectInfo = getProjectInfo()
+            // 公开项目，不需要校验
+            if (projectInfo.public) {
+                return true
+            }
+            // 私有项目，校验启动人是否是项目的成员
+            val members = getProjectMembers(username)
+            members.find {
+                it.username == username &&
+                    it.state == "active" &&
+                    it.accessLevel >= REPORTER_ACCESS_LEVEL
+            } != null
+        } catch (ignore: Throwable) {
+            false
         }
-        // 私有项目，校验启动人是否是项目的成员
-        val members = getProjectMembers(username)
-        return members.find {
-            it.username == username &&
-                it.state == "active" &&
-                it.accessLevel >= REPORTER_ACCESS_LEVEL
-        } != null
     }
 }
