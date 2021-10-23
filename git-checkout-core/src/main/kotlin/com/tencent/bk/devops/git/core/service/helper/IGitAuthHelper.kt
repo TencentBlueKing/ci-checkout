@@ -33,7 +33,7 @@ interface IGitAuthHelper {
 
     fun removeAuth()
 
-     fun configureSubmoduleAuth()
+    fun configureSubmoduleAuth()
 
-     fun removeSubmoduleAuth()
+    fun removeSubmoduleAuth()
 }

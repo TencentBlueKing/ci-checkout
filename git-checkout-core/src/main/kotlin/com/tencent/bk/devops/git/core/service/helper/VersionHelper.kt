@@ -7,7 +7,7 @@ object VersionHelper {
 
     fun getCheckoutCoreVersion(): String {
         val properties = Properties()
-        javaClass.classLoader.getResourceAsStream("core-version.properties").use { properties.load(it)}
+        javaClass.classLoader.getResourceAsStream("core-version.properties").use { properties.load(it) }
         val version = properties["version"]
         val buildNo = properties["buildNo"]
         return "$version-$buildNo"

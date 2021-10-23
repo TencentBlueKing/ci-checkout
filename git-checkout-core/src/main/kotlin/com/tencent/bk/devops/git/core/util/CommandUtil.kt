@@ -44,6 +44,7 @@ import org.apache.commons.exec.ExecuteException
 import org.apache.commons.exec.PumpStreamHandler
 import org.apache.commons.exec.environment.EnvironmentUtils
 import org.apache.commons.io.IOUtils
+import org.slf4j.LoggerFactory
 
 object CommandUtil {
 
@@ -51,6 +52,7 @@ object CommandUtil {
      * 最大的输出日志行数
      */
     private const val MAX_LOG_SIZE = 100
+    private val logger = LoggerFactory.getLogger(CommandUtil::class.java)
 
     @SuppressWarnings("LongParameterList")
     fun execute(
@@ -116,9 +118,13 @@ object CommandUtil {
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {
             val gitErrors = parseError(stdOuts.plus(errOuts))
-            val errorMsg = gitErrors?.description ?: "exec ${command.toStrings().joinToString(" ")} failed"
+            val errorMsg = gitErrors?.title ?: "exec ${command.toStrings().joinToString(" ")} failed"
             val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
             val errorType = gitErrors?.errorType ?: ErrorType.USER
+            val description = gitErrors?.description
+            if (description != null) {
+                logger.info("<a target='_blank' href='\" + $description + \"'>查看解决办法</a>")
+            }
             throw GitExecuteException(
                 errorType = errorType,
                 errorCode = errorCode,
