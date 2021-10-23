@@ -123,7 +123,7 @@ object CommandUtil {
             val errorType = gitErrors?.errorType ?: ErrorType.USER
             val description = gitErrors?.description
             if (description != null) {
-                logger.info("<a target='_blank' href='\" + $description + \"'>查看解决办法</a>")
+                logger.info("<a target='_blank' href='$description'>查看解决办法</a>")
             }
             throw GitExecuteException(
                 errorType = errorType,
