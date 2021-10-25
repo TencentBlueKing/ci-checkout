@@ -34,10 +34,10 @@ object RegexUtil {
 
     private val LOG_PATTERN = Pattern.compile(
         "(?<commitId>[0-9a-f]{40})\\|" +
-            "(?<committerName>.+)\\|" +
-            "(?<commitTime>\\w+)\\|(.+)\\|" +
-            "(?<authorName>.+)\\|" +
-            "(?<commitMessage>.+)"
+            "(?<committerName>.+?)\\|" +
+            "(?<commitTime>\\w+?)\\|[\\S\\s]+?\\|" +
+            "(?<authorName>.+?)\\|" +
+            "(?<commitMessage>.*)"
     )
 
     fun parseLog(log: String): CommitLogInfo? {
