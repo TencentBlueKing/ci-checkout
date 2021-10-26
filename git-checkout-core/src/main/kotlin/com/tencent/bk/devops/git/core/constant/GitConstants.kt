@@ -54,6 +54,7 @@ object GitConstants {
     const val DEVOPS_VIRTUAL_REMOTE_NAME = "devops-virtual-origin"
     const val DEVOPS_VIRTUAL_BRANCH = "devops-virtual-branch"
     const val FETCH_HEAD = "FETCH_HEAD"
+    const val CI_EVENT = "ci.event"
 
     // git env
     const val GIT_TERMINAL_PROMPT = "GIT_TERMINAL_PROMPT"

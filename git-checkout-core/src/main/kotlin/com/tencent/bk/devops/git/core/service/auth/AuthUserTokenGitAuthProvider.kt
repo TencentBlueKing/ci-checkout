@@ -2,6 +2,7 @@ package com.tencent.bk.devops.git.core.service.auth
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.api.TGitApi
+import com.tencent.bk.devops.git.core.constant.GitConstants.CI_EVENT
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_REPOSITORY_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
@@ -21,8 +22,8 @@ class AuthUserTokenGitAuthProvider(
 
     override fun getAuthInfo(): AuthInfo {
         val authInfo = UserTokenGitAuthProvider(userId = userId, devopsApi = devopsApi).getAuthInfo()
-        // 如果授权用户与启动过用户不相同，需要验证启动用户是否有权限下载代码
-        if (pipelineStartUserName != userId) {
+        // 如果授权用户与启动用户不相同,并且事件类型不是定时触发，需要验证启动用户是否有权限下载代码
+        if (System.getenv(CI_EVENT) != "schedule" && pipelineStartUserName != userId) {
             val tGitApi = TGitApi(repositoryUrl = repositoryUrl, token = authInfo.password!!)
             if (!tGitApi.canViewProject(pipelineStartUserName)) {
                 throw ParamInvalidException(

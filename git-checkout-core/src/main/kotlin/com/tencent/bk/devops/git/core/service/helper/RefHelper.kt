@@ -80,7 +80,7 @@ class RefHelper(
             )
         }
         fetchRefSpec?.split(",")?.filter {
-            it != ref || it != sourceBranchName
+            it.isNotBlank() || it != ref || it != sourceBranchName
         }?.forEach { branch ->
             refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
         }
