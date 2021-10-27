@@ -56,7 +56,7 @@ enum class GitErrors(
                 "(fatal: 远程错误：Git repository not found)|" +
                 "(ERROR: Repository not found)|" +
                 "(fatal: remote error: Git:Project not found.)|" +
-                "(fatal: could not read Username for '(.+)': No such device or address)|"
+                "(fatal: could not read Username for '(.+)': No such device or address)"
         ),
         title = when (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL)) {
             GitProtocolEnum.SSH.name -> GitErrorsText.get().sshAuthenticationFailed
@@ -213,7 +213,7 @@ enum class GitErrors(
     ErrorDownloadingObject(
         regex = Regex(
             "(Error downloading object: .*)|" +
-                "(LFS: Repository or object not found: .+)|"
+                "(LFS: Repository or object not found: .+)"
         ),
         title = GitErrorsText.get().errorDownloadingObject,
         description = "$wikiUrl#%E5%8D%81%E5%9B%9Bgit-lfs%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E9%94%99%E8%AF%AF"

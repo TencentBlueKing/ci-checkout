@@ -144,7 +144,6 @@ object CommandUtil {
     private fun parseError(stdErr: List<String>): GitErrors? {
         // 反向遍历,异常基本都是在最后几条
         stdErr.asReversed().forEach { err ->
-            logger.info("$err-> ${GitErrors.matchError(err)}")
             return GitErrors.matchError(err) ?: return@forEach
         }
         return null
