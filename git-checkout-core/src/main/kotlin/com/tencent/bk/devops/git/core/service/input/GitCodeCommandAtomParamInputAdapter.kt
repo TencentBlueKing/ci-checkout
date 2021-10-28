@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_REF
 import com.tencent.bk.devops.git.core.enums.AuthType
 import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullStrategy
@@ -117,6 +118,11 @@ class GitCodeCommandAtomParamInputAdapter(
             }
 
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
+            EnvHelper.addEnvVariable(
+                key = GitConstants.BK_CI_GIT_REPO_ALIAS_NAME,
+                value = GitUtil.getServerInfo(repositoryUrl).repositoryName
+            )
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_REF, refName)
 
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,
