@@ -94,6 +94,7 @@ class GitAuthHelper(
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         install()
         store()
+        unsetInsteadOf()
     }
 
     private fun install() {
@@ -189,12 +190,51 @@ class GitAuthHelper(
         }
     }
 
-    private fun httpInsteadOfGit(host: String) {
-        val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
+    /**
+     * 删除全局的insteadOf
+     */
+    private fun unsetInsteadOf() {
+        if (serverInfo.httpProtocol) {
+            unsetGitInsteadOfHttp(host = serverInfo.hostName)
+
+            // 配置其他域名权限
+            val compatibleHostList = settings.compatibleHostList
+            if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
+                compatibleHostList.filter { it != serverInfo.hostName }.forEach { otherHostName ->
+                    unsetGitInsteadOfHttp(host = otherHostName)
+                }
+            }
+        } else {
+            unsetHttpInsteadOfGit(host = serverInfo.hostName)
+
+            // 配置其他域名权限
+            val compatibleHostList = settings.compatibleHostList
+            if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
+                compatibleHostList.filter { it != serverInfo.hostName }.forEach { otherHostName ->
+                    unsetHttpInsteadOfGit(host = otherHostName)
+                }
+            }
+        }
+    }
+
+    private fun unsetGitInsteadOfHttp(host: String) {
         git.tryConfigUnset(
             configKey = "url.git@$host:.insteadof",
             configScope = GitConfigScope.GLOBAL
         )
+    }
+
+    private fun unsetHttpInsteadOfGit(host: String) {
+        listOf("http", "https").forEach { protocol ->
+            git.tryConfigUnset(
+                configKey = "url.$protocol://$host/.insteadof",
+                configScope = GitConfigScope.GLOBAL
+            )
+        }
+    }
+
+    private fun httpInsteadOfGit(host: String) {
+        val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
         git.configAdd(
             configKey = insteadOfKey,
             configValue = "git@$host:",
