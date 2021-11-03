@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
 import com.tencent.bk.devops.git.core.util.DateUtil
+import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
 
 class GitFetchHandler(
@@ -52,6 +53,7 @@ class GitFetchHandler(
             val shallowSince = calculateShallowSince()
             fetchTargetRepository(shallowSince = shallowSince)
             fetchSourceRepository(shallowSince = shallowSince)
+            fetchPrePushBranch()
             logger.groupEnd("")
         }
     }
@@ -121,5 +123,31 @@ class GitFetchHandler(
             shallowSince = shallowSince,
             enablePartialClone = enablePartialClone
         )
+    }
+
+    /**
+     * 如果开启pre-push，需要将虚拟分支拉取到FETCH_HEAD
+     */
+    private fun GitSourceSettings.fetchPrePushBranch() {
+        if (GitUtil.isPrePushBranch(ref)) {
+            git.fetch(
+                refSpec = listOf(ref),
+                fetchDepth = fetchDepth,
+                remoteName = GitConstants.ORIGIN_REMOTE_NAME,
+                preMerge = preMerge,
+                shallowSince = null,
+                enablePartialClone = enablePartialClone
+            )
+        }
+        if (preMerge && GitUtil.isPrePushBranch(sourceBranchName)) {
+            git.fetch(
+                refSpec = listOf(sourceBranchName),
+                fetchDepth = fetchDepth,
+                remoteName = GitConstants.ORIGIN_REMOTE_NAME,
+                preMerge = preMerge,
+                shallowSince = null,
+                enablePartialClone = enablePartialClone
+            )
+        }
     }
 }
