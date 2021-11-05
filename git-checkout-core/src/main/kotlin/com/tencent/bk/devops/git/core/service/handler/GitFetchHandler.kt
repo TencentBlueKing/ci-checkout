@@ -76,8 +76,7 @@ class GitFetchHandler(
             git.fetch(
                 refSpec = listOf(baseCommitId),
                 fetchDepth = 1,
-                remoteName = GitConstants.ORIGIN_REMOTE_NAME,
-                preMerge = false
+                remoteName = GitConstants.ORIGIN_REMOTE_NAME
             )
             val baseCommitTime = git.log(maxCount = 1, revisionRange = baseCommitId)
                 .firstOrNull()?.commitTime ?: return null
@@ -97,7 +96,6 @@ class GitFetchHandler(
                 refSpec = refSpec,
                 fetchDepth = fetchDepth,
                 remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME,
-                preMerge = preMerge,
                 shallowSince = shallowSince,
                 enablePartialClone = enablePartialClone
             )
@@ -119,7 +117,6 @@ class GitFetchHandler(
             refSpec = refSpec,
             fetchDepth = fetchDepth,
             remoteName = GitConstants.ORIGIN_REMOTE_NAME,
-            preMerge = preMerge,
             shallowSince = shallowSince,
             enablePartialClone = enablePartialClone
         )
@@ -134,7 +131,6 @@ class GitFetchHandler(
                 refSpec = listOf(ref),
                 fetchDepth = fetchDepth,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME,
-                preMerge = preMerge,
                 shallowSince = null,
                 enablePartialClone = enablePartialClone
             )
@@ -144,7 +140,6 @@ class GitFetchHandler(
                 refSpec = listOf(sourceBranchName),
                 fetchDepth = fetchDepth,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME,
-                preMerge = preMerge,
                 shallowSince = null,
                 enablePartialClone = enablePartialClone
             )

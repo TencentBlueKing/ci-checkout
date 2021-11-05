@@ -315,7 +315,6 @@ class GitCommandManager(
         refSpec: List<String>,
         fetchDepth: Int,
         remoteName: String,
-        preMerge: Boolean,
         shallowSince: String? = null,
         enablePartialClone: Boolean? = false
     ) {
@@ -332,7 +331,7 @@ class GitCommandManager(
                 args.add(1, "protocol.version=2")
                 args.add("--shallow-since=$shallowSince")
             }
-            fetchDepth > 0 && !preMerge ->
+            fetchDepth > 0 ->
                 args.add("--depth=$fetchDepth")
             File(File(workingDirectory, ".git"), "shallow").exists() ->
                 args.add("--unshallow")
