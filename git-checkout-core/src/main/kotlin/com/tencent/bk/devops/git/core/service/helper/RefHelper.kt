@@ -82,7 +82,9 @@ class RefHelper(
 
     private fun addBranchRefSpec(branchName: String, refSpec: MutableList<String>) {
         // pre-push分支，只能拉取到FETCH_HEAD，不能拉取到分支，所以单独拉取
-        if (!GitUtil.isPrePushBranch(branchName)) {
+        if (GitUtil.isPrePushBranch(branchName)) {
+            refSpec.add("+refs/heads/$branchName")
+        } else {
             refSpec.add("+refs/heads/$branchName:refs/remotes/$ORIGIN_REMOTE_NAME/$branchName")
         }
     }
