@@ -137,16 +137,16 @@ class GitCheckoutRunner {
 
     private fun printSummaryLog() {
         val summary = StringBuilder("本次构建")
-        when (EnvHelper.getContext(CONTEXT_PULL_STRATEGY)) {
-            PullStrategy.FRESH_CHECKOUT.name ->
-                summary.append("使用【全量】方式拉取")
-            PullStrategy.REVERT_UPDATE.name ->
-                summary.append("使用【增量】方式拉取")
-        }
         if (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL) == GitProtocolEnum.HTTP.name &&
             EnvHelper.getContext(CONTEXT_USER_ID) != null
         ) {
-            summary.append(",使用【${EnvHelper.getContext(CONTEXT_USER_ID)}】的权限拉取")
+            summary.append(",使用【${EnvHelper.getContext(CONTEXT_USER_ID)}】的权限")
+        }
+        when (EnvHelper.getContext(CONTEXT_PULL_STRATEGY)) {
+            PullStrategy.FRESH_CHECKOUT.name ->
+                summary.append("【全量】拉取代码")
+            PullStrategy.REVERT_UPDATE.name ->
+                summary.append("【增量】拉取代码")
         }
         logger.warn(summary.toString())
     }
