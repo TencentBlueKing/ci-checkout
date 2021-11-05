@@ -75,7 +75,7 @@ class GitFetchHandler(
         if (canShallowSince(baseCommitId)) {
             git.fetch(
                 refSpec = listOf(baseCommitId),
-                fetchDepth = 0,
+                fetchDepth = 1,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME,
                 preMerge = false
             )

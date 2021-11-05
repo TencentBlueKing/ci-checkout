@@ -54,12 +54,7 @@ class RefHelper(
         with(settings) {
             return when (pullType) {
                 PullType.BRANCH -> {
-                    // 工蜂pre-push，直接按照分支拉取
-                    return if (GitUtil.isPrePushBranch(ref)) {
-                        listOf(ref)
-                    } else {
-                        getBranchRef()
-                    }
+                    getBranchRefSpec()
                 }
                 PullType.TAG ->
                     listOf("+refs/tags/$ref:refs/tags/$ref")
@@ -69,15 +64,13 @@ class RefHelper(
         }
     }
 
-    private fun GitSourceSettings.getBranchRef(): MutableList<String> {
+    private fun GitSourceSettings.getBranchRefSpec(): MutableList<String> {
         val refSpec = mutableListOf(
-            "--no-tags",
-            "+refs/heads/$ref:refs/remotes/$ORIGIN_REMOTE_NAME/$ref"
+            "--no-tags"
         )
-        if (isAddSourceRef()) {
-            refSpec.add(
-                "+refs/heads/$sourceBranchName:refs/remotes/$ORIGIN_REMOTE_NAME/$sourceBranchName"
-            )
+        addBranchRefSpec(branchName = ref, refSpec = refSpec)
+        if (preMerge) {
+            addBranchRefSpec(branchName = sourceBranchName, refSpec = refSpec)
         }
         fetchRefSpec?.split(",")?.filter {
             it.isNotBlank() && it != ref && it != sourceBranchName
@@ -85,6 +78,13 @@ class RefHelper(
             refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
         }
         return refSpec
+    }
+
+    private fun addBranchRefSpec(branchName: String, refSpec: MutableList<String>) {
+        // pre-push分支，只能拉取到FETCH_HEAD，不能拉取到分支，所以单独拉取
+        if (!GitUtil.isPrePushBranch(branchName)) {
+            refSpec.add("+refs/heads/$branchName:refs/remotes/$ORIGIN_REMOTE_NAME/$branchName")
+        }
     }
 
     fun getSourceRefSpec(): List<String> {
@@ -159,6 +159,4 @@ class RefHelper(
             else -> null
         }
     }
-
-    private fun GitSourceSettings.isAddSourceRef() = preMerge && sourceRepoUrlEqualsRepoUrl
 }
