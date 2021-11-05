@@ -35,7 +35,6 @@ import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
-import org.slf4j.LoggerFactory
 
 /**
  * 根据userId获取oauth2 token
@@ -45,15 +44,10 @@ class UserTokenGitAuthProvider(
     private val devopsApi: IDevopsApi
 ) : IGitAuthProvider {
 
-    companion object {
-        private val logger = LoggerFactory.getLogger(UserTokenGitAuthProvider::class.java)
-    }
-
     override fun getAuthInfo(): AuthInfo {
         if (userId.isNullOrBlank()) {
             throw ParamInvalidException(errorMsg = "授权用户ID不能为空")
         }
-        logger.warn("使用【$userId】的oauth拉取代码")
         val result = devopsApi.getOauthToken(userId = userId)
         if (result.isNotOk() || result.data == null) {
             throw ApiException(

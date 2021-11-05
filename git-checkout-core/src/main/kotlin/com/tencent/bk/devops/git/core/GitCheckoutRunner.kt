@@ -35,6 +35,11 @@ import com.tencent.bk.devops.atom.pojo.StringData
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_GIT_PROTOCOL
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_PULL_STRATEGY
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
+import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
+import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.exception.TaskExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitMetricsInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -92,6 +97,7 @@ class GitCheckoutRunner {
                 reportMetrics(atomContext, settings, startTime, endTime)
             }
             EnvHelper.clearContext()
+            printSummaryLog()
         }
     }
 
@@ -127,5 +133,21 @@ class GitCheckoutRunner {
             }
         } catch (ignore: Throwable) {
         }
+    }
+
+    private fun printSummaryLog() {
+        val summary = StringBuilder("本次构建")
+        when (EnvHelper.getContext(CONTEXT_PULL_STRATEGY)) {
+            PullStrategy.FRESH_CHECKOUT.name ->
+                summary.append("使用【全量】方式拉取")
+            PullStrategy.REVERT_UPDATE.name ->
+                summary.append("使用【增量】方式拉取")
+        }
+        if (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL) == GitProtocolEnum.HTTP.name &&
+            EnvHelper.getContext(CONTEXT_USER_ID) != null
+        ) {
+            summary.append(",使用【${EnvHelper.getContext(CONTEXT_USER_ID)}】的权限拉取")
+        }
+        logger.warn(summary.toString())
     }
 }

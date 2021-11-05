@@ -137,6 +137,7 @@ object GitConstants {
     const val CONTEXT_REPOSITORY_URL = "context_repository_url"
     const val CONTEXT_CREDENTIAL_ID = "context_credential_id"
     const val CONTEXT_GIT_PROTOCOL = "context_git_protocol"
+    const val CONTEXT_PULL_STRATEGY = "context_pull_strategy" // 全量拉取
 
     const val wikiUrl = "https://github.com/TencentBlueKing/ci-git-checkout/wiki/" +
         "Git%E6%8F%92%E4%BB%B6%E5%B8%B8%E8%A7%81%E6%8A%A5%E9%94%99%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"

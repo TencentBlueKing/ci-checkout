@@ -53,7 +53,7 @@ class GitFetchHandler(
             val shallowSince = calculateShallowSince()
             fetchTargetRepository(shallowSince = shallowSince)
             fetchSourceRepository(shallowSince = shallowSince)
-            fetchPrePushBranch()
+            fetchPrePushBranch(shallowSince = shallowSince)
             logger.groupEnd("")
         }
     }
@@ -125,13 +125,13 @@ class GitFetchHandler(
     /**
      * 如果开启pre-push，需要将虚拟分支拉取到FETCH_HEAD
      */
-    private fun GitSourceSettings.fetchPrePushBranch() {
+    private fun GitSourceSettings.fetchPrePushBranch(shallowSince: String?) {
         if (GitUtil.isPrePushBranch(ref)) {
             git.fetch(
                 refSpec = listOf(ref),
                 fetchDepth = fetchDepth,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME,
-                shallowSince = null,
+                shallowSince = shallowSince,
                 enablePartialClone = enablePartialClone
             )
         }
@@ -140,7 +140,7 @@ class GitFetchHandler(
                 refSpec = listOf(sourceBranchName),
                 fetchDepth = fetchDepth,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME,
-                shallowSince = null,
+                shallowSince = shallowSince,
                 enablePartialClone = enablePartialClone
             )
         }
