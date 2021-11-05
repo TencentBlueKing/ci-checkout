@@ -140,7 +140,7 @@ class GitCheckoutRunner {
         if (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL) == GitProtocolEnum.HTTP.name &&
             EnvHelper.getContext(CONTEXT_USER_ID) != null
         ) {
-            summary.append(",使用【${EnvHelper.getContext(CONTEXT_USER_ID)}】的权限")
+            summary.append("使用【${EnvHelper.getContext(CONTEXT_USER_ID)}】的权限")
         }
         when (EnvHelper.getContext(CONTEXT_PULL_STRATEGY)) {
             PullStrategy.FRESH_CHECKOUT.name ->
