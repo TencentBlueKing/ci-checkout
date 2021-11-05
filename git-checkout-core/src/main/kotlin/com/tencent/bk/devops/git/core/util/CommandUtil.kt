@@ -78,7 +78,7 @@ object CommandUtil {
                 }
                 val tmpLine = SensitiveLineParser.onParseLine(line)
                 if (printLogger) {
-                    println("  $tmpLine")
+                    logger.debug("  $tmpLine")
                 }
                 if (stdOuts.size > MAX_LOG_SIZE) {
                     stdOuts.clear()
