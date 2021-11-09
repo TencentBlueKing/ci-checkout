@@ -165,7 +165,13 @@ class RefHelper(
         val hookRepoUrl = System.getenv(BK_CI_REPO_WEBHOOK_REPO_URL)
         val hookRevision = System.getenv(BK_CI_HOOK_REVISION)
         val mrMergeCommitSha = System.getenv(BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA)
-        if (hookRepoUrl != settings.repositoryUrl || hookBranch != settings.ref) {
+        if (!GitUtil.isSameRepository(
+                repositoryUrl = settings.repositoryUrl,
+                otherRepositoryUrl = hookRepoUrl,
+                hostNameList = settings.compatibleHostList
+            ) ||
+            hookBranch != settings.ref
+        ) {
             return null
         }
         return when (gitHookEventType) {
