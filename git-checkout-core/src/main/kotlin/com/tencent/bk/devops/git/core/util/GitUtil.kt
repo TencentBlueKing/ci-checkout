@@ -27,6 +27,8 @@
 
 package com.tencent.bk.devops.git.core.util
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import java.net.URLDecoder
@@ -91,5 +93,30 @@ object GitUtil {
             return false
         }
         return branchName.startsWith(PRE_PUSH_BRANCH_NAME_PREFIX)
+    }
+
+    /**
+     * 开启pre-merge需要满足以下条件
+     * 1. 插件启用pre-merge功能
+     * 2. 触发方式是webhook触发
+     * 3. 触发的url与插件配置的url要是同一个仓库
+     * 4. 触发的事件类型必须是mr/pr
+     */
+    fun isEnablePreMerge(
+        enableVirtualMergeBranch: Boolean,
+        repositoryUrl: String,
+        hookTargetUrl: String?,
+        hookEventType: String?,
+        compatibleHostList: List<String>?
+    ): Boolean {
+        val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
+        return enableVirtualMergeBranch && isSameRepository(
+            repositoryUrl = repositoryUrl,
+            otherRepositoryUrl = hookTargetUrl,
+            hostNameList = compatibleHostList
+        ) &&
+            (hookEventType == CodeEventType.PULL_REQUEST.name ||
+                    hookEventType == CodeEventType.MERGE_REQUEST.name) &&
+            gitHookEventType != CodeEventType.MERGE_REQUEST_ACCEPT.name
     }
 }

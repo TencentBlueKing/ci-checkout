@@ -41,7 +41,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_ALIASNAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_BRANCHNAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_URL
-import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
@@ -107,20 +106,13 @@ class GitCodeAtomParamInputAdapter(
             }
 
             // 3. 确定是否开启pre-merge功能
-            /**
-             * 开启pre-merge需要满足以下条件
-             * 1. 插件启用pre-merge功能
-             * 2. 触发方式是webhook触发
-             * 3. 触发的url与插件配置的url要是同一个仓库
-             * 4. 触发的事件类型必须是mr/pr
-             */
-            val preMerge = enableVirtualMergeBranch &&
-                GitUtil.isSameRepository(
-                    repositoryUrl = repository.url,
-                    otherRepositoryUrl = hookTargetUrl,
-                    hostNameList = compatibleHostList
-                ) &&
-                (hookEventType == CodeEventType.PULL_REQUEST.name || hookEventType == CodeEventType.MERGE_REQUEST.name)
+            val preMerge = GitUtil.isEnablePreMerge(
+                enableVirtualMergeBranch = enableVirtualMergeBranch,
+                repositoryUrl = repository.url,
+                hookTargetUrl = hookTargetUrl,
+                compatibleHostList = compatibleHostList,
+                hookEventType = hookEventType
+            )
             if (preMerge) {
                 ref = hookTargetBranch!!
                 pullType = PullType.BRANCH.name
