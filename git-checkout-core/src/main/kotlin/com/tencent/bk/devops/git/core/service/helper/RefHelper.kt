@@ -72,14 +72,15 @@ class RefHelper(
         // 当push和mr accept事件触发时，需要拉取触发时的commitId,否则拉取指定的分支
         val hookCommitId = getHookCommitId()
         when {
-            hookCommitId != null -> {
+            fetchDepth > 0 && hookCommitId != null -> {
                 refSpec.add("+$hookCommitId:refs/remotes/$ORIGIN_REMOTE_NAME/$ref")
             }
-            commit.isNotBlank() ->
+            fetchDepth > 0 && commit.isNotBlank() ->
                 refSpec.add("+$commit:refs/remotes/$ORIGIN_REMOTE_NAME/$ref")
             else ->
                 addBranchRefSpec(branchName = ref, refSpec = refSpec)
         }
+
         if (preMerge && sourceRepoUrlEqualsRepoUrl) {
             addBranchRefSpec(branchName = sourceBranchName, refSpec = refSpec)
         }
