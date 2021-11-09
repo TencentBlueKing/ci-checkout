@@ -67,6 +67,9 @@ object GitUtil {
         }
     }
 
+    /**
+     * @param hostNameList 当同一个仓库有多个域名时，传入多个域名
+     */
     fun isSameRepository(repositoryUrl: String, otherRepositoryUrl: String?, hostNameList: List<String>?): Boolean {
         if (otherRepositoryUrl.isNullOrBlank()) {
             return false

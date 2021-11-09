@@ -104,11 +104,7 @@ class GitFetchHandler(
 
     private fun GitSourceSettings.fetchTargetRepository(shallowSince: String?) {
         // 按照时间拉，必须是指定的分支,不然会报错
-        val refSpec = if (
-            enableFetchRefSpec == true ||
-            !shallowSince.isNullOrBlank() ||
-                pullType != PullType.BRANCH
-        ) {
+        val refSpec = if (isUseFetchRefSpec(shallowSince)) {
             refHelper.getRefSpec()
         } else {
             refHelper.getRefSpecForAllHistory()
@@ -120,6 +116,20 @@ class GitFetchHandler(
             shallowSince = shallowSince,
             enablePartialClone = enablePartialClone
         )
+    }
+
+    /**
+     * 判断是否只拉取指定的分支，不拉取全部分支，满足以下条件只拉取指定分支
+     * 1. 浅克隆
+     * 2. 用户开启拉取指定分支
+     * 3. preMerge+浅克隆场景i
+     * 4. 按照commitId或者tag拉取
+     */
+    private fun GitSourceSettings.isUseFetchRefSpec(shallowSince: String?): Boolean {
+        return fetchDepth > 0 ||
+            enableFetchRefSpec == true ||
+            !shallowSince.isNullOrBlank() ||
+            pullType != PullType.BRANCH
     }
 
     /**

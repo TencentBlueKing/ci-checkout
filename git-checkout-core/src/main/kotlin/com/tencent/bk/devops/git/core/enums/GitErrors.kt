@@ -220,7 +220,8 @@ enum class GitErrors(
     ),
     LfsNotInstall(
         regex = Regex(
-            "git: 'lfs' is not a git command. See 'git --help'."
+            "(git: 'lfs' is not a git command. See 'git --help'.)|" +
+                "(git：'lfs' 不是一个 git 命令。参见 'git --help'。)"
         ),
         title = GitErrorsText.get().lfsNotInstall,
         description = "$wikiUrl#%E5%8D%81%E4%BA%94lfs%E7%A8%8B%E5%BA%8F%E6%B2%A1%E6%9C%89%E5%AE%89%E8%A3%85"

@@ -68,10 +68,22 @@ class RefHelper(
         val refSpec = mutableListOf(
             "--no-tags"
         )
-        addBranchRefSpec(branchName = ref, refSpec = refSpec)
-        if (preMerge) {
+
+        // 当push和mr accept事件触发时，需要拉取触发时的commitId,否则拉取指定的分支
+        val hookCommitId = getHookCommitId()
+        when {
+            hookCommitId != null -> {
+                refSpec.add("+$hookCommitId:refs/remotes/$ORIGIN_REMOTE_NAME/$ref")
+            }
+            commit.isNotBlank() ->
+                refSpec.add("+$commit:refs/remotes/$ORIGIN_REMOTE_NAME/$ref")
+            else ->
+                addBranchRefSpec(branchName = ref, refSpec = refSpec)
+        }
+        if (preMerge && sourceRepoUrlEqualsRepoUrl) {
             addBranchRefSpec(branchName = sourceBranchName, refSpec = refSpec)
         }
+
         fetchRefSpec?.split(",")?.filter {
             it.isNotBlank() && it != ref && it != sourceBranchName
         }?.forEach { branch ->
@@ -144,15 +156,15 @@ class RefHelper(
     }
 
     /**
-     * 如果是事件触发，则切换到触发的commit点
+     * 如果是push和mr accept事件触发，push拉取指定事件触发的commitId，mr accept拉取合并后的commitId
      */
-    private fun GitSourceSettings.getHookCommitId(): String? {
+    private fun getHookCommitId(): String? {
         val hookBranch = System.getenv(BK_CI_HOOK_BRANCH)
         val gitHookEventType = System.getenv(BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
         val hookRepoUrl = System.getenv(BK_CI_REPO_WEBHOOK_REPO_URL)
         val hookRevision = System.getenv(BK_CI_HOOK_REVISION)
         val mrMergeCommitSha = System.getenv(BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA)
-        if (hookRepoUrl != repositoryUrl || hookBranch != ref) {
+        if (hookRepoUrl != settings.repositoryUrl || hookBranch != settings.ref) {
             return null
         }
         return when (gitHookEventType) {
