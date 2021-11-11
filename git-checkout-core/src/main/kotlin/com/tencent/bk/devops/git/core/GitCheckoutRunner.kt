@@ -78,6 +78,7 @@ class GitCheckoutRunner {
                 }
             }
         } catch (e: TaskExecuteException) {
+            logger.error("git checkout error", e)
             atomContext.result.errorType = e.errorType.num
             atomContext.result.errorCode = e.errorCode
             atomContext.result.message = e.message
