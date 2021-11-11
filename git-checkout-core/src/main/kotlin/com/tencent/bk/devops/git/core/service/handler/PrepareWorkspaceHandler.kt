@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitDirectoryHelper
 import com.tencent.bk.devops.git.core.service.helper.IBkRepoHelper
+import com.tencent.bk.devops.git.core.util.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.util.ServiceLoader
@@ -67,6 +68,8 @@ class PrepareWorkspaceHandler(
                 val downloadResult = if (isExisting) {
                     "success"
                 } else {
+                    logger.error("download from cache repository failed,cleaning workspace")
+                    FileUtils.deleteRepositoryFile(repositoryPath)
                     "failed"
                 }
                 logger.info("download from cache repository $downloadResult")

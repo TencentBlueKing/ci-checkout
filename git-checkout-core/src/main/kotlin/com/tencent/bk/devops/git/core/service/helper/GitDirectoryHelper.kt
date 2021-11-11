@@ -27,16 +27,13 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
-import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
-import com.tencent.bk.devops.git.core.util.AgentEnv.getOS
 import com.tencent.bk.devops.git.core.util.FileUtils
 import com.tencent.bk.devops.git.core.util.GitUtil
-import com.tencent.bk.devops.plugin.script.CommandLineUtils
-import java.io.File
 import org.slf4j.LoggerFactory
+import java.io.File
 
 @Suppress("TooGenericExceptionCaught")
 class GitDirectoryHelper(
@@ -59,7 +56,7 @@ class GitDirectoryHelper(
             }
             if (remove) {
                 logger.info("Deleting the contents of $repositoryPath")
-                deleteRepositoryFile(repositoryPath)
+                FileUtils.deleteRepositoryFile(repositoryPath)
             }
         }
     }
@@ -97,25 +94,6 @@ class GitDirectoryHelper(
             }
         }
         return remove
-    }
-
-    private fun deleteRepositoryFile(repositoryPath: String) {
-        val repositoryFile = File(repositoryPath)
-        repositoryFile.listFiles()?.forEach {
-            try {
-                logger.info("delete the file: ${it.canonicalPath}")
-                FileUtils.forceDelete(it)
-            } catch (e: Exception) {
-                logger.error("delete file fail: ${it.canonicalPath}, ${e.message} (${it.exists()}")
-                if (getOS() != OSType.WINDOWS) {
-                    CommandLineUtils.execute(
-                        command = "rm -rf ${it.canonicalPath}",
-                        workspace = repositoryFile,
-                        print2Logger = true
-                    )
-                }
-            }
-        }
     }
 
     private fun clean(): Boolean {

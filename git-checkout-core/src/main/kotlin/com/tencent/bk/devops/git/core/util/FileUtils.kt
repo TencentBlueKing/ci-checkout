@@ -1,5 +1,8 @@
 package com.tencent.bk.devops.git.core.util
 
+import com.tencent.bk.devops.git.core.enums.OSType
+import com.tencent.bk.devops.plugin.script.CommandLineUtils
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
@@ -7,7 +10,28 @@ import java.nio.file.Files
 
 object FileUtils {
 
-    fun forceDelete(file: File) {
+    private val logger = LoggerFactory.getLogger(FileUtils::class.java)
+
+    fun deleteRepositoryFile(repositoryPath: String) {
+        val repositoryFile = File(repositoryPath)
+        repositoryFile.listFiles()?.forEach {
+            try {
+                logger.info("delete the file: ${it.canonicalPath}")
+                forceDelete(it)
+            } catch (ignore: Exception) {
+                logger.error("delete file fail: ${it.canonicalPath}, ${ignore.message} (${it.exists()}")
+                if (AgentEnv.getOS() != OSType.WINDOWS) {
+                    CommandLineUtils.execute(
+                        command = "rm -rf ${it.canonicalPath}",
+                        workspace = repositoryFile,
+                        print2Logger = true
+                    )
+                }
+            }
+        }
+    }
+
+    private fun forceDelete(file: File) {
         if (file.isDirectory) {
             deleteDirectory(file)
         } else {
