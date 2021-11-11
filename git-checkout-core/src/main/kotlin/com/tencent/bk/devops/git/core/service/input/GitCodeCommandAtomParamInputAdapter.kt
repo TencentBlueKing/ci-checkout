@@ -115,6 +115,15 @@ class GitCodeCommandAtomParamInputAdapter(
             )
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_REF, refName)
 
+            // 添加代码库信息支持codecc扫描
+            EnvHelper.addEnvVariable("bk_repo_taskId_${input.pipelineTaskId}", input.pipelineTaskId)
+            EnvHelper.addEnvVariable("bk_repo_type_${input.pipelineTaskId}", "GIT")
+            EnvHelper.addEnvVariable("bk_repo_local_path_${input.pipelineTaskId}", input.localPath ?: "")
+            EnvHelper.addEnvVariable(
+                "bk_repo_container_id_${input.pipelineTaskId}",
+                System.getenv(GitConstants.BK_CI_BUILD_JOB_ID)
+            )
+
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,
                 pipelineId = pipelineId,
