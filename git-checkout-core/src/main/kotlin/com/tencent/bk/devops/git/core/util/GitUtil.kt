@@ -119,4 +119,12 @@ object GitUtil {
                 hostNameList = compatibleHostList
             )
     }
+
+    fun isGitEvent(gitHookEventType: String?): Boolean {
+        return gitHookEventType == CodeEventType.PUSH.name ||
+            gitHookEventType == CodeEventType.TAG_PUSH.name ||
+            gitHookEventType == CodeEventType.MERGE_REQUEST.name ||
+            gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name ||
+            gitHookEventType == CodeEventType.PULL_REQUEST.name
+    }
 }
