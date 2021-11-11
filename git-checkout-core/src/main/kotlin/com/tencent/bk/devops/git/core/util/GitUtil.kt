@@ -106,17 +106,17 @@ object GitUtil {
         enableVirtualMergeBranch: Boolean,
         repositoryUrl: String,
         hookTargetUrl: String?,
-        hookEventType: String?,
         compatibleHostList: List<String>?
     ): Boolean {
         val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
-        return enableVirtualMergeBranch && isSameRepository(
-            repositoryUrl = repositoryUrl,
-            otherRepositoryUrl = hookTargetUrl,
-            hostNameList = compatibleHostList
-        ) &&
-            (hookEventType == CodeEventType.PULL_REQUEST.name ||
-                    hookEventType == CodeEventType.MERGE_REQUEST.name) &&
-            gitHookEventType != CodeEventType.MERGE_REQUEST_ACCEPT.name
+        // 必须先验证事件类型，再判断仓库是否相同，不然验证仓库类型时解析url会异常
+        return enableVirtualMergeBranch &&
+            (gitHookEventType == CodeEventType.PULL_REQUEST.name ||
+                gitHookEventType == CodeEventType.MERGE_REQUEST.name) &&
+            isSameRepository(
+                repositoryUrl = repositoryUrl,
+                otherRepositoryUrl = hookTargetUrl,
+                hostNameList = compatibleHostList
+            )
     }
 }

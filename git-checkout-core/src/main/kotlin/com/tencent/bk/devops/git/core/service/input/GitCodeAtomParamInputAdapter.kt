@@ -110,8 +110,7 @@ class GitCodeAtomParamInputAdapter(
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
                 repositoryUrl = repository.url,
                 hookTargetUrl = hookTargetUrl,
-                compatibleHostList = compatibleHostList,
-                hookEventType = hookEventType
+                compatibleHostList = compatibleHostList
             )
             if (preMerge) {
                 ref = hookTargetBranch!!
