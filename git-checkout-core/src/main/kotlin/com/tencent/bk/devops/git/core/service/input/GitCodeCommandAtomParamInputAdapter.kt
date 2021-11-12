@@ -116,6 +116,20 @@ class GitCodeCommandAtomParamInputAdapter(
             )
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_REF, refName)
 
+            // 添加代码库信息支持codecc扫描
+            EnvHelper.addEnvVariable("bk_repo_taskId_$pipelineTaskId", pipelineTaskId)
+            EnvHelper.addEnvVariable("bk_repo_type_$pipelineTaskId", "GIT")
+            EnvHelper.addEnvVariable("bk_repo_local_path_$pipelineTaskId", localPath ?: "")
+            EnvHelper.addEnvVariable("bk_repo_code_url_$pipelineTaskId", repositoryUrl)
+            EnvHelper.addEnvVariable(
+                key = "bk_repo_auth_type_$pipelineTaskId",
+                value = getAuthType(authType = authType, repositoryUrl = repositoryUrl)
+            )
+            EnvHelper.addEnvVariable(
+                key = "bk_repo_container_id_$pipelineTaskId",
+                value = System.getenv(GitConstants.BK_CI_BUILD_JOB_ID)
+            )
+
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,
                 pipelineId = pipelineId,
@@ -161,6 +175,16 @@ class GitCodeCommandAtomParamInputAdapter(
                 enablePartialClone = enablePartialClone,
                 cachePath = cachePath
             )
+        }
+    }
+
+    private fun getAuthType(authType: AuthType?, repositoryUrl: String): String {
+        return when {
+            authType == AuthType.ACCESS_TOKEN -> "OAUTH"
+            authType == AuthType.USERNAME_PASSWORD -> "HTTP"
+            repositoryUrl.toUpperCase().startsWith("HTTP") -> "HTTP"
+            else ->
+                "SSH"
         }
     }
 }
