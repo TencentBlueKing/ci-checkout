@@ -100,6 +100,7 @@ class GitCodeCommandAtomParamInputAdapter(
             val preMerge = GitUtil.isEnablePreMerge(
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
                 repositoryUrl = repositoryUrl,
+                hookEventType = hookEventType,
                 hookTargetUrl = hookTargetUrl,
                 compatibleHostList = hostNameList
             )
