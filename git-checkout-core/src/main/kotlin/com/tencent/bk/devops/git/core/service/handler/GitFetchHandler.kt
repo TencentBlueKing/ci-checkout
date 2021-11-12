@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
 import com.tencent.bk.devops.git.core.util.DateUtil
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
 
@@ -48,13 +49,21 @@ class GitFetchHandler(
     }
 
     override fun doHandle() {
-        with(settings) {
-            logger.groupStart("Fetching the repository")
-            val shallowSince = calculateShallowSince()
-            fetchTargetRepository(shallowSince = shallowSince)
-            fetchSourceRepository(shallowSince = shallowSince)
-            fetchPrePushBranch(shallowSince = shallowSince)
-            logger.groupEnd("")
+        val startEpoch = System.currentTimeMillis()
+        try {
+            with(settings) {
+                logger.groupStart("Fetching the repository")
+                val shallowSince = calculateShallowSince()
+                fetchTargetRepository(shallowSince = shallowSince)
+                fetchSourceRepository(shallowSince = shallowSince)
+                fetchPrePushBranch(shallowSince = shallowSince)
+                logger.groupEnd("")
+            }
+        } finally {
+            EnvHelper.putContext(
+                key = GitConstants.CONTEXT_FETCH_COST_TIME,
+                value = (System.currentTimeMillis() - startEpoch).toString()
+            )
         }
     }
 

@@ -46,25 +46,33 @@ class GitCheckoutAndMergeHandler(
     }
 
     override fun doHandle() {
-        val checkoutInfo = refHelper.getCheckInfo()
-        logger.groupStart("Checking out the ref ${checkoutInfo.ref}")
-        git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
-        val afterCheckoutLog = getHeadLog(git)
-        // 保存切换前的commitId，当重试时需要切到这个commitId点
-        EnvHelper.addEnvVariable(
-            key = GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_ID + "_" + settings.pipelineTaskId,
-            value = afterCheckoutLog?.commitId ?: ""
-        )
-        logger.groupEnd("")
-        if (settings.preMerge) {
-            val mergeRef = refHelper.getMergeInfo()
-            logger.groupStart("merge $mergeRef into ${checkoutInfo.ref}")
+        val startEpoch = System.currentTimeMillis()
+        try {
+            val checkoutInfo = refHelper.getCheckInfo()
+            logger.groupStart("Checking out the ref ${checkoutInfo.ref}")
+            git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
+            val afterCheckoutLog = getHeadLog(git)
+            // 保存切换前的commitId，当重试时需要切到这个commitId点
             EnvHelper.addEnvVariable(
-                key = GitConstants.BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID,
+                key = GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_ID + "_" + settings.pipelineTaskId,
                 value = afterCheckoutLog?.commitId ?: ""
             )
-            git.merge(mergeRef)
             logger.groupEnd("")
+            if (settings.preMerge) {
+                val mergeRef = refHelper.getMergeInfo()
+                logger.groupStart("merge $mergeRef into ${checkoutInfo.ref}")
+                EnvHelper.addEnvVariable(
+                    key = GitConstants.BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID,
+                    value = afterCheckoutLog?.commitId ?: ""
+                )
+                git.merge(mergeRef)
+                logger.groupEnd("")
+            }
+        } finally {
+            EnvHelper.putContext(
+                key = GitConstants.CONTEXT_CHECKOUT_COST_TIME,
+                value = (System.currentTimeMillis() - startEpoch).toString()
+            )
         }
     }
 

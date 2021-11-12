@@ -27,10 +27,12 @@
 
 package com.tencent.bk.devops.git.core.service.handler
 
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_PREPARE_COST_TIME
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitDirectoryHelper
 import com.tencent.bk.devops.git.core.service.helper.IBkRepoHelper
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -46,6 +48,15 @@ class PrepareWorkspaceHandler(
     }
 
     override fun doHandle() {
+        val startEpoch = System.currentTimeMillis()
+        try {
+            doHandlePrepare()
+        } finally {
+            EnvHelper.putContext(CONTEXT_PREPARE_COST_TIME, (System.currentTimeMillis() - startEpoch).toString())
+        }
+    }
+
+    private fun doHandlePrepare() {
         with(settings) {
             val workingDirectory = File(repositoryPath)
             var isExisting = true

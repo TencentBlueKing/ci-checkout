@@ -28,9 +28,11 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitLogHelper
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
 
 class GitLogHandler(
@@ -44,8 +46,16 @@ class GitLogHandler(
     }
 
     override fun doHandle() {
-        logger.groupStart("saving commit log info")
-        GitLogHelper(git, settings, devopsApi).saveGitCommit()
-        logger.groupEnd("")
+        val startEpoch = System.currentTimeMillis()
+        try {
+            logger.groupStart("saving commit log info")
+            GitLogHelper(git, settings, devopsApi).saveGitCommit()
+            logger.groupEnd("")
+        } finally {
+            EnvHelper.putContext(
+                key = GitConstants.CONTEXT_LOG_COST_TIME,
+                value = (System.currentTimeMillis() - startEpoch).toString()
+            )
+        }
     }
 }

@@ -1,7 +1,9 @@
 package com.tencent.bk.devops.git.core.service.handler
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
 
 class GitLfsHandler(
@@ -14,13 +16,21 @@ class GitLfsHandler(
     }
 
     override fun doHandle() {
-        with(settings) {
-            if (!lfs) {
-                return
+        val startEpoch = System.currentTimeMillis()
+        try {
+            with(settings) {
+                if (!lfs) {
+                    return
+                }
+                logger.groupStart("Fetching lfs")
+                git.lfsPull()
+                logger.groupEnd("")
             }
-            logger.groupStart("Fetching lfs")
-            git.lfsPull()
-            logger.groupEnd("")
+        } finally {
+            EnvHelper.putContext(
+                key = GitConstants.CONTEXT_LFS_COST_TIME,
+                value = (System.currentTimeMillis() - startEpoch).toString()
+            )
         }
     }
 }

@@ -27,9 +27,11 @@
 
 package com.tencent.bk.devops.git.core.service.handler
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitAuthHelper
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
 
 class GitAuthHandler(
@@ -43,12 +45,20 @@ class GitAuthHandler(
     private val authHelper = GitAuthHelper(settings = settings, git = git)
 
     override fun doHandle() {
-        logger.groupStart("Setting up auth")
-        authHelper.configureAuth()
-        if (settings.submodules) {
-            authHelper.configureSubmoduleAuth()
+        val startEpoch = System.currentTimeMillis()
+        try {
+            logger.groupStart("Setting up auth")
+            authHelper.configureAuth()
+            if (settings.submodules) {
+                authHelper.configureSubmoduleAuth()
+            }
+            logger.groupEnd("")
+        } finally {
+            EnvHelper.putContext(
+                key = GitConstants.CONTEXT_AUTH_COST_TIME,
+                value = (System.currentTimeMillis() - startEpoch).toString()
+            )
         }
-        logger.groupEnd("")
     }
 
     override fun afterHandle() {

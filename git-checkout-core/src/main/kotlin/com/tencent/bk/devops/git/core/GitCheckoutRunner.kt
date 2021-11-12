@@ -35,8 +35,16 @@ import com.tencent.bk.devops.atom.pojo.StringData
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_AUTH_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_CHECKOUT_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_GIT_PROTOCOL
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_PULL_STRATEGY
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_INIT_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_LFS_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_LOG_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_PREPARE_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_STRATEGY
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_SUBMODULE_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.enums.PullStrategy
@@ -101,6 +109,7 @@ class GitCheckoutRunner {
         }
     }
 
+    @SuppressWarnings("ComplexMethod")
     private fun <T : AtomBaseParam> reportMetrics(
         atomContext: AtomContext<T>,
         settings: GitSourceSettings?,
@@ -125,10 +134,20 @@ class GitCheckoutRunner {
                     projectName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName,
                     startTime = DateUtil.format(startTime),
                     endTime = DateUtil.format(endTime),
-                    costTime = endTime - startTime
+                    costTime = endTime - startTime,
+                    prepareCostTime = EnvHelper.getContext(CONTEXT_PREPARE_COST_TIME) as Long? ?: 0L,
+                    initCostTime = EnvHelper.getContext(CONTEXT_INIT_COST_TIME) as Long? ?: 0L,
+                    submoduleCostTime = EnvHelper.getContext(CONTEXT_SUBMODULE_COST_TIME) as Long? ?: 0L,
+                    lfsCostTime = EnvHelper.getContext(CONTEXT_LFS_COST_TIME) as Long? ?: 0L,
+                    fetchCostTime = EnvHelper.getContext(CONTEXT_FETCH_COST_TIME) as Long? ?: 0L,
+                    checkoutCostTime = EnvHelper.getContext(CONTEXT_CHECKOUT_COST_TIME) as Long? ?: 0L,
+                    logCostTime = EnvHelper.getContext(CONTEXT_LOG_COST_TIME) as Long? ?: 0L,
+                    authCostTime = EnvHelper.getContext(CONTEXT_AUTH_COST_TIME) as Long? ?: 0L,
+                    fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: ""
                 )
             }
             if (metricsHelper != null && atomCode != null) {
+                logger.info("metricsInfo:$gitMetricsInfo")
                 metricsHelper.reportMetrics(atomCode = "git", metricsInfo = gitMetricsInfo)
             }
         } catch (ignore: Throwable) {
@@ -142,7 +161,7 @@ class GitCheckoutRunner {
         ) {
             summary.append("使用【${EnvHelper.getContext(CONTEXT_USER_ID)}】的权限")
         }
-        when (EnvHelper.getContext(CONTEXT_PULL_STRATEGY)) {
+        when (EnvHelper.getContext(CONTEXT_FETCH_STRATEGY)) {
             PullStrategy.FRESH_CHECKOUT.name ->
                 summary.append("【全量】拉取代码")
             PullStrategy.REVERT_UPDATE.name ->

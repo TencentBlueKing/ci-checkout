@@ -29,7 +29,8 @@ class PlaceholderResolver {
      * 返回 category:1:product:2<br></br>
      *
      * @param content 要解析的带有占位符的模板字符串
-     * @param values  按照模板占位符索引位置设置对应的值
+     * @param values 按照模板占位符索引位置设置对应的值
+     * @param values 按照模板占位符索引位置设置对应的值
      * @return
      */
     fun resolve(content: String, vararg values: String): String {

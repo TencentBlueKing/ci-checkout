@@ -137,7 +137,15 @@ object GitConstants {
     const val CONTEXT_REPOSITORY_URL = "context_repository_url"
     const val CONTEXT_CREDENTIAL_ID = "context_credential_id"
     const val CONTEXT_GIT_PROTOCOL = "context_git_protocol"
-    const val CONTEXT_PULL_STRATEGY = "context_pull_strategy" // 全量拉取
+    const val CONTEXT_FETCH_STRATEGY = "context_fetch_strategy" // 全量拉取
+    const val CONTEXT_PREPARE_COST_TIME = "context_prepare_cost_time"
+    const val CONTEXT_INIT_COST_TIME = "context_init_cost_time"
+    const val CONTEXT_SUBMODULE_COST_TIME = "context_submodule_cost_time"
+    const val CONTEXT_LFS_COST_TIME = "context_lfs_cost_time"
+    const val CONTEXT_FETCH_COST_TIME = "context_fetch_cost_time"
+    const val CONTEXT_CHECKOUT_COST_TIME = "context_checkout_cost_time"
+    const val CONTEXT_LOG_COST_TIME = "context_log_cost_time"
+    const val CONTEXT_AUTH_COST_TIME = "context_auth_cost_time"
 
     const val wikiUrl = "https://github.com/TencentBlueKing/ci-git-checkout/wiki/" +
         "Git%E6%8F%92%E4%BB%B6%E5%B8%B8%E8%A7%81%E6%8A%A5%E9%94%99%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"

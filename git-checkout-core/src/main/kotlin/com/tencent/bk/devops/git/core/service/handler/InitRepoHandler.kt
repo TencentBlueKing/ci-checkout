@@ -51,21 +51,29 @@ class InitRepoHandler(
     }
 
     override fun doHandle() {
-        with(settings) {
-            // Initialize the repository
-            logger.groupStart("Initializing the repository")
-            initRepository()
-            initConfig()
-            if (settings.enableTrace == true) {
-                git.setEnvironmentVariable(GitConstants.GIT_TRACE, "1")
+        val startEpoch = System.currentTimeMillis()
+        try {
+            with(settings) {
+                // Initialize the repository
+                logger.groupStart("Initializing the repository")
+                initRepository()
+                initConfig()
+                if (settings.enableTrace == true) {
+                    git.setEnvironmentVariable(GitConstants.GIT_TRACE, "1")
+                }
+                logger.groupEnd("")
             }
-            logger.groupEnd("")
+        } finally {
+            EnvHelper.putContext(
+                key = GitConstants.CONTEXT_INIT_COST_TIME,
+                value = (System.currentTimeMillis() - startEpoch).toString()
+            )
         }
     }
 
     private fun GitSourceSettings.initRepository() {
         if (!File(repositoryPath, ".git").exists()) {
-            EnvHelper.putContext(GitConstants.CONTEXT_PULL_STRATEGY, PullStrategy.FRESH_CHECKOUT.name)
+            EnvHelper.putContext(GitConstants.CONTEXT_FETCH_STRATEGY, PullStrategy.FRESH_CHECKOUT.name)
             git.init()
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
             // if source repository is fork repo, adding devops-virtual-origin
@@ -74,7 +82,7 @@ class InitRepoHandler(
                 git.remoteAdd(DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
             }
         } else {
-            EnvHelper.putContext(GitConstants.CONTEXT_PULL_STRATEGY, PullStrategy.REVERT_UPDATE.name)
+            EnvHelper.putContext(GitConstants.CONTEXT_FETCH_STRATEGY, PullStrategy.REVERT_UPDATE.name)
             git.remoteSetUrl(ORIGIN_REMOTE_NAME, repositoryUrl)
             if (preMerge && !sourceRepoUrlEqualsRepoUrl
             ) {

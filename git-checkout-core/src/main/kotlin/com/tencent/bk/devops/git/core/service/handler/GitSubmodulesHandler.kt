@@ -27,8 +27,10 @@
 
 package com.tencent.bk.devops.git.core.service.handler
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
 
 class GitSubmodulesHandler(
@@ -41,22 +43,30 @@ class GitSubmodulesHandler(
     }
 
     override fun doHandle() {
-        with(settings) {
-            if (!submodules) {
-                return
+        val startEpoch = System.currentTimeMillis()
+        try {
+            with(settings) {
+                if (!submodules) {
+                    return
+                }
+                logger.groupStart("Fetching submodules")
+                git.submoduleSync(recursive = nestedSubmodules, path = submodulesPath)
+                git.submoduleUpdate(
+                    recursive = nestedSubmodules,
+                    path = submodulesPath,
+                    submoduleRemote = submoduleRemote
+                )
+                git.submoduleForeach(command = "git config --local gc.auto 0", recursive = nestedSubmodules)
+                if (lfs) {
+                    git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
+                }
+                logger.groupEnd("")
             }
-            logger.groupStart("Fetching submodules")
-            git.submoduleSync(recursive = nestedSubmodules, path = submodulesPath)
-            git.submoduleUpdate(
-                recursive = nestedSubmodules,
-                path = submodulesPath,
-                submoduleRemote = submoduleRemote
+        } finally {
+            EnvHelper.putContext(
+                key = GitConstants.CONTEXT_SUBMODULE_COST_TIME,
+                value = (System.currentTimeMillis() - startEpoch).toString()
             )
-            git.submoduleForeach(command = "git config --local gc.auto 0", recursive = nestedSubmodules)
-            if (lfs) {
-                git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
-            }
-            logger.groupEnd("")
         }
     }
 }

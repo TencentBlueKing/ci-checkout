@@ -11,5 +11,14 @@ data class GitMetricsInfo(
     val projectName: String,
     val startTime: String,
     val endTime: String,
-    val costTime: Long
+    val costTime: Long,
+    val prepareCostTime: Long,
+    val initCostTime: Long,
+    val submoduleCostTime: Long,
+    val lfsCostTime: Long,
+    val fetchCostTime: Long,
+    val checkoutCostTime: Long,
+    val logCostTime: Long,
+    val authCostTime: Long,
+    val fetchStrategy: String
 )
