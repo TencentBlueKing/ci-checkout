@@ -45,7 +45,7 @@ object HttpUtil {
                     val responseContent = response.body()?.string() ?: ""
                     if (!response.isSuccessful) {
                         logger.error(
-                            "Fail to request with code ${response.code()} " +
+                            "$errorMessage|Fail to request with code ${response.code()} " +
                                 "message ${response.message()} and response $responseContent"
                         )
                         throw RemoteServiceException(errorMessage, response.code(), response.body()?.string() ?: "")
