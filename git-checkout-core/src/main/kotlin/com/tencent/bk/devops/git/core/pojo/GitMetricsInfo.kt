@@ -20,5 +20,8 @@ data class GitMetricsInfo(
     val checkoutCostTime: Long,
     val logCostTime: Long,
     val authCostTime: Long,
-    val fetchStrategy: String
+    val fetchStrategy: String,
+    val errorType: Int? = 0,
+    val errorCode: Int? = null,
+    val errorMessage: String? = null
 )

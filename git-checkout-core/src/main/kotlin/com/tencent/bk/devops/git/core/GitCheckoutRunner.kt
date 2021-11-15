@@ -143,7 +143,10 @@ class GitCheckoutRunner {
                     checkoutCostTime = EnvHelper.getContext(CONTEXT_CHECKOUT_COST_TIME)?.toLong() ?: 0L,
                     logCostTime = EnvHelper.getContext(CONTEXT_LOG_COST_TIME)?.toLong() ?: 0L,
                     authCostTime = EnvHelper.getContext(CONTEXT_AUTH_COST_TIME)?.toLong() ?: 0L,
-                    fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: ""
+                    fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: "",
+                    errorType = atomContext.result.errorType,
+                    errorCode = atomContext.result.errorCode,
+                    errorMessage = atomContext.result.message
                 )
             }
             if (metricsHelper != null && atomCode != null) {
