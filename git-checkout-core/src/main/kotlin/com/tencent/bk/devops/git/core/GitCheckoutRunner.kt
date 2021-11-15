@@ -38,12 +38,12 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_AUTH_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_CHECKOUT_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_STRATEGY
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_GIT_PROTOCOL
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_INIT_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_LFS_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_LOG_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_PREPARE_COST_TIME
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_STRATEGY
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_SUBMODULE_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
@@ -135,14 +135,14 @@ class GitCheckoutRunner {
                     startTime = DateUtil.format(startTime),
                     endTime = DateUtil.format(endTime),
                     costTime = endTime - startTime,
-                    prepareCostTime = EnvHelper.getContext(CONTEXT_PREPARE_COST_TIME) as Long? ?: 0L,
-                    initCostTime = EnvHelper.getContext(CONTEXT_INIT_COST_TIME) as Long? ?: 0L,
-                    submoduleCostTime = EnvHelper.getContext(CONTEXT_SUBMODULE_COST_TIME) as Long? ?: 0L,
-                    lfsCostTime = EnvHelper.getContext(CONTEXT_LFS_COST_TIME) as Long? ?: 0L,
-                    fetchCostTime = EnvHelper.getContext(CONTEXT_FETCH_COST_TIME) as Long? ?: 0L,
-                    checkoutCostTime = EnvHelper.getContext(CONTEXT_CHECKOUT_COST_TIME) as Long? ?: 0L,
-                    logCostTime = EnvHelper.getContext(CONTEXT_LOG_COST_TIME) as Long? ?: 0L,
-                    authCostTime = EnvHelper.getContext(CONTEXT_AUTH_COST_TIME) as Long? ?: 0L,
+                    prepareCostTime = EnvHelper.getContext(CONTEXT_PREPARE_COST_TIME)?.toLong() ?: 0L,
+                    initCostTime = EnvHelper.getContext(CONTEXT_INIT_COST_TIME)?.toLong() ?: 0L,
+                    submoduleCostTime = EnvHelper.getContext(CONTEXT_SUBMODULE_COST_TIME)?.toLong() ?: 0L,
+                    lfsCostTime = EnvHelper.getContext(CONTEXT_LFS_COST_TIME)?.toLong() ?: 0L,
+                    fetchCostTime = EnvHelper.getContext(CONTEXT_FETCH_COST_TIME)?.toLong() ?: 0L,
+                    checkoutCostTime = EnvHelper.getContext(CONTEXT_CHECKOUT_COST_TIME)?.toLong() ?: 0L,
+                    logCostTime = EnvHelper.getContext(CONTEXT_LOG_COST_TIME)?.toLong() ?: 0L,
+                    authCostTime = EnvHelper.getContext(CONTEXT_AUTH_COST_TIME)?.toLong() ?: 0L,
                     fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: ""
                 )
             }
