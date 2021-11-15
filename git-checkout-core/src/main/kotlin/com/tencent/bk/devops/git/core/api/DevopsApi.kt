@@ -83,7 +83,15 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val path = "/repository/api/build/oauth/git/$userId"
         val request = buildGet(path)
         val responseContent = retryRequest(request, "获取oauth认证信息失败")
-        return JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
+        val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
+        if (result.data == null) {
+            throw ApiException(
+                errorType = ErrorType.USER,
+                errorCode = GitConstants.CONFIG_ERROR,
+                errorMsg = "用户【$userId】没有oauth授权"
+            )
+        }
+        return result
     }
 
     override fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository> {
