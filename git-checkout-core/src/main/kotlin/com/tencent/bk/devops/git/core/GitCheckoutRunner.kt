@@ -32,6 +32,7 @@ import com.tencent.bk.devops.atom.common.Status
 import com.tencent.bk.devops.atom.pojo.AtomBaseParam
 import com.tencent.bk.devops.atom.pojo.MonitorData
 import com.tencent.bk.devops.atom.pojo.StringData
+import com.tencent.bk.devops.atom.utils.json.JsonUtil
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
@@ -150,7 +151,7 @@ class GitCheckoutRunner {
                 )
             }
             if (metricsHelper != null && atomCode != null) {
-                logger.info("metricsInfo:$gitMetricsInfo")
+                logger.info("metricsInfo:${JsonUtil.toJson(gitMetricsInfo)}")
                 metricsHelper.reportMetrics(atomCode = "git", metricsInfo = gitMetricsInfo)
             }
         } catch (ignore: Throwable) {
