@@ -41,6 +41,7 @@ class RetryHelper(
         private val logger = LoggerFactory.getLogger(RetryHelper::class.java)
     }
 
+    @SuppressWarnings("MagicNumber")
     fun <T> execute(action: () -> T): T {
         var attempt = 1
         while (attempt < maxAttempts) {
@@ -51,13 +52,13 @@ class RetryHelper(
             }
             val seconds = getSleepAmount()
             logger.info("Attempting $attempt|Waiting $seconds seconds before trying again")
-            Thread.sleep(seconds)
+            Thread.sleep(seconds * 1000)
             attempt++
         }
         return action()
     }
 
     private fun getSleepAmount(): Long {
-        return floor(Math.random() * (maxSeconds - minSeconds + 1)).toLong() + minSeconds
+        return (floor(Math.random() * (maxSeconds - minSeconds + 1)).toLong() + minSeconds)
     }
 }
