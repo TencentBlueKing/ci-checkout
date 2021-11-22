@@ -6,6 +6,7 @@ import com.tencent.bk.devops.git.core.pojo.api.TGitProjectMember
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.HttpUtil
 import com.tencent.bk.devops.plugin.utils.JsonUtil
+import org.slf4j.LoggerFactory
 import java.net.URLEncoder
 
 class TGitApi(
@@ -14,8 +15,11 @@ class TGitApi(
 ) {
 
     companion object {
+        private val logger = LoggerFactory.getLogger(TGitApi::class.java)
         private const val API_PATH = "api/v3"
         private const val REPORTER_ACCESS_LEVEL = 20
+        // 项目是否是公开项目
+        private const val PUBLIC_PROJECT_VISIBILITY_LEVEL = 10
     }
     private val serverInfo = GitUtil.getServerInfo(repositoryUrl)
 
@@ -46,7 +50,8 @@ class TGitApi(
         return try {
             val projectInfo = getProjectInfo()
             // 公开项目，不需要校验
-            if (projectInfo.public) {
+            if (projectInfo.visibilityLevel >= PUBLIC_PROJECT_VISIBILITY_LEVEL) {
+                logger.info("${projectInfo.name} is public project")
                 return true
             }
             // 私有项目，校验启动人是否是项目的成员

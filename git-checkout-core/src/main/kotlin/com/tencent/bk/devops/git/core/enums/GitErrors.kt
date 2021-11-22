@@ -71,7 +71,10 @@ enum class GitErrors(
                 "(fatal: 远程错误：Internal server error)|" +
                 "(fatal: 远端意外挂断了)|" +
                 "(Git:Server is busy, please try again later)|" +
-                "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)"
+                "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)|" +
+                "(error: RPC failed; curl 56 Recv failure: Connection reset by peer)|" +
+                "(fatal: 过早的文件结束符（EOF）)|" +
+                "(fatal: index-pack 失败)"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         errorType = ErrorType.THIRD_PARTY,

@@ -71,6 +71,7 @@ object CommandUtil {
         }
         val stdOuts = mutableListOf<String>()
         val errOuts = mutableListOf<String>()
+        var gitErrors: GitErrors? = null
         val outputStream = object : GitLogOutputStream(logType) {
             override fun processLine(line: String?, level: Int) {
                 if (line == null) {
@@ -80,6 +81,7 @@ object CommandUtil {
                 if (printLogger) {
                     println("  $tmpLine")
                 }
+                gitErrors = parseError(line)
                 if (stdOuts.size > MAX_LOG_SIZE) {
                     stdOuts.clear()
                 }
@@ -96,6 +98,7 @@ object CommandUtil {
                 if (printLogger && !allowAllExitCodes) {
                     System.err.println("  $tmpLine")
                 }
+                gitErrors = parseError(line)
                 if (errOuts.size > MAX_LOG_SIZE) {
                     errOuts.clear()
                 }
@@ -117,7 +120,6 @@ object CommandUtil {
             val exitCode = executor.execute(command, env)
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {
-            val gitErrors = parseError(stdOuts.plus(errOuts))
             val errorMsg = gitErrors?.title ?: "exec ${command.toStrings().joinToString(" ")} failed"
             val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
             val errorType = gitErrors?.errorType ?: ErrorType.USER
@@ -141,11 +143,7 @@ object CommandUtil {
         }
     }
 
-    private fun parseError(stdErr: List<String>): GitErrors? {
-        // 反向遍历,异常基本都是在最后几条
-        stdErr.asReversed().forEach { err ->
-            return GitErrors.matchError(err) ?: return@forEach
-        }
-        return null
+    private fun parseError(message: String): GitErrors? {
+        return GitErrors.matchError(message)
     }
 }
