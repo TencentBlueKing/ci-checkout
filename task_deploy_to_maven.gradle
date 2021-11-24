@@ -61,6 +61,35 @@ publishing {
 
             artifact sourceJar
             artifact javadocJar
+
+            pom {
+                name.set("git-checkout-core")
+                description.set("Tencent blueking git checkout core project")
+                url.set("https://github.com/TencentBlueKing/ci-git-checkout.git")
+                licenses {
+                    license {
+                        name.set("MIT")
+                        url.set("https://github.com/TencentBlueKing/ci-git-checkout/blob/master/LICENSE.txt")
+                        distribution.set("repo")
+                        comments.set("A business-friendly OSS license")
+                    }
+                }
+
+                developers {
+                    developer {
+                        name.set("bk-ci")
+                        email.set("devops@tencent.com")
+                        roles.set(listOf("Manager"))
+                        url.set("https://bk.tencent.com")
+                    }
+                }
+
+                scm {
+                    url.set(" https://github.com/TencentBlueKing/ci-git-checkout.git")
+                    connection.set("scm:git:https://github.com/TencentBlueKing/ci-git-checkout.git")
+                    developerConnection.set("scm:git:git@github.com:TencentBlueKing/ci-git-checkout.git")
+                }
+            }
         }
     }
 
