@@ -79,7 +79,7 @@ publishing {
                     developer {
                         name = "bk-ci"
                         email = "devops@tencent.com"
-                        roles = "Manager"
+                        roles = ["Manager"]
                         url = "https://bk.tencent.com"
                     }
                 }
