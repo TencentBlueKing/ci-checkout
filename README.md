@@ -1,4 +1,4 @@
-# 通用git插件
+# checkout插件
 
 根据代码库url拉取代码，适用于所有的git仓库
 
@@ -14,7 +14,7 @@
 
 名称: checkout（这个可以自定义)
 
-标识: git
+标识: checkout
 
 调试项目: 选择自己的项目
 
@@ -42,18 +42,6 @@
 
 ## 协同
 
-### 一、环境
-
-- gradle：4.8 ~ 4.10
-
-### 二、打包
-
-gradle clean buildZip
-
-### 三、代码解析
-
-1. GitCodeAtom：代码入口
-2. GitUpdateTask：执行git命令
 
 ## 四、FAQ
 1. 使用ssh方式拉代码，出现Host key verification failed. fatal: Could not read from remote repository.错误，如果检查公私钥正确的情况下，在构建机中~/.ssh/config增加
