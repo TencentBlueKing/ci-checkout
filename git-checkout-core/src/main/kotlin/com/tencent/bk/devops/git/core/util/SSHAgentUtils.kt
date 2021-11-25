@@ -136,6 +136,7 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         }
     }
 
+    @SuppressWarnings("MagicNumber")
     private fun executeCommand(commandLine: String, env: Map<String, String>?): String {
         val cmdLine = CommandLine.parse(commandLine)
         val executor = DefaultExecutor()
