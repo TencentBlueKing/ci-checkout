@@ -263,7 +263,7 @@ class GitAuthHelper(
             throw ParamInvalidException(errorMsg = "private key must not be empty")
         }
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
-        SSHAgentUtils().addIdentity(privateKey = settings.privateKey, passPhrase = settings.passPhrase)
+        SSHAgentUtils(privateKey = settings.privateKey, passPhrase = settings.passPhrase).addIdentity()
     }
 
     private fun getJavaFilePath() = File(System.getProperty("java.home"), "/bin/java").absolutePath

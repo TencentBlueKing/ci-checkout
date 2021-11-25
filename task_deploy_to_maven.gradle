@@ -162,7 +162,7 @@ publishing {
     }
 }
 
-signing {
+/*signing {
     sign publishing.publications.mavenJava
 }
 
@@ -172,4 +172,4 @@ generatePomFileForMavenJavaPublication.onlyIf { !sourceSets.main.allSource.files
 publishMavenJavaPublicationToOssRepository.onlyIf { !sourceSets.main.allSource.files.isEmpty() }
 publishMavenJavaPublicationToMavenLocal.onlyIf { !sourceSets.main.allSource.files.isEmpty() }
 publishToMavenLocal.onlyIf { !sourceSets.main.allSource.files.isEmpty() }
-signMavenJavaPublication.onlyIf { !sourceSets.main.allSource.files.isEmpty() }
+signMavenJavaPublication.onlyIf { !sourceSets.main.allSource.files.isEmpty() }*/
