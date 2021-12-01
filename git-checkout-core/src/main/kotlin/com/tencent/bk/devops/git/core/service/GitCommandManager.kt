@@ -380,7 +380,7 @@ class GitCommandManager(
     }
 
     fun merge(ref: String) {
-        execGit(args = listOf("merge", ref))
+        execGit(args = listOf("merge", "--no-verify", ref))
     }
 
     fun log(maxCount: Int = 1, revisionRange: String = ""): List<CommitLogInfo> {
