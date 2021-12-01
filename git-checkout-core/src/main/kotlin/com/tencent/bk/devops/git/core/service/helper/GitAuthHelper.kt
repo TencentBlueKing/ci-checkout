@@ -264,6 +264,7 @@ class GitAuthHelper(
         }
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
         SSHAgentUtils(privateKey = settings.privateKey, passPhrase = settings.passPhrase).addIdentity()
+        unsetInsteadOf()
     }
 
     private fun getJavaFilePath() = File(System.getProperty("java.home"), "/bin/java").absolutePath
