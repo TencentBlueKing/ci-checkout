@@ -23,5 +23,6 @@ data class GitMetricsInfo(
     val fetchStrategy: String,
     val errorType: Int? = 0,
     val errorCode: Int? = null,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val status: String? = null
 )

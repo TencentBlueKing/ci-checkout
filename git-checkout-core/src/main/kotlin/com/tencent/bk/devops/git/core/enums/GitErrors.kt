@@ -49,7 +49,7 @@ enum class GitErrors(
                 "(fatal: Authentication failed for '(.+)')|" +
                 "(fatal: Could not read from remote repository.)|" +
                 "(fatal: Authentication failed)|" +
-                "(fatal: '(.+) 鉴权失败')|" +
+                "(fatal: '(.+)' 鉴权失败)|" +
                 "(fatal: 无法读取远程仓库。)" +
                 "(fatal: repository '(.+)' not found)|" +
                 "(fatal: .* Git repository not found)|" +

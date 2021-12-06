@@ -29,7 +29,6 @@ package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT
-import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
@@ -132,13 +131,11 @@ class GitFetchHandler(
      * 1. 浅克隆
      * 2. 用户开启拉取指定分支
      * 3. preMerge+浅克隆场景i
-     * 4. 按照commitId或者tag拉取
      */
     private fun GitSourceSettings.isUseFetchRefSpec(shallowSince: String?): Boolean {
         return fetchDepth > 0 ||
             enableFetchRefSpec == true ||
-            !shallowSince.isNullOrBlank() ||
-            pullType != PullType.BRANCH
+            !shallowSince.isNullOrBlank()
     }
 
     /**

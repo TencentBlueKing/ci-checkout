@@ -117,12 +117,12 @@ class GitCheckoutRunner {
         startTime: Long,
         endTime: Long
     ) {
-        if (settings == null) {
+        val atomCode = System.getenv(BK_CI_ATOM_CODE)
+        if (settings == null || atomCode == null) {
             return
         }
         try {
             val metricsHelper = ServiceLoader.load(IGitMetricsHelper::class.java).firstOrNull()
-            val atomCode = System.getenv(BK_CI_ATOM_CODE)
             val gitMetricsInfo = with(atomContext.param) {
                 GitMetricsInfo(
                     atomCode = atomCode,
@@ -147,10 +147,11 @@ class GitCheckoutRunner {
                     fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: "",
                     errorType = atomContext.result.errorType,
                     errorCode = atomContext.result.errorCode,
-                    errorMessage = atomContext.result.message
+                    errorMessage = atomContext.result.message,
+                    status = atomContext.result.status.name
                 )
             }
-            if (metricsHelper != null && atomCode != null) {
+            if (metricsHelper != null) {
                 logger.info("metricsInfo:${JsonUtil.toJson(gitMetricsInfo)}")
                 metricsHelper.reportMetrics(atomCode = "git", metricsInfo = gitMetricsInfo)
             }
