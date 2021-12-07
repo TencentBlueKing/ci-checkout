@@ -1,10 +1,11 @@
 {
   "atomCode": "checkout",
   "execution": {
+    "packagePath": "checkout.jar",
     "language": "java",
     "minimumVersion": "1.8",
     "demands": [],
-    "target": "java -jar checkout.jar",
+    "target": "$bk_java_path -Dfile.encoding=utf8 -jar checkout.jar",
     "post": {
       "postEntryParam": "True",
       "postCondition": "always()"
@@ -75,7 +76,7 @@
       "optionsConf": {
         "searchable": true,
         "multiple": false,
-        "url": "/repository/api/user/repositories/{projectId}/hasPermissionList?permission=USE&repositoryType=CODE_GIT&page=1&pageSize=5000",
+        "url": "/repository/api/user/repositories/{projectId}/hasPermissionList?permission=USE&repositoryType=CODE_GITLAB&page=1&pageSize=5000",
         "paramId": "repositoryHashId",
         "paramName": "aliasName",
         "itemTargetUrl": "/console/codelib/{projectId}/",

@@ -46,7 +46,13 @@
 ## 四、FAQ
 1. 使用ssh方式拉代码，出现Host key verification failed. fatal: Could not read from remote repository.错误，如果检查公私钥正确的情况下，在构建机中~/.ssh/config增加
 ```shell
-# hostName是拉取的代码库域名
-Host hostName
+# xxx是拉取的代码库域名
+Host xxx
   StrictHostKeyChecking no
+```
+如果是在镜像中,镜像又不方便修改，可以在插件之前，增加bash插件，输入
+```shell
+mkdir ~/.ssh
+# xxx要替换成拉取的代码库域名
+echo -e "Host xxx\nStrictHostKeyChecking no\n" > ~/.ssh/config
 ```
