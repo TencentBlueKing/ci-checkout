@@ -40,6 +40,16 @@ class GitErrorsTest {
             "fatal: 远端意外挂断了"
         )
         Assert.assertEquals(gitError, GitErrors.RemoteServerFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: index-pack failed"
+        )
+        Assert.assertEquals(gitError, GitErrors.RemoteServerFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: early EOF"
+        )
+        Assert.assertEquals(gitError, GitErrors.RemoteServerFailed)
     }
 
     @Test
@@ -174,8 +184,13 @@ class GitErrorsTest {
 
     @Test
     fun lfsNotInstall() {
-        val gitError = GitErrors.matchError(
+        var gitError = GitErrors.matchError(
             "git: 'lfs' is not a git command. See 'git --help'."
+        )
+        Assert.assertEquals(gitError, GitErrors.LfsNotInstall)
+
+        gitError = GitErrors.matchError(
+            "git：'lfs' 不是一个 git 命令。参见 'git --help'。"
         )
         Assert.assertEquals(gitError, GitErrors.LfsNotInstall)
     }

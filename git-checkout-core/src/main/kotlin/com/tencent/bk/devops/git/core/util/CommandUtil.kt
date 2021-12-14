@@ -81,10 +81,11 @@ object CommandUtil {
                 if (printLogger) {
                     println("  $tmpLine")
                 }
-                gitErrors = parseError(line)
-                if (stdOuts.size > MAX_LOG_SIZE) {
-                    stdOuts.clear()
+                val tmpGitErrors = parseError(line.trim())
+                if (tmpGitErrors != null) {
+                    gitErrors = tmpGitErrors
                 }
+                gitErrors = parseError(line.trim())
                 stdOuts.add(tmpLine)
             }
         }
@@ -98,7 +99,10 @@ object CommandUtil {
                 if (printLogger && !allowAllExitCodes) {
                     System.err.println("  $tmpLine")
                 }
-                gitErrors = parseError(line)
+                val tmpGitErrors = parseError(line.trim())
+                if (tmpGitErrors != null) {
+                    gitErrors = tmpGitErrors
+                }
                 if (errOuts.size > MAX_LOG_SIZE) {
                     errOuts.clear()
                 }

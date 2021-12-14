@@ -44,7 +44,7 @@ class RetryHelper(
     @SuppressWarnings("MagicNumber")
     fun <T> execute(action: () -> T): T {
         var attempt = 1
-        while (attempt < maxAttempts) {
+        while (attempt <= maxAttempts) {
             try {
                 return action()
             } catch (e: RetryException) {
