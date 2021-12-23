@@ -65,20 +65,17 @@ class GitLogHelper(
             repositoryConfig = repositoryConfig
         )
         val commitIds = commits.map { it.commit }
-        val currCommitData = if (commits.isEmpty()) {
-            preCommitData
-        } else {
-            commits.first()
-        }
-        val commitMaterial = CommitMaterial(
-            lastCommitId = preCommitData?.commit,
-            newCommitId = currCommitData?.commit,
-            newCommitComment = currCommitData?.comment,
-            newCommitAuthor = currCommitData?.author,
-            newCommitCommitter = currCommitData?.committer,
-            commitTimes = commits.size,
-            commitIds = commitIds
-        )
+        val commitMaterial = git.log().map { log ->
+            CommitMaterial(
+                lastCommitId = preCommitData?.commit,
+                newCommitId = log.commitId,
+                newCommitComment = log.commitMessage,
+                newCommitAuthor = log.authorName,
+                newCommitCommitter = log.committerName,
+                commitTimes = commits.size,
+                commitIds = commitIds
+            )
+        }.first()
         saveBuildMaterial(commitMaterial = commitMaterial)
         EnvHelper.addLogEnv(
             projectName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName,
