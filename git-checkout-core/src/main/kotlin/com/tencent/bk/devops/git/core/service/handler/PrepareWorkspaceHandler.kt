@@ -27,7 +27,11 @@
 
 package com.tencent.bk.devops.git.core.service.handler
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_BKREPO_DOWNLOAD_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_BKREPO_DOWNLOAD_RESULT
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_PREPARE_COST_TIME
+import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitDirectoryHelper
@@ -67,6 +71,7 @@ class PrepareWorkspaceHandler(
             git.getGitVersion()
             // 如果仓库不存在,并且配置了缓存路径,则先从缓存路径下载.git文件
             if (!File(repositoryPath, ".git").exists() && !cachePath.isNullOrBlank()) {
+                val startEpoch = System.currentTimeMillis()
                 logger.groupStart("download from cache repository: $cachePath")
                 val bkRepoHelper = ServiceLoader.load(IBkRepoHelper::class.java).firstOrNull()
                 if (bkRepoHelper != null) {
@@ -77,6 +82,7 @@ class PrepareWorkspaceHandler(
                     )
                 }
                 val downloadResult = if (isExisting) {
+                    EnvHelper.putContext(GitConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.BKREPO_CACHE.name)
                     "success"
                 } else {
                     logger.error("download from cache repository failed,cleaning workspace")
@@ -84,6 +90,11 @@ class PrepareWorkspaceHandler(
                     "failed"
                 }
                 logger.info("download from cache repository $downloadResult")
+                EnvHelper.putContext(
+                    CONTEXT_BKREPO_DOWNLOAD_COST_TIME,
+                    (System.currentTimeMillis() - startEpoch).toString()
+                )
+                EnvHelper.putContext(CONTEXT_BKREPO_DOWNLOAD_RESULT, downloadResult)
                 logger.groupEnd("")
             }
             // Prepare existing directory, otherwise recreate

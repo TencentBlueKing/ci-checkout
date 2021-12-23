@@ -37,6 +37,8 @@ import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_AUTH_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_BKREPO_DOWNLOAD_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_BKREPO_DOWNLOAD_RESULT
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_CHECKOUT_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_STRATEGY
@@ -148,7 +150,9 @@ class GitCheckoutRunner {
                     errorType = atomContext.result.errorType,
                     errorCode = atomContext.result.errorCode,
                     errorMessage = atomContext.result.message,
-                    status = atomContext.result.status.name
+                    status = atomContext.result.status.name,
+                    bkRepoDownloadCostTime = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_COST_TIME)?.toLong() ?: 0L,
+                    bkRepoDownloadResult = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_RESULT) ?: ""
                 )
             }
             if (metricsHelper != null) {

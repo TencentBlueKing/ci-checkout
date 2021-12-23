@@ -24,5 +24,7 @@ data class GitMetricsInfo(
     val errorType: Int? = 0,
     val errorCode: Int? = null,
     val errorMessage: String? = null,
-    val status: String? = null
+    val status: String? = null,
+    val bkRepoDownloadCostTime: Long,
+    val bkRepoDownloadResult: String
 )
