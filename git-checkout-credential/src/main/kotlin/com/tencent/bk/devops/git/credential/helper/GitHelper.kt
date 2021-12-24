@@ -143,7 +143,7 @@ object GitHelper {
         }
 
         executor.workingDirectory = File(System.getenv(GIT_REPO_PATH) ?: ".")
-        executor.streamHandler = PumpStreamHandler(outputStream, null, inputStream)
+        executor.streamHandler = PumpStreamHandler(outputStream, outputStream, inputStream)
 
         if (allowAllExitCodes) {
             executor.setExitValues(null)
