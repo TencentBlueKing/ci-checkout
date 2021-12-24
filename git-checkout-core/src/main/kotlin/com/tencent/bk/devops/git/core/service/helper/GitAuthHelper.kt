@@ -85,7 +85,7 @@ class GitAuthHelper(
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
         // #2 当构建机重启后，worker-agent自启动会导致HOME环境变量丢失,指定HOME
         if (System.getenv(HOME) == null) {
-            git.setEnvironmentVariable(HOME, System.getenv(USER_HOME))
+            git.setEnvironmentVariable(HOME, System.getProperty(USER_HOME))
         }
         val compatibleHostList = settings.compatibleHostList
         if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
