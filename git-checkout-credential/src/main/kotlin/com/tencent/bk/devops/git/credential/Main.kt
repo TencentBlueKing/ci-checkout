@@ -35,7 +35,6 @@ fun main(args: Array<String>) {
         val program = Program(System.`in`, System.out)
         program.innerMain(args)
     } catch (ignore: Throwable) {
-        ignore.printStackTrace()
         System.err.println("Fatal: ${ignore.javaClass.name} encountered.  Details:")
         System.err.println(ignore.message)
     }
