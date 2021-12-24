@@ -33,7 +33,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
-import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -105,8 +104,8 @@ class InitRepoHandler(
         if (!userEmailConfig.isNullOrBlank()) {
             git.config(configKey = "user.email", configValue = userEmailConfig!!)
         }
-        git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.LOCAL)
-        git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.LOCAL)
+        git.config(configKey = "http.sslverify", configValue = "false")
+        git.config(configKey = "http.postBuffer", configValue = "524288000")
         git.config(configKey = "gc.auto", configValue = "0")
         initPartialClone()
     }

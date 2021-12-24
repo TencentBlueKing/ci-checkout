@@ -34,6 +34,8 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
+import com.tencent.bk.devops.git.core.constant.GitConstants.USER_HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
@@ -81,6 +83,10 @@ class GitAuthHelper(
         }
 
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
+        // #2 当构建机重启后，worker-agent自启动会导致HOME环境变量丢失,指定HOME
+        if (System.getenv(HOME) == null) {
+            git.setEnvironmentVariable(HOME, System.getenv(USER_HOME))
+        }
         val compatibleHostList = settings.compatibleHostList
         if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
             git.config(

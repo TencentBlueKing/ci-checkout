@@ -66,6 +66,8 @@ object GitConstants {
     const val GIT_TRACE = "GIT_TRACE"
     const val GIT_CREDENTIAL_COMPATIBLEHOST = "credential.compatibleHost"
     const val GIT_REPO_PATH = "GIT_REPO_PATH"
+    const val HOME = "HOME"
+    const val USER_HOME = "user.home"
 
     // auth env
     const val AUTH_SOCKET_VAR = "SSH_AUTH_SOCK"
