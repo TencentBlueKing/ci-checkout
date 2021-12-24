@@ -51,7 +51,7 @@ class GitCheckoutAndMergeHandler(
             val checkoutInfo = refHelper.getCheckInfo()
             logger.groupStart("Checking out the ref ${checkoutInfo.ref}")
             git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
-            val afterCheckoutLog = getHeadLog(git)
+            val afterCheckoutLog = getHeadLog()
             // 保存切换前的commitId，当重试时需要切到这个commitId点
             EnvHelper.addEnvVariable(
                 key = GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_ID + "_" + settings.pipelineTaskId,
@@ -64,6 +64,15 @@ class GitCheckoutAndMergeHandler(
                 EnvHelper.addEnvVariable(
                     key = GitConstants.BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID,
                     value = afterCheckoutLog?.commitId ?: ""
+                )
+                val sourceBranchLog = getBranchHeadLog(mergeRef)
+                EnvHelper.addEnvVariable(
+                    key = GitConstants.BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID,
+                    value = sourceBranchLog?.commitId ?: ""
+                )
+                EnvHelper.addEnvVariable(
+                    key = GitConstants.BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT,
+                    value = sourceBranchLog?.commitMessage ?: ""
                 )
                 git.merge(mergeRef)
                 logger.groupEnd("")
@@ -79,7 +88,11 @@ class GitCheckoutAndMergeHandler(
     /**
      * 获取当前工作空间head日志
      */
-    private fun getHeadLog(git: GitCommandManager): CommitLogInfo? {
+    private fun getHeadLog(): CommitLogInfo? {
         return git.log().firstOrNull()
+    }
+
+    private fun getBranchHeadLog(branchName: String): CommitLogInfo? {
+        return git.log(branchName = branchName).firstOrNull()
     }
 }

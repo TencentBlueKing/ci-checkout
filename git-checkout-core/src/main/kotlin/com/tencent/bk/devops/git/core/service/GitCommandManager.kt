@@ -383,7 +383,7 @@ class GitCommandManager(
         execGit(args = listOf("merge", "--no-verify", ref))
     }
 
-    fun log(maxCount: Int = 1, revisionRange: String = ""): List<CommitLogInfo> {
+    fun log(maxCount: Int = 1, revisionRange: String = "", branchName: String = ""): List<CommitLogInfo> {
         val args = mutableListOf(
             "log",
             "-$maxCount",
@@ -391,6 +391,9 @@ class GitCommandManager(
         )
         if (revisionRange.isNotBlank()) {
             args.add(revisionRange)
+        }
+        if (branchName.isNotBlank()) {
+            args.add(branchName)
         }
 
         val output = execGit(args = args, allowAllExitCodes = true)
