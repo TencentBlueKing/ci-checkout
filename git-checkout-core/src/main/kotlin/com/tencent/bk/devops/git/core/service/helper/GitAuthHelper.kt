@@ -33,6 +33,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
@@ -116,12 +117,19 @@ class GitAuthHelper(
             sourceFilePath = "script/git-checkout-credential.sh",
             targetFile = File(credentialShellPath)
         )
-        // 安装
-        git.config(
-            configKey = GIT_CREDENTIAL_HELPER,
-            configValue = "!bash '$credentialShellPath'",
-            configScope = GitConfigScope.GLOBAL
-        )
+        // 凭证管理必须安装在全局,否则无法传递给其他插件
+        if (!git.configExists(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX,
+                configScope = GitConfigScope.GLOBAL
+            )
+        ) {
+            git.configAdd(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configValue = "!bash '$credentialShellPath'",
+                configScope = GitConfigScope.GLOBAL
+            )
+        }
     }
 
     private fun store() {
