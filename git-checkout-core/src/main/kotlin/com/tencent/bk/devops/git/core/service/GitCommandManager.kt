@@ -274,7 +274,7 @@ class GitCommandManager(
             args.add("--recursive")
         }
         if (path.isNotBlank()) {
-            args.add(path)
+            args.addAll(path.split(","))
         }
         execGit(args = args)
     }
@@ -306,7 +306,7 @@ class GitCommandManager(
             args.add("--remote")
         }
         if (path.isNotBlank()) {
-            args.add(path)
+            args.addAll(path.split(","))
         }
         execGit(args = args)
     }

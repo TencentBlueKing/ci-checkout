@@ -50,19 +50,14 @@ class GitSubmodulesHandler(
                     return
                 }
                 logger.groupStart("Fetching submodules")
-                val path = if (submodulesPath.isNotBlank()) {
-                    submodulesPath.split(",").joinToString(" ")
-                } else {
-                    ""
-                }
-                git.submoduleSync(recursive = nestedSubmodules, path = path)
+                git.submoduleSync(recursive = nestedSubmodules, path = submodulesPath)
                 git.submoduleForeach(
                     command = "git reset --hard",
                     recursive = nestedSubmodules
                 )
                 git.submoduleUpdate(
                     recursive = nestedSubmodules,
-                    path = path,
+                    path = submodulesPath,
                     submoduleRemote = submoduleRemote
                 )
                 git.submoduleForeach(command = "git config --local gc.auto 0", recursive = nestedSubmodules)
