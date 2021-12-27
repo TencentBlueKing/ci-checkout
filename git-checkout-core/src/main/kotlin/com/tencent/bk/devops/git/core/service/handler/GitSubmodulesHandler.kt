@@ -56,6 +56,10 @@ class GitSubmodulesHandler(
                     ""
                 }
                 git.submoduleSync(recursive = nestedSubmodules, path = path)
+                git.submoduleForeach(
+                    command = "git reset --hard",
+                    recursive = nestedSubmodules
+                )
                 git.submoduleUpdate(
                     recursive = nestedSubmodules,
                     path = path,
