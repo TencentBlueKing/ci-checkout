@@ -30,12 +30,14 @@ package com.tencent.bk.devops.git.core.service.helper
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BUILD_TYPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
+import com.tencent.bk.devops.git.core.enums.BuildType
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
@@ -117,6 +119,13 @@ class GitAuthHelper(
             sourceFilePath = "script/git-checkout-credential.sh",
             targetFile = File(credentialShellPath)
         )
+        // 如果是在docker环境,禁用其他的凭证管理
+        if (System.getProperty(BUILD_TYPE) == BuildType.DOCKER.name) {
+            git.tryConfigUnset(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configScope = GitConfigScope.GLOBAL
+            )
+        }
         // 凭证管理必须安装在全局,否则无法传递给其他插件
         if (!git.configExists(
                 configKey = GIT_CREDENTIAL_HELPER,
