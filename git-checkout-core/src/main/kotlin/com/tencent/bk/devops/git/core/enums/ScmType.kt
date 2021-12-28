@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.enums
 
 enum class ScmType {
+    CODE_SVN,
     CODE_GIT,
     CODE_GITLAB,
     GITHUB,
@@ -36,10 +37,11 @@ enum class ScmType {
     companion object {
         fun parse(type: ScmType): Short {
             return when (type) {
-                CODE_GIT -> 1.toShort()
-                CODE_GITLAB -> 2.toShort()
-                GITHUB -> 3.toShort()
-                CODE_TGIT -> 4.toShort()
+                CODE_SVN -> 1.toShort()
+                CODE_GIT -> 2.toShort()
+                CODE_GITLAB -> 3.toShort()
+                GITHUB -> 4.toShort()
+                CODE_TGIT -> 5.toShort()
             }
         }
     }
