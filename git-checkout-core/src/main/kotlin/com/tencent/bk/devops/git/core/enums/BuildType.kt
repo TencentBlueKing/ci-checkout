@@ -28,19 +28,6 @@
 package com.tencent.bk.devops.git.core.enums
 
 enum class BuildType {
-    WORKER,
-    AGENT,
-    MACOS,
-    DOCKER;
-
-    companion object {
-        fun contains(env: String): Boolean {
-            values().forEach {
-                if (it.name == env) {
-                    return true
-                }
-            }
-            return false
-        }
-    }
+    DOCKER,
+    PUBLIC_DEVCLOUD;
 }

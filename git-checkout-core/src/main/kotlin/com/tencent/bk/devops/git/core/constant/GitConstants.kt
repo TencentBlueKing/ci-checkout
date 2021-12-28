@@ -49,7 +49,7 @@ object GitConstants {
     const val BK_CI_HOOK_REVISION = "BK_CI_HOOK_REVISION"
     const val BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE = "BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE"
     const val BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA = "BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA"
-    const val BUILD_TYPE = "build.type"
+    const val JOB_POOL = "JOB_POOL"
 
     const val ORIGIN_REMOTE_NAME = "origin"
     const val DEVOPS_VIRTUAL_REMOTE_NAME = "devops-virtual-origin"
