@@ -121,7 +121,7 @@ class GitAuthHelper(
         )
         // 如果是在docker环境,禁用其他的凭证管理
         val jobPool = System.getenv(JOB_POOL)
-        if (jobPool == BuildType.DOCKER.name || jobPool == BuildType.DOCKER.name) {
+        if (jobPool == BuildType.PUBLIC_DEVCLOUD.name || jobPool == BuildType.DOCKER.name) {
             git.tryConfigUnset(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configScope = GitConfigScope.GLOBAL
