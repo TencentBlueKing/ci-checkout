@@ -120,8 +120,7 @@ class GitAuthHelper(
             targetFile = File(credentialShellPath)
         )
         // 如果是在docker环境,禁用其他的凭证管理
-        logger.info("build.type: ${System.getProperty(BUILD_TYPE)}")
-        if (System.getProperty(BUILD_TYPE) == BuildType.DOCKER.name) {
+        if (System.getenv(BUILD_TYPE) == BuildType.DOCKER.name) {
             git.tryConfigUnset(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configScope = GitConfigScope.GLOBAL
