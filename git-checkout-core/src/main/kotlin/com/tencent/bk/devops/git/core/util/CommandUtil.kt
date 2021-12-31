@@ -28,6 +28,8 @@
 package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TOTAL_SIZE
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitOutput
@@ -87,6 +89,7 @@ object CommandUtil {
                 }
                 gitErrors = parseError(line.trim())
                 stdOuts.add(tmpLine)
+                reportTransferRateAndTotilSize(line.trim())
             }
         }
 
@@ -149,5 +152,15 @@ object CommandUtil {
 
     private fun parseError(message: String): GitErrors? {
         return GitErrors.matchError(message)
+    }
+
+    private fun reportTransferRateAndTotilSize(message: String) {
+        val gitPackingPhase = RegexUtil.parseReport(message)
+        if (gitPackingPhase != null) {
+            with(gitPackingPhase) {
+                EnvHelper.putContext(CONTEXT_TRANSFER_RATE, transferRate)
+                EnvHelper.putContext(CONTEXT_TOTAL_SIZE, totalSize)
+            }
+        }
     }
 }

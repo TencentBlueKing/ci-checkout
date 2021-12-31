@@ -152,7 +152,9 @@ object GitConstants {
     const val CONTEXT_AUTH_COST_TIME = "context_auth_cost_time"
     const val CONTEXT_BKREPO_DOWNLOAD_COST_TIME = "context_bkrepo_download_cost_time"
     const val CONTEXT_BKREPO_DOWNLOAD_RESULT = "context_bkrepo_download_result"
+    const val CONTEXT_TRANSFER_RATE = "context_transfer_rate"
+    const val CONTEXT_TOTAL_SIZE = "context_total_size"
 
     const val wikiUrl = "https://github.com/TencentBlueKing/ci-git-checkout/wiki/" +
-        "Git%E6%8F%92%E4%BB%B6%E5%B8%B8%E8%A7%81%E6%8A%A5%E9%94%99%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"
+            "Git%E6%8F%92%E4%BB%B6%E5%B8%B8%E8%A7%81%E6%8A%A5%E9%94%99%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"
 }
