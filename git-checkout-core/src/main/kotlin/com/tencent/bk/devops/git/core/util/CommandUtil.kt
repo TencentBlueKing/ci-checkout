@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.util
 
+import com.tencent.bk.devops.atom.utils.json.JsonUtil
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TOTAL_SIZE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RATE
@@ -157,9 +158,11 @@ object CommandUtil {
     private fun parseGitPackingPhase(message: String) {
         val gitPackingPhase = RegexUtil.parseReport(message)
         if (gitPackingPhase != null) {
+            logger.info("gitPackingPhase ：${JsonUtil.toJson(gitPackingPhase)}")
             with(gitPackingPhase) {
                 EnvHelper.putContext(CONTEXT_TRANSFER_RATE, transferRate)
                 EnvHelper.putContext(CONTEXT_TOTAL_SIZE, totalSize)
+                logger.info("transferRate : $transferRate | totalSize : $totalSize")
             }
         }
     }

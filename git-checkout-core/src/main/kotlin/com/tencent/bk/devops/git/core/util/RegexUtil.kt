@@ -79,4 +79,22 @@ object RegexUtil {
         }
         return null
     }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        var message =
+            "remote: Total 11.28s (counting objects 0.50s finding sources 1.65s getting size 0.00s writing 9.13s), transfer rate 38.03 M/s (total size 347.24M)"
+        var a = parseReport(message)
+        var matcher = REPORT_TRANSFER_RATE_AND_TOTIL_SIZE.matcher(message)
+        if (matcher.find()) {
+            println(
+                "counting : ${matcher.group("counting")} | " +
+                        "findSources : ${matcher.group("findingSources")} | " +
+                        "getSize : ${matcher.group("gettingSize")} | " +
+                        "writing : ${matcher.group("writing")} | " +
+                        "transfer rate : ${matcher.group("transferRate")} | " +
+                        "total size : ${matcher.group("totalSize")}"
+            )
+        }
+    }
 }
