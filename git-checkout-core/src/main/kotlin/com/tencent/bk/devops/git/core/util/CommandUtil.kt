@@ -89,7 +89,7 @@ object CommandUtil {
                 }
                 gitErrors = parseError(line.trim())
                 stdOuts.add(tmpLine)
-                reportTransferRateAndTotilSize(line.trim())
+                parseGitPackingPhase(line.trim())
             }
         }
 
@@ -154,7 +154,7 @@ object CommandUtil {
         return GitErrors.matchError(message)
     }
 
-    private fun reportTransferRateAndTotilSize(message: String) {
+    private fun parseGitPackingPhase(message: String) {
         val gitPackingPhase = RegexUtil.parseReport(message)
         if (gitPackingPhase != null) {
             with(gitPackingPhase) {
