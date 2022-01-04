@@ -48,6 +48,8 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_LFS_COST_TIM
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_LOG_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_PREPARE_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_SUBMODULE_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TOTAL_SIZE
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO_LIST
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
@@ -154,6 +156,8 @@ class GitCheckoutRunner {
                     status = atomContext.result.status.name,
                     bkRepoDownloadCostTime = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_COST_TIME)?.toLong() ?: 0L,
                     bkRepoDownloadResult = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_RESULT) ?: "",
+                    transferRate = EnvHelper.getContext(CONTEXT_TRANSFER_RATE)?.toDouble() ?: 0.0,
+                    totalSize = EnvHelper.getContext(CONTEXT_TOTAL_SIZE)?.toDouble() ?: 0.0
                     errorInfo = EnvHelper.getContext(CONTEXT_ERROR_INFO_LIST) ?: ""
                 )
             }
