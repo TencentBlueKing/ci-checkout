@@ -156,6 +156,7 @@ object CommandUtil {
     }
 
     private fun parseGitPackingPhase(message: String) {
+        logger.info("需要正则获取数据的字符串为:$message")
         val gitPackingPhase = RegexUtil.parseReport(message)
         if (gitPackingPhase != null) {
             logger.info("gitPackingPhase ：${JsonUtil.toJson(gitPackingPhase)}")
