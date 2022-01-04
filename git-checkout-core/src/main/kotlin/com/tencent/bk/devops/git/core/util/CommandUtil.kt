@@ -109,7 +109,7 @@ object CommandUtil {
                     gitErrors = tmpGitErrors
                 }
                 var tmpGitPackingPhase = RegexUtil.parseReport(tmpLine)
-                if(tmpGitPackingPhase != null) {
+                if (tmpGitPackingPhase != null) {
                     gitPackingPhase = tmpGitPackingPhase
                 }
                 logger.info("message is : $tmpLine | gitPackingPhase : is ${JsonUtil.toJson(gitPackingPhase)}")
