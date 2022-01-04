@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RAT
 import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitOutput
+import com.tencent.bk.devops.git.core.pojo.GitPackingPhase
 import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.script.CommandLineExecutor
@@ -75,6 +76,7 @@ object CommandUtil {
         val stdOuts = mutableListOf<String>()
         val errOuts = mutableListOf<String>()
         var gitErrors: GitErrors? = null
+        var gitPackingPhase: GitPackingPhase? = null
         val outputStream = object : GitLogOutputStream(logType) {
             override fun processLine(line: String?, level: Int) {
                 if (line == null) {
@@ -90,7 +92,6 @@ object CommandUtil {
                 }
                 gitErrors = parseError(line.trim())
                 stdOuts.add(tmpLine)
-                parseGitPackingPhase(tmpLine)
             }
         }
 
@@ -107,11 +108,11 @@ object CommandUtil {
                 if (tmpGitErrors != null) {
                     gitErrors = tmpGitErrors
                 }
+                gitPackingPhase = RegexUtil.parseReport(tmpLine)
                 if (errOuts.size > MAX_LOG_SIZE) {
                     errOuts.clear()
                 }
                 errOuts.add(tmpLine)
-                parseGitPackingPhase(tmpLine)
             }
         }
         executor.streamHandler = PumpStreamHandler(outputStream, errorStream, inputStream)
@@ -148,6 +149,7 @@ object CommandUtil {
                 errorMsg = ignore.message ?: ""
             )
         } finally {
+            reportGitPackingPhase(gitPackingPhase)
             IOUtils.close(errorStream, outputStream, inputStream)
         }
     }
@@ -156,16 +158,12 @@ object CommandUtil {
         return GitErrors.matchError(message)
     }
 
-    private fun parseGitPackingPhase(message: String) {
-//        logger.info("需要正则获取数据的字符串为:$message")
-        val gitPackingPhase = RegexUtil.parseReport(message)
+    private fun reportGitPackingPhase(gitPackingPhase : GitPackingPhase?){
         if (gitPackingPhase != null) {
-            logger.info("gitPackingPhase ：${JsonUtil.toJson(gitPackingPhase)}")
             with(gitPackingPhase) {
+                logger.info("transferRate : $transferRate | totalSize : $totalSize")
                 EnvHelper.putContext(CONTEXT_TRANSFER_RATE, transferRate)
                 EnvHelper.putContext(CONTEXT_TOTAL_SIZE, totalSize)
-                logger.info("transferRate : $transferRate | totalSize : $totalSize")
-                logger.info("transgerRateInEnv : ${EnvHelper.getContext(CONTEXT_TRANSFER_RATE)}")
             }
         }
     }
