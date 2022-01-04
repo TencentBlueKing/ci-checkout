@@ -111,6 +111,7 @@ object CommandUtil {
                     errOuts.clear()
                 }
                 errOuts.add(tmpLine)
+                parseGitPackingPhase(tmpLine)
             }
         }
         executor.streamHandler = PumpStreamHandler(outputStream, errorStream, inputStream)
