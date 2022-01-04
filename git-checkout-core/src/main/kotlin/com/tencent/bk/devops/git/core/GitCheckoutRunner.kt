@@ -128,6 +128,9 @@ class GitCheckoutRunner {
         try {
             val metricsHelper = ServiceLoader.load(IGitMetricsHelper::class.java).firstOrNull()
             val gitMetricsInfo = with(atomContext.param) {
+                val transferRate = EnvHelper.getContext(CONTEXT_TRANSFER_RATE)
+                val transferRateDouble = transferRate?.toDouble() ?:0.0
+                logger.info("上报数据：transferRate : $transferRate | DoubleValue : $transferRateDouble")
                 GitMetricsInfo(
                     atomCode = atomCode,
                     projectId = projectName,
