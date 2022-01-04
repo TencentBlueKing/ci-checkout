@@ -109,6 +109,7 @@ object CommandUtil {
                     gitErrors = tmpGitErrors
                 }
                 gitPackingPhase = RegexUtil.parseReport(tmpLine)
+                logger.info("message is : $tmpLine | gitPackingPhase : is ${JsonUtil.toJson(gitPackingPhase)}")
                 if (errOuts.size > MAX_LOG_SIZE) {
                     errOuts.clear()
                 }
