@@ -90,7 +90,7 @@ object CommandUtil {
                 }
                 gitErrors = parseError(line.trim())
                 stdOuts.add(tmpLine)
-                parseGitPackingPhase(line.trim())
+                parseGitPackingPhase(tmpLine)
             }
         }
 
