@@ -108,11 +108,10 @@ object CommandUtil {
                 if (tmpGitErrors != null) {
                     gitErrors = tmpGitErrors
                 }
-                var tmpGitPackingPhase = RegexUtil.parseReport(tmpLine)
+                val tmpGitPackingPhase = RegexUtil.parseReport(tmpLine)
                 if (tmpGitPackingPhase != null) {
                     gitPackingPhase = tmpGitPackingPhase
                 }
-                logger.info("message is : $tmpLine | gitPackingPhase : is ${JsonUtil.toJson(gitPackingPhase)}")
                 if (errOuts.size > MAX_LOG_SIZE) {
                     errOuts.clear()
                 }
