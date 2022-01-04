@@ -165,6 +165,7 @@ object CommandUtil {
                 EnvHelper.putContext(CONTEXT_TRANSFER_RATE, transferRate)
                 EnvHelper.putContext(CONTEXT_TOTAL_SIZE, totalSize)
                 logger.info("transferRate : $transferRate | totalSize : $totalSize")
+                logger.info("transgerRateInEnv : ${EnvHelper.getContext(CONTEXT_TRANSFER_RATE)}")
             }
         }
     }
