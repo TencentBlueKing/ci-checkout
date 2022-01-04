@@ -108,7 +108,10 @@ object CommandUtil {
                 if (tmpGitErrors != null) {
                     gitErrors = tmpGitErrors
                 }
-                gitPackingPhase = RegexUtil.parseReport(tmpLine)
+                var tmpGitPackingPhase = RegexUtil.parseReport(tmpLine)
+                if(tmpGitPackingPhase != null) {
+                    gitPackingPhase = tmpGitPackingPhase
+                }
                 logger.info("message is : $tmpLine | gitPackingPhase : is ${JsonUtil.toJson(gitPackingPhase)}")
                 if (errOuts.size > MAX_LOG_SIZE) {
                     errOuts.clear()
@@ -159,7 +162,7 @@ object CommandUtil {
         return GitErrors.matchError(message)
     }
 
-    private fun reportGitPackingPhase(gitPackingPhase : GitPackingPhase?){
+    private fun reportGitPackingPhase(gitPackingPhase: GitPackingPhase?) {
         if (gitPackingPhase != null) {
             with(gitPackingPhase) {
                 logger.info("transferRate : $transferRate | totalSize : $totalSize")
