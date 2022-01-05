@@ -48,8 +48,8 @@ class RetryHelper(
 
     @SuppressWarnings("MagicNumber")
     fun <T> execute(action: () -> T): T {
-        logger.info("插件重试")
         var attempt = 1
+        logger.info("插件重试 attempt = $attempt and maxAttempts = $maxAttempts")
         while (attempt <= maxAttempts) {
             try {
                 return action()
