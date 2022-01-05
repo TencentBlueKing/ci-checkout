@@ -49,12 +49,10 @@ class RetryHelper(
     @SuppressWarnings("MagicNumber")
     fun <T> execute(action: () -> T): T {
         var attempt = 1
-        logger.info("插件重试 attempt = $attempt and maxAttempts = $maxAttempts")
         while (attempt <= maxAttempts) {
             try {
                 return action()
             } catch (e: RetryException) {
-                logger.info("捕获异常 : ${JsonUtil.toJson(e)}")
                 reportErrorInfo(e)
                 logger.error(e.message)
             }

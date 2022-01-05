@@ -354,7 +354,7 @@ class GitCommandManager(
             try {
                 execGit(args = args, logType = LogType.PROGRESS)
             } catch (e: GitExecuteException) {
-                logger.info("抛出异常 : ${JsonUtil.toJson(e)}")
+                logger.info("gitExecyteException : ${JsonUtil.toJson(e)}")
                 if (e.errorCode == GitConstants.GIT_ERROR) {
                     gitEnv[GIT_TRACE] = "1"
                     throw RetryException(errorType = e.errorType, errorCode = e.errorCode, errorMsg = e.message!!)
