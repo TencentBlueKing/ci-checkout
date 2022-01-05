@@ -157,7 +157,7 @@ class GitCheckoutRunner {
                     bkRepoDownloadCostTime = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_COST_TIME)?.toLong() ?: 0L,
                     bkRepoDownloadResult = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_RESULT) ?: "",
                     transferRate = EnvHelper.getContext(CONTEXT_TRANSFER_RATE)?.toDouble() ?: 0.0,
-                    totalSize = EnvHelper.getContext(CONTEXT_TOTAL_SIZE)?.toDouble() ?: 0.0
+                    totalSize = EnvHelper.getContext(CONTEXT_TOTAL_SIZE)?.toDouble() ?: 0.0,
                     errorInfo = EnvHelper.getContext(CONTEXT_ERROR_INFO_LIST) ?: ""
                 )
             }
