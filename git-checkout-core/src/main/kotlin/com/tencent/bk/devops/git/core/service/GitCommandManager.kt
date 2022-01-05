@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service
 
+import com.tencent.bk.devops.atom.utils.json.JsonUtil
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.GCM_INTERACTIVE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
@@ -355,6 +356,7 @@ class GitCommandManager(
             } catch (e: GitExecuteException) {
                 if (e.errorCode == GitConstants.GIT_ERROR) {
                     gitEnv[GIT_TRACE] = "1"
+                    logger.info("抛出异常 : ${JsonUtil.toJson(e)}")
                     throw RetryException(errorType = e.errorType, errorCode = e.errorCode, errorMsg = e.message!!)
                 } else {
                     throw e

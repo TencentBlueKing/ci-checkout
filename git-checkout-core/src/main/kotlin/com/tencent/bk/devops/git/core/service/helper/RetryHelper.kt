@@ -54,6 +54,7 @@ class RetryHelper(
             try {
                 return action()
             } catch (e: RetryException) {
+                logger.info("捕获异常 : ${JsonUtil.toJson(e)}")
                 reportErrorInfo(e)
                 logger.error(e.message)
             }
