@@ -51,7 +51,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_SUBMODULE_CO
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TOTAL_SIZE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO_LIST
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.exception.TaskExecuteException
@@ -158,7 +158,7 @@ class GitCheckoutRunner {
                     bkRepoDownloadResult = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_RESULT) ?: "",
                     transferRate = EnvHelper.getContext(CONTEXT_TRANSFER_RATE)?.toDouble() ?: 0.0,
                     totalSize = EnvHelper.getContext(CONTEXT_TOTAL_SIZE)?.toDouble() ?: 0.0,
-                    errorInfo = EnvHelper.getContext(CONTEXT_ERROR_INFO_LIST) ?: ""
+                    errorInfo = EnvHelper.getContext(CONTEXT_ERROR_INFO) ?: ""
                 )
             }
             if (metricsHelper != null) {

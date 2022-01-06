@@ -164,7 +164,6 @@ object CommandUtil {
     private fun reportGitPackingPhase(gitPackingPhase: GitPackingPhase?) {
         if (gitPackingPhase != null) {
             with(gitPackingPhase) {
-                logger.info("transferRate : $transferRate | totalSize : $totalSize")
                 EnvHelper.putContext(CONTEXT_TRANSFER_RATE, transferRate)
                 EnvHelper.putContext(CONTEXT_TOTAL_SIZE, totalSize)
             }

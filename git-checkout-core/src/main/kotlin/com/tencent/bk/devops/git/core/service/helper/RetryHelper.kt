@@ -29,7 +29,7 @@ package com.tencent.bk.devops.git.core.service.helper
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bk.devops.atom.utils.json.JsonUtil
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO_LIST
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO
 import com.tencent.bk.devops.git.core.exception.RetryException
 import com.tencent.bk.devops.git.core.pojo.ErrorInfo
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -69,7 +69,7 @@ class RetryHelper(
     }
 
     private fun reportErrorInfo(error: RetryException) {
-        val errorInfoStr = EnvHelper.getContext(CONTEXT_ERROR_INFO_LIST)
+        val errorInfoStr = EnvHelper.getContext(CONTEXT_ERROR_INFO)
         val errorInfo: List<ErrorInfo> = if (errorInfoStr != null) {
             val errorInfos = JsonUtil.fromJson(errorInfoStr, object : TypeReference<List<ErrorInfo>>() {})
             val mutableErrorInfos = errorInfos.toMutableList()
@@ -90,7 +90,6 @@ class RetryHelper(
                 )
             )
         }
-        logger.info("retry error info is : ${JsonUtil.toJson(errorInfo)}")
-        EnvHelper.putContext(CONTEXT_ERROR_INFO_LIST, JsonUtil.toJson(errorInfo))
+        EnvHelper.putContext(CONTEXT_ERROR_INFO, JsonUtil.toJson(errorInfo))
     }
 }
