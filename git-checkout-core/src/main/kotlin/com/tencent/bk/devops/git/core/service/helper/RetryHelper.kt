@@ -27,7 +27,12 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.tencent.bk.devops.atom.utils.json.JsonUtil
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO
 import com.tencent.bk.devops.git.core.exception.RetryException
+import com.tencent.bk.devops.git.core.pojo.ErrorInfo
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import kotlin.math.floor
 import org.slf4j.LoggerFactory
 
@@ -48,6 +53,7 @@ class RetryHelper(
             try {
                 return action()
             } catch (e: RetryException) {
+                reportErrorInfo(e)
                 logger.error(e.message)
             }
             val seconds = getSleepAmount()
@@ -60,5 +66,30 @@ class RetryHelper(
 
     private fun getSleepAmount(): Long {
         return (floor(Math.random() * (maxSeconds - minSeconds + 1)).toLong() + minSeconds)
+    }
+
+    private fun reportErrorInfo(error: RetryException) {
+        val errorInfoStr = EnvHelper.getContext(CONTEXT_ERROR_INFO)
+        val errorInfo: List<ErrorInfo> = if (errorInfoStr != null) {
+            val errorInfos = JsonUtil.fromJson(errorInfoStr, object : TypeReference<List<ErrorInfo>>() {})
+            val mutableErrorInfos = errorInfos.toMutableList()
+            mutableErrorInfos.add(
+                ErrorInfo(
+                    errorCode = error.errorCode,
+                    errorType = error.errorType.num,
+                    errorMsg = error.errorMsg
+                )
+            )
+            mutableErrorInfos
+        } else {
+            listOf(
+                ErrorInfo(
+                    errorCode = error.errorCode,
+                    errorType = error.errorType.num,
+                    errorMsg = error.errorMsg
+                )
+            )
+        }
+        EnvHelper.putContext(CONTEXT_ERROR_INFO, JsonUtil.toJson(errorInfo))
     }
 }

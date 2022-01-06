@@ -28,16 +28,27 @@
 package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
+import com.tencent.bk.devops.git.core.pojo.GitPackingPhase
 import java.util.regex.Pattern
 
 object RegexUtil {
 
     private val LOG_PATTERN = Pattern.compile(
         "(?<commitId>[0-9a-f]{40})\\|" +
-            "(?<committerName>.+?)\\|" +
-            "(?<commitTime>\\w+?)\\|[\\S\\s]+?\\|" +
-            "(?<authorName>.+?)\\|" +
-            "(?<commitMessage>.*)"
+                "(?<committerName>.+?)\\|" +
+                "(?<commitTime>\\w+?)\\|[\\S\\s]+?\\|" +
+                "(?<authorName>.+?)\\|" +
+                "(?<commitMessage>.*)"
+    )
+
+    private val REPORT_TRANSFER_RATE_AND_TOTIL_SIZE = Pattern.compile(
+        "remote: Total [0-9]*\\.?[0-9]*s " +
+                "\\(counting objects (?<counting>[0-9]*\\.?[0-9]*)s " +
+                "finding sources (?<findingSources>[0-9]*\\.?[0-9]*)s " +
+                "getting size (?<gettingSize>[0-9]*\\.?[0-9]*)s " +
+                "writing (?<writing>[0-9]*\\.?[0-9]*)s\\), " +
+                "transfer rate (?<transferRate>[0-9]*\\.?[0-9]*) M/s " +
+                "\\(total size (?<totalSize>[0-9]*\\.?[0-9]*)M\\)"
     )
 
     fun parseLog(log: String): CommitLogInfo? {
@@ -49,6 +60,21 @@ object RegexUtil {
                 commitTime = matcher.group("commitTime").toLong(),
                 authorName = matcher.group("authorName"),
                 commitMessage = matcher.group("commitMessage")
+            )
+        }
+        return null
+    }
+
+    fun parseReport(message: String): GitPackingPhase? {
+        val matcher = REPORT_TRANSFER_RATE_AND_TOTIL_SIZE.matcher(message)
+        if (matcher.find()) {
+            return GitPackingPhase(
+                counting = matcher.group("counting"),
+                findingSources = matcher.group("findingSources"),
+                gettingSize = matcher.group("gettingSize"),
+                writing = matcher.group("writing"),
+                transferRate = matcher.group("transferRate"),
+                totalSize = matcher.group("totalSize")
             )
         }
         return null
