@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Logs each line written to this stream to the log system of ant. Tries to be
@@ -112,7 +113,14 @@ public class GitLogOutputStream extends OutputStream {
      * Converts the buffer to a string and sends it to <code>processLine</code>
      */
     protected void processBuffer() {
-        processLine(buffer.toString());
+        String line;
+        try {
+            line = buffer.toString("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.warn("WARNING: UTF-8 not supported, using default charset instead");
+            line = buffer.toString();
+        }
+        processLine(line);
         buffer.reset();
     }
 
