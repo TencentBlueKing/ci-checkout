@@ -27,7 +27,6 @@
 
 package com.tencent.bk.devops.git.core.util
 
-import com.tencent.bk.devops.atom.utils.json.JsonUtil
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TOTAL_SIZE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RATE
@@ -41,14 +40,14 @@ import com.tencent.bk.devops.plugin.script.CommandLineExecutor
 import com.tencent.bk.devops.plugin.script.SensitiveLineParser
 import com.tencent.devops.git.log.GitLogOutputStream
 import com.tencent.devops.git.log.LogType
-import java.io.File
-import java.io.InputStream
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.ExecuteException
 import org.apache.commons.exec.PumpStreamHandler
 import org.apache.commons.exec.environment.EnvironmentUtils
 import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
+import java.io.File
+import java.io.InputStream
 
 object CommandUtil {
 
