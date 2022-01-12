@@ -27,10 +27,14 @@
 
 package com.tencent.bk.devops.git.core.util
 
+import com.tencent.bk.devops.atom.utils.json.JsonUtil
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TOTAL_SIZE
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitOutput
+import com.tencent.bk.devops.git.core.pojo.GitPackingPhase
 import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.script.CommandLineExecutor
@@ -72,6 +76,7 @@ object CommandUtil {
         val stdOuts = mutableListOf<String>()
         val errOuts = mutableListOf<String>()
         var gitErrors: GitErrors? = null
+        var gitPackingPhase: GitPackingPhase? = null
         val outputStream = object : GitLogOutputStream(logType) {
             override fun processLine(line: String?, level: Int) {
                 if (line == null) {
@@ -102,6 +107,10 @@ object CommandUtil {
                 val tmpGitErrors = parseError(line.trim())
                 if (tmpGitErrors != null) {
                     gitErrors = tmpGitErrors
+                }
+                val tmpGitPackingPhase = RegexUtil.parseReport(tmpLine)
+                if (tmpGitPackingPhase != null) {
+                    gitPackingPhase = tmpGitPackingPhase
                 }
                 if (errOuts.size > MAX_LOG_SIZE) {
                     errOuts.clear()
@@ -143,11 +152,21 @@ object CommandUtil {
                 errorMsg = ignore.message ?: ""
             )
         } finally {
+            reportGitPackingPhase(gitPackingPhase)
             IOUtils.close(errorStream, outputStream, inputStream)
         }
     }
 
     private fun parseError(message: String): GitErrors? {
         return GitErrors.matchError(message)
+    }
+
+    private fun reportGitPackingPhase(gitPackingPhase: GitPackingPhase?) {
+        if (gitPackingPhase != null) {
+            with(gitPackingPhase) {
+                EnvHelper.putContext(CONTEXT_TRANSFER_RATE, transferRate)
+                EnvHelper.putContext(CONTEXT_TOTAL_SIZE, totalSize)
+            }
+        }
     }
 }
