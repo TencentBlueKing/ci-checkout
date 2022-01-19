@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_REF
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LOG_MAX_COUNT
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -169,7 +170,7 @@ class GitLogHelper(
                 PipelineBuildMaterial(
                     aliasName = aliasName,
                     url = settings.repositoryUrl,
-                    branchName = settings.ref,
+                    branchName = EnvHelper.getEnvVariable(BK_CI_GIT_REPO_REF),
                     newCommitId = commitMaterial.newCommitId ?: commitMaterial.lastCommitId,
                     newCommitComment = commitMaterial.newCommitComment,
                     commitTimes = commitMaterial.commitTimes
