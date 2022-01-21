@@ -5,4 +5,3 @@ data class ErrorInfo(
     val errorCode: Int,
     val errorMsg: String
 )
-

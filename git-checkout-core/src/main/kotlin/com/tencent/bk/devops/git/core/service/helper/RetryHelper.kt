@@ -28,13 +28,13 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.tencent.bk.devops.atom.utils.json.JsonUtil
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO
 import com.tencent.bk.devops.git.core.exception.RetryException
 import com.tencent.bk.devops.git.core.pojo.ErrorInfo
 import com.tencent.bk.devops.git.core.util.EnvHelper
-import kotlin.math.floor
+import com.tencent.bk.devops.plugin.utils.JsonUtil
 import org.slf4j.LoggerFactory
+import kotlin.math.floor
 
 class RetryHelper(
     private val maxAttempts: Int = 3,
@@ -71,7 +71,7 @@ class RetryHelper(
     private fun reportErrorInfo(error: RetryException) {
         val errorInfoStr = EnvHelper.getContext(CONTEXT_ERROR_INFO)
         val errorInfo: List<ErrorInfo> = if (errorInfoStr != null) {
-            val errorInfos = JsonUtil.fromJson(errorInfoStr, object : TypeReference<List<ErrorInfo>>() {})
+            val errorInfos = JsonUtil.to(errorInfoStr, object : TypeReference<List<ErrorInfo>>() {})
             val mutableErrorInfos = errorInfos.toMutableList()
             mutableErrorInfos.add(
                 ErrorInfo(
