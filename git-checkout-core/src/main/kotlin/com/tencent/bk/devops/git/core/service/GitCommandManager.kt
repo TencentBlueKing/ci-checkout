@@ -434,6 +434,34 @@ class GitCommandManager(
         )
     }
 
+    /**
+     * 是否能够合并
+     *
+     * @param sourceBranch 源分支
+     * @param targetBranch 目标分支
+     */
+    fun canMerge(sourceBranch: String, targetBranch: String): Boolean {
+        val output = execGit(
+            args = listOf("merge-base", sourceBranch, targetBranch)
+        )
+        return output.stdOut.trim().isNotBlank()
+    }
+
+    /**
+     * 统计两个commit之间的提交数
+     */
+    fun countCommits(baseCommitId: String, commitId: String): Int {
+        val output = execGit(
+            args = listOf("rev-list", "--count", "$baseCommitId..$commitId"),
+            allowAllExitCodes = true
+        )
+        return if (output.stdOut.trim().isNotBlank()) {
+            output.stdOut.toInt()
+        } else {
+            0
+        }
+    }
+
     private fun execGit(
         args: List<String>,
         allowAllExitCodes: Boolean = false,

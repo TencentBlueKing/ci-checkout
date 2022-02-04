@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -56,6 +57,7 @@ class GitFetchHandler(
                 fetchTargetRepository(shallowSince = shallowSince)
                 fetchSourceRepository(shallowSince = shallowSince)
                 fetchPrePushBranch(shallowSince = shallowSince)
+                testMerge()
                 logger.groupEnd("")
             }
         } finally {
@@ -67,9 +69,9 @@ class GitFetchHandler(
     }
 
     /**
-     * 如果启用了preMerge并且是浅克隆，在执行merge命令时会出现fatal: refusing to merge unrelated histories错误，
+     * 如果preMerge和fetchDepth同时启用，在执行merge命令时会出现fatal: refusing to merge unrelated histories错误，
      * 所以浅克隆按照深度拉取改成--shallow-since拉取
-     * 1. 先fetch共同祖先
+     * 1. 先fetch共同祖先，共同祖先commitId在webhook body中会传递过来
      * 2. 计算共同祖先提交时间点
      * 3. 按照提交时间点获取代码
      */
@@ -96,6 +98,53 @@ class GitFetchHandler(
     private fun GitSourceSettings.canShallowSince(baseCommitId: String?) =
         preMerge && fetchDepth > 0 && !baseCommitId.isNullOrBlank() &&
             git.isAtLeastVersion(GitConstants.SUPPORT_SHALLOW_SINCE_GIT_VERSION)
+
+    /**
+     * 测试是否能够merge成功
+     *
+     * 如果preMerge和fetchDepth同时启用，并且使用--shallow-since拉取,
+     * 在执行merge命令时也可能会出现fatal: refusing to merge unrelated histories错误,
+     * 这是因为当develop分支合并master分支，如果develop分支先merge master，然后再向master发起mr请求，
+     * ---m1---m2---master
+     *      \
+     *       \
+     *        \
+     * ---d1---d2---d3---develop
+     * develop和master的公共祖先节点是m1，当通过--shallow-since拉取时，develop分支只拉取了d2，d3，d2有两个父节点，导致无法merge,
+     * 只需把d1拉下来就能合并
+     *
+     * 解决策略:
+     * 1. 先通过--shallow-since拉取
+     * 2. 计算m1到d3之间的提交数，提交数+1就能得到d1的深度
+     * 3. 再次通过depth拉取源分支就能得到d1节点
+     */
+    private fun GitSourceSettings.testMerge() {
+        // preMerge和fetchDepth同时启用,并且不能merge
+        if (preMerge && fetchDepth > 0 && !git.canMerge(sourceBranch = sourceBranchName, targetBranch = ref)) {
+            val baseCommitId = System.getenv(BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT)
+            val sourceCommitId = System.getenv(BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID)
+            val sourceCommitNum = if (!baseCommitId.isNullOrBlank() && !sourceCommitId.isNullOrBlank()) {
+                git.countCommits(baseCommitId = baseCommitId, commitId = sourceCommitId)
+            } else {
+                0
+            }
+            if (sourceCommitNum > 0) {
+                val refSpec = refHelper.getSourceRefSpec()
+                val remoteName = if (sourceRepoUrlEqualsRepoUrl) {
+                    GitConstants.ORIGIN_REMOTE_NAME
+                } else {
+                    GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
+                }
+                git.fetch(
+                    refSpec = refSpec,
+                    fetchDepth = sourceCommitNum,
+                    remoteName = remoteName,
+                    shallowSince = null,
+                    enablePartialClone = enablePartialClone
+                )
+            }
+        }
+    }
 
     private fun GitSourceSettings.fetchSourceRepository(shallowSince: String?) {
         if (preMerge && !sourceRepoUrlEqualsRepoUrl) {
@@ -128,14 +177,11 @@ class GitFetchHandler(
 
     /**
      * 判断是否只拉取指定的分支，不拉取全部分支，满足以下条件只拉取指定分支
-     * 1. 浅克隆
-     * 2. 用户开启拉取指定分支
-     * 3. preMerge+浅克隆场景i
+     * 1. 用户开启拉取指定分支
+     * 2. preMerge+浅克隆场景
      */
     private fun GitSourceSettings.isUseFetchRefSpec(shallowSince: String?): Boolean {
-        return fetchDepth > 0 ||
-            enableFetchRefSpec == true ||
-            !shallowSince.isNullOrBlank()
+        return enableFetchRefSpec == true || !shallowSince.isNullOrBlank()
     }
 
     /**
