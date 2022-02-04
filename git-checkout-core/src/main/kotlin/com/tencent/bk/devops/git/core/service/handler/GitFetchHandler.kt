@@ -28,8 +28,8 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
-import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
@@ -131,7 +131,7 @@ class GitFetchHandler(
             )
         ) {
             val baseCommitId = System.getenv(BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT)
-            val sourceCommitId = System.getenv(BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID)
+            val sourceCommitId = System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
             val sourceCommitNum = if (!baseCommitId.isNullOrBlank() && !sourceCommitId.isNullOrBlank()) {
                 git.countCommits(baseCommitId = baseCommitId, commitId = sourceCommitId)
             } else {
