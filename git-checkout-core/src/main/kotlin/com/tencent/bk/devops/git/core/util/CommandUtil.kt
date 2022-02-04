@@ -132,7 +132,8 @@ object CommandUtil {
             val exitCode = executor.execute(command, env)
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {
-            val errorMsg = gitErrors?.title ?: "exec ${command.toStrings().joinToString(" ")} failed"
+            val errorMsg = gitErrors?.title ?: "exec ${command.toStrings().joinToString(" ")} failed " +
+            "with an exitCode ${ignore.exitValue}"
             val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
             val errorType = gitErrors?.errorType ?: ErrorType.USER
             val description = gitErrors?.description

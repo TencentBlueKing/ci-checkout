@@ -442,7 +442,8 @@ class GitCommandManager(
      */
     fun canMerge(sourceBranch: String, targetBranch: String): Boolean {
         val output = execGit(
-            args = listOf("merge-base", sourceBranch, targetBranch)
+            args = listOf("merge-base", sourceBranch, targetBranch),
+            allowAllExitCodes = true
         )
         return output.stdOut.trim().isNotBlank()
     }
