@@ -138,10 +138,9 @@ class GitFetchHandler(
                 0
             }
             if (sourceCommitNum > 0) {
-                val refSpec = refHelper.getSourceRefSpec()
                 git.fetch(
-                    refSpec = refSpec,
-                    fetchDepth = sourceCommitNum,
+                    refSpec = listOf("+refs/heads/$sourceBranchName:refs/remotes/$remoteName/$sourceBranchName"),
+                    fetchDepth = sourceCommitNum + 1,
                     remoteName = remoteName,
                     shallowSince = null,
                     enablePartialClone = enablePartialClone
