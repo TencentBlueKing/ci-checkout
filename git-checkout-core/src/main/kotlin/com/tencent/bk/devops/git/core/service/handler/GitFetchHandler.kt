@@ -120,7 +120,16 @@ class GitFetchHandler(
      */
     private fun GitSourceSettings.testMerge() {
         // preMerge和fetchDepth同时启用,并且不能merge
-        if (preMerge && fetchDepth > 0 && !git.canMerge(sourceBranch = sourceBranchName, targetBranch = ref)) {
+        val remoteName = if (sourceRepoUrlEqualsRepoUrl) {
+            GitConstants.ORIGIN_REMOTE_NAME
+        } else {
+            GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
+        }
+        if (preMerge && fetchDepth > 0 && !git.canMerge(
+                sourceBranch = "$remoteName/$sourceBranchName",
+                targetBranch = "${GitConstants.ORIGIN_REMOTE_NAME}/$ref"
+            )
+        ) {
             val baseCommitId = System.getenv(BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT)
             val sourceCommitId = System.getenv(BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID)
             val sourceCommitNum = if (!baseCommitId.isNullOrBlank() && !sourceCommitId.isNullOrBlank()) {
@@ -130,11 +139,6 @@ class GitFetchHandler(
             }
             if (sourceCommitNum > 0) {
                 val refSpec = refHelper.getSourceRefSpec()
-                val remoteName = if (sourceRepoUrlEqualsRepoUrl) {
-                    GitConstants.ORIGIN_REMOTE_NAME
-                } else {
-                    GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
-                }
                 git.fetch(
                     refSpec = refSpec,
                     fetchDepth = sourceCommitNum,
