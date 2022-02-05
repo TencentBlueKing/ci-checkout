@@ -477,6 +477,14 @@ class GitCommandManager(
         }
     }
 
+    fun readTree(
+        options: List<String>
+    ) {
+        val args = mutableListOf("read-tree")
+        args.addAll(options)
+        execGit(args = args)
+    }
+
     private fun execGit(
         args: List<String>,
         allowAllExitCodes: Boolean = false,
