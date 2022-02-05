@@ -170,7 +170,7 @@ class InitRepoHandler(
             if (!sparseFile.exists()) sparseFile.createNewFile()
             sparseFile.writeText(content.toString())
             git.config(configKey = "core.sparsecheckout", configValue = "true")
-            git.readTree(options = listOf("--reset", "-m", "-u", "HEAD"))
+            git.readTree(options = listOf("-m", "-u", "HEAD"))
         }
     }
 }
