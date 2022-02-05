@@ -129,10 +129,6 @@ object CommandUtil {
             // 系统环境变量 + 运行时环境变量
             val env = EnvironmentUtils.getProcEnvironment()
             env.putAll(runtimeEnv)
-            // #2 当构建机重启后，worker-agent自启动会导致HOME环境变量丢失,在执行全局配置时会报fatal: $HOME not set
-            if (env["HOME"] == null) {
-                env["HOME"] = System.getProperty("user.home")
-            }
             val exitCode = executor.execute(command, env)
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {

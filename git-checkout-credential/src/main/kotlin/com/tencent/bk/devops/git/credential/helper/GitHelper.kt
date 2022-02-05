@@ -153,6 +153,10 @@ object GitHelper {
         Trace.writeLine(command.toStrings().joinToString(" "))
         try {
             val env = EnvironmentUtils.getProcEnvironment()
+            /*
+                #2 当构建机重启后，worker-agent自启动会导致HOME环境变量丢失,在执行全局配置时会报fatal: $HOME not set
+                git-credential-cache需要HOME环境变量
+             */
             if (env["HOME"] == null) {
                 env["HOME"] = System.getProperty("user.home")
             }
