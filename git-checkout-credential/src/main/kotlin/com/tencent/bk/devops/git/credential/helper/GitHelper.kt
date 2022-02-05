@@ -35,6 +35,7 @@ import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.DefaultExecutor
 import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
+import org.apache.commons.exec.environment.EnvironmentUtils
 
 object GitHelper {
 
@@ -151,7 +152,11 @@ object GitHelper {
         val command = CommandLine.parse("git").addArguments(args.toTypedArray(), false)
         Trace.writeLine(command.toStrings().joinToString(" "))
         try {
-            val exitCode = executor.execute(command)
+            val env = EnvironmentUtils.getProcEnvironment()
+            if (env["HOME"] == null) {
+                env["HOME"] = System.getProperty("user.home")
+            }
+            val exitCode = executor.execute(command, env)
             return GitOutput(exitCode = exitCode, stdOuts = stdOuts)
         } finally {
             IOHelper.closeQuietly(outputStream, inputStream)
