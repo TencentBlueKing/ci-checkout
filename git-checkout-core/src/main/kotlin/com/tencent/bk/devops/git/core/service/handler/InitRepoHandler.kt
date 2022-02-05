@@ -109,6 +109,7 @@ class InitRepoHandler(
         git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.LOCAL)
         git.config(configKey = "gc.auto", configValue = "0")
         initPartialClone()
+        initSparseCheckout()
     }
 
     private fun GitSourceSettings.initPartialClone() {
@@ -130,7 +131,6 @@ class InitRepoHandler(
                     configValue = FilterValueEnum.TREELESS.value
                 )
             }
-            initSparseCheckout()
         }
     }
 
