@@ -56,6 +56,7 @@ object GitConstants {
     const val DEVOPS_VIRTUAL_BRANCH = "devops-virtual-branch"
     const val FETCH_HEAD = "FETCH_HEAD"
     const val CI_EVENT = "ci.event"
+    const val HOME = "HOME"
 
     // git env
     const val GIT_TERMINAL_PROMPT = "GIT_TERMINAL_PROMPT"
@@ -137,6 +138,7 @@ object GitConstants {
 
     val SUPPORT_PARTIAL_CLONE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 22, 0, 0)
     val SUPPORT_SHALLOW_SINCE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 18, 0, 0)
+    val SUPPORT_CONFIG_LOCAL_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 9, 0, 0)
 
     // context 上下文，在错误信息中使用 @see GitErrorsText
     const val CONTEXT_USER_ID = "context_user_id"
