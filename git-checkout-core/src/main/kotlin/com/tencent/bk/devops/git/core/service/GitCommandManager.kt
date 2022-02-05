@@ -34,7 +34,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
-import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
@@ -234,13 +233,8 @@ class GitCommandManager(
             throw IllegalArgumentException("config file can't be empty when config scope is file")
         }
         val args = mutableListOf("config")
-        var scope = configScope
-        // #2 当构建机重启后，worker-agent自启动会导致HOME环境变量丢失,在执行全局配置时会报fatal: $HOME not set
-        if (System.getenv(HOME) == null && configScope == GitConfigScope.GLOBAL) {
-            scope = GitConfigScope.LOCAL
-        }
         // 低于git 1.9以下的版本没有--local参数,所以--local直接去掉
-        if (scope != GitConfigScope.LOCAL) {
+        if (configScope != GitConfigScope.LOCAL) {
             args.add(configScope.arg)
         }
         if (!configFile.isNullOrBlank()) {
