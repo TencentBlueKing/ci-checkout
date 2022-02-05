@@ -79,7 +79,8 @@ class GitCommandManager(
     fun getGitVersion(): String {
         val version = execGit(listOf("--version")).stdOut
         gitVersion = VersionHelper.computeGitVersion(version)
-        setEnvironmentVariable(GitConstants.GIT_HTTP_USER_AGENT, "git/$gitVersion (landun-git-checkout)")
+        val buildId = System.getenv("BK_CI_BUILD_ID")
+        setEnvironmentVariable(GitConstants.GIT_HTTP_USER_AGENT, "git/$gitVersion (devops-$buildId)")
         return version
     }
 
