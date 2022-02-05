@@ -4,4 +4,4 @@ credential_java_path=$(env | grep "^[a-zA-Z0-9_]*$credential_key=" | awk '{sub(/
 if [[ -z $credential_java_path ]]; then
         exit 1
 fi
-$credential_java_path -jar git-checkout-credential.jar $@
+$credential_java_path -jar ./git-checkout-credential.jar $@
