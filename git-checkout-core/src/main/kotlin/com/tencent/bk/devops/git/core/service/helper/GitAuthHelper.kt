@@ -144,7 +144,7 @@ class GitAuthHelper(
         }
         // 当HOME环境变量不存在时，使用GIT_ASKPASS设置权限，不然子模块不能拉取
         if (System.getenv(HOME) == null) {
-            git.setEnvironmentVariable(GIT_ASKPASS, "!bash '$credentialShellPath'")
+            git.setEnvironmentVariable(GIT_ASKPASS, "bash '$credentialShellPath'")
         }
     }
 
