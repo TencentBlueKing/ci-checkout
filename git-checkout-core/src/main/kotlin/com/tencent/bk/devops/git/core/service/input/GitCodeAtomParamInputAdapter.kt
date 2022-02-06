@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_BRANCH
@@ -104,6 +105,7 @@ class GitCodeAtomParamInputAdapter(
                 else ->
                     throw ParamInvalidException(errorMsg = "拉取方式只能是BRANCH/TAG/COMMIT_ID")
             }
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_REF, ref)
 
             // 3. 确定是否开启pre-merge功能
             val preMerge = GitUtil.isEnablePreMerge(
