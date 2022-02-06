@@ -37,7 +37,6 @@ import com.tencent.bk.devops.git.core.service.handler.GitCheckoutAndMergeHandler
 import com.tencent.bk.devops.git.core.service.handler.GitFetchHandler
 import com.tencent.bk.devops.git.core.service.handler.GitLfsHandler
 import com.tencent.bk.devops.git.core.service.handler.GitLogHandler
-import com.tencent.bk.devops.git.core.service.handler.GitSparseCheckoutHandler
 import com.tencent.bk.devops.git.core.service.handler.GitSubmodulesHandler
 import com.tencent.bk.devops.git.core.service.handler.HandlerExecutionChain
 import com.tencent.bk.devops.git.core.service.handler.InitRepoHandler
@@ -76,7 +75,6 @@ class GitSourceProvider(
                     InitRepoHandler(settings, git),
                     GitAuthHandler(settings, git),
                     GitFetchHandler(settings, git),
-                    GitSparseCheckoutHandler(settings, git),
                     GitCheckoutAndMergeHandler(settings, git),
                     GitSubmodulesHandler(settings, git),
                     GitLfsHandler(settings, git),
