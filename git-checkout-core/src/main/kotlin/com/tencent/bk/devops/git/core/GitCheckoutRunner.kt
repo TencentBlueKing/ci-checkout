@@ -40,6 +40,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_AUTH_COST_TI
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_BKREPO_DOWNLOAD_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_BKREPO_DOWNLOAD_RESULT
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_CHECKOUT_COST_TIME
+import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_COST_TIME
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_FETCH_STRATEGY
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_GIT_PROTOCOL
@@ -51,9 +52,8 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_SUBMODULE_CO
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TOTAL_SIZE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO
+import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
-import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.exception.TaskExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitMetricsInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -178,10 +178,12 @@ class GitCheckoutRunner {
             summary.append("使用【${EnvHelper.getContext(CONTEXT_USER_ID)}】的权限")
         }
         when (EnvHelper.getContext(CONTEXT_FETCH_STRATEGY)) {
-            PullStrategy.FRESH_CHECKOUT.name ->
+            FetchStrategy.FULL.name ->
                 summary.append("【全量】拉取代码")
-            PullStrategy.REVERT_UPDATE.name ->
-                summary.append("【增量】拉取代码")
+            FetchStrategy.VM_CACHE.name ->
+                summary.append("【构建机缓存】拉取代码")
+            FetchStrategy.BKREPO_CACHE.name ->
+                summary.append("【制品库缓存】拉取代码")
         }
         logger.warn(summary.toString())
     }

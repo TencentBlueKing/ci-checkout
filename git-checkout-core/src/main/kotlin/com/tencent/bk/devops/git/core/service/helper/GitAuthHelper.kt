@@ -31,10 +31,12 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_ASKPASS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.JOB_POOL
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.BuildType
@@ -139,6 +141,10 @@ class GitAuthHelper(
                 configValue = "!bash '$credentialShellPath'",
                 configScope = GitConfigScope.GLOBAL
             )
+        }
+        // 当HOME环境变量不存在时，使用GIT_ASKPASS设置权限，不然子模块不能拉取
+        if (System.getenv(HOME) == null) {
+            git.setEnvironmentVariable(GIT_ASKPASS, "!bash '$credentialShellPath'")
         }
     }
 
