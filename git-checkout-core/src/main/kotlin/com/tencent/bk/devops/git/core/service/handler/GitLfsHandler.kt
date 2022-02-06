@@ -23,7 +23,10 @@ class GitLfsHandler(
                     return
                 }
                 logger.groupStart("Fetching lfs")
-                git.lfsPull()
+                git.lfsPull(
+                    fetchInclude = includeSubPath,
+                    fetchExclude = excludeSubPath
+                )
                 logger.groupEnd("")
             }
         } finally {
