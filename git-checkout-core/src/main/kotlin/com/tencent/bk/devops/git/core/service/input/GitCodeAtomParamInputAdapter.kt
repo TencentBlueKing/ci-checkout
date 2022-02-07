@@ -131,6 +131,17 @@ class GitCodeAtomParamInputAdapter(
             }
             val authInfo = authProvider.getAuthInfo()
 
+            val newUsernameConfig = if (!authInfo.username.isNullOrBlank() && authInfo.username != "oauth2") {
+                authInfo.username
+            } else {
+                repository.userName
+            }
+            val newUserEmailConfig = if (!userEmailConfig.isNullOrBlank()) {
+                "$newUsernameConfig@${userEmailConfig!!.substringAfter("@")}"
+            } else {
+                userEmailConfig
+            }
+
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
@@ -197,8 +208,8 @@ class GitCodeAtomParamInputAdapter(
                 sourceRepositoryUrl = hookSourceUrl ?: "",
                 sourceBranchName = hookSourceBranch ?: "",
                 autoCrlf = autoCrlf,
-                usernameConfig = usernameConfig,
-                userEmailConfig = userEmailConfig,
+                usernameConfig = newUsernameConfig,
+                userEmailConfig = newUserEmailConfig,
                 compatibleHostList = compatibleHostList,
                 enableTrace = enableTrace,
                 enablePartialClone = enablePartialClone,

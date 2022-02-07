@@ -90,6 +90,7 @@ class GitSourceProvider(
     }
 
     fun cleanUp() {
+        logger.info("此插件是git插件后置动作,由系统自动生成,清理构建机上git插件的凭证")
         with(settings) {
             val workingDirectory = File(repositoryPath)
             if (!workingDirectory.exists()) {
