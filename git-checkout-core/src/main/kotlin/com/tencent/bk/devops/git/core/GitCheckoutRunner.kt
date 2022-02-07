@@ -109,8 +109,8 @@ class GitCheckoutRunner {
             atomContext.result.monitorData = monitorData
             if (atomContext.param.postEntryParam != "True") {
                 reportMetrics(atomContext, settings, startTime, endTime)
+                printSummaryLog()
             }
-            printSummaryLog()
             EnvHelper.clearContext()
         }
     }
