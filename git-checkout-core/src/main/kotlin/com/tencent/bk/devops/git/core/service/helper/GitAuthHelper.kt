@@ -86,9 +86,7 @@ class GitAuthHelper(
 
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
         val compatibleHostList = settings.compatibleHostList
-        if (!compatibleHostList.isNullOrEmpty() &&
-            compatibleHostList.contains(serverInfo.hostName)
-        ) {
+        if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
             git.config(
                 configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
                 configValue = compatibleHostList.joinToString(","),
@@ -100,9 +98,7 @@ class GitAuthHelper(
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         install()
         store()
-        if (settings.persistCredentials) {
-            unsetInsteadOf()
-        }
+        unsetInsteadOf()
     }
 
     private fun install() {
@@ -124,30 +120,25 @@ class GitAuthHelper(
             sourceFilePath = "script/git-checkout-credential.sh",
             targetFile = File(credentialShellPath)
         )
-        var scope = GitConfigScope.LOCAL
-        if (settings.persistCredentials) {
-            // 如果是在docker环境并且凭证需要传递,禁用其他的凭证管理
-            val jobPool = System.getenv(JOB_POOL)
-            if (jobPool == BuildType.PUBLIC_DEVCLOUD.name || jobPool == BuildType.DOCKER.name) {
-                git.tryConfigUnset(
-                    configKey = GIT_CREDENTIAL_HELPER,
-                    configScope = GitConfigScope.GLOBAL
-                )
-            }
-            // 凭证需要传递才配置全局的凭证管理,否则只配置当前仓库
-            scope = GitConfigScope.GLOBAL
+        // 如果是在docker环境,禁用其他的凭证管理
+        val jobPool = System.getenv(JOB_POOL)
+        if (jobPool == BuildType.PUBLIC_DEVCLOUD.name || jobPool == BuildType.DOCKER.name) {
+            git.tryConfigUnset(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configScope = GitConfigScope.GLOBAL
+            )
         }
-
+        // 凭证管理必须安装在全局,否则无法传递给其他插件
         if (!git.configExists(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX,
-                configScope = scope
+                configScope = GitConfigScope.GLOBAL
             )
         ) {
             git.configAdd(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValue = "!bash '$credentialShellPath'",
-                configScope = scope
+                configScope = GitConfigScope.GLOBAL
             )
         }
     }
@@ -335,7 +326,7 @@ class GitAuthHelper(
         }
         git.setEnvironmentVariable(XDG_CONFIG_HOME, gitXdgConfigHome)
         // 当HOME环境变量不存在时，xdg中添加凭证管理，不然子模块不能拉取
-        if (System.getenv(HOME) == null || !settings.persistCredentials) {
+        if (System.getenv(HOME) == null) {
             git.configAdd(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValue = "!bash '$credentialShellPath'",
