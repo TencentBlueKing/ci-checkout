@@ -274,12 +274,20 @@ class GitAuthHelper(
         configFile: String? = null
     ) {
         val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
-        git.configAdd(
-            configKey = insteadOfKey,
-            configValue = "git@$host:",
-            configScope = configScope,
-            configFile = configFile
-        )
+        if (
+            !git.configExists(
+                configKey = insteadOfKey,
+                configScope = configScope,
+                configFile = configFile
+            )
+        ) {
+            git.configAdd(
+                configKey = insteadOfKey,
+                configValue = "git@$host:",
+                configScope = configScope,
+                configFile = configFile
+            )
+        }
     }
 
     private fun gitInsteadOfHttp(
@@ -289,12 +297,20 @@ class GitAuthHelper(
     ) {
         val insteadOfKey = "url.${serverInfo.origin}:.insteadOf"
         listOf("http", "https").forEach { protocol ->
-            git.configAdd(
-                configKey = insteadOfKey,
-                configValue = "$protocol://$host/",
-                configScope = configScope,
-                configFile = configFile
-            )
+            if (
+                !git.configExists(
+                    configKey = insteadOfKey,
+                    configScope = configScope,
+                    configFile = configFile
+                )
+            ) {
+                git.configAdd(
+                    configKey = insteadOfKey,
+                    configValue = "$protocol://$host/",
+                    configScope = configScope,
+                    configFile = configFile
+                )
+            }
         }
     }
 

@@ -27,7 +27,8 @@
 
 package com.tencent.bk.devops.git.core.util
 
-import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.atom.api.Header
+import com.tencent.bk.devops.atom.api.SdkEnv
 import com.tencent.bk.devops.git.core.enums.OSType
 import java.util.Locale
 
@@ -55,5 +56,5 @@ object AgentEnv {
         return os!!
     }
 
-    fun isThirdParty() = System.getProperty(GitConstants.BUILD_TYPE) == "AGENT"
+    fun isThirdParty() = SdkEnv.getSdkHeader()[Header.AUTH_HEADER_DEVOPS_BUILD_TYPE] == "AGENT"
 }
