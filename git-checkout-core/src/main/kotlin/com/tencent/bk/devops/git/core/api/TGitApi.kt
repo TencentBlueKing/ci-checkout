@@ -1,16 +1,21 @@
 package com.tencent.bk.devops.git.core.api
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.HttpStatus
+import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.pojo.api.TGitProjectInfo
 import com.tencent.bk.devops.git.core.pojo.api.TGitProjectMember
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.HttpUtil
+import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.utils.JsonUtil
 import org.slf4j.LoggerFactory
 import java.net.URLEncoder
 
 class TGitApi(
     val repositoryUrl: String,
+    val userId: String,
     private val token: String
 ) {
 
@@ -24,13 +29,25 @@ class TGitApi(
     private val serverInfo = GitUtil.getServerInfo(repositoryUrl)
 
     fun getProjectInfo(): TGitProjectInfo {
-        val apiUrl =
-            "${serverInfo.origin}/$API_PATH/" +
-                "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}" +
-                "?access_token=$token"
-        val request = HttpUtil.buildGet(apiUrl)
-        val responseContent = HttpUtil.retryRequest(request, "获取工蜂项目信息失败")
-        return JsonUtil.to(responseContent, TGitProjectInfo::class.java)
+        try {
+            val apiUrl =
+                "${serverInfo.origin}/$API_PATH/" +
+                    "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}" +
+                    "?access_token=$token"
+            val request = HttpUtil.buildGet(apiUrl)
+            val responseContent = HttpUtil.retryRequest(request, "获取工蜂项目信息失败")
+            return JsonUtil.to(responseContent, TGitProjectInfo::class.java)
+        } catch (ignore: ApiException) {
+            if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode) {
+                throw ApiException(
+                    errorType = ErrorType.USER,
+                    errorCode = GitConstants.CONFIG_ERROR,
+                    httpStatus = ignore.httpStatus,
+                    errorMsg = "验证权限失败，用户【$userId】没有仓库【$repositoryUrl】访问权限"
+                )
+            }
+            throw ignore
+        }
     }
 
     fun getProjectMembers(username: String): List<TGitProjectMember> {
