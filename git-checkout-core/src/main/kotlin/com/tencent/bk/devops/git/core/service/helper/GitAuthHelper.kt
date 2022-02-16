@@ -36,15 +36,14 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
-import com.tencent.bk.devops.git.core.constant.GitConstants.JOB_POOL
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
-import com.tencent.bk.devops.git.core.enums.BuildType
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -98,7 +97,6 @@ class GitAuthHelper(
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         install()
         store()
-        unsetInsteadOf()
     }
 
     private fun install() {
@@ -120,9 +118,8 @@ class GitAuthHelper(
             sourceFilePath = "script/git-checkout-credential.sh",
             targetFile = File(credentialShellPath)
         )
-        // 如果是在docker环境,禁用其他的凭证管理
-        val jobPool = System.getenv(JOB_POOL)
-        if (jobPool == BuildType.PUBLIC_DEVCLOUD.name || jobPool == BuildType.DOCKER.name) {
+        // 如果不是第三方构建机，禁用其他凭证
+        if (!AgentEnv.isThirdParty()) {
             git.tryConfigUnset(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configScope = GitConfigScope.GLOBAL
@@ -185,25 +182,44 @@ class GitAuthHelper(
         }
     }
 
-    private fun insteadOf() {
+    private fun insteadOf(
+        configScope: GitConfigScope,
+        configFile: String? = null
+    ) {
         if (serverInfo.httpProtocol) {
-            httpInsteadOfGit(host = serverInfo.hostName)
+            httpInsteadOfGit(
+                host = serverInfo.hostName,
+                configScope = configScope,
+                configFile = configFile
+            )
 
             // 配置其他域名权限
             val compatibleHostList = settings.compatibleHostList
             if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
                 compatibleHostList.filter { it != serverInfo.hostName }.forEach { otherHostName ->
-                    httpInsteadOfGit(host = otherHostName)
+                    httpInsteadOfGit(
+                        host = otherHostName,
+                        configScope = configScope,
+                        configFile = configFile
+                    )
                 }
             }
         } else {
-            gitInsteadOfHttp(host = serverInfo.hostName)
+            gitInsteadOfHttp(
+                host = serverInfo.hostName,
+                configScope = configScope,
+                configFile = configFile
+            )
 
             // 配置其他域名权限
             val compatibleHostList = settings.compatibleHostList
             if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
                 compatibleHostList.filter { it != serverInfo.hostName }.forEach { otherHostName ->
-                    gitInsteadOfHttp(host = otherHostName)
+                    gitInsteadOfHttp(
+                        host = otherHostName,
+                        configScope = configScope,
+                        configFile = configFile
+                    )
                 }
             }
         }
@@ -252,24 +268,32 @@ class GitAuthHelper(
         }
     }
 
-    private fun httpInsteadOfGit(host: String) {
+    private fun httpInsteadOfGit(
+        host: String,
+        configScope: GitConfigScope,
+        configFile: String? = null
+    ) {
         val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
         git.configAdd(
             configKey = insteadOfKey,
             configValue = "git@$host:",
-            configScope = GitConfigScope.FILE,
-            configFile = gitXdgConfigFile
+            configScope = configScope,
+            configFile = configFile
         )
     }
 
-    private fun gitInsteadOfHttp(host: String) {
+    private fun gitInsteadOfHttp(
+        host: String,
+        configScope: GitConfigScope,
+        configFile: String? = null
+    ) {
         val insteadOfKey = "url.${serverInfo.origin}:.insteadOf"
         listOf("http", "https").forEach { protocol ->
             git.configAdd(
                 configKey = insteadOfKey,
                 configValue = "$protocol://$host/",
-                configScope = GitConfigScope.FILE,
-                configFile = gitXdgConfigFile
+                configScope = configScope,
+                configFile = configFile
             )
         }
     }
@@ -290,6 +314,11 @@ class GitAuthHelper(
     override fun configureAuth() {
         configureHttp()
         configureSsh()
+        // 第三方构建机设置insteadOf可能影响用户环境,而且第三方构建机一般不需要凭证传递
+        if (!AgentEnv.isThirdParty()) {
+            unsetInsteadOf()
+            insteadOf(configScope = GitConfigScope.GLOBAL)
+        }
     }
 
     override fun removeAuth() {
@@ -320,6 +349,10 @@ class GitAuthHelper(
     }
 
     override fun configureSubmoduleAuth() {
+        // 如果不是第三方构建机,会配置全局凭证，子模块不需要再设置
+        if (!AgentEnv.isThirdParty()) {
+            return
+        }
         logger.info("Temporarily overriding XDG_CONFIG_HOME='$gitXdgConfigHome' for fetching submodules")
         if (!File(gitXdgConfigFile).exists()) {
             File(gitXdgConfigFile).parentFile.mkdirs()
@@ -334,7 +367,10 @@ class GitAuthHelper(
                 configFile = gitXdgConfigFile
             )
         }
-        insteadOf()
+        insteadOf(
+            configScope = GitConfigScope.FILE,
+            configFile = gitXdgConfigFile
+        )
     }
 
     override fun removeSubmoduleAuth() {
