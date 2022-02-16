@@ -277,6 +277,7 @@ class GitAuthHelper(
         if (
             !git.configExists(
                 configKey = insteadOfKey,
+                configValueRegex = "git@$host:",
                 configScope = configScope,
                 configFile = configFile
             )
@@ -300,6 +301,7 @@ class GitAuthHelper(
             if (
                 !git.configExists(
                     configKey = insteadOfKey,
+                    configValueRegex = "$protocol://$host/",
                     configScope = configScope,
                     configFile = configFile
                 )
