@@ -115,7 +115,12 @@ class GitCheckoutAndMergeHandler(
             if (sparseFile.exists()) {
                 sparseFile.writeText("*")
                 git.config(configKey = "core.sparsecheckout", configValue = "true")
-                git.readTree(options = listOf("--reset", "-u", checkInfo.startPoint))
+                if (checkInfo.startPoint.isBlank()) {
+                    git.readTree(options = listOf("--reset", "-u", checkInfo.ref))
+                } else {
+                    git.readTree(options = listOf("--reset", "-u", checkInfo.startPoint))
+                }
+
                 sparseFile.delete()
             }
             git.config(configKey = "core.sparsecheckout", configValue = "false")

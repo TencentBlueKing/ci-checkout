@@ -492,7 +492,7 @@ class GitCommandManager(
     ) {
         val args = mutableListOf("read-tree")
         args.addAll(options)
-        execGit(args = args)
+        execGit(args = args, allowAllExitCodes = true)
     }
 
     private fun execGit(
