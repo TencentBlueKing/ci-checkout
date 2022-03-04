@@ -129,7 +129,11 @@ class GitCheckoutAndMergeHandler(
             if (!sparseFile.exists()) sparseFile.createNewFile()
             sparseFile.writeText(content.toString())
             git.config(configKey = "core.sparsecheckout", configValue = "true")
-            git.readTree(options = listOf("-m", "-u", checkInfo.startPoint))
+            if (checkInfo.startPoint.isBlank()) {
+                git.readTree(options = listOf("-m", "-u", checkInfo.ref))
+            } else {
+                git.readTree(options = listOf("-m", "-u", checkInfo.startPoint))
+            }
         }
     }
 
