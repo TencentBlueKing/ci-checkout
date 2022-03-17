@@ -71,15 +71,22 @@ class GitCodeAtomParamInputAdapter(
         with(input) {
             // 1. 获取仓库信息
             val repositoryType = RepositoryType.valueOf(repositoryType)
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, repositoryType.name)
             val repositoryId = when (repositoryType) {
-                RepositoryType.ID -> repositoryHashId
-                    ?: throw ParamInvalidException(errorMsg = "代码库ID不能为空")
-                RepositoryType.NAME -> repositoryName
-                    ?: throw ParamInvalidException(errorMsg = "代码库名称不能为空")
+                RepositoryType.ID -> {
+                    repositoryHashId ?: throw ParamInvalidException(errorMsg = "代码库ID不能为空")
+                    EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_ID, repositoryHashId!!)
+                    repositoryHashId
+                }
+                RepositoryType.NAME -> {
+                    repositoryName ?: throw ParamInvalidException(errorMsg = "代码库名称不能为空")
+                    EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_NAME, repositoryName!!)
+                    repositoryName
+                }
                 else ->
                     throw ParamInvalidException(errorMsg = "代码库类型错误")
             }
-            val repositoryConfig = RepositoryUtils.buildConfig(repositoryId, repositoryType)
+            val repositoryConfig = RepositoryUtils.buildConfig(repositoryId!!, repositoryType)
             val repository = devopsApi.getRepository(repositoryConfig).data
                 ?: throw ParamInvalidException(
                     errorMsg = "repository ${repositoryConfig.getRepositoryId()} is not found"
