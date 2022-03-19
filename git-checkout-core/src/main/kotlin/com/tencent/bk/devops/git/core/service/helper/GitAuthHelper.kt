@@ -31,14 +31,18 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_ASKPASS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_PASSWORD_KEY
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_USERNAME_KEY
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
+import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -74,6 +78,7 @@ class GitAuthHelper(
         System.getenv(BK_CI_BUILD_JOB_ID) ?: ""
     ).toString()
     private val gitXdgConfigFile = Paths.get(gitXdgConfigHome, "git", "config").toString()
+    private var askpass: File? = null
 
     private fun configureHttp() {
         if (!serverInfo.httpProtocol ||
@@ -84,6 +89,16 @@ class GitAuthHelper(
         }
 
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
+        // bug: git自定义凭证失效 #42
+        askpass = if (AgentEnv.getOS() == OSType.WINDOWS) {
+            createWindowsAskpass()
+        } else {
+            createUnixAskpass()
+        }
+        git.setEnvironmentVariable(GIT_USERNAME_KEY, settings.username)
+        git.setEnvironmentVariable(GIT_PASSWORD_KEY, settings.password)
+        git.setEnvironmentVariable(GIT_ASKPASS, askpass!!.absolutePath)
+
         val compatibleHostList = settings.compatibleHostList
         if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
             git.config(
@@ -97,6 +112,30 @@ class GitAuthHelper(
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         install()
         store()
+    }
+
+    private fun createUnixAskpass(): File {
+        val askpass = File.createTempFile("pass", "sh")
+        askpass.writeText(
+            "#!/bin/sh\n" +
+                "case \"\$1\" in\n" +
+                "Username*) echo \$GIT_USERNAME ;;\n" +
+                "Password*) echo \$GIT_PASSWORD ;;\n" +
+                "esac\n"
+        )
+        askpass.setExecutable(true, true)
+        return askpass
+    }
+
+    private fun createWindowsAskpass(): File {
+        val askpass = File.createTempFile("pass", "bat")
+        askpass.writeText(
+            "@ECHO OFF\r\n" +
+                "IF %ARG:~0,8%==Username (ECHO \$GIT_USERNAME)\r\n" +
+                "IF %ARG:~0,8%==Password (ECHO \$GIT_PASSWORD)"
+        )
+        askpass.setExecutable(true, true)
+        return askpass
     }
 
     private fun install() {
@@ -340,6 +379,9 @@ class GitAuthHelper(
     }
 
     override fun removeAuth() {
+        if (askpass != null && askpass!!.exists()) {
+            askpass!!.delete()
+        }
         if (!serverInfo.httpProtocol || !File(credentialJarPath).exists()) {
             return
         }

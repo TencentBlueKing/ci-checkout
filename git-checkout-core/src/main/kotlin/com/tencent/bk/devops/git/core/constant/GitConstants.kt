@@ -79,6 +79,8 @@ object GitConstants {
     const val CREDENTIAL_JAVA_PATH = "credential_java_path"
     const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
     const val GIT_ASKPASS = "GIT_ASKPASS"
+    const val GIT_USERNAME_KEY = "GIT_USERNAME"
+    const val GIT_PASSWORD_KEY = "GIT_PASSWORD"
 
     const val PARAM_SEPARATOR = ","
 

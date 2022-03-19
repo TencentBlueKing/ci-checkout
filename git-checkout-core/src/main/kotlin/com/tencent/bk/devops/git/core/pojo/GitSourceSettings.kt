@@ -92,6 +92,11 @@ data class GitSourceSettings(
     val lfs: Boolean = true,
 
     /**
+     * lfs并发上传下载的数量
+     */
+    val lfsConcurrentTransfers: Int? = 0,
+
+    /**
      * Indicates whether to checkout submodules
      */
     val submodules: Boolean = true,
