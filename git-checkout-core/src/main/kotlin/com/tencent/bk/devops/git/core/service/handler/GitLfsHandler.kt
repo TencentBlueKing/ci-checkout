@@ -24,6 +24,9 @@ class GitLfsHandler(
                     return
                 }
                 logger.groupStart("Fetching lfs")
+                if (lfsConcurrentTransfers != null && lfsConcurrentTransfers > 0) {
+                    git.config(configKey = "lfs.concurrenttransfers", configValue = lfsConcurrentTransfers.toString())
+                }
                 git.lfsPull(
                     fetchInclude = includeSubPath,
                     fetchExclude = excludeSubPath
