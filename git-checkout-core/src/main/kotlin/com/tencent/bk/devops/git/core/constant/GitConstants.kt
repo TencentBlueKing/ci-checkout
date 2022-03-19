@@ -81,6 +81,8 @@ object GitConstants {
     const val GIT_ASKPASS = "GIT_ASKPASS"
     const val GIT_USERNAME_KEY = "GIT_USERNAME"
     const val GIT_PASSWORD_KEY = "GIT_PASSWORD"
+    const val GIT_SSH_COMMAND = "GIT_SSH_COMMAND"
+    const val GIT_SSH_COMMAND_VALUE = "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
     const val PARAM_SEPARATOR = ","
 

@@ -37,6 +37,8 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_PASSWORD_KEY
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_SSH_COMMAND
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_SSH_COMMAND_VALUE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_USERNAME_KEY
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
@@ -364,6 +366,7 @@ class GitAuthHelper(
         }
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
         SSHAgentUtils(privateKey = settings.privateKey, passPhrase = settings.passPhrase).addIdentity()
+        git.setEnvironmentVariable(GIT_SSH_COMMAND, GIT_SSH_COMMAND_VALUE)
     }
 
     private fun getJavaFilePath() = File(System.getProperty("java.home"), "/bin/java").absolutePath
