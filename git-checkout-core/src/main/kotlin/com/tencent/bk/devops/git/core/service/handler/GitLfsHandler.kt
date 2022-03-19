@@ -5,6 +5,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
+import java.io.File
 
 class GitLfsHandler(
     private val settings: GitSourceSettings,
@@ -19,7 +20,7 @@ class GitLfsHandler(
         val startEpoch = System.currentTimeMillis()
         try {
             with(settings) {
-                if (!lfs) {
+                if (!lfs || !File(repositoryPath, ".gitattributes").exists()) {
                     return
                 }
                 logger.groupStart("Fetching lfs")
