@@ -104,7 +104,7 @@ data class GitSourceSettings(
     /**
      * Indicates whether to recursively checkout submodules
      */
-    val nestedSubmodules: Boolean = false,
+    val nestedSubmodules: Boolean = true,
 
     /**
      * 子模块初始化是否同步远程仓库，--remote
