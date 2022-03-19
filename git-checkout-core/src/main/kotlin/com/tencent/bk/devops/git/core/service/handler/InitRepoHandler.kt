@@ -34,8 +34,10 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLON
 import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
+import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
@@ -109,6 +111,9 @@ class InitRepoHandler(
         git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.LOCAL)
         git.config(configKey = "gc.auto", configValue = "0")
         initPartialClone()
+        if (AgentEnv.getOS() == OSType.WINDOWS) {
+            git.config(configKey = "core.longpaths", configValue = "true")
+        }
     }
 
     private fun GitSourceSettings.initPartialClone() {
