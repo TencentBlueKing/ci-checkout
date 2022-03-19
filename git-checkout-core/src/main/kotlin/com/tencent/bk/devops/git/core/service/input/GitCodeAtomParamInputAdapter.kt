@@ -200,6 +200,7 @@ class GitCodeAtomParamInputAdapter(
                 enableFetchRefSpec = enableFetchRefSpec,
                 fetchRefSpec = fetchRefSpec,
                 lfs = enableGitLfs,
+                lfsConcurrentTransfers = lfsConcurrentTransfers,
                 submodules = enableSubmodule,
                 nestedSubmodules = enableSubmoduleRecursive ?: true,
                 submodulesPath = submodulePath ?: "",

@@ -74,6 +74,10 @@ data class CheckoutAtomParamInput(
     val enableFetchRefSpec: Boolean? = false,
     val fetchRefSpec: String? = null,
     var enableGitLfs: Boolean = false,
+    /**
+     * lfs并发上传下载的数量
+     */
+    val lfsConcurrentTransfers: Int? = 0,
 
     var includePath: String? = "",
     var excludePath: String? = "",

@@ -64,6 +64,10 @@ data class GitCodeAtomParamInput(
     var enableGitClean: Boolean = true,
     var enableGitCleanIgnore: Boolean = true,
     var enableGitLfs: Boolean = false,
+    /**
+     * lfs并发上传下载的数量
+     */
+    val lfsConcurrentTransfers: Int? = 0,
 
     // 非前端传递的参数
     val pipelineStartType: String? = null,
