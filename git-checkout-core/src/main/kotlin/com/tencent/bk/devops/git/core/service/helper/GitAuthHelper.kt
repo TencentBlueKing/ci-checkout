@@ -379,6 +379,7 @@ class GitAuthHelper(
         )
         if (askPass.isNotBlank()) {
             if (File(askPass).exists()) {
+                logger.info("Deleting askpass file $askPass")
                 File(askPass).delete()
             }
             git.tryConfigUnset(configKey = CORE_ASKPASS)
@@ -437,7 +438,7 @@ class GitAuthHelper(
     }
 
     private fun createUnixAskpass(): File {
-        val askpass = File.createTempFile("pass", "sh")
+        val askpass = File.createTempFile("pass", ".sh")
         askpass.writeText(
             "#!/bin/sh\n" +
                 "case \"\$1\" in\n" +
@@ -450,7 +451,7 @@ class GitAuthHelper(
     }
 
     private fun createWindowsAskpass(): File {
-        val askpass = File.createTempFile("pass", "bat")
+        val askpass = File.createTempFile("pass", ".bat")
         askpass.writeText(
             "@ECHO OFF\r\n" +
                 "IF %ARG:~0,8%==Username (ECHO ${settings.username})\r\n" +
