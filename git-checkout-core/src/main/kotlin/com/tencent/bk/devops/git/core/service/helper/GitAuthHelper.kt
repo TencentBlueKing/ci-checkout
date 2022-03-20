@@ -30,17 +30,16 @@ package com.tencent.bk.devops.git.core.service.helper
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.CORE_ASKPASS
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_ASKPASS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_PASSWORD_KEY
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_SSH_COMMAND
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_SSH_COMMAND_VALUE
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_USERNAME_KEY
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.XDG_CONFIG_HOME
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
@@ -80,7 +79,6 @@ class GitAuthHelper(
         System.getenv(BK_CI_BUILD_JOB_ID) ?: ""
     ).toString()
     private val gitXdgConfigFile = Paths.get(gitXdgConfigHome, "git", "config").toString()
-    private var askpass: File? = null
 
     private fun configureHttp() {
         if (!serverInfo.httpProtocol ||
@@ -90,17 +88,8 @@ class GitAuthHelper(
             return
         }
 
+        logger.info("using custom credential helper to set credentials ${settings.username}/******")
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
-        // bug: git自定义凭证失效 #42
-        askpass = if (AgentEnv.getOS() == OSType.WINDOWS) {
-            createWindowsAskpass()
-        } else {
-            createUnixAskpass()
-        }
-        git.setEnvironmentVariable(GIT_USERNAME_KEY, settings.username)
-        git.setEnvironmentVariable(GIT_PASSWORD_KEY, settings.password)
-        git.setEnvironmentVariable(GIT_ASKPASS, askpass!!.absolutePath)
-
         val compatibleHostList = settings.compatibleHostList
         if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
             git.config(
@@ -114,30 +103,6 @@ class GitAuthHelper(
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         install()
         store()
-    }
-
-    private fun createUnixAskpass(): File {
-        val askpass = File.createTempFile("pass", "sh")
-        askpass.writeText(
-            "#!/bin/sh\n" +
-                "case \"\$1\" in\n" +
-                "Username*) echo \$GIT_USERNAME ;;\n" +
-                "Password*) echo \$GIT_PASSWORD ;;\n" +
-                "esac\n"
-        )
-        askpass.setExecutable(true, true)
-        return askpass
-    }
-
-    private fun createWindowsAskpass(): File {
-        val askpass = File.createTempFile("pass", "bat")
-        askpass.writeText(
-            "@ECHO OFF\r\n" +
-                "IF %ARG:~0,8%==Username (ECHO \$GIT_USERNAME)\r\n" +
-                "IF %ARG:~0,8%==Password (ECHO \$GIT_PASSWORD)"
-        )
-        askpass.setExecutable(true, true)
-        return askpass
     }
 
     private fun install() {
@@ -382,32 +347,40 @@ class GitAuthHelper(
     }
 
     override fun removeAuth() {
-        if (askpass != null && askpass!!.exists()) {
-            askpass!!.delete()
-        }
-        if (!serverInfo.httpProtocol || !File(credentialJarPath).exists()) {
+        if (!serverInfo.httpProtocol) {
             return
         }
         // 删除凭证
-        with(URL(settings.repositoryUrl).toURI()) {
-            CommandUtil.execute(
-                executable = getJavaFilePath(),
-                args = listOf(
-                    "-Dfile.encoding=utf-8",
-                    "-Ddebug=${settings.enableTrace}",
-                    "-jar",
-                    credentialJarPath,
-                    "devopsErase"
-                ),
-                runtimeEnv = mapOf(
-                    GIT_REPO_PATH to settings.repositoryPath
-                ),
-                inputStream = CredentialArguments(
-                    protocol = scheme,
-                    host = host,
-                    path = path.removePrefix("/")
-                ).convertInputStream()
-            )
+        if (File(credentialJarPath).exists()) {
+            with(URL(settings.repositoryUrl).toURI()) {
+                CommandUtil.execute(
+                    executable = getJavaFilePath(),
+                    args = listOf(
+                        "-Dfile.encoding=utf-8",
+                        "-Ddebug=${settings.enableTrace}",
+                        "-jar",
+                        credentialJarPath,
+                        "devopsErase"
+                    ),
+                    runtimeEnv = mapOf(
+                        GIT_REPO_PATH to settings.repositoryPath
+                    ),
+                    inputStream = CredentialArguments(
+                        protocol = scheme,
+                        host = host,
+                        path = path.removePrefix("/")
+                    ).convertInputStream()
+                )
+            }
+        }
+        val askPass = git.tryConfigGet(
+            configKey = CORE_ASKPASS
+        )
+        if (askPass.isNotBlank()) {
+            if (File(askPass).exists()) {
+                File(askPass).delete()
+            }
+            git.tryConfigUnset(configKey = CORE_ASKPASS)
         }
     }
 
@@ -439,5 +412,49 @@ class GitAuthHelper(
     override fun removeSubmoduleAuth() {
         git.removeEnvironmentVariable(XDG_CONFIG_HOME)
         File(gitXdgConfigFile).deleteOnExit()
+    }
+
+    override fun configureAskPass() {
+        if (!serverInfo.httpProtocol ||
+            settings.username.isNullOrBlank() ||
+            settings.password.isNullOrBlank()
+        ) {
+            return
+        }
+        if (git.isAtLeastVersion(SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
+            // 禁用凭证管理,然后配置core.askpass
+            git.tryDisableOtherGitHelpers()
+        }
+        logger.info("using core.askpass to set credentials ${settings.username}/******")
+        val askpass = if (AgentEnv.getOS() == OSType.WINDOWS) {
+            createWindowsAskpass()
+        } else {
+            createUnixAskpass()
+        }
+        git.config(configKey = CORE_ASKPASS, configValue = askpass.absolutePath)
+    }
+
+    private fun createUnixAskpass(): File {
+        val askpass = File.createTempFile("pass", "sh")
+        askpass.writeText(
+            "#!/bin/sh\n" +
+                "case \"\$1\" in\n" +
+                "Username*) echo ${settings.username} ;;\n" +
+                "Password*) echo ${settings.password} ;;\n" +
+                "esac\n"
+        )
+        askpass.setExecutable(true, true)
+        return askpass
+    }
+
+    private fun createWindowsAskpass(): File {
+        val askpass = File.createTempFile("pass", "bat")
+        askpass.writeText(
+            "@ECHO OFF\r\n" +
+                "IF %ARG:~0,8%==Username (ECHO ${settings.username})\r\n" +
+                "IF %ARG:~0,8%==Password (ECHO ${settings.password})"
+        )
+        askpass.setExecutable(true, true)
+        return askpass
     }
 }

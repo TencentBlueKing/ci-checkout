@@ -39,7 +39,8 @@ enum class GitErrors(
     val title: String?,
     val description: String? = null,
     val errorType: ErrorType = ErrorType.USER,
-    val errorCode: Int = GitConstants.CONFIG_ERROR
+    val errorCode: Int = GitConstants.CONFIG_ERROR,
+    val internalErrorCode: Int = 0
 ) {
     // fetch命令错误
     AuthenticationFailed(
@@ -62,7 +63,8 @@ enum class GitErrors(
             GitProtocolEnum.SSH.name -> GitErrorsText.get().sshAuthenticationFailed
             else -> GitErrorsText.get().httpAuthenticationFailed
         },
-        description = "$wikiUrl#%E4%B8%80%E6%8E%88%E6%9D%83%E5%A4%B1%E8%B4%A5"
+        description = "$wikiUrl#%E4%B8%80%E6%8E%88%E6%9D%83%E5%A4%B1%E8%B4%A5",
+        internalErrorCode = 1
     ),
     RemoteServerFailed(
         regex = Regex(
@@ -81,13 +83,15 @@ enum class GitErrors(
         title = GitErrorsText.get().remoteServerFailed,
         errorType = ErrorType.THIRD_PARTY,
         errorCode = GitConstants.GIT_ERROR,
-        description = "$wikiUrl#%E4%BA%8C%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%BC%82%E5%B8%B8"
+        description = "$wikiUrl#%E4%BA%8C%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%BC%82%E5%B8%B8",
+        internalErrorCode = 2
     ),
     ConnectionTimeOut(
         regex = Regex(
             "ssh: connect to host (.+) port (\\d+): Connection timed out"
         ),
-        title = GitErrorsText.get().connectionTimeOut
+        title = GitErrorsText.get().connectionTimeOut,
+        internalErrorCode = 3
     ),
 
     // checkout命令错误
@@ -108,7 +112,8 @@ enum class GitErrors(
             options = setOf(RegexOption.IGNORE_CASE)
         ),
         title = GitErrorsText.get().noMatchingBranch,
-        description = "$wikiUrl#%E4%B8%89%E5%88%86%E6%94%AF%E6%88%96commit%E4%B8%8D%E5%AD%98%E5%9C%A8"
+        description = "$wikiUrl#%E4%B8%89%E5%88%86%E6%94%AF%E6%88%96commit%E4%B8%8D%E5%AD%98%E5%9C%A8",
+        internalErrorCode = 4
     ),
     NoInitializeBranch(
         regex = Regex(
@@ -116,7 +121,8 @@ enum class GitErrors(
                 "(fatal: 您位于一个尚未初始化的分支)"
         ),
         title = GitErrorsText.get().noInitializeBranch,
-        description = "$wikiUrl#%E5%9B%9Bcheckout%E7%9A%84%E5%88%86%E6%94%AF%E5%90%8D%E4%B8%BA%E7%A9%BA"
+        description = "$wikiUrl#%E5%9B%9Bcheckout%E7%9A%84%E5%88%86%E6%94%AF%E5%90%8D%E4%B8%BA%E7%A9%BA",
+        internalErrorCode = 5
     ),
     SparseCheckoutLeavesNoEntry(
         regex = Regex(
@@ -124,14 +130,16 @@ enum class GitErrors(
         ),
         title = GitErrorsText.get().sparseCheckoutLeavesNoEntry,
         description = "$wikiUrl#%E4%BA%94%E9%83%A8%E5%88%86%E6%A3%80%E5%87%BA%E9%94%99%E8%AF%AF%E8%AF%B7%E6%A3%80%E6" +
-            "%9F%A5%E9%83%A8%E5%88%86%E6%A3%80%E5%87%BA%E7%9A%84%E6%96%87%E4%BB%B6%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8"
+            "%9F%A5%E9%83%A8%E5%88%86%E6%A3%80%E5%87%BA%E7%9A%84%E6%96%87%E4%BB%B6%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8",
+        internalErrorCode = 6
     ),
     BranchOrPathNameConflicts(
         regex = Regex(
             "(fatal: '(.+)' 既可以是一个本地文件，也可以是一个跟踪分支。)"
         ),
         title = GitErrorsText.get().branchOrPathNameConflicts,
-        description = "$wikiUrl#%E5%85%AD%E5%88%86%E6%94%AF%E6%88%96%E8%B7%AF%E5%BE%84%E5%90%8D%E5%86%B2%E7%AA%81"
+        description = "$wikiUrl#%E5%85%AD%E5%88%86%E6%94%AF%E6%88%96%E8%B7%AF%E5%BE%84%E5%90%8D%E5%86%B2%E7%AA%81",
+        internalErrorCode = 7
     ),
 
     // merge命令错误
@@ -143,7 +151,8 @@ enum class GitErrors(
         ),
         title = GitErrorsText.get().mergeConflicts,
         description = "$wikiUrl#%E4%B8%83merge%E5%86%B2%E7%AA%81%E8%AF%B7%E5%85%88%E8%A7%A3%E5%86%B3%E5%86%B2%E7" +
-            "%AA%81%E7%84%B6%E5%90%8E%E5%86%8D%E6%9E%84%E5%BB%BA"
+            "%AA%81%E7%84%B6%E5%90%8E%E5%86%8D%E6%9E%84%E5%BB%BA",
+        internalErrorCode = 8
     ),
     InvalidMerge(
         regex = Regex(
@@ -152,7 +161,8 @@ enum class GitErrors(
         ),
         title = GitErrorsText.get().invalidMerge,
         description = "$wikiUrl#%E5%85%AB%E5%90%88%E5%B9%B6%E5%A4%B1%E8%B4%A5%E5%8F%AF%E8%83%BD%E6%98%AF%E5%9B%A0" +
-            "%E4%B8%BA%E6%BA%90%E5%88%86%E6%94%AF%E8%A2%AB%E5%88%A0%E9%99%A4%E5%AF%BC%E8%87%B4"
+            "%E4%B8%BA%E6%BA%90%E5%88%86%E6%94%AF%E8%A2%AB%E5%88%A0%E9%99%A4%E5%AF%BC%E8%87%B4",
+        internalErrorCode = 9
     ),
     CannotMergeUnrelatedHistories(
         regex = Regex(
@@ -161,7 +171,8 @@ enum class GitErrors(
         ),
         title = GitErrorsText.get().cannotMergeUnrelatedHistories,
         description = "$wikiUrl#%E5%85%AB%E5%90%88%E5%B9%B6%E5%A4%B1%E8%B4%A5%E5%8F%AF%E8%83%BD%E6%98%AF%E5%9B%A0%E4" +
-            "%B8%BA%E6%BA%90%E5%88%86%E6%94%AF%E8%A2%AB%E5%88%A0%E9%99%A4%E5%AF%BC%E8%87%B4"
+            "%B8%BA%E6%BA%90%E5%88%86%E6%94%AF%E8%A2%AB%E5%88%A0%E9%99%A4%E5%AF%BC%E8%87%B4",
+        internalErrorCode = 10
     ),
     LocalChangesOverwritten(
         regex = Regex(
@@ -171,7 +182,8 @@ enum class GitErrors(
         ),
         title = GitErrorsText.get().localChangesOverwritten,
         description = "$wikiUrl#%E5%8D%81%E5%88%87%E6%8D%A2%E5%88%86%E6%94%AF%E5%A4%B1%E8%B4%A5%E6%9C%AC%E5%9C%B0%E4" +
-            "%BF%AE%E6%94%B9%E7%9A%84%E6%96%87%E4%BB%B6%E5%B0%86%E8%A2%AB%E8%A6%86%E7%9B%96"
+            "%BF%AE%E6%94%B9%E7%9A%84%E6%96%87%E4%BB%B6%E5%B0%86%E8%A2%AB%E8%A6%86%E7%9B%96",
+        internalErrorCode = 11
     ),
 
     // submodule命令错误
@@ -183,7 +195,8 @@ enum class GitErrors(
                 "(fatal: No url found for submodule path '(.+)' in .gitmodules)"
         ),
         title = GitErrorsText.get().noSubmoduleMapping,
-        description = "$wikiUrl#%E5%8D%81%E4%B8%80%E5%AD%90%E6%A8%A1%E5%9D%97%E6%9B%B4%E6%96%B0%E5%A4%B1%E8%B4%A5"
+        description = "$wikiUrl#%E5%8D%81%E4%B8%80%E5%AD%90%E6%A8%A1%E5%9D%97%E6%9B%B4%E6%96%B0%E5%A4%B1%E8%B4%A5",
+        internalErrorCode = 12
     ),
     SubmoduleRepositoryDoesNotExist(
         regex = Regex(
@@ -193,7 +206,8 @@ enum class GitErrors(
         ),
         title = GitErrorsText.get().submoduleRepositoryDoesNotExist,
         description = "$wikiUrl#%E5%8D%81%E4%BA%8C%E5%AD%90%E6%A8%A1%E5%9D%97%E9%85%8D%E7%BD%AE%E7%9A%84%E4" +
-            "%BB%93%E5%BA%93%E4%B8%8D%E5%AD%98%E5%9C%A8"
+            "%BB%93%E5%BA%93%E4%B8%8D%E5%AD%98%E5%9C%A8",
+        internalErrorCode = 13
     ),
     InvalidSubmoduleSHA(
         regex = Regex(
@@ -205,7 +219,8 @@ enum class GitErrors(
         ),
         title = GitErrorsText.get().invalidSubmoduleSHA,
         description = "$wikiUrl#%E5%8D%81%E4%B8%89%E5%AD%90%E6%A8%A1%E5%9D%97%E6%8C%87%E5%90%91%E7%9A" +
-            "%84commit%E4%B8%8D%E5%AD%98%E5%9C%A8"
+            "%84commit%E4%B8%8D%E5%AD%98%E5%9C%A8",
+        internalErrorCode = 14
     ),
 
     // lfs命令错误
@@ -213,7 +228,8 @@ enum class GitErrors(
         regex = Regex(
             "The .+ attribute should be .+ but is .+"
         ),
-        title = GitErrorsText.get().lfsAttributeDoesNotMatch
+        title = GitErrorsText.get().lfsAttributeDoesNotMatch,
+        internalErrorCode = 15
     ),
     ErrorDownloadingObject(
         regex = Regex(
@@ -221,7 +237,8 @@ enum class GitErrors(
                 "(LFS: Repository or object not found: .+)"
         ),
         title = GitErrorsText.get().errorDownloadingObject,
-        description = "$wikiUrl#%E5%8D%81%E5%9B%9Bgit-lfs%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E9%94%99%E8%AF%AF"
+        description = "$wikiUrl#%E5%8D%81%E5%9B%9Bgit-lfs%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E9%94%99%E8%AF%AF",
+        internalErrorCode = 16
     ),
     LfsNotInstall(
         regex = Regex(
@@ -229,7 +246,8 @@ enum class GitErrors(
                 "(git：'lfs' 不是一个 git 命令。参见 'git --help'。)"
         ),
         title = GitErrorsText.get().lfsNotInstall,
-        description = "$wikiUrl#%E5%8D%81%E4%BA%94lfs%E7%A8%8B%E5%BA%8F%E6%B2%A1%E6%9C%89%E5%AE%89%E8%A3%85"
+        description = "$wikiUrl#%E5%8D%81%E4%BA%94lfs%E7%A8%8B%E5%BA%8F%E6%B2%A1%E6%9C%89%E5%AE%89%E8%A3%85",
+        internalErrorCode = 17
     ),
 
     // 其他命令错误
@@ -238,19 +256,22 @@ enum class GitErrors(
             "(Another git process seems to be running in this repository, e.g.)|" +
                 "(error: could not lock config file (.+): File exists)"
         ),
-        title = GitErrorsText.get().lockFileAlreadyExists
+        title = GitErrorsText.get().lockFileAlreadyExists,
+        internalErrorCode = 18
     ),
     BadRevision(
         regex = Regex(
             "fatal: bad revision '(.*)'"
         ),
-        title = GitErrorsText.get().badRevision
+        title = GitErrorsText.get().badRevision,
+        internalErrorCode = 19
     ),
     NotAGitRepository(
         regex = Regex(
             "fatal: [Nn]ot a git repository \\(or any of the parent directories\\): .git"
         ),
-        title = GitErrorsText.get().notAGitRepository
+        title = GitErrorsText.get().notAGitRepository,
+        internalErrorCode = 20
     );
 
     companion object {

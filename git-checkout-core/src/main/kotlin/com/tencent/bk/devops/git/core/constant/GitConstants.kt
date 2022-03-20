@@ -79,6 +79,7 @@ object GitConstants {
     const val CREDENTIAL_JAVA_PATH = "credential_java_path"
     const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
     const val GIT_ASKPASS = "GIT_ASKPASS"
+    const val CORE_ASKPASS = "core.askpass"
     const val GIT_USERNAME_KEY = "GIT_USERNAME"
     const val GIT_PASSWORD_KEY = "GIT_PASSWORD"
     const val GIT_SSH_COMMAND = "GIT_SSH_COMMAND"
@@ -145,6 +146,9 @@ object GitConstants {
     val SUPPORT_PARTIAL_CLONE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 22, 0, 0)
     val SUPPORT_SHALLOW_SINCE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 18, 0, 0)
     val SUPPORT_CONFIG_LOCAL_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 9, 0, 0)
+    // 支持通过配置credential.helper= 禁用其他凭证管理的版本
+    val SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION =
+        VersionHelper.computeVersionFromBits(2, 9, 0, 0)
 
     // context 上下文，在错误信息中使用 @see GitErrorsText
     const val CONTEXT_USER_ID = "context_user_id"

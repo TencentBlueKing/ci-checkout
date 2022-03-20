@@ -36,4 +36,9 @@ interface IGitAuthHelper {
     fun configureSubmoduleAuth()
 
     fun removeSubmoduleAuth()
+
+    /**
+     * 如果自定义凭证授权失败,则通过core.askpass再次验证权限
+     */
+    fun configureAskPass()
 }
