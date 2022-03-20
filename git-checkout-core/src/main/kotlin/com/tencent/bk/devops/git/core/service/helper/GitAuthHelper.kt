@@ -102,8 +102,8 @@ class GitAuthHelper(
         val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
         EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
-        // install()
-        // store()
+        install()
+        store()
     }
 
     private fun install() {
@@ -426,6 +426,11 @@ class GitAuthHelper(
         if (git.isAtLeastVersion(SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             // 禁用凭证管理,然后配置core.askpass
             git.tryDisableOtherGitHelpers()
+        } else if (!AgentEnv.isThirdParty()) {
+            git.tryConfigUnset(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configScope = GitConfigScope.GLOBAL
+            )
         }
         logger.info("using core.askpass to set credentials ${settings.username}/******")
         val askpass = if (AgentEnv.getOS() == OSType.WINDOWS) {
