@@ -143,7 +143,8 @@ object CommandUtil {
             throw GitExecuteException(
                 errorType = errorType,
                 errorCode = errorCode,
-                errorMsg = defaultResolver.resolveByMap(errorMsg, EnvHelper.getContextMap())
+                errorMsg = defaultResolver.resolveByMap(errorMsg, EnvHelper.getContextMap()),
+                internalErrorCode = gitErrors?.internalErrorCode ?: 0
             )
         } catch (ignore: Throwable) {
             throw GitExecuteException(
