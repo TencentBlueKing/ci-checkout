@@ -101,8 +101,8 @@ class GitAuthHelper(
         val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
         EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
-        install()
-        store()
+        // install()
+        // store()
     }
 
     private fun install() {
