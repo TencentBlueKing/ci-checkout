@@ -32,6 +32,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CORE_ASKPASS
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_ASKPASS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
@@ -431,6 +432,7 @@ class GitAuthHelper(
         } else {
             createUnixAskpass()
         }
+        git.setEnvironmentVariable(GIT_ASKPASS, askpass.absolutePath)
         git.config(configKey = CORE_ASKPASS, configValue = askpass.absolutePath)
     }
 
