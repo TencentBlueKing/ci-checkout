@@ -458,9 +458,9 @@ class GitAuthHelper(
     private fun createWindowsAskpass(): File {
         val askpass = File.createTempFile("pass", ".bat")
         askpass.writeText(
-            "@ECHO OFF\r\n" +
-                "IF %ARG:~0,8%==Username (ECHO ${settings.username})\r\n" +
-                "IF %ARG:~0,8%==Password (ECHO ${settings.password})"
+            "@set arg=%~1\r\n" +
+                "@if (%arg:~0,8%)==(Username) ECHO ${settings.username}\r\n" +
+                "@if (%arg:~0,8%)==(Password) ECHO ${settings.password}\r\n"
         )
         askpass.setExecutable(true, true)
         return askpass
