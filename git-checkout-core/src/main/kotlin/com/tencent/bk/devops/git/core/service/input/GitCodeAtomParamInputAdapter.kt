@@ -33,6 +33,8 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_CODE_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_EXCLUDE_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_INCLUDE_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_TAG
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_BRANCH
@@ -167,6 +169,8 @@ class GitCodeAtomParamInputAdapter(
                 key = "$PIPELINE_MATERIAL_ALIASNAME.${repositoryConfig.getRepositoryId()}",
                 value = repository.aliasName
             )
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_INCLUDE_PATH, input.includePath ?: "")
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_EXCLUDE_PATH, input.excludePath ?: "")
 
             // 添加代码库信息支持codecc扫描
             EnvHelper.addEnvVariable("bk_repo_taskId_${input.pipelineTaskId}", input.pipelineTaskId)
@@ -176,6 +180,8 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable("bk_repo_type_${input.pipelineTaskId}", "GIT")
             EnvHelper.addEnvVariable("bk_repo_local_path_${input.pipelineTaskId}", input.localPath ?: "")
             EnvHelper.addEnvVariable("bk_repo_container_id_${input.pipelineTaskId}", System.getenv(BK_CI_BUILD_JOB_ID))
+            EnvHelper.addEnvVariable("bk_repo_include_path_${input.pipelineTaskId}", input.includePath ?: "")
+            EnvHelper.addEnvVariable("bk_repo_exclude_path_${input.pipelineTaskId}", input.excludePath ?: "")
 
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,

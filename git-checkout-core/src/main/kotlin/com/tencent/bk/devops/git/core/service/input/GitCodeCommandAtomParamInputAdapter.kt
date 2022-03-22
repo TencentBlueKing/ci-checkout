@@ -29,6 +29,8 @@ package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_EXCLUDE_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_INCLUDE_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_REF
 import com.tencent.bk.devops.git.core.enums.AuthType
 import com.tencent.bk.devops.git.core.enums.PullStrategy
@@ -115,6 +117,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 value = GitUtil.getServerInfo(repositoryUrl).repositoryName
             )
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_REF, refName)
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_INCLUDE_PATH, input.includePath ?: "")
+            EnvHelper.addEnvVariable(BK_CI_GIT_REPO_EXCLUDE_PATH, input.excludePath ?: "")
 
             // 添加代码库信息支持codecc扫描
             EnvHelper.addEnvVariable("bk_repo_taskId_$pipelineTaskId", pipelineTaskId)
@@ -129,6 +133,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 key = "bk_repo_container_id_$pipelineTaskId",
                 value = System.getenv(GitConstants.BK_CI_BUILD_JOB_ID)
             )
+            EnvHelper.addEnvVariable("bk_repo_include_path_${input.pipelineTaskId}", input.includePath ?: "")
+            EnvHelper.addEnvVariable("bk_repo_exclude_path_${input.pipelineTaskId}", input.excludePath ?: "")
 
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,
