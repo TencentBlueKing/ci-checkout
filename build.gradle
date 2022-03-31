@@ -38,7 +38,7 @@ repositories {
 
 dependencies {
     ktlint "com.github.shyiko:ktlint:0.34.2"
-    compile "com.tencent.bk.devops.git:git-checkout-core:1.0.19-RELEASE"
+    compile "com.tencent.bk.devops.git:git-checkout-core:1.0.25-RELEASE"
 }
 
 compileKotlin {

@@ -63,6 +63,39 @@
         }
       ]
     },
+    "scmType": {
+      "label": "代码库类型",
+      "default": "CODE_GITLAB",
+      "desc": "",
+      "type": "enum-input",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "list": [
+        {
+          "label": "GITLAB",
+          "value": "CODE_GITLAB"
+        },
+        {
+          "label": "GITHUB",
+          "value": "GITHUB"
+        },
+        {
+          "label": "工蜂外网",
+          "value": "CODE_TGIT"
+        }
+      ],
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "ID"
+          }
+        ]
+      }
+    },
     "repositoryHashId": {
       "label": "按代码库选择",
       "default": "",
@@ -76,7 +109,7 @@
       "optionsConf": {
         "searchable": true,
         "multiple": false,
-        "url": "/repository/api/user/repositories/{projectId}/hasPermissionList?permission=USE&repositoryType=CODE_GITLAB&page=1&pageSize=5000",
+        "url": "/repository/api/user/repositories/{projectId}/hasPermissionList?permission=USE&repositoryType={scmType}}&page=1&pageSize=5000",
         "paramId": "repositoryHashId",
         "paramName": "aliasName",
         "itemTargetUrl": "/console/codelib/{projectId}/",
