@@ -22,8 +22,22 @@
 
 自定义前端: 否
 
-### 二、配置插件
+### 二、发布管理
+新增插件后，就会跳转到插件发布管理界面,点击"上架”
+![publish](images/publish.png)
 
+### 三、上架插件
+![publicDetail](images/publicDetail.png)
+步骤:
+1. 上传插件图标,插件图标可以直接使用[checkout](images/checkout.png)
+2. 插件job类型,linux、macos、windows都选上
+3. 上传插件包，插件包从[https://github.com/TencentBlueKing/ci-checkout/releases](https://github.com/TencentBlueKing/ci-checkout/releases))下载最新版本插件zip包
+   ![release](images/release.png)
+   
+4. 填写发布日志
+
+
+### 四、配置插件
 当插件上架后，就可以在流水线中选择插件，插件配置如下:
 
 ![configPlugin](images/configPlugin.png)
@@ -56,3 +70,5 @@ mkdir ~/.ssh
 # xxx要替换成拉取的代码库域名
 echo -e "Host xxx\nStrictHostKeyChecking no\n" > ~/.ssh/config
 ```
+2. git常见FAQ参考
+[Git插件常见报错及解决办法](https://github.com/TencentBlueKing/ci-git-checkout/wiki/Git%E6%8F%92%E4%BB%B6%E5%B8%B8%E8%A7%81%E6%8A%A5%E9%94%99%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95)

@@ -109,7 +109,7 @@
       "optionsConf": {
         "searchable": true,
         "multiple": false,
-        "url": "/repository/api/user/repositories/{projectId}/hasPermissionList?permission=USE&repositoryType={scmType}}&page=1&pageSize=5000",
+        "url": "/repository/api/user/repositories/{projectId}/hasPermissionList?permission=USE&repositoryType={scmType}&page=1&pageSize=5000",
         "paramId": "repositoryHashId",
         "paramName": "aliasName",
         "itemTargetUrl": "/console/codelib/{projectId}/",
