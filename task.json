@@ -112,7 +112,7 @@
         "url": "/repository/api/user/repositories/{projectId}/hasPermissionList?permission=USE&repositoryType={scmType}&page=1&pageSize=5000",
         "paramId": "repositoryHashId",
         "paramName": "aliasName",
-        "itemTargetUrl": "/console/codelib/{projectId}/",
+        "itemTargetUrl": "/codelib/{projectId}/",
         "itemText": "关联代码库",
         "hasAddItem": true
       },
@@ -238,7 +238,7 @@
         "url": "/ticket/api/user/credentials/{projectId}/hasPermissionList?permission=USE&page=1&pageSize=10000",
         "paramId": "credentialId",
         "paramName": "credentialId",
-        "itemTargetUrl": "/console/ticket/{projectId}/",
+        "itemTargetUrl": "/ticket/{projectId}/",
         "itemText": "添加新的凭证",
         "hasAddItem": true
       }
