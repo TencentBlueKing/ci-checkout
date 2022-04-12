@@ -80,6 +80,7 @@ class CheckoutAtomParamInputAdapter(
             fetchRefSpec = fetchRefSpec,
             enableGitClean = enableGitClean,
             enableGitCleanIgnore = enableGitCleanIgnore,
+            enableGitCleanNested = enableGitCleanNested,
             enableGitLfs = enableGitLfs,
             lfsConcurrentTransfers = lfsConcurrentTransfers,
 
@@ -134,6 +135,7 @@ class CheckoutAtomParamInputAdapter(
             fetchRefSpec = fetchRefSpec,
             enableGitClean = enableGitClean,
             enableGitCleanIgnore = enableGitCleanIgnore,
+            enableGitCleanNested = enableGitCleanNested,
             enableGitLfs = enableGitLfs,
             lfsConcurrentTransfers = lfsConcurrentTransfers,
 

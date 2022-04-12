@@ -79,6 +79,7 @@ data class GitCodeCommandAtomParamInput(
 
     var enableGitClean: Boolean = true,
     var enableGitCleanIgnore: Boolean = true,
+    var enableGitCleanNested: Boolean = false,
 
     // 非前端传递的参数
     val pipelineStartType: String? = null,

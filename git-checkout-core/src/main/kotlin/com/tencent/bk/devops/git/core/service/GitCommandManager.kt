@@ -99,10 +99,13 @@ class GitCommandManager(
         return stdout
     }
 
-    fun tryClean(enableGitCleanIgnore: Boolean?): Boolean {
+    fun tryClean(enableGitCleanIgnore: Boolean?, enableGitCleanNested: Boolean?): Boolean {
         val args = mutableListOf("clean", "-fd")
         if (enableGitCleanIgnore == true) {
             args.add("-x")
+        }
+        if (enableGitCleanNested == true) {
+            args.add("-f")
         }
         val output = execGit(args = args, allowAllExitCodes = true)
         return output.exitCode == 0

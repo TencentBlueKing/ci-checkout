@@ -74,6 +74,10 @@ data class GitSourceSettings(
      * 是否清理配置在.gitignore里面的文件
      */
     val enableGitCleanIgnore: Boolean? = true,
+    /**
+     * 是否清理没有跟踪的嵌套仓库
+     */
+    val enableGitCleanNested: Boolean? = false,
 
     /**
      * The depth when fetching

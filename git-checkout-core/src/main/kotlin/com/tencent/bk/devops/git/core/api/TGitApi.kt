@@ -1,6 +1,7 @@
 package com.tencent.bk.devops.git.core.api
 
 import com.fasterxml.jackson.core.type.TypeReference
+import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.HttpStatus
 import com.tencent.bk.devops.git.core.exception.ApiException
@@ -37,7 +38,7 @@ class TGitApi(
             val request = HttpUtil.buildGet(apiUrl)
             val responseContent = HttpUtil.retryRequest(request, "获取工蜂项目信息失败")
             return JsonUtil.to(responseContent, TGitProjectInfo::class.java)
-        } catch (ignore: ApiException) {
+        } catch (ignore: RemoteServiceException) {
             if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode) {
                 throw ApiException(
                     errorType = ErrorType.USER,

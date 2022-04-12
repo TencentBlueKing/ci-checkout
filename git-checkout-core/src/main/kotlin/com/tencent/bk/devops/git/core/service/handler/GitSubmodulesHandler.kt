@@ -32,6 +32,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
+import java.lang.StringBuilder
 
 class GitSubmodulesHandler(
     private val settings: GitSourceSettings,
@@ -55,6 +56,7 @@ class GitSubmodulesHandler(
                     command = "git reset --hard",
                     recursive = nestedSubmodules
                 )
+                submoduleClean()
                 git.submoduleUpdate(
                     recursive = nestedSubmodules,
                     path = submodulesPath,
@@ -72,5 +74,19 @@ class GitSubmodulesHandler(
                 value = (System.currentTimeMillis() - startEpoch).toString()
             )
         }
+    }
+
+    private fun GitSourceSettings.submoduleClean() {
+        val builder = StringBuilder("git clean -fd ")
+        if (enableGitCleanIgnore == true) {
+            builder.append(" -x ")
+        }
+        if (enableGitCleanNested == true) {
+            builder.append(" -f ")
+        }
+        git.submoduleForeach(
+            command = builder.toString(),
+            recursive = nestedSubmodules
+        )
     }
 }

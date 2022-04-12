@@ -63,6 +63,7 @@ data class GitCodeAtomParamInput(
     val fetchRefSpec: String? = null,
     var enableGitClean: Boolean = true,
     var enableGitCleanIgnore: Boolean = true,
+    var enableGitCleanNested: Boolean = false,
     var enableGitLfs: Boolean = false,
     /**
      * lfs并发上传下载的数量

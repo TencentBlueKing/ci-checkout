@@ -98,7 +98,7 @@ class GitDirectoryHelper(
 
     private fun clean(): Boolean {
         var remove = false
-        if (!git.tryClean(settings.enableGitCleanIgnore)) {
+        if (!git.tryClean(settings.enableGitCleanIgnore, settings.enableGitCleanNested)) {
             logger.info("The clean command failed. This might be caused by: " +
                 "1) path too long, " +
                 "2) permission issue, or " +

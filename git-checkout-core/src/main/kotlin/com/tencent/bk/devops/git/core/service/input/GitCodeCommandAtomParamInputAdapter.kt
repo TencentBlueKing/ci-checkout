@@ -155,6 +155,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 pullStrategy = PullStrategy.valueOf(strategy),
                 enableGitClean = enableGitClean,
                 enableGitCleanIgnore = enableGitCleanIgnore,
+                enableGitCleanNested = enableGitCleanNested,
                 fetchDepth = fetchDepth ?: 0,
                 enableFetchRefSpec = enableFetchRefSpec,
                 fetchRefSpec = fetchRefSpec,
