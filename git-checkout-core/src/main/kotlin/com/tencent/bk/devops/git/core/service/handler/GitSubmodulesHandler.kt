@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -52,10 +53,6 @@ class GitSubmodulesHandler(
                 }
                 logger.groupStart("Fetching submodules")
                 git.submoduleSync(recursive = nestedSubmodules, path = submodulesPath)
-                git.submoduleForeach(
-                    command = "git reset --hard",
-                    recursive = nestedSubmodules
-                )
                 submoduleClean()
                 git.submoduleUpdate(
                     recursive = nestedSubmodules,
@@ -77,6 +74,13 @@ class GitSubmodulesHandler(
     }
 
     private fun GitSourceSettings.submoduleClean() {
+        if (pullStrategy != PullStrategy.REVERT_UPDATE) {
+            return
+        }
+        git.submoduleForeach(
+            command = "git reset --hard",
+            recursive = nestedSubmodules
+        )
         val builder = StringBuilder("git clean -fd ")
         if (enableGitCleanIgnore == true) {
             builder.append(" -x ")
