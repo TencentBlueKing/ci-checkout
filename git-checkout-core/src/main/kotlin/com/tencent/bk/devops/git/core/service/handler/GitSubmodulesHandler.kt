@@ -81,16 +81,18 @@ class GitSubmodulesHandler(
             command = "git reset --hard",
             recursive = nestedSubmodules
         )
-        val builder = StringBuilder("git clean -fd ")
-        if (enableGitCleanIgnore == true) {
-            builder.append(" -x ")
+        if (enableGitClean) {
+            val builder = StringBuilder("git clean -fd ")
+            if (enableGitCleanIgnore == true) {
+                builder.append(" -x ")
+            }
+            if (enableGitCleanNested == true) {
+                builder.append(" -f ")
+            }
+            git.submoduleForeach(
+                command = builder.toString(),
+                recursive = nestedSubmodules
+            )
         }
-        if (enableGitCleanNested == true) {
-            builder.append(" -f ")
-        }
-        git.submoduleForeach(
-            command = builder.toString(),
-            recursive = nestedSubmodules
-        )
     }
 }
