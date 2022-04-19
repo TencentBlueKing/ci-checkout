@@ -48,7 +48,7 @@ object HttpUtil {
                             "$errorMessage|Fail to request with code ${response.code()} " +
                                 "message ${response.message()} and response $responseContent"
                         )
-                        throw RemoteServiceException(errorMessage, response.code(), response.body()?.string() ?: "")
+                        throw RemoteServiceException(errorMessage, response.code(), responseContent)
                     }
                     responseContent
                 }
