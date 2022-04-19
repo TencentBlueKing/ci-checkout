@@ -36,6 +36,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_RECURSE_SUBMODULES_VERSION
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.OSType
@@ -335,7 +336,10 @@ class GitCommandManager(
         shallowSince: String? = null,
         enablePartialClone: Boolean? = false
     ) {
-        val args = mutableListOf("fetch", "--prune", "--progress", "--no-recurse-submodules")
+        val args = mutableListOf("fetch", "--prune", "--progress")
+        if (isAtLeastVersion(SUPPORT_RECURSE_SUBMODULES_VERSION)) {
+            args.add("--no-recurse-submodules")
+        }
         /**
          * 如果git版本大于2.20.0,并且开启部分克隆，则忽略浅克隆
          */
