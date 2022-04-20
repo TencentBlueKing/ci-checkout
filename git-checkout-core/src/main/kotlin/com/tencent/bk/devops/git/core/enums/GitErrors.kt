@@ -57,7 +57,8 @@ enum class GitErrors(
                 "(fatal: 远程错误：Git repository not found)|" +
                 "(ERROR: Repository not found)|" +
                 "(fatal: remote error: Git:Project not found.)|" +
-                "(fatal: could not read Username for '(.+)': No such device or address)"
+                "(fatal: could not read Username for '(.+)': No such device or address)|" +
+                "(error: The requested URL returned error: 401 Unauthorized while accessing .*)"
         ),
         title = when (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL)) {
             GitProtocolEnum.SSH.name -> GitErrorsText.get().sshAuthenticationFailed

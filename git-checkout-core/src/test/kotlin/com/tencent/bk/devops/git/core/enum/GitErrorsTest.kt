@@ -27,6 +27,12 @@ class GitErrorsTest {
             "fatal: remote error: Git:Project not found."
         )
         Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
+
+        gitError = GitErrors.matchError(
+            "error: The requested URL returned error: 401 Unauthorized " +
+                "while accessing https://github.com/mingshewhe/webhook_test.git/info/refs"
+        )
+        Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
     }
 
     @Test

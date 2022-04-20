@@ -55,20 +55,34 @@ class GitFetchHandler(
     override fun doHandle() {
         val startEpoch = System.currentTimeMillis()
         try {
-            with(settings) {
-                logger.groupStart("Fetching the repository")
-                val shallowSince = calculateShallowSince()
-                fetchTargetRepository(shallowSince = shallowSince)
-                fetchSourceRepository(shallowSince = shallowSince)
-                fetchPrePushBranch(shallowSince = shallowSince)
-                testMerge()
-                logger.groupEnd("")
+            doFetch()
+        } catch (ignore: GitExecuteException) {
+            /**
+             * 如果拉取报凭证失败，可能是因为凭证管理有问题，如凭证写入失败，或者被其他错误凭证覆盖,使用core.askpass获取凭证重试拉取
+             */
+            if (ignore.internalErrorCode == GitErrors.AuthenticationFailed.internalErrorCode) {
+                authHelper.configureAskPass()
+                doFetch()
+            } else {
+                throw ignore
             }
         } finally {
             EnvHelper.putContext(
                 key = GitConstants.CONTEXT_FETCH_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()
             )
+        }
+    }
+
+    private fun doFetch() {
+        with(settings) {
+            logger.groupStart("Fetching the repository")
+            val shallowSince = calculateShallowSince()
+            fetchTargetRepository(shallowSince = shallowSince)
+            fetchSourceRepository(shallowSince = shallowSince)
+            fetchPrePushBranch(shallowSince = shallowSince)
+            testMerge()
+            logger.groupEnd("")
         }
     }
 
