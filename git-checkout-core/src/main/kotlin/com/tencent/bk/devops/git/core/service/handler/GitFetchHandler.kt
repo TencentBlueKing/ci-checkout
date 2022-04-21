@@ -101,7 +101,7 @@ class GitFetchHandler(
             logger.warn("开启preMerge，并且指定depth,git版本需要大于2.18才会生效，否则使用的是全量拉取")
         }
         if (canShallowSince(baseCommitId)) {
-            retryAuthFetch(
+            git.fetch(
                 refSpec = listOf(baseCommitId),
                 fetchDepth = 1,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME
@@ -189,7 +189,7 @@ class GitFetchHandler(
         } else {
             refHelper.getRefSpecForAllHistory()
         }
-        retryAuthFetch(
+        git.fetch(
             refSpec = refSpec,
             fetchDepth = fetchDepth,
             remoteName = GitConstants.ORIGIN_REMOTE_NAME,
@@ -228,40 +228,6 @@ class GitFetchHandler(
                 shallowSince = shallowSince,
                 enablePartialClone = enablePartialClone
             )
-        }
-    }
-
-    private fun retryAuthFetch(
-        refSpec: List<String>,
-        fetchDepth: Int,
-        remoteName: String,
-        shallowSince: String? = null,
-        enablePartialClone: Boolean? = false
-    ) {
-        try {
-            git.fetch(
-                refSpec = refSpec,
-                fetchDepth = fetchDepth,
-                remoteName = remoteName,
-                shallowSince = shallowSince,
-                enablePartialClone = enablePartialClone
-            )
-        } catch (ignore: GitExecuteException) {
-            /**
-             * 如果拉取报凭证失败，可能是因为凭证管理有问题，如凭证写入失败，或者被其他错误凭证覆盖,使用core.askpass获取凭证重试拉取
-             */
-            if (ignore.internalErrorCode == GitErrors.AuthenticationFailed.internalErrorCode) {
-                authHelper.configureAskPass()
-                git.fetch(
-                    refSpec = refSpec,
-                    fetchDepth = fetchDepth,
-                    remoteName = remoteName,
-                    shallowSince = shallowSince,
-                    enablePartialClone = enablePartialClone
-                )
-            } else {
-                throw ignore
-            }
         }
     }
 }
