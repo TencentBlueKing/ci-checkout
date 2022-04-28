@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -79,7 +80,7 @@ class GitCheckoutAndMergeHandler(
                 git.merge(mergeRef)
                 logger.groupEnd("")
             }
-            if (settings.enableGitClean) {
+            if (settings.pullStrategy == PullStrategy.REVERT_UPDATE && settings.enableGitClean) {
                 // checkout完成后再执行git clean命令,避免当子模块删除,但是构建机上子模块目录不会被清理的问题,影响下一次构建
                 git.tryClean(
                     enableGitCleanIgnore = settings.enableGitCleanIgnore,
