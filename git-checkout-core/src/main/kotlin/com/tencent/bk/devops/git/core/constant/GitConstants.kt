@@ -148,7 +148,7 @@ object GitConstants {
     val SUPPORT_PARTIAL_CLONE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 22, 0, 0)
     val SUPPORT_SHALLOW_SINCE_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 18, 0, 0)
     val SUPPORT_CONFIG_LOCAL_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 9, 0, 0)
-    val SUPPORT_RECURSE_SUBMODULES_VERSION = VersionHelper.computeVersionFromBits(2, 13, 0, 0)
+    val SUPPORT_RECURSE_SUBMODULES_VERSION = VersionHelper.computeVersionFromBits(1, 8, 0, 0)
     // 支持通过配置credential.helper= 禁用其他凭证管理的版本
     val SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION =
         VersionHelper.computeVersionFromBits(2, 9, 0, 0)
