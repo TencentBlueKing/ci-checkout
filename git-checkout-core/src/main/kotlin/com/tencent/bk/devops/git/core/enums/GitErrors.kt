@@ -71,6 +71,7 @@ enum class GitErrors(
         regex = Regex(
             "(fatal: (the|The) remote end hung up unexpectedly)|" +
                 "(fatal: unable to access '(.+)': The requested URL returned error: 502)|" +
+                "(fatal: 无法访问 '(.+)'：The requested URL returned error: 502)|" +
                 "(fatal: 远程错误：Internal server error)|" +
                 "(fatal: 远端意外挂断了)|" +
                 "(Git:Server is busy, please try again later)|" +
