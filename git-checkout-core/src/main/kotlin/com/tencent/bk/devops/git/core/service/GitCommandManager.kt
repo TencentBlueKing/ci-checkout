@@ -48,7 +48,6 @@ import com.tencent.bk.devops.git.core.service.helper.RetryHelper
 import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
-import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import com.tencent.devops.git.log.LogType
 import org.slf4j.LoggerFactory
@@ -378,8 +377,6 @@ class GitCommandManager(
     }
 
     private fun doFetch(args: List<String>) {
-        // add runtime env to git env
-        gitEnv.putAll(EnvHelper.getAuthEnv())
         RetryHelper().execute {
             try {
                 execGit(args = args, logType = LogType.PROGRESS)

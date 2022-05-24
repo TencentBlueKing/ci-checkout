@@ -129,11 +129,12 @@ object CommandUtil {
             // 系统环境变量 + 运行时环境变量
             val env = EnvironmentUtils.getProcEnvironment()
             env.putAll(runtimeEnv)
+            env.putAll(EnvHelper.getAuthEnv())
             val exitCode = executor.execute(command, env)
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {
-            val errorMsg = gitErrors?.title ?: "exec ${command.toStrings().joinToString(" ")} failed " +
-            "with an exitCode ${ignore.exitValue}"
+            val errorMsg = gitErrors?.title ?: ("exec ${command.toStrings().joinToString(" ")} failed " +
+                "with an exitCode ${ignore.exitValue}")
             val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
             val errorType = gitErrors?.errorType ?: ErrorType.USER
             val description = gitErrors?.description
