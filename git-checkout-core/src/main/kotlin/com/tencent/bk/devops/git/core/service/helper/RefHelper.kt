@@ -47,7 +47,12 @@ class RefHelper(
 ) {
 
     fun getRefSpecForAllHistory(): List<String> {
-        return listOf("+refs/heads/*:refs/remotes/$ORIGIN_REMOTE_NAME/*", "+refs/tags/*:refs/tags/*")
+        val refSpec = mutableListOf("+refs/heads/*:refs/remotes/$ORIGIN_REMOTE_NAME/*", "+refs/tags/*:refs/tags/*")
+        // 当指定commitId拉取并且设置depth，可能要拉取的commitId不在depth中,需指定拉取
+        if (settings.pullType == PullType.COMMIT_ID && settings.fetchDepth > 0) {
+            refSpec.add(settings.ref)
+        }
+        return refSpec
     }
 
     fun getRefSpec(): List<String> {
