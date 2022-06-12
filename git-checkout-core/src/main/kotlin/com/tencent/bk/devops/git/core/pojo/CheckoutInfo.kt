@@ -29,5 +29,6 @@ package com.tencent.bk.devops.git.core.pojo
 
 data class CheckoutInfo(
     val ref: String,
-    val startPoint: String
+    val startPoint: String,
+    val upstream: String = ""
 )

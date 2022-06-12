@@ -54,6 +54,9 @@ class GitCheckoutAndMergeHandler(
             logger.groupStart("Checking out the ref ${checkoutInfo.ref}")
             settings.initSparseCheckout()
             git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
+            if (checkoutInfo.upstream.isNotBlank()) {
+                git.branchUpstream(checkoutInfo.upstream)
+            }
             val afterCheckoutLog = getHeadLog()
             // 保存切换前的commitId，当重试时需要切到这个commitId点
             EnvHelper.addEnvVariable(
