@@ -53,7 +53,7 @@ class CredentialGitAuthProvider(
         EnvHelper.putContext(CONTEXT_CREDENTIAL_ID, credentialId!!)
         val gitAuthProvider = when (credentialInfo.credentialType) {
             CredentialType.ACCESSTOKEN ->
-                OauthGitAuthProvider(credentialInfo.v1)
+                OauthGitAuthProvider(token = credentialInfo.v1, userId = "")
             CredentialType.USERNAME_PASSWORD -> {
                 if (credentialInfo.v1.isEmpty()) {
                     throw ParamInvalidException(errorMsg = "the git credential username is empty")

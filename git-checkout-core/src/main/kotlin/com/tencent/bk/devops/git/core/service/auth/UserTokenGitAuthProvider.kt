@@ -59,6 +59,6 @@ class UserTokenGitAuthProvider(
             )
         }
         EnvHelper.putContext(GitConstants.CONTEXT_USER_ID, userId)
-        return OauthGitAuthProvider(token = result.data!!.accessToken).getAuthInfo()
+        return OauthGitAuthProvider(token = result.data!!.accessToken, userId = userId).getAuthInfo()
     }
 }

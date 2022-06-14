@@ -80,16 +80,17 @@ class GitAuthHelper(
         System.getenv(BK_CI_BUILD_JOB_ID) ?: ""
     ).toString()
     private val gitXdgConfigFile = Paths.get(gitXdgConfigHome, "git", "config").toString()
+    private val authInfo = settings.authInfo
 
     private fun configureHttp() {
         if (!serverInfo.httpProtocol ||
-            settings.username.isNullOrBlank() ||
-            settings.password.isNullOrBlank()
+            authInfo.username.isNullOrBlank() ||
+            authInfo.password.isNullOrBlank()
         ) {
             return
         }
 
-        logger.info("using custom credential helper to set credentials ${settings.username}/******")
+        logger.info("using custom credential helper to set credentials ${authInfo.username}/******")
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
         val compatibleHostList = settings.compatibleHostList
         if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
@@ -165,8 +166,8 @@ class GitAuthHelper(
                     protocol = scheme,
                     host = host,
                     path = path.removePrefix("/"),
-                    username = settings.username,
-                    password = settings.password
+                    username = authInfo.username,
+                    password = authInfo.password
                 ).convertInputStream()
             )
         }
@@ -327,11 +328,11 @@ class GitAuthHelper(
         if (serverInfo.httpProtocol) {
             return
         }
-        if (settings.privateKey.isNullOrBlank()) {
+        if (authInfo.privateKey.isNullOrBlank()) {
             throw ParamInvalidException(errorMsg = "private key must not be empty")
         }
         EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
-        SSHAgentUtils(privateKey = settings.privateKey, passPhrase = settings.passPhrase).addIdentity()
+        SSHAgentUtils(privateKey = authInfo.privateKey, passPhrase = authInfo.passPhrase).addIdentity()
         git.setEnvironmentVariable(GIT_SSH_COMMAND, GIT_SSH_COMMAND_VALUE)
     }
 
@@ -418,8 +419,8 @@ class GitAuthHelper(
 
     override fun configureAskPass() {
         if (!serverInfo.httpProtocol ||
-            settings.username.isNullOrBlank() ||
-            settings.password.isNullOrBlank()
+            authInfo.username.isNullOrBlank() ||
+            authInfo.password.isNullOrBlank()
         ) {
             return
         }
@@ -432,7 +433,7 @@ class GitAuthHelper(
                 configScope = GitConfigScope.GLOBAL
             )
         }
-        logger.info("using core.askpass to set credentials ${settings.username}/******")
+        logger.info("using core.askpass to set credentials ${authInfo.username}/******")
         val askpass = if (AgentEnv.getOS() == OSType.WINDOWS) {
             createWindowsAskpass()
         } else {
@@ -447,8 +448,8 @@ class GitAuthHelper(
         askpass.writeText(
             "#!/bin/sh\n" +
                 "case \"\$1\" in\n" +
-                "Username*) echo ${settings.username} ;;\n" +
-                "Password*) echo ${settings.password} ;;\n" +
+                "Username*) echo ${authInfo.username} ;;\n" +
+                "Password*) echo ${authInfo.password} ;;\n" +
                 "esac\n"
         )
         askpass.setExecutable(true, true)
@@ -459,8 +460,8 @@ class GitAuthHelper(
         val askpass = File.createTempFile("pass", ".bat")
         askpass.writeText(
             "@set arg=%~1\r\n" +
-                "@if (%arg:~0,8%)==(Username) ECHO ${settings.username}\r\n" +
-                "@if (%arg:~0,8%)==(Password) ECHO ${settings.password}\r\n"
+                "@if (%arg:~0,8%)==(Username) ECHO ${authInfo.username}\r\n" +
+                "@if (%arg:~0,8%)==(Password) ECHO ${authInfo.password}\r\n"
         )
         askpass.setExecutable(true, true)
         return askpass

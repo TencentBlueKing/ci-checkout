@@ -130,23 +130,9 @@ data class GitSourceSettings(
     var excludeSubPath: String? = "",
 
     /**
-     * 指定授权用户
+     * 授权信息
      */
-    var authUserId: String? = "",
-
-    /**
-     * if auth type is oauth, the username value is oauth2.
-     */
-    val username: String? = null,
-
-    /**
-     * The password to use when fetching the repository
-     */
-    val password: String? = null,
-
-    val privateKey: String? = null,
-
-    val passPhrase: String? = null,
+    val authInfo: AuthInfo,
 
     /**
      * Indicates whether to persist the credentials on disk to enable scripting authenticated git commands

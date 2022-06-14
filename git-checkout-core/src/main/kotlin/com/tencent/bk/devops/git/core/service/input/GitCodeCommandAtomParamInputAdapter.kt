@@ -70,7 +70,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 EmptyGitAuthProvider()
             } else {
                 when (authType) {
-                    AuthType.ACCESS_TOKEN -> OauthGitAuthProvider(token = accessToken)
+                    AuthType.ACCESS_TOKEN -> OauthGitAuthProvider(token = accessToken, userId = "")
                     AuthType.USERNAME_PASSWORD -> UserNamePasswordGitAuthProvider(
                         username = username,
                         password = password
@@ -167,10 +167,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 submodulesPath = submodulePath ?: "",
                 includeSubPath = includePath,
                 excludeSubPath = excludePath,
-                username = authInfo.username,
-                password = authInfo.password,
-                privateKey = authInfo.privateKey,
-                passPhrase = authInfo.passPhrase,
+                authInfo = authInfo,
                 persistCredentials = persistCredentials,
                 preMerge = preMerge,
                 sourceRepositoryUrl = hookSourceUrl ?: "",
