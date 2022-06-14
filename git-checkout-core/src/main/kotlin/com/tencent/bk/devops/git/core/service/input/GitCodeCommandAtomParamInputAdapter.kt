@@ -141,6 +141,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 pipelineId = pipelineId,
                 pipelineTaskId = pipelineTaskId,
                 pipelineBuildId = pipelineBuildId,
+                pipelineStartUserName = pipelineStartUserName,
                 postEntryParam = postEntryParam,
                 scmType = scmType,
                 repositoryUrl = repositoryUrl,

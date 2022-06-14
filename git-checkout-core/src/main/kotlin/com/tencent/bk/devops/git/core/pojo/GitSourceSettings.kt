@@ -39,6 +39,7 @@ data class GitSourceSettings(
     val pipelineId: String,
     val pipelineTaskId: String,
     val pipelineBuildId: String,
+    val pipelineStartUserName: String,
     val postEntryParam: String? = "false",
 
     val scmType: ScmType,
