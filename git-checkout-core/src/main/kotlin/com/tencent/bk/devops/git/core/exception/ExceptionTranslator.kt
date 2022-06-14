@@ -30,6 +30,7 @@ package com.tencent.bk.devops.git.core.exception
 import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.USER_NEED_PROJECT_X_PERMISSION
 import com.tencent.bk.devops.git.core.enums.HttpStatus
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.pojo.Result
@@ -53,36 +54,38 @@ object ExceptionTranslator {
                 }
             }
             is RemoteServiceException -> {
-                when {
-                    exception.httpStatus >= HttpStatus.INTERNAL_SERVER_ERROR.statusCode ->
-                        RetryException(errorMsg = exception.message ?: "")
-                    exception.httpStatus >= HttpStatus.BAD_REQUEST.statusCode &&
-                        exception.httpStatus < HttpStatus.INTERNAL_SERVER_ERROR.statusCode -> {
-                        val apiException = ApiException(
-                            errorType = ErrorType.USER,
-                            errorCode = GitConstants.CONFIG_ERROR,
-                            httpStatus = exception.httpStatus,
-                            errorMsg = exception.message ?: ""
-                        )
-                        try {
-                            val result =
-                                JsonUtil.to(exception.responseContent, object : TypeReference<Result<Unit>>() {})
-                            // 因权限中心bug，可能会出现调用权限中心失败，导致接口失败，增加重试
-                            if (result.status == 2101181) {
-                                RetryException(errorMsg = exception.message ?: "")
-                            } else {
-                                apiException
-                            }
-                        } catch (ignore: Exception) {
-                            apiException
-                        }
-                    }
-                    else ->
-                        ApiException(httpStatus = exception.httpStatus, errorMsg = exception.message ?: "")
-                }
+                handleRemoteException(exception)
             }
             else ->
                 ApiException(errorMsg = exception.message ?: "")
         }
+    }
+
+    private fun handleRemoteException(exception: RemoteServiceException) = when {
+        exception.httpStatus >= HttpStatus.INTERNAL_SERVER_ERROR.statusCode ->
+            RetryException(errorMsg = exception.message ?: "")
+        exception.httpStatus >= HttpStatus.BAD_REQUEST.statusCode &&
+            exception.httpStatus < HttpStatus.INTERNAL_SERVER_ERROR.statusCode -> {
+            val apiException = ApiException(
+                errorType = ErrorType.USER,
+                errorCode = GitConstants.CONFIG_ERROR,
+                httpStatus = exception.httpStatus,
+                errorMsg = exception.message ?: ""
+            )
+            try {
+                val result =
+                    JsonUtil.to(exception.responseContent, object : TypeReference<Result<Unit>>() {})
+                // 因权限中心bug，可能会出现调用权限中心失败，导致接口失败，增加重试
+                if (result.status == USER_NEED_PROJECT_X_PERMISSION) {
+                    RetryException(errorMsg = exception.message ?: "")
+                } else {
+                    apiException
+                }
+            } catch (ignore: Exception) {
+                apiException
+            }
+        }
+        else ->
+            ApiException(httpStatus = exception.httpStatus, errorMsg = exception.message ?: "")
     }
 }

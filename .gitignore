@@ -17,3 +17,5 @@ notes/
 *.apk
 git-checkout-credential.jar
 core-version.properties
+.codecc
+build.yml

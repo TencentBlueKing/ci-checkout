@@ -175,4 +175,6 @@ object GitConstants {
 
     const val wikiUrl = "https://github.com/TencentBlueKing/ci-git-checkout/wiki/" +
             "Git%E6%8F%92%E4%BB%B6%E5%B8%B8%E8%A7%81%E6%8A%A5%E9%94%99%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"
+
+    const val USER_NEED_PROJECT_X_PERMISSION = 2101181
 }
