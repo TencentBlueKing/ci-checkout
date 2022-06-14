@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 
 class OauthGitAuthProvider(
+    private val userId: String?,
     private val token: String?
 ) : IGitAuthProvider {
     override fun getAuthInfo(): AuthInfo {
@@ -39,7 +40,8 @@ class OauthGitAuthProvider(
         }
         return AuthInfo(
             username = "oauth2",
-            password = token
+            password = token,
+            usernameConfig = userId
         )
     }
 }

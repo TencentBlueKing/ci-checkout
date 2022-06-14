@@ -183,7 +183,6 @@ class GitFetchHandler(
     }
 
     private fun GitSourceSettings.fetchTargetRepository(shallowSince: String?) {
-        // 按照时间拉，必须是指定的分支,不然会报错
         val refSpec = if (isUseFetchRefSpec(shallowSince)) {
             refHelper.getRefSpec()
         } else {

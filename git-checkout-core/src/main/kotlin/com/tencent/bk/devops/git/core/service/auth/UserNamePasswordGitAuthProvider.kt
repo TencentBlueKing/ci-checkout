@@ -46,7 +46,8 @@ class UserNamePasswordGitAuthProvider(
         EnvHelper.putContext(GitConstants.CONTEXT_USER_ID, username)
         return AuthInfo(
             username = username,
-            password = password
+            password = password,
+            usernameConfig = username
         )
     }
 }

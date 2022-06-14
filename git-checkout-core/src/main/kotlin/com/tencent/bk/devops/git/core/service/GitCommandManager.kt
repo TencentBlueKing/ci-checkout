@@ -407,6 +407,11 @@ class GitCommandManager(
         execGit(args = args, logType = LogType.PROGRESS)
     }
 
+    fun branchUpstream(upstream: String) {
+        val args = listOf("branch", "--set-upstream-to=$upstream")
+        execGit(args = args)
+    }
+
     fun merge(ref: String) {
         execGit(args = listOf("merge", "--no-verify", ref))
     }

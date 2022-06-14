@@ -37,11 +37,14 @@ import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.service.helper.DefaultGitUserConfigHelper
+import com.tencent.bk.devops.git.core.service.helper.IGitUserConfigHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.util.ServiceLoader
 
 class InitRepoHandler(
     private val settings: GitSourceSettings,
@@ -101,11 +104,14 @@ class InitRepoHandler(
         if (!autoCrlf.isNullOrBlank()) {
             git.config(configKey = "core.autocrlf", configValue = autoCrlf!!)
         }
+        val userConfigHelper = ServiceLoader.load(IGitUserConfigHelper::class.java).firstOrNull()
+            ?: DefaultGitUserConfigHelper()
+        val (usernameConfig, userEmailConfig) = userConfigHelper.getUserConfig(settings)
         if (!usernameConfig.isNullOrBlank()) {
-            git.config(configKey = "user.name", configValue = usernameConfig!!)
+            git.config(configKey = "user.name", configValue = usernameConfig)
         }
         if (!userEmailConfig.isNullOrBlank()) {
-            git.config(configKey = "user.email", configValue = userEmailConfig!!)
+            git.config(configKey = "user.email", configValue = userEmailConfig)
         }
         git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.LOCAL)
         git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.LOCAL)

@@ -47,7 +47,12 @@ class RefHelper(
 ) {
 
     fun getRefSpecForAllHistory(): List<String> {
-        return listOf("+refs/heads/*:refs/remotes/$ORIGIN_REMOTE_NAME/*", "+refs/tags/*:refs/tags/*")
+        val refSpec = mutableListOf("+refs/heads/*:refs/remotes/$ORIGIN_REMOTE_NAME/*", "+refs/tags/*:refs/tags/*")
+        // 当指定commitId拉取并且设置depth，可能要拉取的commitId不在depth中,需指定拉取
+        if (settings.pullType == PullType.COMMIT_ID && settings.fetchDepth > 0) {
+            refSpec.add(settings.ref)
+        }
+        return refSpec
     }
 
     fun getRefSpec(): List<String> {
@@ -113,16 +118,16 @@ class RefHelper(
             val hookCommitId = getHookCommitId()
             return when (pullType) {
                 PullType.BRANCH -> {
-                    val startPoint = when {
+                    val (startPoint, upstream) = when {
                         GitUtil.isPrePushBranch(ref) ->
-                            "FETCH_HEAD"
+                            Pair("FETCH_HEAD", "")
                         hookCommitId != null -> {
-                            hookCommitId
+                            Pair(hookCommitId, "$ORIGIN_REMOTE_NAME/$ref")
                         }
                         commit.isBlank() ->
-                            "refs/remotes/$ORIGIN_REMOTE_NAME/$ref"
+                            Pair("refs/remotes/$ORIGIN_REMOTE_NAME/$ref", "")
                         else ->
-                            commit
+                            Pair(commit, "$ORIGIN_REMOTE_NAME/$ref")
                     }
                     if (preMerge) {
                         CheckoutInfo(
@@ -130,7 +135,7 @@ class RefHelper(
                             startPoint = startPoint
                         )
                     } else {
-                        CheckoutInfo(ref = ref, startPoint = startPoint)
+                        CheckoutInfo(ref = ref, startPoint = startPoint, upstream = upstream)
                     }
                 }
                 PullType.TAG ->

@@ -37,5 +37,8 @@ data class AuthInfo(
 
     val privateKey: String? = null,
 
-    val passPhrase: String? = null
+    val passPhrase: String? = null,
+
+    // git config user.name配置的值
+    val usernameConfig: String? = null
 )
