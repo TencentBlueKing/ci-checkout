@@ -111,6 +111,7 @@ class GitAuthHelper(
         EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         EnvHelper.addEnvVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
+        git.setEnvironmentVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
         install()
         store()
     }
@@ -134,13 +135,6 @@ class GitAuthHelper(
             sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
         )
-        // 如果不是第三方构建机，禁用其他凭证
-        if (!AgentEnv.isThirdParty()) {
-            git.tryConfigUnset(
-                configKey = GIT_CREDENTIAL_HELPER,
-                configScope = GitConfigScope.GLOBAL
-            )
-        }
         // 凭证管理必须安装在全局,否则无法传递给其他插件
         if (!git.configExists(
                 configKey = GIT_CREDENTIAL_HELPER,
@@ -337,6 +331,8 @@ class GitAuthHelper(
     private fun getJavaFilePath() = File(System.getProperty("java.home"), "/bin/java").absolutePath
 
     override fun configureAuth() {
+        // 打印credential.helper,方便分析报错
+        git.tryConfigGet(configKey = GIT_CREDENTIAL_HELPER)
         configureHttp()
         configureSsh()
         // 第三方构建机设置insteadOf可能影响用户环境,而且第三方构建机一般不需要凭证传递
@@ -412,7 +408,9 @@ class GitAuthHelper(
 
     override fun removeSubmoduleAuth() {
         git.removeEnvironmentVariable(XDG_CONFIG_HOME)
-        File(gitXdgConfigFile).deleteOnExit()
+        if (File(gitXdgConfigFile).exists()) {
+            File(gitXdgConfigFile).delete()
+        }
     }
 
     override fun configureAskPass() {
