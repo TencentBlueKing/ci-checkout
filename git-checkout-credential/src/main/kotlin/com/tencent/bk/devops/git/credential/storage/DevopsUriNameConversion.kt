@@ -7,8 +7,12 @@ import java.net.URI
 class DevopsUriNameConversion : Secret.IUriNameConversion {
     override fun convert(targetUri: URI, namespace: String): String {
         val builder = StringBuilder(namespace)
-        val buildId = System.getenv(Constants.BK_CI_PIPELINE_ID)
+        val pipelineId = System.getenv(Constants.BK_CI_PIPELINE_ID)
+        val buildId = System.getenv(Constants.BK_CI_BUILD_ID)
         val vmSeqId = System.getenv(Constants.BK_CI_BUILD_JOB_ID)
+        if (!pipelineId.isNullOrBlank()) {
+            builder.append(":").append(pipelineId)
+        }
         if (!buildId.isNullOrBlank()) {
             builder.append(":").append(buildId)
         }

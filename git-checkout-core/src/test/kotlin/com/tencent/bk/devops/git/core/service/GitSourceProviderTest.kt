@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service
 
 import com.tencent.bk.devops.git.core.api.MockDevopsApi
 import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import java.io.File
 import java.nio.file.Files
@@ -43,6 +44,7 @@ class GitSourceProviderTest {
         pipelineId = "001",
         pipelineBuildId = "122",
         pipelineTaskId = "1243",
+        pipelineStartUserName = "mingshewhe",
         scmType = ScmType.CODE_GIT,
         repositoryUrl = "https://github.com/ci-plugins/git.git",
         repositoryPath = workspace.absolutePath,
@@ -52,7 +54,11 @@ class GitSourceProviderTest {
         lfs = true,
         preMerge = false,
         submodules = true,
-        persistCredentials = true
+        persistCredentials = true,
+        authInfo = AuthInfo(
+            username = "xiaoming",
+            password = "123456"
+        )
     )
     private val devopsApi = MockDevopsApi()
 
