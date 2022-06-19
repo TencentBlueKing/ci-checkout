@@ -1,6 +1,7 @@
 package com.tencent.bk.devops.git.credential.storage
 
 import com.microsoft.alm.secret.Credential
+import com.tencent.bk.devops.git.credential.Constants
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 import com.tencent.bk.devops.git.credential.helper.GitOutput
 import java.io.ByteArrayInputStream
@@ -49,7 +50,7 @@ class CacheSecureStore : ICredentialStore {
         args.add(action)
         val builder = StringBuilder()
         builder.append("protocol=").append(targetUri.scheme).append("\n")
-        builder.append("host=").append(targetUri.host).append("\n")
+        builder.append("host=").append(hostToName(targetUri.host)).append("\n")
         if (credential != null) {
             builder.append("username=").append(credential.Username).append("\n")
             builder.append("password=").append(credential.Password).append("\n")
@@ -58,5 +59,23 @@ class CacheSecureStore : ICredentialStore {
             args = args,
             inputStream = ByteArrayInputStream(builder.toString().toByteArray())
         )
+    }
+
+    private fun hostToName(host: String): String {
+        val builder = StringBuilder("devops")
+        val pipelineId = System.getenv(Constants.BK_CI_PIPELINE_ID)
+        val buildId = System.getenv(Constants.BK_CI_BUILD_ID)
+        val vmSeqId = System.getenv(Constants.BK_CI_BUILD_JOB_ID)
+        if (!pipelineId.isNullOrBlank()) {
+            builder.append("_").append(pipelineId)
+        }
+        if (!buildId.isNullOrBlank()) {
+            builder.append("_").append(buildId)
+        }
+        if (!vmSeqId.isNullOrBlank()) {
+            builder.append("_").append(vmSeqId)
+        }
+        builder.append("_").append(host)
+        return builder.toString()
     }
 }

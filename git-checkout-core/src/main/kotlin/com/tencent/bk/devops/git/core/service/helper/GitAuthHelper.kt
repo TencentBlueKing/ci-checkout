@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CORE_ASKPASS
+import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_ASKPASS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
@@ -54,7 +55,6 @@ import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.SSHAgentUtils
-import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -72,9 +72,16 @@ class GitAuthHelper(
     }
 
     private val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
+    private val credentialVersion = VersionHelper.getCredentialVersion()
+    private val credentialJarFileName = if (credentialVersion.isNotBlank()) {
+        "git-checkout-credential-$credentialVersion.jar"
+    } else {
+        "git-checkout-credential.jar"
+    }
+    private val credentialShellFileName = "git-checkout.sh"
     private val credentialHome = File(System.getProperty("user.home"), ".checkout").absolutePath
-    private val credentialJarPath = File(credentialHome, "git-checkout-credential.jar").absolutePath
-    private val credentialShellPath = File(credentialHome, "git-checkout-credential.sh").absolutePath
+    private val credentialJarPath = File(credentialHome, credentialJarFileName).absolutePath
+    private val credentialShellPath = File(credentialHome, credentialShellFileName).absolutePath
     private val gitXdgConfigHome = Paths.get(credentialHome,
         System.getenv(BK_CI_PIPELINE_ID) ?: "",
         System.getenv(BK_CI_BUILD_JOB_ID) ?: ""
@@ -102,7 +109,9 @@ class GitAuthHelper(
         }
         val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
         EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
+        EnvHelper.addEnvVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
+        git.setEnvironmentVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
         install()
         store()
     }
@@ -113,7 +122,7 @@ class GitAuthHelper(
             credentialJarParentFile.mkdirs()
         }
         copyCredentialFile(
-            sourceFilePath = "script/git-checkout-credential.jar",
+            sourceFilePath = "script/$credentialJarFileName",
             targetFile = File(credentialJarPath)
         )
 
@@ -123,27 +132,19 @@ class GitAuthHelper(
         )
 
         copyCredentialFile(
-            sourceFilePath = "script/git-checkout-credential.sh",
+            sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
         )
-        // 如果不是第三方构建机，禁用其他凭证
-        if (!AgentEnv.isThirdParty()) {
-            git.tryConfigUnset(
-                configKey = GIT_CREDENTIAL_HELPER,
-                configScope = GitConfigScope.GLOBAL
-            )
-        }
         // 凭证管理必须安装在全局,否则无法传递给其他插件
         if (!git.configExists(
                 configKey = GIT_CREDENTIAL_HELPER,
-                configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX,
-                configScope = GitConfigScope.GLOBAL
+                configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX
             )
         ) {
             git.configAdd(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValue = "!bash '$credentialShellPath'",
-                configScope = GitConfigScope.GLOBAL
+                configScope = GitConfigScope.SYSTEM
             )
         }
     }
@@ -177,15 +178,6 @@ class GitAuthHelper(
         if (!targetFile.exists()) {
             javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { sourceInputStream ->
                 FileUtils.copyToFile(sourceInputStream, targetFile)
-            }
-        } else {
-            val newFileMd5 = javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { DigestUtils.md5Hex(it) }
-            val oldFileMd5 = targetFile.inputStream().use { DigestUtils.md5Hex(it) }
-            if (newFileMd5 != oldFileMd5) {
-                targetFile.delete()
-                javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { sourceInputStream ->
-                    FileUtils.copyToFile(sourceInputStream, targetFile)
-                }
             }
         }
     }
@@ -339,6 +331,8 @@ class GitAuthHelper(
     private fun getJavaFilePath() = File(System.getProperty("java.home"), "/bin/java").absolutePath
 
     override fun configureAuth() {
+        // 打印credential.helper,方便分析报错
+        git.tryConfigGet(configKey = GIT_CREDENTIAL_HELPER)
         configureHttp()
         configureSsh()
         // 第三方构建机设置insteadOf可能影响用户环境,而且第三方构建机一般不需要凭证传递
@@ -414,7 +408,9 @@ class GitAuthHelper(
 
     override fun removeSubmoduleAuth() {
         git.removeEnvironmentVariable(XDG_CONFIG_HOME)
-        File(gitXdgConfigFile).deleteOnExit()
+        if (File(gitXdgConfigFile).exists()) {
+            File(gitXdgConfigFile).delete()
+        }
     }
 
     override fun configureAskPass() {

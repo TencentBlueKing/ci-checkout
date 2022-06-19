@@ -68,7 +68,7 @@ subprojects {
     if (snapshot == "true") {
         version = version + "-SNAPSHOT"
     } else {
-        version = version + "-RELEASE"
+        version = version
     }
 
     configurations {

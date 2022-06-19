@@ -5,12 +5,22 @@ import java.util.Properties
 @SuppressWarnings("MagicNumber")
 object VersionHelper {
 
-    fun getCheckoutCoreVersion(): String {
+    fun getCheckoutBuildInfo(): String {
         val properties = Properties()
         javaClass.classLoader.getResourceAsStream("core-version.properties").use { properties.load(it) }
-        val version = properties["version"]
-        val buildNo = properties["buildNo"]
-        return "$version-$buildNo"
+        val version = properties["version"]?.toString()
+        val buildNo = properties["buildNo"]?.toString()
+        return if (buildNo.isNullOrBlank()) {
+            version ?: ""
+        } else {
+            "$version-$buildNo"
+        }
+    }
+
+    fun getCredentialVersion(): String {
+        val properties = Properties()
+        javaClass.classLoader.getResourceAsStream("credential-version.properties").use { properties.load(it) }
+        return properties["version"]?.toString() ?: ""
     }
 
     fun computeGitVersion(version: String): Long {

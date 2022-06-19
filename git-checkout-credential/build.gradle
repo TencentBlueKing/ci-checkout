@@ -35,11 +35,19 @@ dependencies {
 
 // 固定入口类 不要改
 mainClassName = "com.tencent.bk.devops.git.credential.MainKt"
+version '2.0.0'
 
 shadowJar {
     archiveBaseName.set("git-checkout-credential")
     zip64 true
     archiveClassifier.set("")
-    archiveVersion.set("")
     destinationDirectory.set(new File("$rootDir/git-checkout-core/src/main/resources/script/"))
 }
+
+task versionInfo(type: WriteProperties) {
+    outputFile new File("$rootDir/git-checkout-core/src/main/resources/credential-version.properties")
+    encoding = "UTF-8"
+    property 'version', version
+}
+
+processResources.dependsOn versionInfo
