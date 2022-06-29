@@ -3,8 +3,8 @@ package com.tencent.bk.devops.git.core.service.auth
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.api.TGitApi
 import com.tencent.bk.devops.git.core.constant.GitConstants.CI_EVENT
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_REPOSITORY_URL
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_USER_ID
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_USER_ID
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.AuthInfo

@@ -27,17 +27,19 @@
 
 package com.tencent.bk.devops.git.core.enums
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_TYPE
 import com.tencent.bk.devops.git.core.constant.GitConstants
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_GIT_PROTOCOL
-import com.tencent.bk.devops.git.core.constant.GitConstants.wikiUrl
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
+import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 
+@SuppressWarnings("LongParameterList")
 enum class GitErrors(
     val regex: Regex,
     val title: String?,
-    val description: String? = null,
+    val cause: String?,
+    val solution: String?,
     val errorType: ErrorType = ErrorType.USER,
     val errorCode: Int = GitConstants.CONFIG_ERROR,
     val internalErrorCode: Int = 0
@@ -48,25 +50,50 @@ enum class GitErrors(
             "(The requested URL returned error: 403)|" +
                 "(fatal: could not read Username for '(.+)': terminal prompts disabled)|" +
                 "(fatal: Authentication failed for '(.+)')|" +
-                "(fatal: Could not read from remote repository.)|" +
                 "(fatal: Authentication failed)|" +
                 "(fatal: '(.+)' 鉴权失败)|" +
-                "(fatal: 无法读取远程仓库。)" +
+                "(fatal: could not read Username for '(.+)': No such device or address)|" +
+                "(error: The requested URL returned error: 401 Unauthorized while accessing .*)"
+        ),
+        title = GitErrorsText.get().httpAuthenticationFailed,
+        cause = GitErrorsText.get().httpAuthenticationFailedCause,
+        solution = if (EnvHelper.getContext(CONTEXT_REPOSITORY_TYPE) == RepositoryType.URL.name) {
+            GitErrorsText.get().httpAuthenticationFailedUrlSolution
+        } else {
+            GitErrorsText.get().httpAuthenticationFailedRepositorySolution
+        },
+        internalErrorCode = 1
+    ),
+
+    SshAuthenticationFailed(
+        regex = Regex(
+                "(fatal: Could not read from remote repository.)|" +
+                "(fatal: 无法读取远程仓库。)"
+        ),
+        title = GitErrorsText.get().sshAuthenticationFailed,
+        cause = GitErrorsText.get().sshAuthenticationFailedCause,
+        solution = GitErrorsText.get().sshAuthenticationFailedSolution,
+        internalErrorCode = 1
+    ),
+
+    RepositoryNotFoundFailed(
+        regex = Regex(
                 "(fatal: repository '(.+)' not found)|" +
                 "(fatal: .* Git repository not found)|" +
                 "(fatal: 远程错误：Git repository not found)|" +
                 "(ERROR: Repository not found)|" +
-                "(fatal: remote error: Git:Project not found.)|" +
-                "(fatal: could not read Username for '(.+)': No such device or address)|" +
-                "(error: The requested URL returned error: 401 Unauthorized while accessing .*)"
+                "(fatal: remote error: Git:Project not found.)"
         ),
-        title = when (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL)) {
-            GitProtocolEnum.SSH.name -> GitErrorsText.get().sshAuthenticationFailed
-            else -> GitErrorsText.get().httpAuthenticationFailed
+        title = GitErrorsText.get().repositoryNotFoundFailed,
+        cause = GitErrorsText.get().httpAuthenticationFailedCause,
+        solution = if (EnvHelper.getContext(CONTEXT_REPOSITORY_TYPE) == RepositoryType.URL.name) {
+            GitErrorsText.get().httpAuthenticationFailedUrlSolution
+        } else {
+            GitErrorsText.get().httpAuthenticationFailedRepositorySolution
         },
-        description = "$wikiUrl#%E4%B8%80%E6%8E%88%E6%9D%83%E5%A4%B1%E8%B4%A5",
         internalErrorCode = 1
     ),
+
     RemoteServerFailed(
         regex = Regex(
             "(fatal: (the|The) remote end hung up unexpectedly)|" +
@@ -83,9 +110,10 @@ enum class GitErrors(
                 "(fatal: index-pack failed)"
         ),
         title = GitErrorsText.get().remoteServerFailed,
+        cause = GitErrorsText.get().remoteServerFailedCause,
+        solution = GitErrorsText.get().remoteServerFailedSolution,
         errorType = ErrorType.THIRD_PARTY,
         errorCode = GitConstants.GIT_ERROR,
-        description = "$wikiUrl#%E4%BA%8C%E8%BF%9C%E7%A8%8B%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%BC%82%E5%B8%B8",
         internalErrorCode = 2
     ),
     ConnectionTimeOut(
@@ -93,6 +121,8 @@ enum class GitErrors(
             "ssh: connect to host (.+) port (\\d+): Connection timed out"
         ),
         title = GitErrorsText.get().connectionTimeOut,
+        cause = GitErrorsText.get().connectionTimeOutCause,
+        solution = GitErrorsText.get().connectionTimeOutSolution,
         internalErrorCode = 3
     ),
 
@@ -114,7 +144,8 @@ enum class GitErrors(
             options = setOf(RegexOption.IGNORE_CASE)
         ),
         title = GitErrorsText.get().noMatchingBranch,
-        description = "$wikiUrl#%E4%B8%89%E5%88%86%E6%94%AF%E6%88%96commit%E4%B8%8D%E5%AD%98%E5%9C%A8",
+        cause = GitErrorsText.get().noMatchingBranchCause,
+        solution = GitErrorsText.get().noMatchingBranchSolution,
         internalErrorCode = 4
     ),
     NoInitializeBranch(
@@ -123,7 +154,8 @@ enum class GitErrors(
                 "(fatal: 您位于一个尚未初始化的分支)"
         ),
         title = GitErrorsText.get().noInitializeBranch,
-        description = "$wikiUrl#%E5%9B%9Bcheckout%E7%9A%84%E5%88%86%E6%94%AF%E5%90%8D%E4%B8%BA%E7%A9%BA",
+        cause = GitErrorsText.get().noInitializeBranchCause,
+        solution = GitErrorsText.get().noInitializeBranchSolution,
         internalErrorCode = 5
     ),
     SparseCheckoutLeavesNoEntry(
@@ -131,8 +163,8 @@ enum class GitErrors(
             "(error: Sparse checkout leaves no entry on working directory)"
         ),
         title = GitErrorsText.get().sparseCheckoutLeavesNoEntry,
-        description = "$wikiUrl#%E4%BA%94%E9%83%A8%E5%88%86%E6%A3%80%E5%87%BA%E9%94%99%E8%AF%AF%E8%AF%B7%E6%A3%80%E6" +
-            "%9F%A5%E9%83%A8%E5%88%86%E6%A3%80%E5%87%BA%E7%9A%84%E6%96%87%E4%BB%B6%E6%98%AF%E5%90%A6%E5%AD%98%E5%9C%A8",
+        cause = GitErrorsText.get().sparseCheckoutLeavesNoEntryCause,
+        solution = GitErrorsText.get().sparseCheckoutLeavesNoEntrySolution,
         internalErrorCode = 6
     ),
     BranchOrPathNameConflicts(
@@ -140,7 +172,8 @@ enum class GitErrors(
             "(fatal: '(.+)' 既可以是一个本地文件，也可以是一个跟踪分支。)"
         ),
         title = GitErrorsText.get().branchOrPathNameConflicts,
-        description = "$wikiUrl#%E5%85%AD%E5%88%86%E6%94%AF%E6%88%96%E8%B7%AF%E5%BE%84%E5%90%8D%E5%86%B2%E7%AA%81",
+        cause = GitErrorsText.get().branchOrPathNameConflictsCause,
+        solution = GitErrorsText.get().branchOrPathNameConflictsSolution,
         internalErrorCode = 7
     ),
 
@@ -152,8 +185,8 @@ enum class GitErrors(
                 "(自动合并失败，修正冲突然后提交修正的结果。)"
         ),
         title = GitErrorsText.get().mergeConflicts,
-        description = "$wikiUrl#%E4%B8%83merge%E5%86%B2%E7%AA%81%E8%AF%B7%E5%85%88%E8%A7%A3%E5%86%B3%E5%86%B2%E7" +
-            "%AA%81%E7%84%B6%E5%90%8E%E5%86%8D%E6%9E%84%E5%BB%BA",
+        cause = GitErrorsText.get().mergeConflictsCause,
+        solution = GitErrorsText.get().mergeConflictsSolution,
         internalErrorCode = 8
     ),
     InvalidMerge(
@@ -162,8 +195,8 @@ enum class GitErrors(
                 "(merge：.+ - 不能合并)"
         ),
         title = GitErrorsText.get().invalidMerge,
-        description = "$wikiUrl#%E5%85%AB%E5%90%88%E5%B9%B6%E5%A4%B1%E8%B4%A5%E5%8F%AF%E8%83%BD%E6%98%AF%E5%9B%A0" +
-            "%E4%B8%BA%E6%BA%90%E5%88%86%E6%94%AF%E8%A2%AB%E5%88%A0%E9%99%A4%E5%AF%BC%E8%87%B4",
+        cause = GitErrorsText.get().invalidMergeCause,
+        solution = GitErrorsText.get().invalidMergeSolution,
         internalErrorCode = 9
     ),
     CannotMergeUnrelatedHistories(
@@ -172,8 +205,8 @@ enum class GitErrors(
                 "(fatal: 拒绝合并无关的历史)"
         ),
         title = GitErrorsText.get().cannotMergeUnrelatedHistories,
-        description = "$wikiUrl#%E5%85%AB%E5%90%88%E5%B9%B6%E5%A4%B1%E8%B4%A5%E5%8F%AF%E8%83%BD%E6%98%AF%E5%9B%A0%E4" +
-            "%B8%BA%E6%BA%90%E5%88%86%E6%94%AF%E8%A2%AB%E5%88%A0%E9%99%A4%E5%AF%BC%E8%87%B4",
+        cause = GitErrorsText.get().cannotMergeUnrelatedHistoriesCause,
+        solution = GitErrorsText.get().cannotMergeUnrelatedHistoriesSolution,
         internalErrorCode = 10
     ),
     LocalChangesOverwritten(
@@ -183,8 +216,8 @@ enum class GitErrors(
                 "(error: 您对下列文件的本地修改将被检出操作覆盖：)"
         ),
         title = GitErrorsText.get().localChangesOverwritten,
-        description = "$wikiUrl#%E5%8D%81%E5%88%87%E6%8D%A2%E5%88%86%E6%94%AF%E5%A4%B1%E8%B4%A5%E6%9C%AC%E5%9C%B0%E4" +
-            "%BF%AE%E6%94%B9%E7%9A%84%E6%96%87%E4%BB%B6%E5%B0%86%E8%A2%AB%E8%A6%86%E7%9B%96",
+        cause = GitErrorsText.get().localChangesOverwrittenCause,
+        solution = GitErrorsText.get().localChangesOverwrittenSolution,
         internalErrorCode = 11
     ),
 
@@ -197,7 +230,8 @@ enum class GitErrors(
                 "(fatal: No url found for submodule path '(.+)' in .gitmodules)"
         ),
         title = GitErrorsText.get().noSubmoduleMapping,
-        description = "$wikiUrl#%E5%8D%81%E4%B8%80%E5%AD%90%E6%A8%A1%E5%9D%97%E6%9B%B4%E6%96%B0%E5%A4%B1%E8%B4%A5",
+        cause = GitErrorsText.get().noSubmoduleMappingCause,
+        solution = GitErrorsText.get().noSubmoduleMappingSolution,
         internalErrorCode = 12
     ),
     SubmoduleRepositoryDoesNotExist(
@@ -207,8 +241,8 @@ enum class GitErrors(
             options = setOf(RegexOption.IGNORE_CASE)
         ),
         title = GitErrorsText.get().submoduleRepositoryDoesNotExist,
-        description = "$wikiUrl#%E5%8D%81%E4%BA%8C%E5%AD%90%E6%A8%A1%E5%9D%97%E9%85%8D%E7%BD%AE%E7%9A%84%E4" +
-            "%BB%93%E5%BA%93%E4%B8%8D%E5%AD%98%E5%9C%A8",
+        cause = GitErrorsText.get().submoduleRepositoryDoesNotExistCause,
+        solution = GitErrorsText.get().submoduleRepositoryDoesNotExistSolution,
         internalErrorCode = 13
     ),
     InvalidSubmoduleSHA(
@@ -220,8 +254,8 @@ enum class GitErrors(
                 "(fatal: Needed a single revision)"
         ),
         title = GitErrorsText.get().invalidSubmoduleSHA,
-        description = "$wikiUrl#%E5%8D%81%E4%B8%89%E5%AD%90%E6%A8%A1%E5%9D%97%E6%8C%87%E5%90%91%E7%9A" +
-            "%84commit%E4%B8%8D%E5%AD%98%E5%9C%A8",
+        cause = GitErrorsText.get().invalidSubmoduleSHACause,
+        solution = GitErrorsText.get().invalidSubmoduleSHASolution,
         internalErrorCode = 14
     ),
 
@@ -231,6 +265,8 @@ enum class GitErrors(
             "The .+ attribute should be .+ but is .+"
         ),
         title = GitErrorsText.get().lfsAttributeDoesNotMatch,
+        cause = GitErrorsText.get().lfsAttributeDoesNotMatchCause,
+        solution = GitErrorsText.get().lfsAttributeDoesNotMatchSolution,
         internalErrorCode = 15
     ),
     ErrorDownloadingObject(
@@ -239,7 +275,8 @@ enum class GitErrors(
                 "(LFS: Repository or object not found: .+)"
         ),
         title = GitErrorsText.get().errorDownloadingObject,
-        description = "$wikiUrl#%E5%8D%81%E5%9B%9Bgit-lfs%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E9%94%99%E8%AF%AF",
+        cause = GitErrorsText.get().errorDownloadingObjectCause,
+        solution = GitErrorsText.get().errorDownloadingObjectSolution,
         internalErrorCode = 16
     ),
     LfsNotInstall(
@@ -248,7 +285,8 @@ enum class GitErrors(
                 "(git：'lfs' 不是一个 git 命令。参见 'git --help'。)"
         ),
         title = GitErrorsText.get().lfsNotInstall,
-        description = "$wikiUrl#%E5%8D%81%E4%BA%94lfs%E7%A8%8B%E5%BA%8F%E6%B2%A1%E6%9C%89%E5%AE%89%E8%A3%85",
+        cause = GitErrorsText.get().lfsNotInstallCause,
+        solution = GitErrorsText.get().lfsNotInstallSolution,
         internalErrorCode = 17
     ),
 
@@ -259,6 +297,8 @@ enum class GitErrors(
                 "(error: could not lock config file (.+): File exists)"
         ),
         title = GitErrorsText.get().lockFileAlreadyExists,
+        cause = GitErrorsText.get().lockFileAlreadyExistsCause,
+        solution = GitErrorsText.get().lockFileAlreadyExistsSolution,
         internalErrorCode = 18
     ),
     BadRevision(
@@ -266,6 +306,8 @@ enum class GitErrors(
             "fatal: bad revision '(.*)'"
         ),
         title = GitErrorsText.get().badRevision,
+        cause = GitErrorsText.get().badRevisionCause,
+        solution = GitErrorsText.get().badRevisionSolution,
         internalErrorCode = 19
     ),
     NotAGitRepository(
@@ -273,6 +315,8 @@ enum class GitErrors(
             "fatal: [Nn]ot a git repository \\(or any of the parent directories\\): .git"
         ),
         title = GitErrorsText.get().notAGitRepository,
+        cause = GitErrorsText.get().notAGitRepositoryCause,
+        solution = GitErrorsText.get().notAGitRepositorySolution,
         internalErrorCode = 20
     );
 

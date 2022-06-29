@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_TYPE
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_EXCLUDE_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_INCLUDE_PATH
@@ -37,6 +38,7 @@ import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
+import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.GitCodeCommandAtomParamInput
 import com.tencent.bk.devops.git.core.service.auth.AuthUserTokenGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.CredentialGitAuthProvider
@@ -135,6 +137,7 @@ class GitCodeCommandAtomParamInputAdapter(
             )
             EnvHelper.addEnvVariable("bk_repo_include_path_${input.pipelineTaskId}", input.includePath ?: "")
             EnvHelper.addEnvVariable("bk_repo_exclude_path_${input.pipelineTaskId}", input.excludePath ?: "")
+            EnvHelper.putContext(CONTEXT_REPOSITORY_TYPE, RepositoryType.URL.name)
 
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,

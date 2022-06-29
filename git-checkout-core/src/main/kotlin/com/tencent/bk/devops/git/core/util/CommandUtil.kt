@@ -28,8 +28,8 @@
 package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TOTAL_SIZE
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_TRANSFER_RATE
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TOTAL_SIZE
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitOutput
@@ -133,18 +133,22 @@ object CommandUtil {
             val exitCode = executor.execute(command, env)
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {
-            val errorMsg = gitErrors?.title ?: ("exec ${command.toStrings().joinToString(" ")} failed " +
-                "with an exitCode ${ignore.exitValue}")
+            val errorMsg = gitErrors?.title?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
+                ?: ("exec ${command.toStrings().joinToString(" ")} failed " +
+                    "with an exitCode ${ignore.exitValue}")
             val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
             val errorType = gitErrors?.errorType ?: ErrorType.USER
-            val description = gitErrors?.description
-            if (description != null) {
-                logger.info("<a target='_blank' href='$description'>查看解决办法</a>")
-            }
+            logger.warn("===========================问题排查指引===========================")
+            logger.warn("错误信息: $errorMsg")
+            logger.warn("问题原因:")
+            logger.warn("${gitErrors?.cause}")
+            logger.warn("解决方法:")
+            logger.warn("${gitErrors?.solution?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }}")
+            logger.warn("================================================================")
             throw GitExecuteException(
                 errorType = errorType,
                 errorCode = errorCode,
-                errorMsg = defaultResolver.resolveByMap(errorMsg, EnvHelper.getContextMap()),
+                errorMsg = errorMsg,
                 internalErrorCode = gitErrors?.internalErrorCode ?: 0
             )
         } catch (ignore: Throwable) {

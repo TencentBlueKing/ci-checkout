@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service.handler
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT
@@ -68,7 +69,7 @@ class GitFetchHandler(
             }
         } finally {
             EnvHelper.putContext(
-                key = GitConstants.CONTEXT_FETCH_COST_TIME,
+                key = ContextConstants.CONTEXT_FETCH_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()
             )
         }

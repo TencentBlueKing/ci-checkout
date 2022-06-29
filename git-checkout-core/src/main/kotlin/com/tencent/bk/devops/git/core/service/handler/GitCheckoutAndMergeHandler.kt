@@ -27,6 +27,10 @@
 
 package com.tencent.bk.devops.git.core.service.handler
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CHECKOUT_COST_TIME
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CHECKOUT_REF
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MERGE_SOURCE_REF
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MERGE_TARGET_REF
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
@@ -53,6 +57,7 @@ class GitCheckoutAndMergeHandler(
             val checkoutInfo = refHelper.getCheckInfo()
             logger.groupStart("Checking out the ref ${checkoutInfo.ref}")
             settings.initSparseCheckout()
+            EnvHelper.putContext(CONTEXT_CHECKOUT_REF, checkoutInfo.ref)
             git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
             if (checkoutInfo.upstream.isNotBlank()) {
                 git.branchUpstream(checkoutInfo.upstream)
@@ -80,6 +85,8 @@ class GitCheckoutAndMergeHandler(
                     key = GitConstants.BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT,
                     value = sourceBranchLog?.commitMessage ?: ""
                 )
+                EnvHelper.putContext(CONTEXT_MERGE_SOURCE_REF, mergeRef)
+                EnvHelper.putContext(CONTEXT_MERGE_TARGET_REF, settings.ref)
                 git.merge(mergeRef)
                 logger.groupEnd("")
             }
@@ -92,7 +99,7 @@ class GitCheckoutAndMergeHandler(
             }
         } finally {
             EnvHelper.putContext(
-                key = GitConstants.CONTEXT_CHECKOUT_COST_TIME,
+                key = CONTEXT_CHECKOUT_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()
             )
         }

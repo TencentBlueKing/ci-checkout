@@ -28,6 +28,8 @@
 package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_ALIAS_NAME
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_TYPE
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
@@ -73,7 +75,6 @@ class GitCodeAtomParamInputAdapter(
         with(input) {
             // 1. 获取仓库信息
             val repositoryType = RepositoryType.valueOf(repositoryType)
-            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, repositoryType.name)
             val repositoryId = when (repositoryType) {
                 RepositoryType.ID -> {
                     repositoryHashId ?: throw ParamInvalidException(errorMsg = "代码库ID不能为空")
@@ -142,6 +143,9 @@ class GitCodeAtomParamInputAdapter(
 
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
+            EnvHelper.putContext(CONTEXT_REPOSITORY_ALIAS_NAME, repository.aliasName)
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, repositoryType.name)
+            EnvHelper.putContext(CONTEXT_REPOSITORY_TYPE, repositoryType.name)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_BRANCH, branchName)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_TAG, tagName ?: "")

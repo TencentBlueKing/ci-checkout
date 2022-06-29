@@ -28,7 +28,7 @@
 package com.tencent.bk.devops.git.core.service.auth
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_CREDENTIAL_ID
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CREDENTIAL_ID
 import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo

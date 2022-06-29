@@ -28,7 +28,7 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
-import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitLogHelper
@@ -53,7 +53,7 @@ class GitLogHandler(
             logger.groupEnd("")
         } finally {
             EnvHelper.putContext(
-                key = GitConstants.CONTEXT_LOG_COST_TIME,
+                key = ContextConstants.CONTEXT_LOG_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()
             )
         }

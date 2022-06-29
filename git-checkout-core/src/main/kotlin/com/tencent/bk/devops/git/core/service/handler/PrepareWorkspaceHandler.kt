@@ -27,10 +27,10 @@
 
 package com.tencent.bk.devops.git.core.service.handler
 
-import com.tencent.bk.devops.git.core.constant.GitConstants
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_BKREPO_DOWNLOAD_COST_TIME
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_BKREPO_DOWNLOAD_RESULT
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_PREPARE_COST_TIME
+import com.tencent.bk.devops.git.core.constant.ContextConstants
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_BKREPO_DOWNLOAD_COST_TIME
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_BKREPO_DOWNLOAD_RESULT
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_PREPARE_COST_TIME
 import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -82,7 +82,7 @@ class PrepareWorkspaceHandler(
                     )
                 }
                 val downloadResult = if (isExisting) {
-                    EnvHelper.putContext(GitConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.BKREPO_CACHE.name)
+                    EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.BKREPO_CACHE.name)
                     "success"
                 } else {
                     logger.error("download from cache repository failed,cleaning workspace")

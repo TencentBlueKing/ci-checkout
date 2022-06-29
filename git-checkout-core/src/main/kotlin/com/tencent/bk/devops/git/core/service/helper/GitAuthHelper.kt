@@ -27,7 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
-import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CORE_ASKPASS
@@ -98,7 +98,7 @@ class GitAuthHelper(
         }
 
         logger.info("using custom credential helper to set credentials ${authInfo.username}/******")
-        EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
+        EnvHelper.putContext(ContextConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
         val compatibleHostList = settings.compatibleHostList
         if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
             git.config(
@@ -323,7 +323,7 @@ class GitAuthHelper(
         if (authInfo.privateKey.isNullOrBlank()) {
             throw ParamInvalidException(errorMsg = "private key must not be empty")
         }
-        EnvHelper.putContext(GitConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
+        EnvHelper.putContext(ContextConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
         SSHAgentUtils(privateKey = authInfo.privateKey, passPhrase = authInfo.passPhrase).addIdentity()
         git.setEnvironmentVariable(GIT_SSH_COMMAND, GIT_SSH_COMMAND_VALUE)
     }

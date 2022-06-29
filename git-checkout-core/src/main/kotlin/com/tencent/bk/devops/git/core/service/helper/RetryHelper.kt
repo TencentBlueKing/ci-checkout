@@ -28,7 +28,7 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.fasterxml.jackson.core.type.TypeReference
-import com.tencent.bk.devops.git.core.constant.GitConstants.CONTEXT_ERROR_INFO
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_ERROR_INFO
 import com.tencent.bk.devops.git.core.exception.RetryException
 import com.tencent.bk.devops.git.core.pojo.ErrorInfo
 import com.tencent.bk.devops.git.core.util.EnvHelper

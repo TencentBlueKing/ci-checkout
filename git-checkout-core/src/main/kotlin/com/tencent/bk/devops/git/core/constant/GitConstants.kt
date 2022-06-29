@@ -154,28 +154,5 @@ object GitConstants {
     val SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION =
         VersionHelper.computeVersionFromBits(2, 9, 0, 0)
 
-    // context 上下文，在错误信息中使用 @see GitErrorsText
-    const val CONTEXT_USER_ID = "context_user_id"
-    const val CONTEXT_REPOSITORY_URL = "context_repository_url"
-    const val CONTEXT_CREDENTIAL_ID = "context_credential_id"
-    const val CONTEXT_GIT_PROTOCOL = "context_git_protocol"
-    const val CONTEXT_FETCH_STRATEGY = "context_fetch_strategy" // 全量拉取
-    const val CONTEXT_PREPARE_COST_TIME = "context_prepare_cost_time"
-    const val CONTEXT_INIT_COST_TIME = "context_init_cost_time"
-    const val CONTEXT_SUBMODULE_COST_TIME = "context_submodule_cost_time"
-    const val CONTEXT_LFS_COST_TIME = "context_lfs_cost_time"
-    const val CONTEXT_FETCH_COST_TIME = "context_fetch_cost_time"
-    const val CONTEXT_CHECKOUT_COST_TIME = "context_checkout_cost_time"
-    const val CONTEXT_LOG_COST_TIME = "context_log_cost_time"
-    const val CONTEXT_AUTH_COST_TIME = "context_auth_cost_time"
-    const val CONTEXT_BKREPO_DOWNLOAD_COST_TIME = "context_bkrepo_download_cost_time"
-    const val CONTEXT_BKREPO_DOWNLOAD_RESULT = "context_bkrepo_download_result"
-    const val CONTEXT_TRANSFER_RATE = "context_transfer_rate"
-    const val CONTEXT_TOTAL_SIZE = "context_total_size"
-    const val CONTEXT_ERROR_INFO = "context_error_info"
-
-    const val wikiUrl = "https://github.com/TencentBlueKing/ci-git-checkout/wiki/" +
-            "Git%E6%8F%92%E4%BB%B6%E5%B8%B8%E8%A7%81%E6%8A%A5%E9%94%99%E5%8F%8A%E8%A7%A3%E5%86%B3%E5%8A%9E%E6%B3%95"
-
     const val USER_NEED_PROJECT_X_PERMISSION = 2101181
 }

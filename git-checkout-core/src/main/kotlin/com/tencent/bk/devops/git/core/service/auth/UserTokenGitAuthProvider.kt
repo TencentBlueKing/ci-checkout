@@ -28,7 +28,7 @@
 package com.tencent.bk.devops.git.core.service.auth
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
-import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
@@ -58,7 +58,7 @@ class UserTokenGitAuthProvider(
                 )
             )
         }
-        EnvHelper.putContext(GitConstants.CONTEXT_USER_ID, userId)
+        EnvHelper.putContext(ContextConstants.CONTEXT_USER_ID, userId)
         return OauthGitAuthProvider(token = result.data!!.accessToken, userId = userId).getAuthInfo()
     }
 }

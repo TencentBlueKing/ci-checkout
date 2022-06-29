@@ -1,6 +1,6 @@
 package com.tencent.bk.devops.git.core.service.handler
 
-import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -34,7 +34,7 @@ class GitLfsHandler(
             }
         } finally {
             EnvHelper.putContext(
-                key = GitConstants.CONTEXT_LFS_COST_TIME,
+                key = ContextConstants.CONTEXT_LFS_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()
             )
         }

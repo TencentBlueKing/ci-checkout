@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service.handler
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
@@ -70,7 +71,7 @@ class InitRepoHandler(
             }
         } finally {
             EnvHelper.putContext(
-                key = GitConstants.CONTEXT_INIT_COST_TIME,
+                key = ContextConstants.CONTEXT_INIT_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()
             )
         }
@@ -78,7 +79,7 @@ class InitRepoHandler(
 
     private fun GitSourceSettings.initRepository() {
         if (!File(repositoryPath, ".git").exists()) {
-            EnvHelper.putContext(GitConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.FULL.name)
+            EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.FULL.name)
             git.init()
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
             // if source repository is fork repo, adding devops-virtual-origin
@@ -87,8 +88,8 @@ class InitRepoHandler(
                 git.remoteAdd(DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
             }
         } else {
-            if (EnvHelper.getContext(GitConstants.CONTEXT_FETCH_STRATEGY) == null) {
-                EnvHelper.putContext(GitConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.VM_CACHE.name)
+            if (EnvHelper.getContext(ContextConstants.CONTEXT_FETCH_STRATEGY) == null) {
+                EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.VM_CACHE.name)
             }
             git.remoteSetUrl(ORIGIN_REMOTE_NAME, repositoryUrl)
             if (preMerge && !sourceRepoUrlEqualsRepoUrl
