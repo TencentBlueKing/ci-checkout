@@ -138,15 +138,12 @@ object CommandUtil {
                     "with an exitCode ${ignore.exitValue}")
             val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
             val errorType = gitErrors?.errorType ?: ErrorType.USER
-            logger.warn("===========================问题排查指引===========================")
-            logger.warn("错误信息: $errorMsg")
-            logger.warn("----------------------------------------------------------------")
-            logger.warn("问题原因:")
-            logger.warn("${gitErrors?.cause}")
-            logger.warn("----------------------------------------------------------------")
-            logger.warn("解决方法:")
-            logger.warn("${gitErrors?.solution?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }}")
-            logger.warn("================================================================")
+            ConsoleTableUtil.printAsTable(
+                errMsg = errorMsg,
+                cause = gitErrors?.cause ?: "",
+                solution = gitErrors?.solution?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
+                    ?: ""
+            )
             throw GitExecuteException(
                 errorType = errorType,
                 errorCode = errorCode,
