@@ -57,7 +57,7 @@ object CommandUtil {
     private const val MAX_LOG_SIZE = 100
     private val logger = LoggerFactory.getLogger(CommandUtil::class.java)
 
-    @SuppressWarnings("LongParameterList")
+    @SuppressWarnings("LongParameterList", "ComplexMethod")
     fun execute(
         workingDirectory: File? = null,
         executable: String,
