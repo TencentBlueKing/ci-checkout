@@ -17,9 +17,9 @@ object ConsoleTableUtil {
     private fun printSplit(title: String, str: String) {
         str.split("\n").forEachIndexed { index, message ->
             if (index == 0) {
-                logger.warn("$title：\t${message.trim()}")
+                logger.warn("$title：${message.trim()}")
             } else {
-                logger.warn("           \t${message.trim()}")
+                logger.warn("           ${message.trim()}")
             }
         }
     }

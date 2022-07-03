@@ -140,7 +140,7 @@ object CommandUtil {
             val errorType = gitErrors?.errorType ?: ErrorType.USER
             ConsoleTableUtil.printAsTable(
                 errMsg = errorMsg,
-                cause = gitErrors?.cause ?: "",
+                cause = gitErrors?.cause?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) } ?: "",
                 solution = gitErrors?.solution?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
                     ?: ""
             )

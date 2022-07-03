@@ -55,6 +55,7 @@ import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.SSHAgentUtils
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -178,6 +179,15 @@ class GitAuthHelper(
         if (!targetFile.exists()) {
             javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { sourceInputStream ->
                 FileUtils.copyToFile(sourceInputStream, targetFile)
+            }
+        } else {
+            val newFileMd5 = javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { DigestUtils.md5Hex(it) }
+            val oldFileMd5 = targetFile.inputStream().use { DigestUtils.md5Hex(it) }
+            if (newFileMd5 != oldFileMd5) {
+                targetFile.delete()
+                javaClass.classLoader.getResourceAsStream(sourceFilePath)?.use { sourceInputStream ->
+                    FileUtils.copyToFile(sourceInputStream, targetFile)
+                }
             }
         }
     }

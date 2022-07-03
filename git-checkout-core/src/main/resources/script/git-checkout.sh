@@ -7,7 +7,7 @@ if [[ -z $credential_java_path ]]; then
 fi
 credential_jar_key='credential_jar_path_'$BK_CI_BUILD_JOB_ID
 credential_jar_path=$(env | grep "^[a-zA-Z0-9_]*$credential_jar_key=" | awk '{sub(/^[^=]+=/,"");print; exit;}')
-if [[ -z $credential_jar_path ]]; then
+if [ ! -z $credential_jar_path ] && [ -f $bash_path/$credential_jar_path ]; then
         $credential_java_path -jar $bash_path/$credential_jar_path $@
 elif [ -f $bash_path/git-checkout-credential.jar ]; then
         $credential_java_path -jar $bash_path/git-checkout-credential.jar $@
