@@ -146,6 +146,7 @@ class GitAuthHelper(
         // 先卸载全局的git凭证,为了兼容历史配置
         git.tryConfigUnset(
             configKey = GIT_CREDENTIAL_HELPER,
+            configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX,
             configScope = GitConfigScope.GLOBAL
         )
     }

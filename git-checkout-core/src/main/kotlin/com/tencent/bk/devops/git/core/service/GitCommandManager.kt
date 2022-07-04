@@ -179,12 +179,14 @@ class GitCommandManager(
 
     fun tryConfigUnset(
         configKey: String,
+        configValueRegex: String? = null,
         configScope: GitConfigScope = GitConfigScope.LOCAL,
         configFile: String? = null
     ): Boolean {
         val output = execGit(
             args = configArgs(
                 configKey = configKey,
+                configValue = configValueRegex,
                 configScope = configScope,
                 configFile = configFile,
                 action = "--unset-all"

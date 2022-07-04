@@ -64,13 +64,9 @@ class CacheSecureStore : ICredentialStore {
     private fun hostToName(host: String): String {
         val builder = StringBuilder("devops")
         val pipelineId = System.getenv(Constants.BK_CI_PIPELINE_ID)
-        val buildId = System.getenv(Constants.BK_CI_BUILD_ID)
         val vmSeqId = System.getenv(Constants.BK_CI_BUILD_JOB_ID)
         if (!pipelineId.isNullOrBlank()) {
             builder.append("_").append(pipelineId)
-        }
-        if (!buildId.isNullOrBlank()) {
-            builder.append("_").append(buildId)
         }
         if (!vmSeqId.isNullOrBlank()) {
             builder.append("_").append(vmSeqId)
