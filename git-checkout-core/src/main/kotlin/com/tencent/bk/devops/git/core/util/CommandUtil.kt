@@ -27,9 +27,9 @@
 
 package com.tencent.bk.devops.git.core.util
 
-import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TOTAL_SIZE
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TRANSFER_RATE
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitOutput
@@ -37,7 +37,6 @@ import com.tencent.bk.devops.git.core.pojo.GitPackingPhase
 import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.script.CommandLineExecutor
-import com.tencent.bk.devops.plugin.script.SensitiveLineParser
 import com.tencent.devops.git.log.GitLogOutputStream
 import com.tencent.devops.git.log.LogType
 import org.apache.commons.exec.CommandLine
@@ -45,7 +44,6 @@ import org.apache.commons.exec.ExecuteException
 import org.apache.commons.exec.PumpStreamHandler
 import org.apache.commons.exec.environment.EnvironmentUtils
 import org.apache.commons.io.IOUtils
-import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.InputStream
 
@@ -55,7 +53,6 @@ object CommandUtil {
      * 最大的输出日志行数
      */
     private const val MAX_LOG_SIZE = 100
-    private val logger = LoggerFactory.getLogger(CommandUtil::class.java)
 
     @SuppressWarnings("LongParameterList", "ComplexMethod")
     fun execute(
