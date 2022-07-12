@@ -49,7 +49,7 @@ object EnvHelper {
 
     private val env = mutableMapOf<String, String>()
 
-    private val copyOnThreadLocal = object : ThreadLocal<MutableMap<String, String>>() {
+    private val copyOnThreadLocal = object : InheritableThreadLocal<MutableMap<String, String>>() {
         override fun initialValue(): MutableMap<String, String> {
             return mutableMapOf()
         }

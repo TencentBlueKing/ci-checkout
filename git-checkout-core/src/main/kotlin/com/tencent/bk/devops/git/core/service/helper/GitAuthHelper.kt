@@ -132,6 +132,20 @@ class GitAuthHelper(
             sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
         )
+        // 如果不是第三方构建机，禁用其他凭证
+        if (!AgentEnv.isThirdParty()) {
+            git.tryConfigUnset(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configScope = GitConfigScope.GLOBAL
+            )
+        } else {
+            // 卸载全局的git-checkout-credential凭证,为了兼容历史配置
+            git.tryConfigUnset(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configValueRegex = GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
+                configScope = GitConfigScope.GLOBAL
+            )
+        }
         // 凭证管理必须安装在全局,否则无法传递给其他插件
         if (!git.configExists(
                 configKey = GIT_CREDENTIAL_HELPER,
@@ -144,12 +158,6 @@ class GitAuthHelper(
                 configScope = GitConfigScope.SYSTEM
             )
         }
-        // 卸载全局的git-checkout-credential凭证,为了兼容历史配置
-        git.tryConfigUnset(
-            configKey = GIT_CREDENTIAL_HELPER,
-            configValueRegex = GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
-            configScope = GitConfigScope.GLOBAL
-        )
     }
 
     private fun store() {
