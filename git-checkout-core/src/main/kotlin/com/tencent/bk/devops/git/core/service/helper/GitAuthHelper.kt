@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CORE_ASKPASS
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_ASKPASS
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
@@ -143,10 +144,10 @@ class GitAuthHelper(
                 configScope = GitConfigScope.SYSTEM
             )
         }
-        // 先卸载全局的git凭证,为了兼容历史配置
+        // 卸载全局的git-checkout-credential凭证,为了兼容历史配置
         git.tryConfigUnset(
             configKey = GIT_CREDENTIAL_HELPER,
-            configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX,
+            configValueRegex = GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
             configScope = GitConfigScope.GLOBAL
         )
     }
@@ -343,7 +344,7 @@ class GitAuthHelper(
 
     override fun configureAuth() {
         // 打印credential.helper,方便分析报错
-        git.tryConfigGet(configKey = GIT_CREDENTIAL_HELPER)
+        git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
         configureHttp()
         configureSsh()
         // 第三方构建机设置insteadOf可能影响用户环境,而且第三方构建机一般不需要凭证传递

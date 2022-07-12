@@ -177,6 +177,28 @@ class GitCommandManager(
         return output.stdOut
     }
 
+    fun tryConfigGetAll(
+        configKey: String,
+        configValueRegex: String? = null,
+        configScope: GitConfigScope = GitConfigScope.LOCAL,
+        configFile: String? = null
+    ): String {
+        val output = execGit(
+            args = configArgs(
+                configKey = configKey,
+                configValue = configValueRegex,
+                configScope = configScope,
+                configFile = configFile,
+                action = "--get-all"
+            ),
+            allowAllExitCodes = true
+        )
+        if (output.exitCode != 0) {
+            return ""
+        }
+        return output.stdOut
+    }
+
     fun tryConfigUnset(
         configKey: String,
         configValueRegex: String? = null,
