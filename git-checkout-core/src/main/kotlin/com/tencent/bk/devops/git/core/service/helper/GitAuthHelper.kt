@@ -132,14 +132,19 @@ class GitAuthHelper(
             sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
         )
-        // 如果不是第三方构建机，禁用其他凭证
+        // 卸载本地的git凭证配置
+        git.tryConfigUnset(
+            configKey = GIT_CREDENTIAL_HELPER
+        )
+        // 卸载全局的git凭证配置
         if (!AgentEnv.isThirdParty()) {
+            // docker构建机卸载所有的git凭证配置
             git.tryConfigUnset(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configScope = GitConfigScope.GLOBAL
             )
         } else {
-            // 卸载全局的git-checkout-credential凭证,为了兼容历史配置
+            // 第三方构建机不影响用户凭证，只卸载全局的git-checkout-credential凭证,为了兼容历史配置
             git.tryConfigUnset(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValueRegex = GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
