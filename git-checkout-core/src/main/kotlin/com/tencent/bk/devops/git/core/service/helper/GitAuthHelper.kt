@@ -160,7 +160,7 @@ class GitAuthHelper(
             git.configAdd(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValue = "!bash '$credentialShellPath'",
-                configScope = GitConfigScope.SYSTEM
+                configScope = GitConfigScope.GLOBAL
             )
         }
     }
