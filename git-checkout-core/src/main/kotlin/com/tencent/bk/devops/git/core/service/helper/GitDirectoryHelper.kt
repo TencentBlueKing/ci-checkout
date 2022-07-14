@@ -99,11 +99,13 @@ class GitDirectoryHelper(
     private fun clean(): Boolean {
         var remove = false
         if (!git.tryClean(settings.enableGitCleanIgnore, settings.enableGitCleanNested)) {
-            logger.info("The clean command failed. This might be caused by: " +
-                "1) path too long, " +
-                "2) permission issue, or " +
-                "3) file in use. For futher investigation, " +
-                "manually run 'git clean -ffdx' on the directory '\$repositoryPath.")
+            logger.info(
+                "The clean command failed. This might be caused by: " +
+                    "1) path too long, " +
+                    "2) permission issue, or " +
+                    "3) file in use. For futher investigation, " +
+                    "manually run 'git clean -ffdx' on the directory '\$repositoryPath."
+            )
             remove = true
         } else if (git.headExists() && !git.tryReset("HEAD")) {
             // If the last checkout failed, then the HEAD is empty
@@ -115,7 +117,8 @@ class GitDirectoryHelper(
     private fun removeLockFile(repositoryPath: String) {
         val lockFiles = listOf(
             File(repositoryPath, ".git/index.lock"),
-            File(repositoryPath, ".git/shallow.lock")
+            File(repositoryPath, ".git/shallow.lock"),
+            File(repositoryPath, ".git/config.lock")
         )
         lockFiles.forEach { lockFile ->
             try {
