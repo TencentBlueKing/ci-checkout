@@ -115,11 +115,12 @@ class GitDirectoryHelper(
     }
 
     private fun removeLockFile(repositoryPath: String) {
-        val lockFiles = listOf(
+        val lockFiles = mutableListOf(
             File(repositoryPath, ".git/index.lock"),
             File(repositoryPath, ".git/shallow.lock"),
             File(repositoryPath, ".git/config.lock")
         )
+        lockFiles.addAll(findRefLockFile(File(repositoryPath, ".git/refs")))
         lockFiles.forEach { lockFile ->
             try {
                 lockFile.delete()
@@ -127,5 +128,9 @@ class GitDirectoryHelper(
                 logger.error("Unable to delete ${lockFile.name}", e.message)
             }
         }
+    }
+
+    private fun findRefLockFile(directory: File): List<File> {
+        return org.apache.commons.io.FileUtils.listFiles(directory, arrayOf("lock"), true).toList()
     }
 }
