@@ -135,7 +135,7 @@ class RefHelper(
                     }
                 }
                 PullType.TAG ->
-                    CheckoutInfo(ref = ref, startPoint = "refs/tags/$ref")
+                    CheckoutInfo(ref = "refs/tags/$ref", startPoint = "")
                 PullType.COMMIT_ID ->
                     CheckoutInfo(ref = ref, startPoint = "")
             }
