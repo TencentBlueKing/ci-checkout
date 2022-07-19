@@ -81,7 +81,7 @@ class RefHelper(
                 addBranchRefSpec(branchName = ref, refSpec = refSpec)
         }
 
-        if (preMerge && sourceRepoUrlEqualsRepoUrl) {
+        if (sourceRepoUrlEqualsRepoUrl) {
             addBranchRefSpec(branchName = sourceBranchName, refSpec = refSpec)
         }
 
