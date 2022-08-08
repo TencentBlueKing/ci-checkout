@@ -35,6 +35,7 @@ import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
 import com.tencent.bk.devops.git.core.pojo.api.GitToken
+import com.tencent.bk.devops.git.core.pojo.api.GithubToken
 import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
@@ -84,6 +85,21 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val request = buildGet(path)
         val responseContent = retryRequest(request, "获取oauth认证信息失败")
         val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
+        if (result.data == null) {
+            throw ApiException(
+                errorType = ErrorType.USER,
+                errorCode = GitConstants.CONFIG_ERROR,
+                errorMsg = "用户【$userId】没有oauth授权"
+            )
+        }
+        return result
+    }
+
+    override fun getGithubOauthToken(userId: String): Result<GithubToken> {
+        val path = "/repository/api/build/oauth/github/$userId"
+        val request = buildGet(path)
+        val responseContent = retryRequest(request, "获取oauth认证信息失败")
+        val result = JsonUtil.to(responseContent, object : TypeReference<Result<GithubToken>>() {})
         if (result.data == null) {
             throw ApiException(
                 errorType = ErrorType.USER,

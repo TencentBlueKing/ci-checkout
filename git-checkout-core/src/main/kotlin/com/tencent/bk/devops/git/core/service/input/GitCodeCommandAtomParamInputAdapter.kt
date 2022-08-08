@@ -83,7 +83,8 @@ class GitCodeCommandAtomParamInputAdapter(
                     )
                     AuthType.START_USER_TOKEN -> UserTokenGitAuthProvider(
                         userId = pipelineStartUserName,
-                        devopsApi = devopsApi
+                        devopsApi = devopsApi,
+                        scmType = scmType
                     )
                     AuthType.PERSONAL_ACCESS_TOKEN -> PrivateGitAuthProvider(
                         token = personalAccessToken
@@ -93,7 +94,8 @@ class GitCodeCommandAtomParamInputAdapter(
                             pipelineStartUserName = pipelineStartUserName,
                             userId = authUserId,
                             repositoryUrl = repositoryUrl,
-                            devopsApi = devopsApi
+                            devopsApi = devopsApi,
+                            scmType = scmType
                         )
                     else -> EmptyGitAuthProvider()
                 }

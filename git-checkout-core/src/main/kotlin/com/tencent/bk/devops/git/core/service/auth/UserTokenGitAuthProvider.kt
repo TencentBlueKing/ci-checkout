@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.auth
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.constant.ContextConstants
+import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
@@ -41,13 +42,24 @@ import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.default
  */
 class UserTokenGitAuthProvider(
     private val userId: String?,
-    private val devopsApi: IDevopsApi
+    private val devopsApi: IDevopsApi,
+    private val scmType: ScmType
 ) : IGitAuthProvider {
 
     override fun getAuthInfo(): AuthInfo {
         if (userId.isNullOrBlank()) {
             throw ParamInvalidException(errorMsg = "授权用户ID不能为空")
         }
+        val token = if (scmType == ScmType.GITHUB) {
+            getGithubOauthToken(userId)
+        } else {
+            getGitOauthToken(userId)
+        }
+        EnvHelper.putContext(ContextConstants.CONTEXT_USER_ID, userId)
+        return OauthGitAuthProvider(token = token, userId = userId).getAuthInfo()
+    }
+
+    private fun getGitOauthToken(userId: String): String {
         val result = devopsApi.getOauthToken(userId = userId)
         if (result.isNotOk() || result.data == null) {
             throw ApiException(
@@ -58,7 +70,20 @@ class UserTokenGitAuthProvider(
                 )
             )
         }
-        EnvHelper.putContext(ContextConstants.CONTEXT_USER_ID, userId)
-        return OauthGitAuthProvider(token = result.data!!.accessToken, userId = userId).getAuthInfo()
+        return result.data!!.accessToken
+    }
+
+    private fun getGithubOauthToken(userId: String): String {
+        val result = devopsApi.getGithubOauthToken(userId = userId)
+        if (result.isNotOk() || result.data == null) {
+            throw ApiException(
+                errorMsg =
+                defaultResolver.resolveByMap(
+                    content = GitErrorsText.get().emptyAccessToken ?: "access token is empty",
+                    valueMap = EnvHelper.getContextMap()
+                )
+            )
+        }
+        return result.data!!.accessToken
     }
 }

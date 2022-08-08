@@ -27,34 +27,7 @@
 
 package com.tencent.bk.devops.git.core.api
 
-import com.tencent.bk.devops.git.core.pojo.api.CommitData
-import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
-import com.tencent.bk.devops.git.core.pojo.api.GitToken
-import com.tencent.bk.devops.git.core.pojo.api.GithubToken
-import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
-import com.tencent.bk.devops.git.core.pojo.api.Repository
-import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
-import com.tencent.bk.devops.plugin.pojo.Result
+interface GitApi {
 
-interface IDevopsApi {
-
-    fun addCommit(commits: List<CommitData>): Result<Int>
-
-    fun getLatestCommit(
-        pipelineId: String,
-        elementId: String,
-        repositoryConfig: RepositoryConfig
-    ): Result<List<CommitData>>
-
-    fun saveBuildMaterial(materialList: List<PipelineBuildMaterial>): Result<Int>
-
-    fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo>
-
-    fun getOauthToken(userId: String): Result<GitToken>
-
-    fun getGithubOauthToken(userId: String): Result<GithubToken>
-
-    fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository>
-
-    fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean>
+    fun canViewProject(username: String): Boolean
 }

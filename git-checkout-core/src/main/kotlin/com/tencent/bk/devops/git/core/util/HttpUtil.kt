@@ -22,15 +22,15 @@ object HttpUtil {
         .writeTimeout(writeTimeout, TimeUnit.SECONDS)
         .build()
 
-    fun buildGet(url: String, headers: Map<String?, String?>? = null): Request {
+    fun buildGet(url: String, headers: Map<String, String>? = null): Request {
         return build(url, headers).get().build()
     }
 
-    fun buildPost(url: String, requestBody: RequestBody, headers: Map<String?, String?>? = null): Request {
+    fun buildPost(url: String, requestBody: RequestBody, headers: Map<String, String>? = null): Request {
         return build(url, headers).post(requestBody).build()
     }
 
-    fun build(url: String, headers: Map<String?, String?>? = null): Request.Builder {
+    fun build(url: String, headers: Map<String, String>? = null): Request.Builder {
         val builder = Request.Builder().url(url)
         if (headers != null) {
             builder.headers(Headers.of(headers))

@@ -18,7 +18,7 @@ class TGitApi(
     val repositoryUrl: String,
     val userId: String,
     private val token: String
-) {
+): GitApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(TGitApi::class.java)
@@ -64,7 +64,7 @@ class TGitApi(
     /**
      * 判断用户是否有权限访问当前项目
      */
-    fun canViewProject(username: String): Boolean {
+    override fun canViewProject(username: String): Boolean {
         return try {
             val projectInfo = getProjectInfo()
             // 公开项目，不需要校验

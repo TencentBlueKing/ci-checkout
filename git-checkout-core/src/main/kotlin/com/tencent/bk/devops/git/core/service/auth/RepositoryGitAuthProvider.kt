@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.auth
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.enums.RepoAuthType
+import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.api.CodeGitRepository
 import com.tencent.bk.devops.git.core.pojo.api.CodeGitlabRepository
@@ -52,21 +53,24 @@ class RepositoryGitAuthProvider(
                 getGitAuthProvider(
                     repoAuthType = repository.authType,
                     userId = repository.userName,
-                    credentialId = repository.credentialId
+                    credentialId = repository.credentialId,
+                    scmType = ScmType.CODE_GIT
                 )
             }
             is CodeTGitRepository -> {
                 getGitAuthProvider(
                     repoAuthType = repository.authType,
                     userId = repository.userName,
-                    credentialId = repository.credentialId
+                    credentialId = repository.credentialId,
+                    scmType = ScmType.CODE_TGIT
                 )
             }
             is CodeGitlabRepository -> {
                 getGitAuthProvider(
                     repoAuthType = repository.authType,
                     userId = repository.userName,
-                    credentialId = repository.credentialId
+                    credentialId = repository.credentialId,
+                    scmType = ScmType.CODE_GITLAB
                 )
             }
             is GithubRepository -> {
@@ -82,11 +86,12 @@ class RepositoryGitAuthProvider(
     private fun getGitAuthProvider(
         repoAuthType: RepoAuthType?,
         userId: String,
-        credentialId: String
+        credentialId: String,
+        scmType: ScmType
     ): IGitAuthProvider {
         return when (repoAuthType) {
             RepoAuthType.OAUTH -> {
-                UserTokenGitAuthProvider(userId = userId, devopsApi = devopsApi)
+                UserTokenGitAuthProvider(userId = userId, devopsApi = devopsApi, scmType = scmType)
             }
             else ->
                 CredentialGitAuthProvider(credentialId = credentialId, devopsApi = devopsApi)

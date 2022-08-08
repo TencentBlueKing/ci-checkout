@@ -23,38 +23,44 @@
  * NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
  */
 
-package com.tencent.bk.devops.git.core.api
+package com.tencent.bk.devops.git.core.enums
 
-import com.tencent.bk.devops.git.core.pojo.api.CommitData
-import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
-import com.tencent.bk.devops.git.core.pojo.api.GitToken
-import com.tencent.bk.devops.git.core.pojo.api.GithubToken
-import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
-import com.tencent.bk.devops.git.core.pojo.api.Repository
-import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
-import com.tencent.bk.devops.plugin.pojo.Result
+/**
+ * github权限枚举
+ */
+enum class GithubAccessLevelEnum(val level: Int) {
+    GUEST(10),
+    READ(15),
+    TRIAGE(20),
+    WRITE(30),
+    MAINTAIN(40),
+    ADMIN(50);
 
-interface IDevopsApi {
+    companion object {
+        fun getGithubAccessLevel(level: Int): GithubAccessLevelEnum {
+            return when (level) {
+                10 -> GUEST
+                15 -> READ
+                20 -> TRIAGE
+                30 -> WRITE
+                40 -> MAINTAIN
+                50 -> ADMIN
+                else -> GUEST
+            }
+        }
 
-    fun addCommit(commits: List<CommitData>): Result<Int>
-
-    fun getLatestCommit(
-        pipelineId: String,
-        elementId: String,
-        repositoryConfig: RepositoryConfig
-    ): Result<List<CommitData>>
-
-    fun saveBuildMaterial(materialList: List<PipelineBuildMaterial>): Result<Int>
-
-    fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo>
-
-    fun getOauthToken(userId: String): Result<GitToken>
-
-    fun getGithubOauthToken(userId: String): Result<GithubToken>
-
-    fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository>
-
-    fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean>
+        fun getGithubAccessLevel(permission: String): GithubAccessLevelEnum {
+            return when (permission) {
+                "read" -> READ
+                "triage" -> TRIAGE
+                "write" -> WRITE
+                "maintain" -> MAINTAIN
+                "admin" -> ADMIN
+                else -> GUEST
+            }
+        }
+    }
 }

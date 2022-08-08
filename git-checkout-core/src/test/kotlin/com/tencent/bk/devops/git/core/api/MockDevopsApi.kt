@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
 import com.tencent.bk.devops.git.core.pojo.api.CredentialType
 import com.tencent.bk.devops.git.core.pojo.api.GitToken
+import com.tencent.bk.devops.git.core.pojo.api.GithubToken
 import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
@@ -59,6 +60,10 @@ class MockDevopsApi : IDevopsApi {
 
     override fun getOauthToken(userId: String): Result<GitToken> {
         return Result(GitToken())
+    }
+
+    override fun getGithubOauthToken(userId: String): Result<GithubToken> {
+        return Result(GithubToken(accessToken = "", tokenType = "", scope = ""))
     }
 
     override fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository> {
