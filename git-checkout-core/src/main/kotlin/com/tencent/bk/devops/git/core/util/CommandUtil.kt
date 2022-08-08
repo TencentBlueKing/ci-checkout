@@ -131,15 +131,18 @@ object CommandUtil {
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {
             val errorMsg = gitErrors?.title?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
-                ?: ("exec ${command.toStrings().joinToString(" ")} failed " +
-                    "with an exitCode ${ignore.exitValue}")
+                ?: (
+                    "exec ${command.toStrings().joinToString(" ")} failed " +
+                        "with an exitCode ${ignore.exitValue}"
+                    )
             val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
             val errorType = gitErrors?.errorType ?: ErrorType.USER
             ConsoleTableUtil.printAsTable(
                 errMsg = errorMsg,
                 cause = gitErrors?.cause?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) } ?: "",
                 solution = gitErrors?.solution?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
-                    ?: ""
+                    ?: "",
+                wiki = gitErrors?.wiki ?: ""
             )
             throw GitExecuteException(
                 errorType = errorType,

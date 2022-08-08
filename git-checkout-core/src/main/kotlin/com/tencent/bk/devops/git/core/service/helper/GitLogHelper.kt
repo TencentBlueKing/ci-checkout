@@ -32,6 +32,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_REF
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_TARGET_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_PUSH_BEFORE_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LOG_MAX_COUNT
@@ -163,7 +164,7 @@ class GitLogHelper(
                     gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name
                 ) -> {
                 val source = System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
-                val target = System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
+                val target = System.getenv(BK_REPO_GIT_WEBHOOK_MR_TARGET_COMMIT)
                 git.log(
                     maxCount = GIT_LOG_MAX_COUNT,
                     revisionRange = "$source..$target"

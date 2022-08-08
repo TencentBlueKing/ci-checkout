@@ -42,7 +42,8 @@ enum class GitErrors(
     val solution: String?,
     val errorType: ErrorType = ErrorType.USER,
     val errorCode: Int = GitConstants.CONFIG_ERROR,
-    val internalErrorCode: Int = 0
+    val internalErrorCode: Int = 0,
+    val wiki: String?
 ) {
     // fetch命令错误
     AuthenticationFailed(
@@ -61,7 +62,8 @@ enum class GitErrors(
             GitErrorsText.get().httpAuthenticationFailedUrlSolution
         } else {
             GitErrorsText.get().httpAuthenticationFailedRepositorySolution
-        }
+        },
+        wiki = GitErrorsText.get().httpAuthenticationFailedWiki
     ),
 
     SshAuthenticationFailed(
@@ -72,7 +74,8 @@ enum class GitErrors(
         title = GitErrorsText.get().sshAuthenticationFailed,
         cause = GitErrorsText.get().sshAuthenticationFailedCause,
         solution = GitErrorsText.get().sshAuthenticationFailedSolution,
-        internalErrorCode = 1
+        internalErrorCode = 1,
+        wiki = GitErrorsText.get().sshAuthenticationFailedWiki
     ),
 
     RepositoryNotFoundFailed(
@@ -90,7 +93,8 @@ enum class GitErrors(
         } else {
             GitErrorsText.get().httpAuthenticationFailedRepositorySolution
         },
-        internalErrorCode = 1
+        internalErrorCode = 1,
+        wiki = GitErrorsText.get().httpAuthenticationFailedWiki
     ),
 
     RemoteServerFailed(
@@ -113,7 +117,8 @@ enum class GitErrors(
         solution = GitErrorsText.get().remoteServerFailedSolution,
         errorType = ErrorType.THIRD_PARTY,
         errorCode = GitConstants.GIT_ERROR,
-        internalErrorCode = 2
+        internalErrorCode = 2,
+        wiki = GitErrorsText.get().remoteServerFailedWiki
     ),
     ConnectionTimeOut(
         regex = Regex(
@@ -122,7 +127,8 @@ enum class GitErrors(
         title = GitErrorsText.get().connectionTimeOut,
         cause = GitErrorsText.get().connectionTimeOutCause,
         solution = GitErrorsText.get().connectionTimeOutSolution,
-        internalErrorCode = 3
+        internalErrorCode = 3,
+        wiki = GitErrorsText.get().connectionTimeOutWiki
     ),
 
     // checkout命令错误
@@ -145,7 +151,8 @@ enum class GitErrors(
         title = GitErrorsText.get().noMatchingBranch,
         cause = GitErrorsText.get().noMatchingBranchCause,
         solution = GitErrorsText.get().noMatchingBranchSolution,
-        internalErrorCode = 4
+        internalErrorCode = 4,
+        wiki = GitErrorsText.get().noMatchingBranchWiki
     ),
     NoInitializeBranch(
         regex = Regex(
@@ -155,7 +162,8 @@ enum class GitErrors(
         title = GitErrorsText.get().noInitializeBranch,
         cause = GitErrorsText.get().noInitializeBranchCause,
         solution = GitErrorsText.get().noInitializeBranchSolution,
-        internalErrorCode = 5
+        internalErrorCode = 5,
+        wiki = GitErrorsText.get().noInitializeBranchWiki
     ),
     SparseCheckoutLeavesNoEntry(
         regex = Regex(
@@ -164,7 +172,8 @@ enum class GitErrors(
         title = GitErrorsText.get().sparseCheckoutLeavesNoEntry,
         cause = GitErrorsText.get().sparseCheckoutLeavesNoEntryCause,
         solution = GitErrorsText.get().sparseCheckoutLeavesNoEntrySolution,
-        internalErrorCode = 6
+        internalErrorCode = 6,
+        wiki = GitErrorsText.get().sparseCheckoutLeavesNoEntryWiki
     ),
     BranchOrPathNameConflicts(
         regex = Regex(
@@ -173,7 +182,8 @@ enum class GitErrors(
         title = GitErrorsText.get().branchOrPathNameConflicts,
         cause = GitErrorsText.get().branchOrPathNameConflictsCause,
         solution = GitErrorsText.get().branchOrPathNameConflictsSolution,
-        internalErrorCode = 7
+        internalErrorCode = 7,
+        wiki = GitErrorsText.get().branchOrPathNameConflictsWiki
     ),
 
     // merge命令错误
@@ -188,7 +198,8 @@ enum class GitErrors(
         title = GitErrorsText.get().mergeConflicts,
         cause = GitErrorsText.get().mergeConflictsCause,
         solution = GitErrorsText.get().mergeConflictsSolution,
-        internalErrorCode = 8
+        internalErrorCode = 8,
+        wiki = GitErrorsText.get().mergeConflictsWiki
     ),
     InvalidMerge(
         regex = Regex(
@@ -198,7 +209,8 @@ enum class GitErrors(
         title = GitErrorsText.get().invalidMerge,
         cause = GitErrorsText.get().invalidMergeCause,
         solution = GitErrorsText.get().invalidMergeSolution,
-        internalErrorCode = 9
+        internalErrorCode = 9,
+        wiki = GitErrorsText.get().invalidMergeWiki
     ),
     CannotMergeUnrelatedHistories(
         regex = Regex(
@@ -208,7 +220,8 @@ enum class GitErrors(
         title = GitErrorsText.get().cannotMergeUnrelatedHistories,
         cause = GitErrorsText.get().cannotMergeUnrelatedHistoriesCause,
         solution = GitErrorsText.get().cannotMergeUnrelatedHistoriesSolution,
-        internalErrorCode = 10
+        internalErrorCode = 10,
+        wiki = GitErrorsText.get().cannotMergeUnrelatedHistoriesWiki
     ),
     LocalChangesOverwritten(
         regex = Regex(
@@ -219,7 +232,8 @@ enum class GitErrors(
         title = GitErrorsText.get().localChangesOverwritten,
         cause = GitErrorsText.get().localChangesOverwrittenCause,
         solution = GitErrorsText.get().localChangesOverwrittenSolution,
-        internalErrorCode = 11
+        internalErrorCode = 11,
+        wiki = GitErrorsText.get().localChangesOverwrittenWiki
     ),
 
     // submodule命令错误
@@ -234,7 +248,8 @@ enum class GitErrors(
         title = GitErrorsText.get().noSubmoduleMapping,
         cause = GitErrorsText.get().noSubmoduleMappingCause,
         solution = GitErrorsText.get().noSubmoduleMappingSolution,
-        internalErrorCode = 12
+        internalErrorCode = 12,
+        wiki = GitErrorsText.get().noSubmoduleMappingWiki
     ),
     SubmoduleRepositoryDoesNotExist(
         regex = Regex(
@@ -245,7 +260,8 @@ enum class GitErrors(
         title = GitErrorsText.get().submoduleRepositoryDoesNotExist,
         cause = GitErrorsText.get().submoduleRepositoryDoesNotExistCause,
         solution = GitErrorsText.get().submoduleRepositoryDoesNotExistSolution,
-        internalErrorCode = 13
+        internalErrorCode = 13,
+        wiki = GitErrorsText.get().submoduleRepositoryDoesNotExistWiki
     ),
     InvalidSubmoduleSHA(
         regex = Regex(
@@ -259,7 +275,8 @@ enum class GitErrors(
         title = GitErrorsText.get().invalidSubmoduleSHA,
         cause = GitErrorsText.get().invalidSubmoduleSHACause,
         solution = GitErrorsText.get().invalidSubmoduleSHASolution,
-        internalErrorCode = 14
+        internalErrorCode = 14,
+        wiki = GitErrorsText.get().invalidSubmoduleSHAWiki
     ),
 
     // lfs命令错误
@@ -270,7 +287,8 @@ enum class GitErrors(
         title = GitErrorsText.get().lfsAttributeDoesNotMatch,
         cause = GitErrorsText.get().lfsAttributeDoesNotMatchCause,
         solution = GitErrorsText.get().lfsAttributeDoesNotMatchSolution,
-        internalErrorCode = 15
+        internalErrorCode = 15,
+        wiki = GitErrorsText.get().lfsAttributeDoesNotMatchWiki
     ),
     ErrorDownloadingObject(
         regex = Regex(
@@ -280,7 +298,8 @@ enum class GitErrors(
         title = GitErrorsText.get().errorDownloadingObject,
         cause = GitErrorsText.get().errorDownloadingObjectCause,
         solution = GitErrorsText.get().errorDownloadingObjectSolution,
-        internalErrorCode = 16
+        internalErrorCode = 16,
+        wiki = GitErrorsText.get().errorDownloadingObjectWiki
     ),
     LfsNotInstall(
         regex = Regex(
@@ -290,7 +309,8 @@ enum class GitErrors(
         title = GitErrorsText.get().lfsNotInstall,
         cause = GitErrorsText.get().lfsNotInstallCause,
         solution = GitErrorsText.get().lfsNotInstallSolution,
-        internalErrorCode = 17
+        internalErrorCode = 17,
+        wiki = GitErrorsText.get().lfsNotInstallWiki
     ),
 
     // 其他命令错误
@@ -302,7 +322,8 @@ enum class GitErrors(
         title = GitErrorsText.get().lockFileAlreadyExists,
         cause = GitErrorsText.get().lockFileAlreadyExistsCause,
         solution = GitErrorsText.get().lockFileAlreadyExistsSolution,
-        internalErrorCode = 18
+        internalErrorCode = 18,
+        wiki = GitErrorsText.get().lockFileAlreadyExistsWiki
     ),
     BadRevision(
         regex = Regex(
@@ -311,7 +332,8 @@ enum class GitErrors(
         title = GitErrorsText.get().badRevision,
         cause = GitErrorsText.get().badRevisionCause,
         solution = GitErrorsText.get().badRevisionSolution,
-        internalErrorCode = 19
+        internalErrorCode = 19,
+        wiki = GitErrorsText.get().badRevisionWiki
     ),
     NotAGitRepository(
         regex = Regex(
@@ -320,7 +342,8 @@ enum class GitErrors(
         title = GitErrorsText.get().notAGitRepository,
         cause = GitErrorsText.get().notAGitRepositoryCause,
         solution = GitErrorsText.get().notAGitRepositorySolution,
-        internalErrorCode = 20
+        internalErrorCode = 20,
+        wiki = GitErrorsText.get().notAGitRepositoryWiki
     );
 
     companion object {
