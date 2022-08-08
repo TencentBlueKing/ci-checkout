@@ -31,6 +31,7 @@ package com.tencent.bk.devops.git.core.enums
 /**
  * github权限枚举
  */
+@SuppressWarnings("MagicNumber")
 enum class GithubAccessLevelEnum(val level: Int) {
     GUEST(10),
     READ(15),
