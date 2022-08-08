@@ -102,6 +102,7 @@ class CheckoutAtomParamInputAdapter(
         )
     ).getInputs()
 
+    @SuppressWarnings("LongMethod")
     private fun CheckoutAtomParamInput.byRepositoryUrl() = GitCodeCommandAtomParamInputAdapter(
         GitCodeCommandAtomParamInput(
             bkWorkspace = bkWorkspace,
