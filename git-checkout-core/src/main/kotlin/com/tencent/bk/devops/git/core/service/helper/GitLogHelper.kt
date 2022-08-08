@@ -28,10 +28,16 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_REF
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_PUSH_BEFORE_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LOG_MAX_COUNT
+import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CommitMaterial
@@ -88,19 +94,7 @@ class GitLogHelper(
         preCommitData: CommitData?,
         repositoryConfig: RepositoryConfig
     ): List<CommitData> {
-
-        val gitLogs = if (preCommitData == null) {
-            git.log()
-        } else {
-            logger.info(
-                "previously build commit info|buildId:${preCommitData.buildId}|commitId:${preCommitData.commit}"
-            )
-            git.log(
-                maxCount = GIT_LOG_MAX_COUNT,
-                revisionRange = "${preCommitData.commit}..HEAD"
-            )
-        }
-        val commits = gitLogs
+        val commits = getLogs(preCommitData)
             .map { log ->
                 CommitData(
                     type = ScmType.parse(settings.scmType),
@@ -139,6 +133,54 @@ class GitLogHelper(
             saveCommit(commits)
         }
         return commits
+    }
+
+    /**
+     * 1. 如果是拉取代码库与触发库相同，代码变更记录应与触发的代码变更记录相同
+     * 2. 如果拉取代码库与触发库不相同或手工触发，对比上一次构建与本次构建的差异
+     */
+    private fun getLogs(preCommitData: CommitData?): List<CommitLogInfo> {
+        val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
+        val hookRepoUrl = System.getenv(GitConstants.BK_CI_REPO_WEBHOOK_REPO_URL)
+        val isHook = GitUtil.isGitEvent(gitHookEventType) &&
+            GitUtil.isSameRepository(
+                repositoryUrl = settings.repositoryUrl,
+                otherRepositoryUrl = hookRepoUrl,
+                hostNameList = settings.compatibleHostList
+            )
+
+        return when {
+            isHook && gitHookEventType == CodeEventType.PUSH.name -> {
+                val before = System.getenv(BK_REPO_GIT_WEBHOOK_PUSH_BEFORE_COMMIT)
+                val after = System.getenv(BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT)
+                git.log(
+                    maxCount = GIT_LOG_MAX_COUNT,
+                    revisionRange = "$before..$after"
+                )
+            }
+            isHook && (
+                gitHookEventType == CodeEventType.MERGE_REQUEST.name ||
+                    gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name
+                ) -> {
+                val source = System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
+                val target = System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
+                git.log(
+                    maxCount = GIT_LOG_MAX_COUNT,
+                    revisionRange = "$source..$target"
+                )
+            }
+            preCommitData == null ->
+                git.log()
+            else -> {
+                logger.info(
+                    "previously build commit info|buildId:${preCommitData.buildId}|commitId:${preCommitData.commit}"
+                )
+                git.log(
+                    maxCount = GIT_LOG_MAX_COUNT,
+                    revisionRange = "${preCommitData.commit}..HEAD"
+                )
+            }
+        }
     }
 
     private fun getLastCommitId(

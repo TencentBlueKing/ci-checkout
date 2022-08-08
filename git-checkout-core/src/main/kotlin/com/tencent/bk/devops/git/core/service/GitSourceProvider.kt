@@ -28,9 +28,10 @@
 package com.tencent.bk.devops.git.core.service
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_URL
-import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
+import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.handler.GitAuthHandler
 import com.tencent.bk.devops.git.core.service.handler.GitCheckoutAndMergeHandler
@@ -66,6 +67,9 @@ class GitSourceProvider(
             preMerge = preMerge && sourceRepositoryUrl.isNotBlank() && sourceBranchName.isNotBlank()
 
             logger.info("Working directory is: $repositoryPath")
+            if (ref.isBlank()) {
+                throw ParamInvalidException(errorMsg = "拉取的【分支/TAG/COMMIT】不能为空")
+            }
             val workingDirectory = File(repositoryPath)
             val git = GitCommandManager(workingDirectory = workingDirectory, lfs = lfs)
 

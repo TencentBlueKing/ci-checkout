@@ -61,13 +61,12 @@ enum class GitErrors(
             GitErrorsText.get().httpAuthenticationFailedUrlSolution
         } else {
             GitErrorsText.get().httpAuthenticationFailedRepositorySolution
-        },
-        internalErrorCode = 1
+        }
     ),
 
     SshAuthenticationFailed(
         regex = Regex(
-                "(fatal: Could not read from remote repository.)|" +
+            "(fatal: Could not read from remote repository.)|" +
                 "(fatal: 无法读取远程仓库。)"
         ),
         title = GitErrorsText.get().sshAuthenticationFailed,
@@ -78,7 +77,7 @@ enum class GitErrors(
 
     RepositoryNotFoundFailed(
         regex = Regex(
-                "(fatal: repository '(.+)' not found)|" +
+            "(fatal: repository '(.+)' not found)|" +
                 "(fatal: .* Git repository not found)|" +
                 "(fatal: 远程错误：Git repository not found)|" +
                 "(ERROR: Repository not found)|" +
@@ -182,7 +181,9 @@ enum class GitErrors(
         regex = Regex(
             "(Automatic merge failed; fix conflicts and then commit the result.)|" +
                 "(Resolve all conflicts manually, mark them as resolved with)|" +
-                "(自动合并失败，修正冲突然后提交修正的结果。)"
+                "(自动合并失败，修正冲突然后提交修正的结果。)|" +
+                "(error: add_cacheinfo 无法刷新路径 '.+'，合并终止。)|" +
+                "(error: add_cacheinfo failed to refresh for path '.+'; merge aborting.)"
         ),
         title = GitErrorsText.get().mergeConflicts,
         cause = GitErrorsText.get().mergeConflictsCause,
@@ -225,6 +226,7 @@ enum class GitErrors(
     NoSubmoduleMapping(
         regex = Regex(
             "(fatal: No submodule mapping found in .gitmodules for path '(.+)')|" +
+                "(fatal: 在 .gitmodules 中未找到子模组路径 '(.+)' 的 url)|" +
                 "(fatal: 在 .gitmodules 中没有发现路径 '(.+)' 的子模组映射)|" +
                 "(fatal: 在 .gitmodules 中未找到子模组 '(.+)' 的 url)|" +
                 "(fatal: No url found for submodule path '(.+)' in .gitmodules)"
@@ -251,7 +253,8 @@ enum class GitErrors(
                 "Direct fetching of that commit failed.)|" +
                 "(获取了子模组路径 '(.+)'，但是它没有包含 (.+)。直接获取该提交失败。)|" +
                 "(无法在子模组路径 '(.+)' 中找到当前版本)|" +
-                "(fatal: Needed a single revision)"
+                "(fatal: Needed a single revision)|" +
+                "(fatal: Unable to find current revision in submodule path '.+')"
         ),
         title = GitErrorsText.get().invalidSubmoduleSHA,
         cause = GitErrorsText.get().invalidSubmoduleSHACause,
