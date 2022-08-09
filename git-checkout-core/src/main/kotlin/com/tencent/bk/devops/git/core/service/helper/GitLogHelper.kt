@@ -177,7 +177,7 @@ class GitLogHelper(
                     )
                 }
             }
-            isHook && gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name -> {
+           /* isHook && gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name -> {
                 val mergeSha = System.getenv(BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA)
                 val target = System.getenv(BK_REPO_GIT_WEBHOOK_MR_TARGET_COMMIT)
                 if (mergeSha.isNullOrBlank() || target.isNullOrBlank()) {
@@ -188,7 +188,7 @@ class GitLogHelper(
                         revisionRange = "$target..$mergeSha"
                     )
                 }
-            }
+            }*/
             else -> localDiff(preCommitData)
         }
     }
