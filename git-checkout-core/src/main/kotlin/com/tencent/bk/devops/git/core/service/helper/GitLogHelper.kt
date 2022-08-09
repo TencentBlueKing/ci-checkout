@@ -167,7 +167,7 @@ class GitLogHelper(
                 val target = System.getenv(BK_REPO_GIT_WEBHOOK_MR_TARGET_COMMIT)
                 git.log(
                     maxCount = GIT_LOG_MAX_COUNT,
-                    revisionRange = "$source..$target"
+                    revisionRange = "$target..$source"
                 )
             }
             preCommitData == null ->
