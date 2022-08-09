@@ -63,6 +63,7 @@ enum class GitErrors(
         } else {
             GitErrorsText.get().httpAuthenticationFailedRepositorySolution
         },
+        internalErrorCode = 1,
         wiki = GitErrorsText.get().httpAuthenticationFailedWiki
     ),
 
