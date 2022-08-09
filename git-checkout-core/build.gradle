@@ -46,4 +46,4 @@ task versionInfo(type: WriteProperties) {
 }
 processResources.dependsOn versionInfo
 
-apply from: "$rootDir/task_deploy_to_maven.gradle"
+apply from: "../task_deploy_to_maven.gradle"
