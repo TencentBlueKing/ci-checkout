@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_REF
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_TARGET_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT
@@ -140,6 +141,7 @@ class GitLogHelper(
      * 1. 如果是拉取代码库与触发库相同，代码变更记录应与触发的代码变更记录相同
      * 2. 如果拉取代码库与触发库不相同或手工触发，对比上一次构建与本次构建的差异
      */
+    @SuppressWarnings("ComplexMethod")
     private fun getLogs(preCommitData: CommitData?): List<CommitLogInfo> {
         val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
         val hookRepoUrl = System.getenv(GitConstants.BK_CI_REPO_WEBHOOK_REPO_URL)
@@ -154,33 +156,54 @@ class GitLogHelper(
             isHook && gitHookEventType == CodeEventType.PUSH.name -> {
                 val before = System.getenv(BK_REPO_GIT_WEBHOOK_PUSH_BEFORE_COMMIT)
                 val after = System.getenv(BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT)
-                git.log(
-                    maxCount = GIT_LOG_MAX_COUNT,
-                    revisionRange = "$before..$after"
-                )
+                if (before.isNullOrBlank() || after.isNullOrBlank()) {
+                    localDiff(preCommitData)
+                } else {
+                    git.log(
+                        maxCount = GIT_LOG_MAX_COUNT,
+                        revisionRange = "$before..$after"
+                    )
+                }
             }
-            isHook && (
-                gitHookEventType == CodeEventType.MERGE_REQUEST.name ||
-                    gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name
-                ) -> {
+            isHook && gitHookEventType == CodeEventType.MERGE_REQUEST.name -> {
                 val source = System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
                 val target = System.getenv(BK_REPO_GIT_WEBHOOK_MR_TARGET_COMMIT)
-                git.log(
-                    maxCount = GIT_LOG_MAX_COUNT,
-                    revisionRange = "$target..$source"
-                )
+                if (source.isNullOrBlank() || target.isNullOrBlank()) {
+                    localDiff(preCommitData)
+                } else {
+                    git.log(
+                        maxCount = GIT_LOG_MAX_COUNT,
+                        revisionRange = "$target..$source"
+                    )
+                }
             }
-            preCommitData == null ->
-                git.log()
-            else -> {
-                logger.info(
-                    "previously build commit info|buildId:${preCommitData.buildId}|commitId:${preCommitData.commit}"
-                )
-                git.log(
-                    maxCount = GIT_LOG_MAX_COUNT,
-                    revisionRange = "${preCommitData.commit}..HEAD"
-                )
+            isHook && gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name -> {
+                val mergeSha = System.getenv(BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA)
+                val target = System.getenv(BK_REPO_GIT_WEBHOOK_MR_TARGET_COMMIT)
+                if (mergeSha.isNullOrBlank() || target.isNullOrBlank()) {
+                    localDiff(preCommitData)
+                } else {
+                    git.log(
+                        maxCount = GIT_LOG_MAX_COUNT,
+                        revisionRange = "$target..$mergeSha"
+                    )
+                }
             }
+            else -> localDiff(preCommitData)
+        }
+    }
+
+    private fun localDiff(preCommitData: CommitData?): List<CommitLogInfo> {
+        return if (preCommitData == null) {
+            git.log()
+        } else {
+            logger.info(
+                "previously build commit info|buildId:${preCommitData.buildId}|commitId:${preCommitData.commit}"
+            )
+            git.log(
+                maxCount = GIT_LOG_MAX_COUNT,
+                revisionRange = "${preCommitData.commit}..HEAD"
+            )
         }
     }
 
