@@ -1,0 +1,3 @@
+[submodule "ci-git-checkout"]
+	path = ci-git-checkout
+	url = https://github.com/TencentBlueKing/ci-git-checkout.git

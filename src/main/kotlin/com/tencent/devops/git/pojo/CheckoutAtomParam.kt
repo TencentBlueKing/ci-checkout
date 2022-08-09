@@ -3,11 +3,7 @@ package com.tencent.devops.git.pojo
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.tencent.bk.devops.atom.pojo.AtomBaseParam
 import com.tencent.bk.devops.git.core.enums.AuthType
-import lombok.Data
-import lombok.EqualsAndHashCode
 
-@Data
-@EqualsAndHashCode(callSuper = true)
 class CheckoutAtomParam : AtomBaseParam() {
     var repositoryType: String = "ID"
     var repositoryHashId: String? = null
@@ -65,4 +61,6 @@ class CheckoutAtomParam : AtomBaseParam() {
      * 归档的缓存路径
      */
     val cachePath: String = ""
+    val usernameConfig: String? = null
+    val userEmailConfig: String? = null
 }

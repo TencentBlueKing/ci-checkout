@@ -30,6 +30,7 @@ jobs:
     - name: Gradle Build
       run: |
         chmod +x ./gradlew
+        ./gradlew :ci-git-checkout:git-checkout-credential:clean shadowJar
         ./gradlew clean buildZip
     - name: Create Release
       id: create_release

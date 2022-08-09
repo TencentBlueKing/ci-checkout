@@ -67,8 +67,8 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 persistCredentials = persistCredentials ?: true,
                 compatibleHostList = null,
                 enableTrace = enableTrace,
-                usernameConfig = pipelineStartUserName,
-                userEmailConfig = "$pipelineStartUserName@tencent.com",
+                usernameConfig = usernameConfig,
+                userEmailConfig = userEmailConfig,
                 enablePartialClone = enablePartialClone,
                 cachePath = cachePath
             )
