@@ -41,11 +41,11 @@ shadowJar {
     archiveBaseName.set("git-checkout-credential")
     zip64 true
     archiveClassifier.set("")
-    destinationDirectory.set(new File("$rootDir/git-checkout-core/src/main/resources/script/"))
+    destinationDirectory.set(new File("../git-checkout-core/src/main/resources/script/"))
 }
 
 task versionInfo(type: WriteProperties) {
-    outputFile new File("$rootDir/git-checkout-core/src/main/resources/credential-version.properties")
+    outputFile new File("../git-checkout-core/src/main/resources/credential-version.properties")
     encoding = "UTF-8"
     property 'version', version
 }
