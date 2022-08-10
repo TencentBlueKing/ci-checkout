@@ -160,7 +160,7 @@ class GitLogHelper(
                 } else {
                     git.log(
                         maxCount = GIT_LOG_MAX_COUNT,
-                        revisionRange = "$before..$after"
+                        revisionRange = "$before..HEAD"
                     )
                 }
             }
@@ -172,7 +172,7 @@ class GitLogHelper(
                 } else {
                     git.log(
                         maxCount = GIT_LOG_MAX_COUNT,
-                        revisionRange = "$target..$source"
+                        revisionRange = "$target...$source"
                     )
                 }
             }
