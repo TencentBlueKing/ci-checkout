@@ -152,7 +152,7 @@ class GitLogHelper(
             )
 
         return when {
-            isHook && gitHookEventType == CodeEventType.PUSH.name -> {
+            isHook && gitHookEventType == CodeEventType.PUSH.name && settings.fetchDepth == 0 -> {
                 val before = System.getenv(BK_REPO_GIT_WEBHOOK_PUSH_BEFORE_COMMIT)
                 val after = System.getenv(BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT)
                 if (before.isNullOrBlank() || after.isNullOrBlank()) {
