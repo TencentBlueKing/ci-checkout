@@ -81,12 +81,13 @@ class RefHelper(
                 addBranchRefSpec(branchName = ref, refSpec = refSpec)
         }
 
-        if (sourceRepoUrlEqualsRepoUrl) {
+        // 只有开启preMerge的时候才添加源分支,否则可能出现源分支合并后就删除,导致找不到源分支
+        if (preMerge && sourceRepoUrlEqualsRepoUrl) {
             addBranchRefSpec(branchName = sourceBranchName, refSpec = refSpec)
         }
 
         fetchRefSpec?.split(",")?.filter {
-            it.isNotBlank() && it != ref && it != sourceBranchName
+            it.isNotBlank() && !refSpec.contains(it)
         }?.forEach { branch ->
             refSpec.add("+refs/heads/$branch:refs/remotes/$ORIGIN_REMOTE_NAME/$branch")
         }
