@@ -61,7 +61,12 @@ class GitFetchHandler(
             /**
              * 如果拉取报凭证失败，可能是因为凭证管理有问题，如凭证写入失败，或者被其他错误凭证覆盖,使用core.askpass获取凭证重试拉取
              */
-            if (ignore.internalErrorCode == GitErrors.AuthenticationFailed.internalErrorCode) {
+            if (listOf(
+                    GitErrors.AuthenticationFailed.errorCode,
+                    GitErrors.SshAuthenticationFailed.errorCode,
+                    GitErrors.RepositoryNotFoundFailed.errorCode
+                ).contains(ignore.errorCode)
+            ) {
                 authHelper.configureAskPass()
                 doFetch()
             } else {
