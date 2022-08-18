@@ -147,8 +147,7 @@ object CommandUtil {
             throw GitExecuteException(
                 errorType = errorType,
                 errorCode = errorCode,
-                errorMsg = errorMsg,
-                internalErrorCode = gitErrors?.internalErrorCode ?: 0
+                errorMsg = errorMsg
             )
         } catch (ignore: Throwable) {
             throw GitExecuteException(
