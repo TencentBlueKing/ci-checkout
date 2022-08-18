@@ -40,7 +40,7 @@ enum class GitErrors(
     val cause: String?,
     val solution: String?,
     val errorType: ErrorType = ErrorType.USER,
-    val errorCode: Int = 106501,
+    val errorCode: Int = 806501,
     val wiki: String?
 ) {
     // fetch命令错误
@@ -61,7 +61,7 @@ enum class GitErrors(
         } else {
             GitErrorsText.get().httpAuthenticationFailedRepositorySolution
         },
-        errorCode = 106502,
+        errorCode = 806502,
         wiki = GitErrorsText.get().httpAuthenticationFailedWiki
     ),
 
@@ -73,7 +73,7 @@ enum class GitErrors(
         title = GitErrorsText.get().sshAuthenticationFailed,
         cause = GitErrorsText.get().sshAuthenticationFailedCause,
         solution = GitErrorsText.get().sshAuthenticationFailedSolution,
-        errorCode = 106503,
+        errorCode = 806503,
         wiki = GitErrorsText.get().sshAuthenticationFailedWiki
     ),
 
@@ -92,7 +92,7 @@ enum class GitErrors(
         } else {
             GitErrorsText.get().httpAuthenticationFailedRepositorySolution
         },
-        errorCode = 106504,
+        errorCode = 806504,
         wiki = GitErrorsText.get().httpAuthenticationFailedWiki
     ),
 
@@ -115,7 +115,7 @@ enum class GitErrors(
         cause = GitErrorsText.get().remoteServerFailedCause,
         solution = GitErrorsText.get().remoteServerFailedSolution,
         errorType = ErrorType.THIRD_PARTY,
-        errorCode = 106505,
+        errorCode = 806505,
         wiki = GitErrorsText.get().remoteServerFailedWiki
     ),
     ConnectionTimeOut(
@@ -125,7 +125,7 @@ enum class GitErrors(
         title = GitErrorsText.get().connectionTimeOut,
         cause = GitErrorsText.get().connectionTimeOutCause,
         solution = GitErrorsText.get().connectionTimeOutSolution,
-        errorCode = 106506,
+        errorCode = 806506,
         wiki = GitErrorsText.get().connectionTimeOutWiki
     ),
 
@@ -149,7 +149,7 @@ enum class GitErrors(
         title = GitErrorsText.get().noMatchingBranch,
         cause = GitErrorsText.get().noMatchingBranchCause,
         solution = GitErrorsText.get().noMatchingBranchSolution,
-        errorCode = 106507,
+        errorCode = 806507,
         wiki = GitErrorsText.get().noMatchingBranchWiki
     ),
     NoInitializeBranch(
@@ -160,7 +160,7 @@ enum class GitErrors(
         title = GitErrorsText.get().noInitializeBranch,
         cause = GitErrorsText.get().noInitializeBranchCause,
         solution = GitErrorsText.get().noInitializeBranchSolution,
-        errorCode = 106508,
+        errorCode = 806508,
         wiki = GitErrorsText.get().noInitializeBranchWiki
     ),
     SparseCheckoutLeavesNoEntry(
@@ -170,7 +170,7 @@ enum class GitErrors(
         title = GitErrorsText.get().sparseCheckoutLeavesNoEntry,
         cause = GitErrorsText.get().sparseCheckoutLeavesNoEntryCause,
         solution = GitErrorsText.get().sparseCheckoutLeavesNoEntrySolution,
-        errorCode = 106509,
+        errorCode = 806509,
         wiki = GitErrorsText.get().sparseCheckoutLeavesNoEntryWiki
     ),
     BranchOrPathNameConflicts(
@@ -180,7 +180,7 @@ enum class GitErrors(
         title = GitErrorsText.get().branchOrPathNameConflicts,
         cause = GitErrorsText.get().branchOrPathNameConflictsCause,
         solution = GitErrorsText.get().branchOrPathNameConflictsSolution,
-        errorCode = 106510,
+        errorCode = 806510,
         wiki = GitErrorsText.get().branchOrPathNameConflictsWiki
     ),
 
@@ -196,7 +196,7 @@ enum class GitErrors(
         title = GitErrorsText.get().mergeConflicts,
         cause = GitErrorsText.get().mergeConflictsCause,
         solution = GitErrorsText.get().mergeConflictsSolution,
-        errorCode = 106511,
+        errorCode = 806511,
         wiki = GitErrorsText.get().mergeConflictsWiki
     ),
     InvalidMerge(
@@ -207,7 +207,7 @@ enum class GitErrors(
         title = GitErrorsText.get().invalidMerge,
         cause = GitErrorsText.get().invalidMergeCause,
         solution = GitErrorsText.get().invalidMergeSolution,
-        errorCode = 106512,
+        errorCode = 806512,
         wiki = GitErrorsText.get().invalidMergeWiki
     ),
     CannotMergeUnrelatedHistories(
@@ -218,7 +218,7 @@ enum class GitErrors(
         title = GitErrorsText.get().cannotMergeUnrelatedHistories,
         cause = GitErrorsText.get().cannotMergeUnrelatedHistoriesCause,
         solution = GitErrorsText.get().cannotMergeUnrelatedHistoriesSolution,
-        errorCode = 106513,
+        errorCode = 806513,
         wiki = GitErrorsText.get().cannotMergeUnrelatedHistoriesWiki
     ),
     LocalChangesOverwritten(
@@ -230,7 +230,7 @@ enum class GitErrors(
         title = GitErrorsText.get().localChangesOverwritten,
         cause = GitErrorsText.get().localChangesOverwrittenCause,
         solution = GitErrorsText.get().localChangesOverwrittenSolution,
-        errorCode = 106514,
+        errorCode = 806514,
         wiki = GitErrorsText.get().localChangesOverwrittenWiki
     ),
 
@@ -246,7 +246,7 @@ enum class GitErrors(
         title = GitErrorsText.get().noSubmoduleMapping,
         cause = GitErrorsText.get().noSubmoduleMappingCause,
         solution = GitErrorsText.get().noSubmoduleMappingSolution,
-        errorCode = 106515,
+        errorCode = 806515,
         wiki = GitErrorsText.get().noSubmoduleMappingWiki
     ),
     SubmoduleRepositoryDoesNotExist(
@@ -258,7 +258,7 @@ enum class GitErrors(
         title = GitErrorsText.get().submoduleRepositoryDoesNotExist,
         cause = GitErrorsText.get().submoduleRepositoryDoesNotExistCause,
         solution = GitErrorsText.get().submoduleRepositoryDoesNotExistSolution,
-        errorCode = 106516,
+        errorCode = 806516,
         wiki = GitErrorsText.get().submoduleRepositoryDoesNotExistWiki
     ),
     InvalidSubmoduleSHA(
@@ -273,7 +273,7 @@ enum class GitErrors(
         title = GitErrorsText.get().invalidSubmoduleSHA,
         cause = GitErrorsText.get().invalidSubmoduleSHACause,
         solution = GitErrorsText.get().invalidSubmoduleSHASolution,
-        errorCode = 106517,
+        errorCode = 806517,
         wiki = GitErrorsText.get().invalidSubmoduleSHAWiki
     ),
 
@@ -285,7 +285,7 @@ enum class GitErrors(
         title = GitErrorsText.get().lfsAttributeDoesNotMatch,
         cause = GitErrorsText.get().lfsAttributeDoesNotMatchCause,
         solution = GitErrorsText.get().lfsAttributeDoesNotMatchSolution,
-        errorCode = 106518,
+        errorCode = 806518,
         wiki = GitErrorsText.get().lfsAttributeDoesNotMatchWiki
     ),
     ErrorDownloadingObject(
@@ -296,7 +296,7 @@ enum class GitErrors(
         title = GitErrorsText.get().errorDownloadingObject,
         cause = GitErrorsText.get().errorDownloadingObjectCause,
         solution = GitErrorsText.get().errorDownloadingObjectSolution,
-        errorCode = 106519,
+        errorCode = 806519,
         wiki = GitErrorsText.get().errorDownloadingObjectWiki
     ),
     LfsNotInstall(
@@ -307,7 +307,7 @@ enum class GitErrors(
         title = GitErrorsText.get().lfsNotInstall,
         cause = GitErrorsText.get().lfsNotInstallCause,
         solution = GitErrorsText.get().lfsNotInstallSolution,
-        errorCode = 106520,
+        errorCode = 806520,
         wiki = GitErrorsText.get().lfsNotInstallWiki
     ),
 
@@ -320,7 +320,7 @@ enum class GitErrors(
         title = GitErrorsText.get().lockFileAlreadyExists,
         cause = GitErrorsText.get().lockFileAlreadyExistsCause,
         solution = GitErrorsText.get().lockFileAlreadyExistsSolution,
-        errorCode = 106521,
+        errorCode = 806521,
         wiki = GitErrorsText.get().lockFileAlreadyExistsWiki
     ),
     BadRevision(
@@ -330,7 +330,7 @@ enum class GitErrors(
         title = GitErrorsText.get().badRevision,
         cause = GitErrorsText.get().badRevisionCause,
         solution = GitErrorsText.get().badRevisionSolution,
-        errorCode = 106522,
+        errorCode = 806522,
         wiki = GitErrorsText.get().badRevisionWiki
     ),
     NotAGitRepository(
@@ -340,7 +340,7 @@ enum class GitErrors(
         title = GitErrorsText.get().notAGitRepository,
         cause = GitErrorsText.get().notAGitRepositoryCause,
         solution = GitErrorsText.get().notAGitRepositorySolution,
-        errorCode = 106523,
+        errorCode = 806523,
         wiki = GitErrorsText.get().notAGitRepositoryWiki
     );
 
