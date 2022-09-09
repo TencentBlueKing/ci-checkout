@@ -5,6 +5,7 @@ import com.tencent.bk.devops.git.credential.Constants
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 import com.tencent.bk.devops.git.credential.helper.GitOutput
 import java.io.ByteArrayInputStream
+import java.io.File
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -46,11 +47,15 @@ class CacheSecureStore : ICredentialStore {
         targetUri: URI,
         credential: Credential? = null
     ): GitOutput {
-        val args = mutableListOf("credential-cache", "--timeout=${TimeUnit.DAYS.toSeconds(MAX_JOB_RUN_DAYS).toInt()}")
+        val args = mutableListOf(
+            "credential-cache",
+            "--timeout=${TimeUnit.DAYS.toSeconds(MAX_JOB_RUN_DAYS).toInt()}",
+            "--socket=${cacheSocketPath()}"
+        )
         args.add(action)
         val builder = StringBuilder()
         builder.append("protocol=").append(targetUri.scheme).append("\n")
-        builder.append("host=").append(hostToName(targetUri.host)).append("\n")
+        builder.append("host=").append(targetUri.host).append("\n")
         if (credential != null) {
             builder.append("username=").append(credential.Username).append("\n")
             builder.append("password=").append(credential.Password).append("\n")
@@ -61,17 +66,18 @@ class CacheSecureStore : ICredentialStore {
         )
     }
 
-    private fun hostToName(host: String): String {
-        val builder = StringBuilder("devops")
+    // 按照job级别指定缓存路径
+    private fun cacheSocketPath(): String {
         val pipelineId = System.getenv(Constants.BK_CI_PIPELINE_ID)
         val vmSeqId = System.getenv(Constants.BK_CI_BUILD_JOB_ID)
+        var socketPath = File(System.getProperty("user.home"), ".checkout")
         if (!pipelineId.isNullOrBlank()) {
-            builder.append("_").append(pipelineId)
+            socketPath = File(socketPath, pipelineId)
         }
         if (!vmSeqId.isNullOrBlank()) {
-            builder.append("_").append(vmSeqId)
+            socketPath = File(socketPath, vmSeqId)
         }
-        builder.append("_").append(host)
-        return builder.toString()
+        socketPath = File(socketPath, "credential/socket")
+        return socketPath.absolutePath
     }
 }

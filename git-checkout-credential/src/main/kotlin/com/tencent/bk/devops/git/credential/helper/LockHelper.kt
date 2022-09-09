@@ -25,18 +25,44 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.bk.devops.git.credential
+package com.tencent.bk.devops.git.credential.helper
 
-object Constants {
-    const val BK_CI_BUILD_ID = "BK_CI_BUILD_ID"
-    const val BK_CI_PIPELINE_ID = "BK_CI_PIPELINE_ID"
-    const val BK_CI_BUILD_JOB_ID = "BK_CI_BUILD_JOB_ID"
-    const val BK_CI_BUILD_TASK_ID = "BK_CI_BUILD_TASK_ID"
-    const val GIT_CREDENTIAL_HELPER = "credential.helper"
-    const val GIT_CREDENTIAL_HELPER_VALUEREGEX = "git-checkout-credential"
-    const val GIT_CREDENTIAL_COMPATIBLEHOST = "credential.compatibleHost"
-    const val GIT_CREDENTIAL_TASKID = "credential.taskId"
-    const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
-    const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
-    const val GIT_REPO_PATH = "GIT_REPO_PATH"
+import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_ID
+import com.tencent.bk.devops.git.credential.Constants.BK_CI_BUILD_JOB_ID
+import com.tencent.bk.devops.git.credential.Constants.BK_CI_PIPELINE_ID
+import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+
+object LockHelper {
+
+    fun lock() {
+        getLockFile().writeText(System.getenv(BK_CI_BUILD_ID) ?: "")
+    }
+
+    fun unlock(): Boolean {
+        val lockFile = getLockFile()
+        if (!lockFile.exists()) {
+            return true
+        }
+        return if (lockFile.readText() == (System.getenv(BK_CI_BUILD_ID) ?: "")) {
+            lockFile.delete()
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun getLockFile(): File {
+        val lockPath = Paths.get(
+            System.getProperty("user.home"),
+            ".checkout",
+            System.getenv(BK_CI_PIPELINE_ID),
+            System.getenv(BK_CI_BUILD_JOB_ID)
+        )
+        if (!Files.exists(lockPath)) {
+            Files.createDirectories(lockPath)
+        }
+        return File(lockPath.toString(), "credential.lock")
+    }
 }

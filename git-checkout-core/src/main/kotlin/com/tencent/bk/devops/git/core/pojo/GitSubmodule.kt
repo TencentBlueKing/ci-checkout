@@ -25,18 +25,14 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.bk.devops.git.credential
+package com.tencent.bk.devops.git.core.pojo
 
-object Constants {
-    const val BK_CI_BUILD_ID = "BK_CI_BUILD_ID"
-    const val BK_CI_PIPELINE_ID = "BK_CI_PIPELINE_ID"
-    const val BK_CI_BUILD_JOB_ID = "BK_CI_BUILD_JOB_ID"
-    const val BK_CI_BUILD_TASK_ID = "BK_CI_BUILD_TASK_ID"
-    const val GIT_CREDENTIAL_HELPER = "credential.helper"
-    const val GIT_CREDENTIAL_HELPER_VALUEREGEX = "git-checkout-credential"
-    const val GIT_CREDENTIAL_COMPATIBLEHOST = "credential.compatibleHost"
-    const val GIT_CREDENTIAL_TASKID = "credential.taskId"
-    const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
-    const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
-    const val GIT_REPO_PATH = "GIT_REPO_PATH"
-}
+data class GitSubmodule(
+    val name: String,
+    val path: String,
+    // 绝对路径
+    val absolutePath: String,
+    val url: String,
+    val revision: String? = null,
+    val branch: String? = null
+)

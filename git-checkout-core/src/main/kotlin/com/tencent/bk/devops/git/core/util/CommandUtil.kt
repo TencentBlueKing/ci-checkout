@@ -30,7 +30,9 @@ package com.tencent.bk.devops.git.core.util
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TOTAL_SIZE
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.CommandLogLevel
 import com.tencent.bk.devops.git.core.enums.GitErrors
+import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitOutput
 import com.tencent.bk.devops.git.core.pojo.GitPackingPhase
@@ -41,11 +43,14 @@ import com.tencent.devops.git.log.GitLogOutputStream
 import com.tencent.devops.git.log.LogType
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.ExecuteException
+import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
 import org.apache.commons.exec.environment.EnvironmentUtils
 import org.apache.commons.io.IOUtils
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.InputStream
+import java.nio.file.Files
 
 object CommandUtil {
 
@@ -53,8 +58,9 @@ object CommandUtil {
      * 最大的输出日志行数
      */
     private const val MAX_LOG_SIZE = 100
+    private val logger = LoggerFactory.getLogger(CommandUtil::class.java)
 
-    @SuppressWarnings("LongParameterList", "ComplexMethod")
+    @SuppressWarnings("LongParameterList", "ComplexMethod", "LongMethod")
     fun execute(
         workingDirectory: File? = null,
         executable: String,
@@ -63,7 +69,9 @@ object CommandUtil {
         inputStream: InputStream? = null,
         allowAllExitCodes: Boolean = false,
         logType: LogType = LogType.TEXT,
-        printLogger: Boolean = true
+        printLogger: Boolean = true,
+        logLevel: CommandLogLevel = CommandLogLevel.INFO,
+        handleErrStream: Boolean = true
     ): GitOutput {
         val executor = CommandLineExecutor()
         if (workingDirectory != null) {
@@ -80,39 +88,43 @@ object CommandUtil {
                 }
                 val tmpLine = SensitiveLineParser.onParseLine(line)
                 if (printLogger) {
-                    println("  $tmpLine")
+                    printLog("  $tmpLine", logLevel)
                 }
                 val tmpGitErrors = parseError(line.trim())
                 if (tmpGitErrors != null) {
                     gitErrors = tmpGitErrors
                 }
                 gitErrors = parseError(line.trim())
-                stdOuts.add(tmpLine)
+                stdOuts.add(line)
             }
         }
 
-        val errorStream = object : GitLogOutputStream(logType) {
-            override fun processLine(line: String?, level: Int) {
-                if (line == null) {
-                    return
+        val errorStream = if (handleErrStream) {
+            object : GitLogOutputStream(logType) {
+                override fun processLine(line: String?, level: Int) {
+                    if (line == null) {
+                        return
+                    }
+                    val tmpLine = SensitiveLineParser.onParseLine(line)
+                    if (printLogger && !allowAllExitCodes) {
+                        System.err.println("  $tmpLine")
+                    }
+                    val tmpGitErrors = parseError(line.trim())
+                    if (tmpGitErrors != null) {
+                        gitErrors = tmpGitErrors
+                    }
+                    val tmpGitPackingPhase = RegexUtil.parseReport(tmpLine)
+                    if (tmpGitPackingPhase != null) {
+                        gitPackingPhase = tmpGitPackingPhase
+                    }
+                    if (errOuts.size > MAX_LOG_SIZE) {
+                        errOuts.clear()
+                    }
+                    errOuts.add(line)
                 }
-                val tmpLine = SensitiveLineParser.onParseLine(line)
-                if (printLogger && !allowAllExitCodes) {
-                    System.err.println("  $tmpLine")
-                }
-                val tmpGitErrors = parseError(line.trim())
-                if (tmpGitErrors != null) {
-                    gitErrors = tmpGitErrors
-                }
-                val tmpGitPackingPhase = RegexUtil.parseReport(tmpLine)
-                if (tmpGitPackingPhase != null) {
-                    gitPackingPhase = tmpGitPackingPhase
-                }
-                if (errOuts.size > MAX_LOG_SIZE) {
-                    errOuts.clear()
-                }
-                errOuts.add(tmpLine)
             }
+        } else {
+            null
         }
         executor.streamHandler = PumpStreamHandler(outputStream, errorStream, inputStream)
         if (allowAllExitCodes) {
@@ -120,7 +132,10 @@ object CommandUtil {
         }
         val command = CommandLine.parse(executable).addArguments(args.toTypedArray(), false)
         if (printLogger) {
-            println("##[command]$ ${command.toStrings().joinToString(" ")}")
+            printLog(
+                "##[command]$ ${SensitiveLineParser.onParseLine(command.toStrings().joinToString(" "))}",
+                logLevel
+            )
         }
         try {
             // 系统环境变量 + 运行时环境变量
@@ -161,6 +176,62 @@ object CommandUtil {
         }
     }
 
+    fun execute(
+        command: String,
+        workingDirectory: File?,
+        printLogger: Boolean = false,
+        logLevel: CommandLogLevel = CommandLogLevel.INFO,
+        allowAllExitCodes: Boolean = false
+    ) {
+        if (printLogger) {
+            printLog(
+                log = "##[command]$ ${command.replace("\n", "&&")}",
+                logLevel = logLevel
+            )
+        }
+        val file = if (AgentEnv.getOS() == OSType.WINDOWS) {
+            Files.createTempFile("devops_script", ".bat").toFile()
+        } else {
+            Files.createTempFile("devops_script", ".sh").toFile()
+        }
+        file.setExecutable(true)
+        file.deleteOnExit()
+        file.writeText(command)
+        val cmdLine = CommandLine.parse(file.absolutePath)
+
+        val executor = CommandLineExecutor()
+        if (workingDirectory != null) {
+            executor.workingDirectory = workingDirectory
+        }
+
+        val outputStream = object : LogOutputStream() {
+            override fun processLine(line: String?, level: Int) {
+                if (line == null)
+                    return
+
+                val tmpLine = SensitiveLineParser.onParseLine(line)
+                if (printLogger) {
+                    logger.debug("  $tmpLine")
+                }
+            }
+        }
+        executor.streamHandler = PumpStreamHandler(outputStream, outputStream)
+        if (allowAllExitCodes) {
+            executor.setExitValues(null)
+        }
+        try {
+            executor.execute(cmdLine)
+        } catch (ignore: Throwable) {
+            throw GitExecuteException(
+                errorType = ErrorType.PLUGIN,
+                errorCode = GitConstants.DEFAULT_ERROR,
+                errorMsg = ignore.message ?: ""
+            )
+        } finally {
+            IOUtils.close(outputStream, outputStream)
+        }
+    }
+
     private fun parseError(message: String): GitErrors? {
         return GitErrors.matchError(message)
     }
@@ -171,6 +242,18 @@ object CommandUtil {
                 EnvHelper.putContext(CONTEXT_TRANSFER_RATE, transferRate)
                 EnvHelper.putContext(CONTEXT_TOTAL_SIZE, totalSize)
             }
+        }
+    }
+
+    private fun printLog(
+        log: String,
+        logLevel: CommandLogLevel
+    ) {
+        when (logLevel) {
+            CommandLogLevel.INFO ->
+                println(log)
+            CommandLogLevel.DEBUG ->
+                logger.debug(log)
         }
     }
 }

@@ -27,4 +27,5 @@ object ContextConstants {
     const val CONTEXT_TRANSFER_RATE = "context_transfer_rate"
     const val CONTEXT_TOTAL_SIZE = "context_total_size"
     const val CONTEXT_ERROR_INFO = "context_error_info"
+    const val CONTEXT_GIT_VERSION = "context_git_version"
 }

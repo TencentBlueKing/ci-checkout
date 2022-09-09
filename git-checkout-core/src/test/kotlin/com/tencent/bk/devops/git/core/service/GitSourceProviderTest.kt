@@ -31,19 +31,22 @@ import com.tencent.bk.devops.git.core.api.MockDevopsApi
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
+import com.tencent.bk.devops.git.core.util.AgentEnv
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.mockito.Mockito
 import java.io.File
 import java.nio.file.Files
-import org.junit.After
-import org.junit.Test
 
 class GitSourceProviderTest {
 
     private var workspace: File = Files.createTempDirectory("git-checkout").toFile()
     private val settings = GitSourceSettings(
         bkWorkspace = workspace.absolutePath,
-        pipelineId = "001",
-        pipelineBuildId = "122",
-        pipelineTaskId = "1243",
+        pipelineId = "p-0dedf8a92a3147bcb5bed58dd10a667e",
+        pipelineBuildId = "b-3bee3e2d0a1941fa9dc1845aa6c55dbc",
+        pipelineTaskId = "e-702f4c9b54604da78f71b244b978c445",
         pipelineStartUserName = "mingshewhe",
         scmType = ScmType.CODE_GIT,
         repositoryUrl = "https://github.com/ci-plugins/git.git",
@@ -61,6 +64,12 @@ class GitSourceProviderTest {
         )
     )
     private val devopsApi = MockDevopsApi()
+
+    @Before
+    fun setup() {
+        val agentEnv = Mockito.mockStatic(AgentEnv::class.java)
+        agentEnv.`when`<Boolean> { AgentEnv.isThirdParty() }.thenReturn(false)
+    }
 
     @Test
     fun getSource() {

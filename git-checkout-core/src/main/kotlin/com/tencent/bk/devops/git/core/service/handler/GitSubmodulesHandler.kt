@@ -31,9 +31,9 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.service.helper.auth.GitAuthHelperFactory
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
-import java.lang.StringBuilder
 
 class GitSubmodulesHandler(
     private val settings: GitSourceSettings,
@@ -43,6 +43,7 @@ class GitSubmodulesHandler(
     companion object {
         private val logger = LoggerFactory.getLogger(GitSubmodulesHandler::class.java)
     }
+    private val authHelper by lazy { GitAuthHelperFactory.getAuthHelper(settings = settings, git = git) }
 
     override fun doHandle() {
         val startEpoch = System.currentTimeMillis()
@@ -62,6 +63,9 @@ class GitSubmodulesHandler(
                 git.submoduleForeach(command = "git config --local gc.auto 0", recursive = nestedSubmodules)
                 if (lfs) {
                     git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
+                }
+                if (settings.persistCredentials) {
+                    authHelper.configureSubmoduleAuth()
                 }
                 logger.groupEnd("")
             }

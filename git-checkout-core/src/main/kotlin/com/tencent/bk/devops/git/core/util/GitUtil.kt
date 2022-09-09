@@ -38,6 +38,9 @@ import java.net.URLEncoder
 object GitUtil {
 
     private const val PRE_PUSH_BRANCH_NAME_PREFIX = "refs/for/"
+    private val HTTP_URL_REGEX = Regex("(http[s]?://)(.*:.*@)?(([-.a-z0-9A-Z]+)(:[0-9]+)?)/(.*?)(\\.git)?$")
+    private val GIT_URL_REGEX = Regex("(git@([-.a-z0-9A-Z]+)):(.*?)(\\.git)?$")
+    private val NOT_GIT_PROTOCOL_URL_REGEX = Regex("([-.a-z0-9A-Z]+):(.*?)(\\.git)?$")
 
     fun urlDecode(s: String) = URLDecoder.decode(s, "UTF-8")
 
@@ -48,24 +51,40 @@ object GitUtil {
     }
 
     fun getServerInfo(url: String): ServerInfo {
-        return if (isHttpProtocol(url)) {
-            val groups = Regex("(http[s]?://)(.*:.*@)?(([-.a-z0-9A-Z]+)(:[0-9]+)?)/(.*).git").find(url)?.groups
-                ?: throw ParamInvalidException(errorMsg = "Invalid git url $url")
-            ServerInfo(
-                origin = "${groups[1]!!.value}${groups[3]!!.value}",
-                hostName = groups[3]!!.value,
-                repositoryName = groups[6]!!.value,
-                httpProtocol = true
-            )
-        } else {
-            val groups = Regex("(git@([-.a-z0-9A-Z]+)):(.*).git").find(url)?.groups
-                ?: throw ParamInvalidException(errorMsg = "Invalid git url $url")
-            ServerInfo(
-                origin = groups[1]!!.value,
-                hostName = groups[2]!!.value,
-                repositoryName = groups[3]!!.value,
-                httpProtocol = false
-            )
+        return when {
+            HTTP_URL_REGEX.matches(url) -> {
+                val groups = HTTP_URL_REGEX.find(url)!!.groups
+                ServerInfo(
+                    origin = "${groups[1]!!.value}${groups[3]!!.value}",
+                    hostName = groups[3]!!.value,
+                    repositoryName = groups[6]!!.value,
+                    httpProtocol = true
+                )
+            }
+            GIT_URL_REGEX.matches(url) -> {
+                val groups = GIT_URL_REGEX.find(url)!!.groups
+                ServerInfo(
+                    origin = groups[1]!!.value,
+                    hostName = groups[2]!!.value,
+                    repositoryName = groups[3]!!.value,
+                    httpProtocol = false
+                )
+            }
+            NOT_GIT_PROTOCOL_URL_REGEX.matches(url) -> {
+                val groups = NOT_GIT_PROTOCOL_URL_REGEX.find(url)!!.groups
+                ServerInfo(
+                    origin = "git@${groups[1]!!.value}",
+                    hostName = groups[1]!!.value,
+                    repositoryName = groups[2]!!.value,
+                    httpProtocol = false
+                )
+            }
+            else -> {
+                throw ParamInvalidException(
+                    errorMsg = "Invalid git url $url," +
+                        "url format:http[s]://HOSTNAME[:PORT]//REPONAME[.git] or git@:HOSTNAME[:PORT]:REPONAME[.git]"
+                )
+            }
         }
     }
 
@@ -112,8 +131,10 @@ object GitUtil {
         val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
         // 必须先验证事件类型，再判断仓库是否相同，不然验证仓库类型时解析url会异常
         return enableVirtualMergeBranch &&
-            (hookEventType == CodeEventType.PULL_REQUEST.name ||
-                hookEventType == CodeEventType.MERGE_REQUEST.name) &&
+            (
+                hookEventType == CodeEventType.PULL_REQUEST.name ||
+                    hookEventType == CodeEventType.MERGE_REQUEST.name
+                ) &&
             gitHookEventType != CodeEventType.MERGE_REQUEST_ACCEPT.name &&
             isSameRepository(
                 repositoryUrl = repositoryUrl,

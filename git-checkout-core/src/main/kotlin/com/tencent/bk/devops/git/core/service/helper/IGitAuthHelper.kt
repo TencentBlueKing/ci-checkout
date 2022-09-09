@@ -29,16 +29,38 @@ package com.tencent.bk.devops.git.core.service.helper
 
 interface IGitAuthHelper {
 
+    /**
+     * 清理上一次构建执行的授权
+     *
+     * 当用户取消时,post action可能没有执行导致auth没有清理,应该清理上一次构建执行的凭证
+     */
+    fun removePreviousAuth()
+
+    /**
+     * 配置当前仓库凭证
+     */
     fun configureAuth()
 
+    /**
+     * 移除当前仓库凭证
+     */
     fun removeAuth()
 
+    /**
+     * 配置全局凭证，用于拉取子模块时使用
+     *
+     */
+    fun configGlobalAuth()
+
+    /**
+     * 移除全局凭证
+     */
+    fun removeGlobalAuth()
+
+    /**
+     * 配置子模块凭证，用户拉取完子模块后，再配置子模块的凭证
+     */
     fun configureSubmoduleAuth()
 
     fun removeSubmoduleAuth()
-
-    /**
-     * 如果自定义凭证授权失败,则通过core.askpass再次验证权限
-     */
-    fun configureAskPass()
 }

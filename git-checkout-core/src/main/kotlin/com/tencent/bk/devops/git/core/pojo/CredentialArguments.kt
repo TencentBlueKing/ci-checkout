@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.pojo
 
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 
 data class CredentialArguments(
@@ -36,6 +37,10 @@ data class CredentialArguments(
     val username: String? = null,
     val password: String? = null
 ) {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(CredentialArguments::class.java)
+    }
     override fun toString(): String {
         val builder = StringBuilder()
         builder.append("protocol=").append(protocol).append("\n")
@@ -49,6 +54,7 @@ data class CredentialArguments(
         if (password != null) {
             builder.append("password=").append(password).append("\n")
         }
+        logger.debug("host:$host,protocol:$protocol")
         return builder.toString()
     }
 

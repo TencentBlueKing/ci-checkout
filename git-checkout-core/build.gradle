@@ -35,6 +35,9 @@ dependencies {
     compile "commons-codec:commons-codec:1.15"
     compile "org.apache.commons:commons-lang3:3.12.0"
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2"
+    testCompile "org.mockito.kotlin:mockito-kotlin:4.0.0"
+    testCompile "org.mockito:mockito-inline:4.0.0"
+    testCompile "com.nhaarman:mockito-kotlin-kt1.1:1.6.0"
 }
 
 task versionInfo(type: WriteProperties) {

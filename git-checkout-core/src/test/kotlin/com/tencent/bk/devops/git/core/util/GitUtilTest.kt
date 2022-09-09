@@ -44,6 +44,15 @@ class GitUtilTest {
         )
         Assert.assertEquals(expected, actual)
 
+        expected = GitUtil.getServerInfo("https://git.exaple.com/my-proj/my-repo")
+        actual = ServerInfo(
+            origin = "https://git.exaple.com",
+            hostName = "git.exaple.com",
+            repositoryName = "my-proj/my-repo",
+            httpProtocol = true
+        )
+        Assert.assertEquals(expected, actual)
+
         expected = GitUtil.getServerInfo("https://git.exaple.com:8080/my-proj/my-repo.git")
         actual = ServerInfo(
             origin = "https://git.exaple.com:8080",
@@ -63,6 +72,15 @@ class GitUtilTest {
         Assert.assertEquals(expected, actual)
 
         expected = GitUtil.getServerInfo("git@git.exaple.com:my-proj/my-repo.git")
+        actual = ServerInfo(
+            origin = "git@git.exaple.com",
+            hostName = "git.exaple.com",
+            repositoryName = "my-proj/my-repo",
+            httpProtocol = false
+        )
+        Assert.assertEquals(expected, actual)
+
+        expected = GitUtil.getServerInfo("git.exaple.com:my-proj/my-repo.git")
         actual = ServerInfo(
             origin = "git@git.exaple.com",
             hostName = "git.exaple.com",

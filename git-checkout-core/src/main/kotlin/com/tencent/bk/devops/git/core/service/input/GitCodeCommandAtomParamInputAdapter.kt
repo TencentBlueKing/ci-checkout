@@ -121,6 +121,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 value = GitUtil.getServerInfo(repositoryUrl).repositoryName
             )
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_REF, refName)
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_BRANCH, refName)
+            EnvHelper.addEnvVariable(GitConstants.DEVOPS_GIT_REPO_BRANCH, refName)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_INCLUDE_PATH, input.includePath ?: "")
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_EXCLUDE_PATH, input.excludePath ?: "")
 

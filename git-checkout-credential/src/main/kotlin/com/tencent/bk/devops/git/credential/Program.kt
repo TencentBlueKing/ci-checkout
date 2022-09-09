@@ -30,6 +30,7 @@ package com.tencent.bk.devops.git.credential
 import com.microsoft.alm.secret.Credential
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.credential.helper.GitHelper
+import com.tencent.bk.devops.git.credential.helper.LockHelper
 import com.tencent.bk.devops.git.credential.storage.CredentialStore
 import java.io.BufferedReader
 import java.io.InputStream
@@ -44,6 +45,13 @@ class Program(
 ) {
 
     private val credentialStore = CredentialStore()
+    private var taskId: String? = null
+
+    private fun getTaskUri(targetUri: URI): URI {
+        return with(targetUri) {
+            URI("$scheme://$taskId.$host")
+        }
+    }
 
     fun innerMain(args: Array<String>) {
         if (args.isEmpty() || args[0].contains("?")) {
@@ -54,6 +62,10 @@ class Program(
         actions["get"] = { get() }
         actions["fill"] = { get() }
         actions["devopsErase"] = { devopsErase() }
+
+        if (args.size >= 2) {
+            taskId = args[0]
+        }
 
         args.forEach { arg ->
             if (actions.containsKey(arg)) {
@@ -76,9 +88,20 @@ class Program(
                     Credential(username, password)
                 )
             }
+            // 保存插件的凭证,为了解决当出现`拉代码1->拉代码2-bash:git push 代码1`,
+            // 如果拉仓库2的身份没有仓库1的权限，那么bash就会报错,因为凭证会被拉代码2插件给覆盖
+            if (!taskId.isNullOrBlank()) {
+                credentialStore.add(
+                    getTaskUri(targetUri),
+                    Credential(username, password)
+                )
+            }
         }
+        // 凭证写入成功后,把buildId写入到锁文件，防止在第三方构建机同一条流水线同时运行时,前面执行的构建把后面执行的构建凭证删除
+        LockHelper.lock()
     }
 
+    @SuppressWarnings("NestedBlockDepth")
     private fun CredentialArguments.compatible(action: (URI) -> Unit) {
         val compatibleHost = GitHelper.tryConfigGet(
             configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
@@ -86,17 +109,25 @@ class Program(
         )
         // 同一服务多个域名时，需要保存不同域名的凭证
         if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(host)) {
-            compatibleHost.split(",").forEach { cHost ->
-                listOf("https", "http").forEach { cProtocol ->
-                    action.invoke(URI("$cProtocol://$cHost/"))
-                }
+            compatibleHost.split(",").forEach host@{ cHost ->
+                listOf("https", "http")
+                    .forEach protocol@{ cProtocol ->
+                        if (cProtocol == protocol && cHost == host) return@protocol
+                        action.invoke(URI("$cProtocol://$cHost/"))
+                    }
             }
         }
     }
 
     private fun get() {
         with(readInput()) {
-            var credential = credentialStore.get(targetUri)
+            var credential: Credential? = null
+            if (!taskId.isNullOrBlank()) {
+                credential = credentialStore.get(getTaskUri(targetUri))
+            }
+            if (credential == null) {
+                credential = credentialStore.get(targetUri)
+            }
             if (credential == null) {
                 credential = Credential.Empty
             }
@@ -108,11 +139,18 @@ class Program(
      * 清理所有适配的host
      */
     private fun devopsErase() {
+        // 如果当前凭证不是此构建Id写入的,就不删除
+        if (!LockHelper.unlock()) {
+            return
+        }
         val credentialArguments = readInput()
         with(credentialArguments) {
             credentialStore.delete(targetUri)
             compatible { compatibleUri ->
                 credentialStore.delete(compatibleUri)
+            }
+            if (!taskId.isNullOrBlank()) {
+                credentialStore.delete(getTaskUri(targetUri))
             }
         }
     }

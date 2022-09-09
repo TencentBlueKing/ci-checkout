@@ -66,10 +66,14 @@ object GitConstants {
     const val GIT_LFS_FORCE_PROGRESS = "GIT_LFS_FORCE_PROGRESS"
     const val GIT_HTTP_USER_AGENT = "GIT_HTTP_USER_AGENT"
     const val GIT_CREDENTIAL_HELPER = "credential.helper"
+    const val GIT_CREDENTIAL_TASKID = "credential.taskId"
+    const val GIT_CREDENTIAL_INSTEADOF_KEY = "credential.insteadOfKey"
     const val GIT_CREDENTIAL_HELPER_VALUE_REGEX = "git-checkout.sh"
     const val GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX = "git-checkout-credential.sh"
     const val GIT_TRACE = "GIT_TRACE"
     const val GIT_CREDENTIAL_COMPATIBLEHOST = "credential.compatibleHost"
+    const val GIT_CREDENTIAL_AUTH_HELPER = "credential.authHelper"
+    const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
     const val GIT_REPO_PATH = "GIT_REPO_PATH"
 
     // auth env
@@ -156,6 +160,10 @@ object GitConstants {
     // 支持通过配置credential.helper= 禁用其他凭证管理的版本
     val SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION =
         VersionHelper.computeVersionFromBits(2, 9, 0, 0)
+    val SUPPORT_CRED_HELPER_GIT_VERSION =
+        VersionHelper.computeVersionFromBits(1, 7, 10, 0)
+    val SUPPORT_SUBMODULE_SYNC_RECURSIVE_GIT_VERSION =
+        VersionHelper.computeVersionFromBits(1, 8, 1, 0)
 
     const val USER_NEED_PROJECT_X_PERMISSION = 2101181
 }

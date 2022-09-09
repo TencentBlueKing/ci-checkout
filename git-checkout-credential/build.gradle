@@ -35,7 +35,7 @@ dependencies {
 
 // 固定入口类 不要改
 mainClassName = "com.tencent.bk.devops.git.credential.MainKt"
-version '2.0.0'
+version '3.0.1'
 
 shadowJar {
     archiveBaseName.set("git-checkout-credential")

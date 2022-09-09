@@ -29,13 +29,13 @@ package com.tencent.bk.devops.git.credential.helper
 
 import com.tencent.bk.devops.git.credential.ConfigScope
 import com.tencent.bk.devops.git.credential.Constants.GIT_REPO_PATH
-import java.io.File
-import java.io.InputStream
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.DefaultExecutor
 import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
 import org.apache.commons.exec.environment.EnvironmentUtils
+import java.io.File
+import java.io.InputStream
 
 object GitHelper {
 

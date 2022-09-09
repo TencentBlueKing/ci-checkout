@@ -56,5 +56,6 @@ object AgentEnv {
         return os!!
     }
 
+    @JvmStatic
     fun isThirdParty() = SdkEnv.getSdkHeader()[Header.AUTH_HEADER_DEVOPS_BUILD_TYPE] == "AGENT"
 }

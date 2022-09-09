@@ -46,7 +46,7 @@ object FileUtils {
         }
     }
 
-    private fun deleteDirectory(directory: File) {
+    fun deleteDirectory(directory: File) {
         if (!directory.exists()) {
             return
         }

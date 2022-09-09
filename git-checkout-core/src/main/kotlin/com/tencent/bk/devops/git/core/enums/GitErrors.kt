@@ -48,6 +48,7 @@ enum class GitErrors(
         regex = Regex(
             "(The requested URL returned error: 403)|" +
                 "(fatal: could not read Username for '(.+)': terminal prompts disabled)|" +
+                "(fatal: could not read Password for '(.+)': terminal prompts disabled)|" +
                 "(fatal: Authentication failed for '(.+)')|" +
                 "(fatal: Authentication failed)|" +
                 "(fatal: '(.+)' 鉴权失败)|" +

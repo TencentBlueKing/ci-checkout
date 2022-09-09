@@ -114,7 +114,9 @@ class InitRepoHandler(
         if (!userEmailConfig.isNullOrBlank()) {
             git.config(configKey = "user.email", configValue = userEmailConfig)
         }
-        git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.LOCAL)
+        if (repositoryUrl.startsWith("http")) {
+            git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.LOCAL)
+        }
         git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.LOCAL)
         git.config(configKey = "gc.auto", configValue = "0")
         initPartialClone()

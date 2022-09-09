@@ -31,11 +31,8 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT
-import com.tencent.bk.devops.git.core.enums.GitErrors
-import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
-import com.tencent.bk.devops.git.core.service.helper.GitAuthHelper
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
 import com.tencent.bk.devops.git.core.util.DateUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -48,7 +45,6 @@ class GitFetchHandler(
 ) : IGitHandler {
 
     private val refHelper = RefHelper(settings = settings)
-    private val authHelper = GitAuthHelper(settings = settings, git = git)
     companion object {
         private val logger = LoggerFactory.getLogger(GitFetchHandler::class.java)
     }
@@ -57,21 +53,6 @@ class GitFetchHandler(
         val startEpoch = System.currentTimeMillis()
         try {
             doFetch()
-        } catch (ignore: GitExecuteException) {
-            /**
-             * 如果拉取报凭证失败，可能是因为凭证管理有问题，如凭证写入失败，或者被其他错误凭证覆盖,使用core.askpass获取凭证重试拉取
-             */
-            if (listOf(
-                    GitErrors.AuthenticationFailed.errorCode,
-                    GitErrors.SshAuthenticationFailed.errorCode,
-                    GitErrors.RepositoryNotFoundFailed.errorCode
-                ).contains(ignore.errorCode)
-            ) {
-                authHelper.configureAskPass()
-                doFetch()
-            } else {
-                throw ignore
-            }
         } finally {
             EnvHelper.putContext(
                 key = ContextConstants.CONTEXT_FETCH_COST_TIME,

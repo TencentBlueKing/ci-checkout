@@ -30,7 +30,7 @@ package com.tencent.bk.devops.git.core.service.handler
 import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
-import com.tencent.bk.devops.git.core.service.helper.GitAuthHelper
+import com.tencent.bk.devops.git.core.service.helper.auth.GitAuthHelperFactory
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
 
@@ -42,16 +42,16 @@ class GitAuthHandler(
     companion object {
         private val logger = LoggerFactory.getLogger(GitAuthHandler::class.java)
     }
-    private val authHelper = GitAuthHelper(settings = settings, git = git)
+
+    private val authHelper by lazy { GitAuthHelperFactory.getAuthHelper(settings = settings, git = git) }
 
     override fun doHandle() {
         val startEpoch = System.currentTimeMillis()
         try {
             logger.groupStart("Setting up auth")
+            authHelper.removePreviousAuth()
             authHelper.configureAuth()
-            if (settings.submodules) {
-                authHelper.configureSubmoduleAuth()
-            }
+            authHelper.configGlobalAuth()
             logger.groupEnd("")
         } finally {
             EnvHelper.putContext(
@@ -62,13 +62,12 @@ class GitAuthHandler(
     }
 
     override fun afterHandle() {
+        logger.groupStart("removing auth")
+        // 临时全局配置,执行完就清理
+        authHelper.removeGlobalAuth()
         if (!settings.persistCredentials) {
-            logger.groupStart("removing auth")
             authHelper.removeAuth()
-            logger.groupEnd("")
         }
-        if (settings.submodules) {
-            authHelper.removeSubmoduleAuth()
-        }
+        logger.groupEnd("")
     }
 }
