@@ -67,8 +67,16 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 persistCredentials = persistCredentials ?: true,
                 compatibleHostList = null,
                 enableTrace = enableTrace,
-                usernameConfig = usernameConfig,
-                userEmailConfig = userEmailConfig,
+                usernameConfig = if (usernameConfig.isNullOrBlank()) {
+                    pipelineStartUserName
+                } else {
+                    usernameConfig
+                },
+                userEmailConfig = if (userEmailConfig.isNullOrBlank()) {
+                    "$pipelineStartUserName@xxx.com"
+                } else {
+                    userEmailConfig
+                },
                 enablePartialClone = enablePartialClone,
                 cachePath = cachePath
             )
