@@ -38,14 +38,19 @@ class CheckoutAtomParam : AtomBaseParam() {
     var excludePath: String? = ""
 
     // 非前端传递的参数
-    @JsonProperty("pipeline.start.type")
+    @JsonProperty("BK_CI_START_TYPE")
     val pipelineStartType: String? = null
+    @JsonProperty("BK_CI_HOOK_EVENT_TYPE")
     val hookEventType: String? = null
+    @JsonProperty("BK_CI_HOOK_SOURCE_BRANCH")
     val hookSourceBranch: String? = null
+    @JsonProperty("BK_CI_HOOK_TARGET_BRANCH")
     val hookTargetBranch: String? = null
+    @JsonProperty("BK_CI_HOOK_SOURCE_URL")
     val hookSourceUrl: String? = null
+    @JsonProperty("BK_CI_HOOK_TARGET_URL")
     val hookTargetUrl: String? = null
-    @JsonProperty("git_mr_number")
+    @JsonProperty("BK_CI_GIT_MR_NUMBER")
     val gitMrNumber: String? = null
 
     // 重试时检出的commitId
