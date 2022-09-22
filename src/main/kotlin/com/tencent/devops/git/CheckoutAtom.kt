@@ -12,6 +12,7 @@ import com.tencent.devops.git.pojo.CheckoutAtomParam
 
 @AtomService(paramClass = CheckoutAtomParam::class)
 class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
+    @Suppress("LongMethod")
     override fun execute(context: AtomContext<CheckoutAtomParam>) {
         val inputAdapter = CheckoutAtomParamInputAdapter(input = with(context.param) {
             // 配置环境变量
