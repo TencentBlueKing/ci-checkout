@@ -429,7 +429,12 @@ class GitCommandManager(
         if (startPoint.isBlank()) {
             args.add(ref)
         } else {
-            args.addAll(listOf("-B", ref, startPoint))
+            if (isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
+                args.addAll(listOf("-B", ref, startPoint))
+            } else {
+                execGit(args = listOf("branch", "-f", ref, startPoint))
+                args.add(ref)
+            }
         }
         execGit(args = args, logType = LogType.PROGRESS)
     }
