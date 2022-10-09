@@ -127,7 +127,10 @@ class UsernamePwdGitAuthHelper(
         moduleServerInfo: ServerInfo,
         commands: MutableList<String>
     ) {
-        commands.add("git config --unset-all ${getInsteadofUrl()}")
+        val insteadOfKey = git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
+        if (insteadOfKey.isNotBlank()) {
+            commands.add("git config --unset-all $insteadOfKey")
+        }
     }
 
     override fun submoduleInsteadOf(
