@@ -114,7 +114,7 @@ class InitRepoHandler(
         if (!userEmailConfig.isNullOrBlank()) {
             git.config(configKey = "user.email", configValue = userEmailConfig)
         }
-        if (repositoryUrl.startsWith("http")) {
+        if (repositoryUrl.startsWith("http:")) {
             git.config(configKey = "http.sslverify", configValue = "false", configScope = GitConfigScope.LOCAL)
         }
         git.config(configKey = "http.postBuffer", configValue = "524288000", configScope = GitConfigScope.LOCAL)

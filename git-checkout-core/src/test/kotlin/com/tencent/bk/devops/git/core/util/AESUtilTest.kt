@@ -29,7 +29,6 @@ package com.tencent.bk.devops.git.core.util
 
 import org.junit.Assert
 import org.junit.Test
-import java.io.File
 
 class AESUtilTest {
 
@@ -44,10 +43,5 @@ class AESUtilTest {
     @Test
     fun decrypt() {
         Assert.assertEquals(AESUtil.decrypt(secretKey, "C+8Fpua5fwl3sLZ3uqXg/A=="), "1234")
-    }
-
-    @Test
-    fun test() {
-        println(File("?", ".checkout").absolutePath)
     }
 }
