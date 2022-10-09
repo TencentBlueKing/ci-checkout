@@ -165,6 +165,8 @@ object GitConstants {
     val SUPPORT_SUBMODULE_SYNC_RECURSIVE_GIT_VERSION =
         VersionHelper.computeVersionFromBits(1, 8, 1, 0)
     val SUPPORT_CHECKOUT_B_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 7, 3, 0)
+    val SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION =
+        VersionHelper.computeVersionFromBits(1, 8, 2, 0)
 
     const val USER_NEED_PROJECT_X_PERMISSION = 2101181
 }

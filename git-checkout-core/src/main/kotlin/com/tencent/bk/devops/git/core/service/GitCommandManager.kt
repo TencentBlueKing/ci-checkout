@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_RECURSE_SUBMODULES_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_SYNC_RECURSIVE_GIT_VERSION
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.CredentialActionEnum
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
@@ -336,7 +337,10 @@ class GitCommandManager(
     }
 
     fun submoduleUpdate(recursive: Boolean, path: String, submoduleRemote: Boolean) {
-        val args = mutableListOf("submodule", "update", "--init", "--force")
+        val args = mutableListOf("submodule", "update", "--init")
+        if (isAtLeastVersion(SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION)) {
+            args.add("--force")
+        }
         if (recursive) {
             args.add("--recursive")
         }
