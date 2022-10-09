@@ -360,8 +360,9 @@ class GitCommandManager(
         shallowSince: String? = null,
         enablePartialClone: Boolean? = false
     ) {
-        val args = mutableListOf("fetch", "--prune", "--progress")
+        val args = mutableListOf("fetch", "--progress")
         if (isAtLeastVersion(SUPPORT_RECURSE_SUBMODULES_VERSION)) {
+            args.add("--prune")
             args.add("--no-recurse-submodules")
         }
         /**
