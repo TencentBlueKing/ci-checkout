@@ -60,7 +60,7 @@ class GitSubmodulesHandler(
                     path = submodulesPath,
                     submoduleRemote = submoduleRemote
                 )
-                git.submoduleForeach(command = "git config --local gc.auto 0", recursive = nestedSubmodules)
+                git.submoduleForeach(command = "git config gc.auto 0", recursive = nestedSubmodules)
                 if (lfs) {
                     git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
                 }
