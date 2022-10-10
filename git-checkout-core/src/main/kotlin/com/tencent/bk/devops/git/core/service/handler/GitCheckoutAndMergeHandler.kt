@@ -122,6 +122,7 @@ class GitCheckoutAndMergeHandler(
                 content.append("/").append(it.trim().removePrefix("/")).append(System.lineSeparator())
             }
         }
+        logger.debug(".git/info/sparse-checkout content: $content")
 
         val checkInfo = refHelper.getCheckInfo()
         if (content.toString().isBlank()) {
