@@ -38,11 +38,15 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_CODE_
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_EXCLUDE_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_INCLUDE_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_TAG
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_URLS
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_BRANCHES
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_CODE_PATHS
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_CODE_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_URL
+import com.tencent.bk.devops.git.core.constant.GitConstants.PARAM_SEPARATOR
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_ALIASNAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_BRANCHNAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_URL
@@ -175,6 +179,21 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable("bk_repo_container_id_${input.pipelineTaskId}", System.getenv(BK_CI_BUILD_JOB_ID))
             EnvHelper.addEnvVariable("bk_repo_include_path_${input.pipelineTaskId}", input.includePath ?: "")
             EnvHelper.addEnvVariable("bk_repo_exclude_path_${input.pipelineTaskId}", input.excludePath ?: "")
+
+            EnvHelper.addEnvVariable(
+                key = BK_CI_GIT_URLS,
+                value = System.getenv(BK_CI_GIT_URLS)?.let { "$it$PARAM_SEPARATOR${repository.url}" } ?: repository.url
+            )
+            EnvHelper.addEnvVariable(
+                key = DEVOPS_GIT_BRANCHES,
+                value = System.getenv(DEVOPS_GIT_BRANCHES)?.let { "$it$PARAM_SEPARATOR$branchName" } ?: branchName
+            )
+            EnvHelper.addEnvVariable(
+                key = DEVOPS_GIT_CODE_PATHS,
+                value = System.getenv(DEVOPS_GIT_CODE_PATHS)?.let {
+                    "$it$PARAM_SEPARATOR$localPath}"
+                } ?: (localPath ?: "")
+            )
 
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,

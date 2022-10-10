@@ -36,6 +36,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_PUSH_BEFORE_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LOG_MAX_COUNT
+import com.tencent.bk.devops.git.core.enums.ChannelCode
 import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
@@ -61,6 +62,9 @@ class GitLogHelper(
     }
 
     fun saveGitCommit() {
+        if (!isSaveCommit()) {
+            return
+        }
         val repositoryConfig = RepositoryUtils.buildConfig(settings.repositoryUrl)
         val preCommitData = getLastCommitId(
             pipelineId = settings.pipelineId,
@@ -87,8 +91,19 @@ class GitLogHelper(
         saveBuildMaterial(commitMaterial = commitMaterial)
         EnvHelper.addLogEnv(
             projectName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName,
+            repositoryConfig = repositoryConfig,
             commitMaterial = commitMaterial
         )
+    }
+
+    /**
+     * codecc不保存代码提交记录
+     */
+    private fun isSaveCommit(): Boolean {
+        return when (System.getenv("BK_CI_START_CHANNEL")) {
+            ChannelCode.CODECC.name, ChannelCode.GONGFENGSCAN.name, ChannelCode.CODECC_EE.name -> false
+            else -> true
+        }
     }
 
     private fun saveCommits(

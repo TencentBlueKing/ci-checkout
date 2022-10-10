@@ -37,12 +37,16 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_LAST_COMMIT_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_HEAD_COMMITS
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_CUR_COMMITS
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_HEAD_COMMIT_COMMENT
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_HEAD_COMMIT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_LAST_COMMIT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.PARAM_SEPARATOR
+import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_NEW_COMMIT_COMMENT
+import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_NEW_COMMIT_TIMES
 import com.tencent.bk.devops.git.core.pojo.api.CommitMaterial
+import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
 
 @SuppressWarnings("TooManyFunctions")
 object EnvHelper {
@@ -59,8 +63,10 @@ object EnvHelper {
         env.putAll(agentEnv)
     }
 
+    @SuppressWarnings("ComplexMethod")
     fun addLogEnv(
         projectName: String,
+        repositoryConfig: RepositoryConfig,
         commitMaterial: CommitMaterial
     ) {
         val envProjectName = projectName.replace("/", ".")
@@ -69,6 +75,14 @@ object EnvHelper {
         }
         if (commitMaterial.newCommitId != null) {
             env["git.$envProjectName.new.commit"] = commitMaterial.newCommitId
+        }
+        if (commitMaterial.newCommitComment != null) {
+            env["$PIPELINE_MATERIAL_NEW_COMMIT_COMMENT.${repositoryConfig.getRepositoryId()}"] =
+                commitMaterial.newCommitComment
+        }
+        if (commitMaterial.commitTimes != 0) {
+            env["$PIPELINE_MATERIAL_NEW_COMMIT_TIMES.${repositoryConfig.getRepositoryId()}"] =
+                commitMaterial.commitTimes.toString()
         }
 
         env[DEVOPS_GIT_REPO_CUR_COMMITS] = commitMaterial.commitIds.joinToString(PARAM_SEPARATOR)
@@ -82,6 +96,9 @@ object EnvHelper {
         env[BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT] = commitMaterial.newCommitComment ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR] = commitMaterial.newCommitAuthor ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER] = commitMaterial.newCommitAuthor ?: ""
+        env[DEVOPS_GIT_HEAD_COMMITS] = System.getenv(DEVOPS_GIT_HEAD_COMMITS)?.let {
+            "$it$PARAM_SEPARATOR${commitMaterial.newCommitId}"
+        } ?: ""
     }
 
     fun getAuthEnv(): Map<String, String> {
