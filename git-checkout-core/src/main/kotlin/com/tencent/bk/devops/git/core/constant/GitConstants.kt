@@ -167,6 +167,8 @@ object GitConstants {
     val SUPPORT_CHECKOUT_B_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 7, 3, 0)
     val SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION =
         VersionHelper.computeVersionFromBits(1, 8, 2, 0)
+    val SUPPORT_MERGE_NO_VERIFY_GIT_VERSION =
+        VersionHelper.computeVersionFromBits(2, 15, 0, 0)
 
     const val USER_NEED_PROJECT_X_PERMISSION = 2101181
 }

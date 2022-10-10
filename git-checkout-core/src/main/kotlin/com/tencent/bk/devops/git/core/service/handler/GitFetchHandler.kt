@@ -203,7 +203,8 @@ class GitFetchHandler(
                 fetchDepth = fetchDepth,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME,
                 shallowSince = shallowSince,
-                enablePartialClone = enablePartialClone
+                enablePartialClone = enablePartialClone,
+                prune = false
             )
         }
         if (preMerge && GitUtil.isPrePushBranch(sourceBranchName)) {

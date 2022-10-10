@@ -35,6 +35,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_MERGE_NO_VERIFY_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_RECURSE_SUBMODULES_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_SYNC_RECURSIVE_GIT_VERSION
@@ -358,11 +359,14 @@ class GitCommandManager(
         fetchDepth: Int,
         remoteName: String,
         shallowSince: String? = null,
-        enablePartialClone: Boolean? = false
+        enablePartialClone: Boolean? = false,
+        prune: Boolean = true
     ) {
         val args = mutableListOf("fetch", "--progress")
-        if (isAtLeastVersion(SUPPORT_RECURSE_SUBMODULES_VERSION)) {
+        if (prune) {
             args.add("--prune")
+        }
+        if (isAtLeastVersion(SUPPORT_RECURSE_SUBMODULES_VERSION)) {
             args.add("--no-recurse-submodules")
         }
         /**
@@ -450,7 +454,12 @@ class GitCommandManager(
     }
 
     fun merge(ref: String) {
-        execGit(args = listOf("merge", "--no-verify", ref))
+        val args = mutableListOf("merge")
+        if (isAtLeastVersion(SUPPORT_MERGE_NO_VERIFY_GIT_VERSION)) {
+            args.add("--no-verify")
+        }
+        args.add(ref)
+        execGit(args = args)
     }
 
     fun log(maxCount: Int = 1, revisionRange: String = "", branchName: String = ""): List<CommitLogInfo> {
