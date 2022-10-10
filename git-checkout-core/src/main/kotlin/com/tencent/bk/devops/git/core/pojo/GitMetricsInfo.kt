@@ -33,5 +33,6 @@ data class GitMetricsInfo(
     val authHelper: String,
     val gitVersion: String,
     val osType: String,
-    val jobType: String?
+    val jobType: String?,
+    val channel: String
 )

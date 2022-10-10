@@ -171,7 +171,8 @@ class GitCheckoutRunner {
                     authHelper = EnvHelper.getContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER) ?: "",
                     gitVersion = EnvHelper.getContext(CONTEXT_GIT_VERSION) ?: "",
                     osType = AgentEnv.getOS().name,
-                    jobType = SdkEnv.getSdkHeader()[Header.AUTH_HEADER_DEVOPS_BUILD_TYPE] ?: ""
+                    jobType = SdkEnv.getSdkHeader()[Header.AUTH_HEADER_DEVOPS_BUILD_TYPE] ?: "",
+                    channel = System.getenv("BK_CI_START_CHANNEL") ?: ""
                 )
             }
             ServiceLoader.load(IGitMetricsHelper::class.java).firstOrNull()
