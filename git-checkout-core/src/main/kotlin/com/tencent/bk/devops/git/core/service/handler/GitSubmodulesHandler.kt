@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.auth.GitAuthHelperFactory
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
+import java.io.File
 
 class GitSubmodulesHandler(
     private val settings: GitSourceSettings,
@@ -49,7 +50,7 @@ class GitSubmodulesHandler(
         val startEpoch = System.currentTimeMillis()
         try {
             with(settings) {
-                if (!submodules) {
+                if (!submodules || !File(repositoryPath, ".gitmodules").exists()) {
                     return
                 }
                 logger.groupStart("Fetching submodules")
