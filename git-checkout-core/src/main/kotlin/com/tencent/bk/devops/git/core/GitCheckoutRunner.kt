@@ -67,6 +67,7 @@ import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.DateUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
+import com.tencent.bk.devops.git.core.util.LogUtil
 import com.tencent.bk.devops.git.core.util.StringUtils
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import org.slf4j.LoggerFactory
@@ -95,6 +96,12 @@ class GitCheckoutRunner {
                 }
             }
         } catch (e: TaskExecuteException) {
+            LogUtil.printException(
+                errMsg = e.errorMsg,
+                reason = e.reason,
+                solution = e.solution,
+                wiki = e.wiki
+            )
             atomContext.result.errorType = e.errorType.num
             atomContext.result.errorCode = e.errorCode
             atomContext.result.message = e.message

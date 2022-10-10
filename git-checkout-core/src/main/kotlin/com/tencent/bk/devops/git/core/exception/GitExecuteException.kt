@@ -33,6 +33,15 @@ import com.tencent.bk.devops.plugin.pojo.ErrorType
 class GitExecuteException constructor(
     override val errorType: ErrorType = ErrorType.USER,
     override val errorCode: Int = GitConstants.CONFIG_ERROR,
-    val internalErrorCode: Int = 0,
-    override val errorMsg: String
-) : TaskExecuteException(errorType, errorCode, errorMsg)
+    override val errorMsg: String,
+    override val reason: String = "",
+    override val solution: String = "",
+    override val wiki: String = ""
+) : TaskExecuteException(
+    errorType = errorType,
+    errorCode = errorCode,
+    errorMsg = errorMsg,
+    reason = reason,
+    solution = solution,
+    wiki = wiki
+)

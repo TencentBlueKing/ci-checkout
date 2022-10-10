@@ -2,14 +2,18 @@ package com.tencent.bk.devops.git.core.util
 
 import org.slf4j.LoggerFactory
 
-object ConsoleTableUtil {
+object LogUtil {
 
-    private val logger = LoggerFactory.getLogger(ConsoleTableUtil::class.java)
+    private val logger = LoggerFactory.getLogger(LogUtil::class.java)
 
-    fun printAsTable(errMsg: String, cause: String, solution: String, wiki: String) {
+    fun printException(errMsg: String, reason: String, solution: String, wiki: String) {
         logger.warn("************************************问题排查指引**********************************************")
-        printSplit("【错误信息】", "<a target='_blank' href='$wiki'>$errMsg</a>")
-        printSplit("【问题原因】", cause)
+        if (wiki.isNotBlank()) {
+            printSplit("【错误信息】", "<a target='_blank' href='$wiki'>$errMsg</a>")
+        } else {
+            printSplit("【错误信息】", errMsg)
+        }
+        printSplit("【问题原因】", reason)
         printSplit("【解决办法】", solution)
         logger.warn("********************************************************************************************")
     }

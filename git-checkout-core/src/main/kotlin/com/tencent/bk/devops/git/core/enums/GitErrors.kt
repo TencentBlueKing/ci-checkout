@@ -110,7 +110,8 @@ enum class GitErrors(
                 "(fatal: 过早的文件结束符（EOF）)|" +
                 "(fatal: index-pack 失败)|" +
                 "(fatal: early EOF)|" +
-                "(fatal: index-pack failed)"
+                "(fatal: index-pack failed)|" +
+                "(fatal: unable to access '(.+)': The requested URL returned error: 429)"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         cause = GitErrorsText.get().remoteServerFailedCause,

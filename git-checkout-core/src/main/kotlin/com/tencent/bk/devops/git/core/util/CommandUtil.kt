@@ -146,23 +146,16 @@ object CommandUtil {
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {
             val errorMsg = gitErrors?.title?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
-                ?: (
-                    "exec ${command.toStrings().joinToString(" ")} failed " +
-                        "with an exitCode ${ignore.exitValue}"
-                    )
-            val errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR
-            val errorType = gitErrors?.errorType ?: ErrorType.USER
-            ConsoleTableUtil.printAsTable(
-                errMsg = errorMsg,
-                cause = gitErrors?.cause?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) } ?: "",
-                solution = gitErrors?.solution?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
-                    ?: "",
-                wiki = gitErrors?.wiki ?: ""
-            )
+                ?: errOuts.firstOrNull() ?: stdOuts.firstOrNull() ?: ""
             throw GitExecuteException(
-                errorType = errorType,
-                errorCode = errorCode,
-                errorMsg = errorMsg
+                errorType = gitErrors?.errorType ?: ErrorType.USER,
+                errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR,
+                errorMsg = errorMsg,
+                reason = gitErrors?.cause ?: "",
+                solution = gitErrors?.solution?.let {
+                    defaultResolver.resolveByMap(it, EnvHelper.getContextMap())
+                } ?: "",
+                wiki = gitErrors?.wiki ?: ""
             )
         } catch (ignore: Throwable) {
             throw GitExecuteException(
