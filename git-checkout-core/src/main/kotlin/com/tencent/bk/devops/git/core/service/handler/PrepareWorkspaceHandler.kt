@@ -69,6 +69,11 @@ class PrepareWorkspaceHandler(
                 workingDirectory.mkdirs()
             }
             git.getGitVersion()
+            // 如果缓存锁存在,说明上次构建下载缓存没有成功,需要先清理工作空间
+            if (File(repositoryPath, ".git/cache.lock").exists()) {
+                logger.warn("previously build download from cache repository failed,cleaning workspace")
+                FileUtils.deleteRepositoryFile(repositoryPath)
+            }
             // 如果仓库不存在,并且配置了缓存路径,则先从缓存路径下载.git文件
             if (!File(repositoryPath, ".git").exists() && !cachePath.isNullOrBlank()) {
                 val startEpoch = System.currentTimeMillis()
