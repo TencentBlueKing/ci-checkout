@@ -217,6 +217,7 @@ class GitCommandManager(
         configScope: GitConfigScope = GitConfigScope.LOCAL,
         configFile: String? = null
     ): Boolean {
+        println("workingDirectory:$workingDirectory")
         val output = execGit(
             args = configArgs(
                 configKey = configKey,
@@ -225,7 +226,7 @@ class GitCommandManager(
                 configFile = configFile,
                 action = "--unset-all"
             ),
-            allowAllExitCodes = true
+            allowAllExitCodes = false
         )
         return output.exitCode == 0
     }
