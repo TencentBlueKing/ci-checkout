@@ -147,14 +147,15 @@ object CommandUtil {
         } catch (ignore: ExecuteException) {
             val errorMsg = gitErrors?.title?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
                 ?: errOuts.firstOrNull() ?: stdOuts.firstOrNull() ?: ""
+            val cause = gitErrors?.cause?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) } ?: ""
+            val solution = gitErrors?.solution?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
+                ?: ""
             throw GitExecuteException(
                 errorType = gitErrors?.errorType ?: ErrorType.USER,
                 errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR,
                 errorMsg = errorMsg,
-                reason = gitErrors?.cause ?: "",
-                solution = gitErrors?.solution?.let {
-                    defaultResolver.resolveByMap(it, EnvHelper.getContextMap())
-                } ?: "",
+                reason = cause,
+                solution = solution,
                 wiki = gitErrors?.wiki ?: ""
             )
         } catch (ignore: Throwable) {
