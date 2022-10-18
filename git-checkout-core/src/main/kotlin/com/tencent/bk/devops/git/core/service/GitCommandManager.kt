@@ -217,7 +217,6 @@ class GitCommandManager(
         configScope: GitConfigScope = GitConfigScope.LOCAL,
         configFile: String? = null
     ): Boolean {
-        println("workingDirectory:$workingDirectory")
         val output = execGit(
             args = configArgs(
                 configKey = configKey,
