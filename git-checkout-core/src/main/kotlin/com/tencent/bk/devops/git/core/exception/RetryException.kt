@@ -33,5 +33,15 @@ import com.tencent.bk.devops.plugin.pojo.ErrorType
 class RetryException constructor(
     override val errorType: ErrorType = ErrorType.THIRD_PARTY,
     override val errorCode: Int = GitConstants.DEPEND_ERROR,
-    override val errorMsg: String
-) : TaskExecuteException(errorType, errorCode, errorMsg)
+    override val errorMsg: String,
+    override val reason: String = "",
+    override val solution: String = "",
+    override val wiki: String = ""
+) : TaskExecuteException(
+    errorType = errorType,
+    errorCode = errorCode,
+    errorMsg = errorMsg,
+    reason = reason,
+    solution = solution,
+    wiki = wiki
+)

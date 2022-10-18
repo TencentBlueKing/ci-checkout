@@ -421,7 +421,14 @@ class GitCommandManager(
                 }
                 if (isFetchRetry(errorCode = e.errorCode)) {
                     gitEnv[GIT_TRACE] = "1"
-                    throw RetryException(errorType = e.errorType, errorCode = e.errorCode, errorMsg = e.message!!)
+                    throw RetryException(
+                        errorType = e.errorType,
+                        errorCode = e.errorCode,
+                        errorMsg = e.message!!,
+                        reason = e.reason,
+                        solution = e.solution,
+                        wiki = e.wiki
+                    )
                 } else {
                     throw e
                 }

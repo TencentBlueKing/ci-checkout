@@ -96,7 +96,6 @@ class GitCheckoutRunner {
                 }
             }
         } catch (e: TaskExecuteException) {
-            logger.warn(e.errorMsg, e)
             LogUtil.printException(
                 errMsg = e.errorMsg,
                 reason = e.reason,
