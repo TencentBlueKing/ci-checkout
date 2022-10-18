@@ -1,6 +1,5 @@
 package com.tencent.bk.devops.git.core.service.auth
 
-import com.tencent.bk.devops.git.core.api.GithubApi
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.api.TGitApi
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
@@ -30,12 +29,8 @@ class AuthUserTokenGitAuthProvider(
             scmType = scmType
         ).getAuthInfo()
         // 如果授权用户与启动用户不相同,并且事件类型不是定时触发，需要验证启动用户是否有权限下载代码
-        if (System.getenv(CI_EVENT) != "schedule" && pipelineStartUserName != userId) {
-            val gitApi = if (scmType == ScmType.GITHUB) {
-                GithubApi(repositoryUrl = repositoryUrl, userId = userId!!, token = authInfo.password!!)
-            } else {
-                TGitApi(repositoryUrl = repositoryUrl, userId = userId!!, token = authInfo.password!!)
-            }
+        if (System.getenv(CI_EVENT) != "schedule" && pipelineStartUserName != userId && scmType == ScmType.CODE_GIT) {
+            val gitApi = TGitApi(repositoryUrl = repositoryUrl, userId = userId!!, token = authInfo.password!!)
             if (!gitApi.canViewProject(pipelineStartUserName)) {
                 throw ParamInvalidException(
                     errorMsg = defaultResolver.resolveByMap(
