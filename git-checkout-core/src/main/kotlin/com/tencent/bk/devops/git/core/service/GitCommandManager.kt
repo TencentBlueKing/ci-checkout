@@ -226,7 +226,7 @@ class GitCommandManager(
                 configFile = configFile,
                 action = "--unset-all"
             ),
-            allowAllExitCodes = false
+            allowAllExitCodes = true
         )
         return output.exitCode == 0
     }
