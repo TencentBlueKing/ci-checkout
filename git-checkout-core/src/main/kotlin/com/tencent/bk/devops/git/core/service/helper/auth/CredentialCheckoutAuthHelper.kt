@@ -95,8 +95,6 @@ class CredentialCheckoutAuthHelper(
         )
         EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.CUSTOM_CREDENTIAL.name)
 
-        eraseOauth2Credential()
-        storeGlobalCredential(writeCompatibleHost = false)
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
         }
@@ -146,6 +144,12 @@ class CredentialCheckoutAuthHelper(
         replaceCredentialFile(
             sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
+        )
+        // 第三方构建机不影响用户凭证，只卸载全局的git-checkout-credential凭证,为了兼容历史配置
+        git.tryConfigUnset(
+            configKey = GIT_CREDENTIAL_HELPER,
+            configValueRegex = GitConstants.GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
+            configScope = GitConfigScope.GLOBAL
         )
         // 凭证管理必须安装在全局,否则无法传递给其他插件
         if (!git.configExists(

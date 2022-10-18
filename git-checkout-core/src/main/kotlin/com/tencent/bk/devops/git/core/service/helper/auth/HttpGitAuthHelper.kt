@@ -35,7 +35,6 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import org.slf4j.LoggerFactory
-import java.net.URI
 
 /**
  * http或https协议的授权管理
@@ -46,7 +45,6 @@ abstract class HttpGitAuthHelper(
 ) : AbGitAuthHelper(git = git, settings = settings) {
 
     companion object {
-        private const val OAUTH2 = "oauth2"
         private val logger = LoggerFactory.getLogger(HttpGitAuthHelper::class.java)
     }
 
@@ -113,29 +111,6 @@ abstract class HttpGitAuthHelper(
         commands.add("git config --unset-all credential.helper")
     }
 
-    // 工蜂如果oauth2方式授权，如果token有效但是没有仓库的权限,返回状态码是200，但是会抛出repository not found异常,
-    // 导致凭证不会自动清理,所以如果是oauth2授权，先移除全局oauth2的凭证
-    fun eraseOauth2Credential() {
-        if (authInfo.username != OAUTH2) {
-            return
-        }
-        logger.info("removing global credential for `oauth2` username")
-        println("##[command]$ git credential reject")
-        // 同一服务多个域名时，需要保存不同域名的凭证
-        getHostList().forEach { cHost ->
-            listOf("https", "http").forEach { cProtocol ->
-                git.credential(
-                    action = CredentialActionEnum.REJECT,
-                    inputStream = CredentialArguments(
-                        protocol = cProtocol,
-                        host = cHost,
-                        username = OAUTH2
-                    ).convertInputStream()
-                )
-            }
-        }
-    }
-
     /**
      * 存储全局凭证,保证凭证能够向下游插件传递,兼容http和https
      *
@@ -144,34 +119,20 @@ abstract class HttpGitAuthHelper(
      * 3. 保存的全局凭证在下游插件可能不生效，因为在同一个私有构建机，
      *    如果同时执行多条流水线,每条流水线拉代码的账号oauth不同就可能被覆盖
      *
-     *  @param writeCompatibleHost 兼容host是否写入
      */
-    fun storeGlobalCredential(writeCompatibleHost: Boolean) {
+    fun storeGlobalCredential() {
         logger.info("store and overriding global credential for other plugins")
         println("##[command]$ git credential approve")
-        val targetUri = URI(settings.repositoryUrl)
-        git.credential(
-            action = CredentialActionEnum.APPROVE,
-            inputStream = CredentialArguments(
-                protocol = targetUri.scheme,
-                host = targetUri.host,
-                username = authInfo.username,
-                password = authInfo.password
-            ).convertInputStream()
-        )
-        if (writeCompatibleHost) {
-            // 同一服务多个域名时，需要保存不同域名的凭证
-            combinableHost { protocol, host ->
-                git.credential(
-                    action = CredentialActionEnum.APPROVE,
-                    inputStream = CredentialArguments(
-                        protocol = protocol,
-                        host = host,
-                        username = authInfo.username,
-                        password = authInfo.password
-                    ).convertInputStream()
-                )
-            }
+        combinableHost { protocol, host ->
+            git.credential(
+                action = CredentialActionEnum.APPROVE,
+                inputStream = CredentialArguments(
+                    protocol = protocol,
+                    host = host,
+                    username = authInfo.username,
+                    password = authInfo.password
+                ).convertInputStream()
+            )
         }
     }
 

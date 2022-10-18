@@ -64,8 +64,7 @@ class CredentialStoreAuthHelper(
             configKey = GitConstants.GIT_CREDENTIAL_AUTH_HELPER,
             configValue = AuthHelperType.STORE_CREDENTIAL.name
         )
-        eraseOauth2Credential()
-        storeGlobalCredential(writeCompatibleHost = true)
+        storeGlobalCredential()
         writeStoreFile()
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)

@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service
 
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_GIT_VERSION
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.GCM_INTERACTIVE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRESS
@@ -48,17 +49,20 @@ import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.exception.RetryException
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
+import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitOutput
 import com.tencent.bk.devops.git.core.service.helper.RetryHelper
 import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import com.tencent.devops.git.log.LogType
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.InputStream
+import java.net.URI
 
 @Suppress("ALL")
 class GitCommandManager(
@@ -351,7 +355,7 @@ class GitCommandManager(
         if (path.isNotBlank()) {
             args.addAll(path.split(","))
         }
-        execGit(args = args)
+        doRetry(args = args)
     }
 
     fun fetch(
@@ -389,7 +393,7 @@ class GitCommandManager(
 
         args.add(remoteName)
         args.addAll(refSpec)
-        doFetch(args = args)
+        doRetry(args = args)
     }
 
     fun lfsPull(
@@ -403,14 +407,18 @@ class GitCommandManager(
         if (!fetchExclude.isNullOrBlank()) {
             args.addAll(listOf("-X", fetchExclude))
         }
-        doFetch(args = args)
+        doRetry(args = args)
     }
 
-    private fun doFetch(args: List<String>) {
+    private fun doRetry(args: List<String>) {
         RetryHelper().execute {
             try {
                 execGit(args = args, logType = LogType.PROGRESS)
             } catch (e: GitExecuteException) {
+                // 先卸载oauth2凭证,然后再重试
+                if (e.errorCode == GitErrors.RepositoryNotFoundFailed.errorCode) {
+                    eraseOauth2Credential()
+                }
                 if (isFetchRetry(errorCode = e.errorCode)) {
                     gitEnv[GIT_TRACE] = "1"
                     throw RetryException(errorType = e.errorType, errorCode = e.errorCode, errorMsg = e.message!!)
@@ -427,6 +435,27 @@ class GitCommandManager(
             GitErrors.AuthenticationFailed.errorCode,
             GitErrors.RepositoryNotFoundFailed.errorCode
         ).contains(errorCode)
+    }
+
+    // 工蜂如果oauth2方式授权，如果token有效但是没有仓库的权限,返回状态码是200，但是会抛出repository not found异常,
+    // 导致凭证不会自动清理,所以清理构建机上存在的oauth2凭证,然后再清理
+    private fun eraseOauth2Credential() {
+        logger.debug("removing global credential for `oauth2` username")
+        logger.debug("##[command]$ git credential reject")
+        // 获取主仓库url
+        val repositoryUrl = EnvHelper.getContext(CONTEXT_REPOSITORY_URL) ?: return
+        val serverInfo = GitUtil.getServerInfo(repositoryUrl)
+        if (serverInfo.httpProtocol) {
+            val targetUri = URI(repositoryUrl)
+            credential(
+                action = CredentialActionEnum.REJECT,
+                inputStream = CredentialArguments(
+                    protocol = targetUri.scheme,
+                    host = targetUri.host,
+                    username = GitConstants.OAUTH2
+                ).convertInputStream()
+            )
+        }
     }
 
     fun lfsInstall() {
