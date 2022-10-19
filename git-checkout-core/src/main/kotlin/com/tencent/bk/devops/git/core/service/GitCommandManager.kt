@@ -56,6 +56,7 @@ import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.FileUtils
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import com.tencent.devops.git.log.LogType
@@ -63,6 +64,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.InputStream
 import java.net.URI
+import java.nio.file.Files
 
 @Suppress("ALL")
 class GitCommandManager(
@@ -452,18 +454,25 @@ class GitCommandManager(
         // 获取主仓库url
         val repositoryUrl = EnvHelper.getContext(CONTEXT_REPOSITORY_URL) ?: return
         val serverInfo = GitUtil.getServerInfo(repositoryUrl)
-        if (serverInfo.httpProtocol) {
-            val targetUri = URI(repositoryUrl)
-            listOf("http", "https").forEach { protocol ->
-                credential(
-                    action = CredentialActionEnum.REJECT,
-                    inputStream = CredentialArguments(
-                        protocol = protocol,
-                        host = targetUri.host,
-                        username = GitConstants.OAUTH2
-                    ).convertInputStream()
-                )
+        // 清理的时候,当前仓库已经配置了credential.helper='',不会卸载全局凭证,创建一个临时目录,在临时目录执行清理命令
+        val workDir = Files.createTempDirectory("git-credential-").toFile()
+        try {
+            if (serverInfo.httpProtocol) {
+                val targetUri = URI(repositoryUrl)
+                listOf("http", "https").forEach { protocol ->
+                    credential(
+                        repoDir = workDir,
+                        action = CredentialActionEnum.REJECT,
+                        inputStream = CredentialArguments(
+                            protocol = protocol,
+                            host = targetUri.host,
+                            username = GitConstants.OAUTH2
+                        ).convertInputStream()
+                    )
+                }
             }
+        } finally {
+            FileUtils.deleteDirectory(workDir)
         }
     }
 
@@ -591,10 +600,14 @@ class GitCommandManager(
         execGit(args = args, allowAllExitCodes = true)
     }
 
-    fun credential(action: CredentialActionEnum, inputStream: InputStream) {
+    fun credential(
+        repoDir: File? = null,
+        action: CredentialActionEnum,
+        inputStream: InputStream
+    ) {
         val args = listOf("credential", action.value)
         CommandUtil.execute(
-            workingDirectory = workingDirectory,
+            workingDirectory = repoDir ?: workingDirectory,
             executable = "git",
             args = args,
             runtimeEnv = gitEnv,
