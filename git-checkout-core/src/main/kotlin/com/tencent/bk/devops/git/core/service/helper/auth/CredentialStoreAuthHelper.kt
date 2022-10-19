@@ -93,7 +93,7 @@ class CredentialStoreAuthHelper(
             }
             git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
             git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
-            git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
+            git.tryConfigGetAll(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
         }
     }
 

@@ -250,7 +250,7 @@ class CredentialCheckoutAuthHelper(
         }
         git.tryConfigUnset(configKey = GIT_CREDENTIAL_HELPER)
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
-        git.tryConfigGet(configKey = GIT_CREDENTIAL_HELPER)
+        git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
     }
 
     override fun configSubmoduleAuthCommand(
