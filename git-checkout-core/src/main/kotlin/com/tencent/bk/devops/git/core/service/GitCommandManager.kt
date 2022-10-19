@@ -454,14 +454,16 @@ class GitCommandManager(
         val serverInfo = GitUtil.getServerInfo(repositoryUrl)
         if (serverInfo.httpProtocol) {
             val targetUri = URI(repositoryUrl)
-            credential(
-                action = CredentialActionEnum.REJECT,
-                inputStream = CredentialArguments(
-                    protocol = targetUri.scheme,
-                    host = targetUri.host,
-                    username = GitConstants.OAUTH2
-                ).convertInputStream()
-            )
+            listOf("http", "https").forEach { protocol ->
+                credential(
+                    action = CredentialActionEnum.REJECT,
+                    inputStream = CredentialArguments(
+                        protocol = protocol,
+                        host = targetUri.host,
+                        username = GitConstants.OAUTH2
+                    ).convertInputStream()
+                )
+            }
         }
     }
 
