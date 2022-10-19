@@ -73,6 +73,7 @@ class SshGitAuthHelper(
 
     override fun removeAuth() {
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
+        git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
     }
 
     override fun insteadOf() {
