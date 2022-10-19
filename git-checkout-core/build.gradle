@@ -26,7 +26,7 @@
  */
 
 dependencies {
-    compile("com.tencent.devops.ci-plugins:java-plugin-sdk:1.0.9") {
+    compile("com.tencent.devops.ci-plugins:java-plugin-sdk:1.1.2") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
     }
     compile "com.squareup.okhttp3:okhttp:3.12.0"
