@@ -64,6 +64,7 @@ class SshGitAuthHelper(
             configKey = GitConstants.GIT_CREDENTIAL_AUTH_HELPER,
             configValue = AuthHelperType.SSH.name
         )
+        EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.SSH.name)
         // 卸载子模块insteadOf时使用
         git.config(
             configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY,

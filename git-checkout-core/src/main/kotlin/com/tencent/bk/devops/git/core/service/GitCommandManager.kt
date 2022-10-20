@@ -34,7 +34,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GCM_INTERACTIVE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRESS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TRACE
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_MERGE_NO_VERIFY_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
@@ -47,11 +46,9 @@ import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
-import com.tencent.bk.devops.git.core.exception.RetryException
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitOutput
-import com.tencent.bk.devops.git.core.service.helper.RetryHelper
 import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
@@ -74,6 +71,8 @@ class GitCommandManager(
 
     companion object {
         private val logger = LoggerFactory.getLogger(GitCommandManager::class.java)
+        private const val SHORT_RETRY_PERIOD_MILLS = 500L
+        private const val LONG_RETRY_PERIOD_MILLS = 10000L
     }
 
     private val gitEnv = mutableMapOf(
@@ -412,33 +411,33 @@ class GitCommandManager(
         doRetry(args = args)
     }
 
-    private fun doRetry(args: List<String>) {
-        RetryHelper().execute {
-            try {
-                execGit(args = args, logType = LogType.PROGRESS)
-            } catch (e: GitExecuteException) {
-                // 先卸载oauth2凭证,然后再重试
-                if (e.errorCode == GitErrors.RepositoryNotFoundFailed.errorCode) {
-                    eraseOauth2Credential()
-                }
-                if (isFetchRetry(errorCode = e.errorCode)) {
-                    gitEnv[GIT_TRACE] = "1"
-                    throw RetryException(
-                        errorType = e.errorType,
-                        errorCode = e.errorCode,
-                        errorMsg = e.message!!,
-                        reason = e.reason,
-                        solution = e.solution,
-                        wiki = e.wiki
-                    )
+    private fun doRetry(args: List<String>, retryTime: Int = 3) {
+        try {
+            execGit(args = args, logType = LogType.PROGRESS)
+        } catch (e: GitExecuteException) {
+            if (retryTime - 1 < 0) {
+                throw e
+            }
+            // 第一次重试先卸载oauth2凭证,然后再重试
+            if (retryTime == 3 && e.errorCode == GitErrors.RepositoryNotFoundFailed.errorCode) {
+                eraseOauth2Credential()
+            }
+            if (needRetry(errorCode = e.errorCode)) {
+                gitEnv[GitConstants.GIT_TRACE] = "1"
+                if (e.errorCode == GitErrors.RemoteServerFailed.errorCode) {
+                    // 服务端故障,重试睡眠时间加强
+                    Thread.sleep(LONG_RETRY_PERIOD_MILLS)
                 } else {
-                    throw e
+                    Thread.sleep(SHORT_RETRY_PERIOD_MILLS)
                 }
+                doRetry(args = args, retryTime = retryTime - 1)
+            } else {
+                throw e
             }
         }
     }
 
-    private fun isFetchRetry(errorCode: Int): Boolean {
+    private fun needRetry(errorCode: Int): Boolean {
         return listOf(
             GitErrors.RemoteServerFailed.errorCode,
             GitErrors.AuthenticationFailed.errorCode,
