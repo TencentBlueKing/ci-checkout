@@ -41,7 +41,8 @@ import java.util.Base64
 
 class CredentialGitAuthProvider(
     private val credentialId: String?,
-    private val devopsApi: DevopsApi
+    private val devopsApi: DevopsApi,
+    private val defaultGitAuthProvider: IGitAuthProvider? = null
 ) : IGitAuthProvider {
 
     companion object {
@@ -85,7 +86,7 @@ class CredentialGitAuthProvider(
                 SshGitAuthProvider(privateKey = credentialInfo.v2, passPhrase = credentialInfo.v3)
             }
             else ->
-                EmptyGitAuthProvider()
+                defaultGitAuthProvider ?: EmptyGitAuthProvider()
         }
         return gitAuthProvider.getAuthInfo()
     }

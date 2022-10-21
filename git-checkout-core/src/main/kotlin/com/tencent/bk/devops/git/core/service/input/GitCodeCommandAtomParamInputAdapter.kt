@@ -36,6 +36,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_REF
 import com.tencent.bk.devops.git.core.enums.AuthType
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
+import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
@@ -79,7 +80,16 @@ class GitCodeCommandAtomParamInputAdapter(
                     )
                     AuthType.TICKET -> CredentialGitAuthProvider(
                         credentialId = ticketId,
-                        devopsApi = devopsApi
+                        devopsApi = devopsApi,
+                        defaultGitAuthProvider = if (scmType == ScmType.CODE_GIT) {
+                            UserTokenGitAuthProvider(
+                                userId = pipelineStartUserName,
+                                devopsApi = devopsApi,
+                                scmType = scmType
+                            )
+                        } else {
+                            EmptyGitAuthProvider()
+                        }
                     )
                     AuthType.START_USER_TOKEN -> UserTokenGitAuthProvider(
                         userId = pipelineStartUserName,
