@@ -14,25 +14,33 @@ class GitErrorsTest {
         Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
 
         gitError = GitErrors.matchError(
-            "fatal: 远程错误：Git repository not found"
-        )
-        Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
-
-        gitError = GitErrors.matchError(
-            "fatal: Could not read from remote repository."
-        )
-        Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
-
-        gitError = GitErrors.matchError(
-            "fatal: remote error: Git:Project not found."
-        )
-        Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
-
-        gitError = GitErrors.matchError(
             "error: The requested URL returned error: 401 Unauthorized " +
                 "while accessing https://github.com/mingshewhe/webhook_test.git/info/refs"
         )
         Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
+    }
+
+    @Test
+    fun repositoryNotFoundFailed() {
+        var gitError = GitErrors.matchError(
+            "fatal: 远程错误：Git repository not found"
+        )
+        Assert.assertEquals(gitError, GitErrors.RepositoryNotFoundFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: Could not read from remote repository."
+        )
+        Assert.assertEquals(gitError, GitErrors.RepositoryNotFoundFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: remote error: Git:Project not found."
+        )
+        Assert.assertEquals(gitError, GitErrors.RepositoryNotFoundFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: 远程错误：Git:Project not found."
+        )
+        Assert.assertEquals(gitError, GitErrors.RepositoryNotFoundFailed)
     }
 
     @Test

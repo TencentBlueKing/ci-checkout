@@ -71,7 +71,6 @@ class GitCommandManager(
 
     companion object {
         private val logger = LoggerFactory.getLogger(GitCommandManager::class.java)
-        private const val SHORT_RETRY_PERIOD_MILLS = 500L
         private const val LONG_RETRY_PERIOD_MILLS = 10000L
     }
 
@@ -425,10 +424,8 @@ class GitCommandManager(
             if (needRetry(errorCode = e.errorCode)) {
                 gitEnv[GitConstants.GIT_TRACE] = "1"
                 if (e.errorCode == GitErrors.RemoteServerFailed.errorCode) {
-                    // 服务端故障,重试睡眠时间加强
+                    // 服务端故障,睡眠后再重试
                     Thread.sleep(LONG_RETRY_PERIOD_MILLS)
-                } else {
-                    Thread.sleep(SHORT_RETRY_PERIOD_MILLS)
                 }
                 doRetry(args = args, retryTime = retryTime - 1)
             } else {

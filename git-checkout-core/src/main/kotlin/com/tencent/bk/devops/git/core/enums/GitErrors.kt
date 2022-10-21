@@ -84,7 +84,8 @@ enum class GitErrors(
                 "(fatal: .* Git repository not found)|" +
                 "(fatal: 远程错误：Git repository not found)|" +
                 "(ERROR: Repository not found)|" +
-                "(fatal: remote error: Git:Project not found.)"
+                "(fatal: remote error: Git:Project not found.)|" +
+                "(fatal: 远程错误：Git:Project not found.)"
         ),
         title = GitErrorsText.get().repositoryNotFoundFailed,
         cause = GitErrorsText.get().httpAuthenticationFailedCause,
