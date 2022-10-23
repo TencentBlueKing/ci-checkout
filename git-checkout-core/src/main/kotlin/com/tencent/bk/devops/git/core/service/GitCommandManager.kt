@@ -540,6 +540,13 @@ class GitCommandManager(
         return output.stdOut.trim().isNotBlank()
     }
 
+    fun tagDelete(tagName: String) {
+        execGit(
+            args = listOf("tag", "-d", tagName),
+            allowAllExitCodes = true
+        )
+    }
+
     fun headExists(): Boolean {
         val output = execGit(
             args = listOf("rev-parse", "--symbolic-full-name", "--verify", "--quiet", "HEAD"),

@@ -18,6 +18,11 @@ class GitErrorsTest {
                 "while accessing https://github.com/mingshewhe/webhook_test.git/info/refs"
         )
         Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: unable to access 'http://example.com/demo.git/': The requested URL returned error: 403"
+        )
+        Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
     }
 
     @Test
