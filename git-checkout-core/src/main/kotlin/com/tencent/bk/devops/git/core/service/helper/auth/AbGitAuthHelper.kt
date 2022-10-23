@@ -94,7 +94,8 @@ abstract class AbGitAuthHelper(
         ) { submodule ->
             val moduleServerInfo = GitUtil.getServerInfo(submodule.url)
             // 如果是相同的git服务端,但是域名不同,则执行insteadOf命令
-            if (getHostList().contains(moduleServerInfo.hostName)) {
+            // .gitmodules中声明了子模块,但是目录被删除了,这种子模块不会被初始化
+            if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
                 logger.info("enter submodule|name:${submodule.name},path:${submodule.path},url:${submodule.url}")
                 val commands = mutableListOf<String>()
                 configSubmoduleAuthCommand(moduleServerInfo, commands)
@@ -119,7 +120,8 @@ abstract class AbGitAuthHelper(
         ) { submodule ->
             val moduleServerInfo = GitUtil.getServerInfo(submodule.url)
             // 如果是相同的git服务端,但是域名不同,则执行unset insteadOf命令
-            if (getHostList().contains(moduleServerInfo.hostName)) {
+            // .gitmodules中声明了子模块,但是目录被删除了,这种子模块不会被初始化
+            if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
                 logger.info("enter submodule|name:${submodule.name},path:${submodule.path},url:${submodule.url}")
                 val commands = mutableListOf<String>()
                 removeSubmoduleAuthCommand(moduleServerInfo, commands)
