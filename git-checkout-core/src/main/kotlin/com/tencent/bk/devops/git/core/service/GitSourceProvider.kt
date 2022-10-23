@@ -101,10 +101,14 @@ class GitSourceProvider(
             val git = GitCommandManager(workingDirectory = workingDirectory, lfs = false)
             val authHelper = GitAuthHelperFactory.getCleanUpAuthHelper(git = git, settings = settings)
             if (settings.submodules && settings.persistCredentials) {
+                logger.groupStart("removing credentials for submodules")
                 authHelper.removeSubmoduleAuth()
+                logger.groupEnd("")
             }
             if (settings.persistCredentials) {
+                logger.groupStart("removing auth")
                 authHelper.removeAuth()
+                logger.groupEnd("")
             }
         }
     }

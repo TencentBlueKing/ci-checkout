@@ -97,7 +97,7 @@ class GitSubmodulesHandler(
             commands.add(builder.toString())
         }
         git.submoduleForeach(
-            command = "${commands.joinToString(",")} || true",
+            command = "${commands.joinToString(";")} || true",
             recursive = nestedSubmodules
         )
     }
