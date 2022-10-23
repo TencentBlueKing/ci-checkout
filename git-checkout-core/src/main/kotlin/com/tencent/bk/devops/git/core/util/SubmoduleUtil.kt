@@ -45,14 +45,19 @@ object SubmoduleUtil {
         if (!File(repositoryDir, ".gitmodules").exists()) {
             return emptyList()
         }
-        val submoduleCfg = CommandUtil.execute(
-            workingDirectory = repositoryDir,
-            executable = "git",
-            args = listOf("config", "--get-regexp", SUBMODULE_REMOTE_PATTERN_CONFIG_KEY),
-            allowAllExitCodes = true,
-            printLogger = true,
-            logLevel = CommandLogLevel.DEBUG
-        ).stdOuts
+        val submoduleCfg = try {
+            CommandUtil.execute(
+                workingDirectory = repositoryDir,
+                executable = "git",
+                args = listOf("config", "-f", ".gitmodules", "--get-regexp", SUBMODULE_REMOTE_PATTERN_CONFIG_KEY),
+                allowAllExitCodes = true,
+                printLogger = true,
+                logLevel = CommandLogLevel.DEBUG
+            ).stdOuts
+        } catch (ignore: Throwable) {
+            logger.debug("No submodules found.")
+            emptyList<String>()
+        }
 
         val submodules = mutableListOf<GitSubmodule>()
         submoduleCfg.forEach { cfg ->
