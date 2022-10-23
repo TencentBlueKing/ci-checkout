@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.helper.auth
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.CommandLogLevel
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
@@ -96,7 +97,9 @@ abstract class AbGitAuthHelper(
             // 如果是相同的git服务端,但是域名不同,则执行insteadOf命令
             // .gitmodules中声明了子模块,但是目录被删除了,这种子模块不会被初始化
             if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
-                logger.info("enter submodule|name:${submodule.name},path:${submodule.path},url:${submodule.url}")
+                logger.info(
+                    "enter '${submodule.absolutePath.removePrefix(settings.repositoryPath).removePrefix("/")}'"
+                )
                 val commands = mutableListOf<String>()
                 configSubmoduleAuthCommand(moduleServerInfo, commands)
                 // 如果schema://HOSTNAME不相同,则统一转换成主库的协议拉取
@@ -107,6 +110,7 @@ abstract class AbGitAuthHelper(
                     command = commands.joinToString("\n"),
                     workingDirectory = File(submodule.absolutePath),
                     printLogger = true,
+                    logLevel = CommandLogLevel.DEBUG,
                     allowAllExitCodes = true
                 )
             }
@@ -122,7 +126,9 @@ abstract class AbGitAuthHelper(
             // 如果是相同的git服务端,但是域名不同,则执行unset insteadOf命令
             // .gitmodules中声明了子模块,但是目录被删除了,这种子模块不会被初始化
             if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
-                logger.info("enter submodule|name:${submodule.name},path:${submodule.path},url:${submodule.url}")
+                logger.info(
+                    "enter '${submodule.absolutePath.removePrefix(settings.repositoryPath).removePrefix("/")}'"
+                )
                 val commands = mutableListOf<String>()
                 removeSubmoduleAuthCommand(moduleServerInfo, commands)
                 if (moduleServerInfo.origin != serverInfo.origin) {
@@ -132,6 +138,7 @@ abstract class AbGitAuthHelper(
                     command = commands.joinToString("\n"),
                     workingDirectory = File(submodule.absolutePath),
                     printLogger = true,
+                    logLevel = CommandLogLevel.DEBUG,
                     allowAllExitCodes = true
                 )
             }

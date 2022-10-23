@@ -65,10 +65,12 @@ class GitSubmodulesHandler(
                 if (lfs) {
                     git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
                 }
-                if (settings.persistCredentials) {
-                    authHelper.configureSubmoduleAuth()
-                }
                 logger.groupEnd("")
+                if (settings.persistCredentials) {
+                    logger.groupStart("Persisting credentials for submodules")
+                    authHelper.configureSubmoduleAuth()
+                    logger.groupEnd("")
+                }
             }
         } finally {
             EnvHelper.putContext(
@@ -82,10 +84,8 @@ class GitSubmodulesHandler(
         if (pullStrategy != PullStrategy.REVERT_UPDATE) {
             return
         }
-        git.submoduleForeach(
-            command = "git reset --hard",
-            recursive = nestedSubmodules
-        )
+        val commands = mutableListOf<String>()
+        commands.add("git reset --hard")
         if (enableGitClean) {
             val builder = StringBuilder("git clean -fd ")
             if (enableGitCleanIgnore == true) {
@@ -94,10 +94,11 @@ class GitSubmodulesHandler(
             if (enableGitCleanNested == true) {
                 builder.append(" -f ")
             }
-            git.submoduleForeach(
-                command = builder.toString(),
-                recursive = nestedSubmodules
-            )
+            commands.add(builder.toString())
         }
+        git.submoduleForeach(
+            command = "${commands.joinToString(",")} || true",
+            recursive = nestedSubmodules
+        )
     }
 }
