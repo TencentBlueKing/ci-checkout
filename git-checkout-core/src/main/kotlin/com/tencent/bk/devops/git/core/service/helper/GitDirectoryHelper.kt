@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.enums.PullStrategy
+import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.FileUtils
@@ -83,6 +84,10 @@ class GitDirectoryHelper(
                             "Unable to clean or reset the repository. " +
                                 "The repository will be recreated instead."
                         )
+                    }
+                    // 如果拉取类型是tag,先删除旧的tag再拉取,防止切换到旧的tag
+                    if (settings.pullType == PullType.TAG) {
+                        git.tagDelete(settings.ref)
                     }
                 } catch (ignore: Exception) {
                     logger.warn(

@@ -33,7 +33,6 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MERGE_SO
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MERGE_TARGET_REF
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.PullStrategy
-import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -59,10 +58,6 @@ class GitCheckoutAndMergeHandler(
             logger.groupStart("Checking out the ref ${checkoutInfo.ref}")
             settings.initSparseCheckout()
             EnvHelper.putContext(CONTEXT_CHECKOUT_REF, checkoutInfo.ref)
-            // 如果拉取类型是tag,先删除旧的tag再拉取,防止切换到旧的tag
-            if (settings.pullType == PullType.TAG) {
-                git.tagDelete(settings.ref)
-            }
             git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
             if (checkoutInfo.upstream.isNotBlank()) {
                 git.branchUpstream(checkoutInfo.upstream)
