@@ -31,6 +31,7 @@ import com.microsoft.alm.secret.Credential
 import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.credential.helper.GitHelper
 import com.tencent.bk.devops.git.credential.helper.LockHelper
+import com.tencent.bk.devops.git.credential.helper.Trace
 import com.tencent.bk.devops.git.credential.storage.CredentialStore
 import java.io.BufferedReader
 import java.io.InputStream
@@ -107,6 +108,7 @@ class Program(
             configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
             configScope = ConfigScope.GLOBAL
         )
+        Trace.writeLine("compatibleHost:$compatibleHost")
         // 同一服务多个域名时，需要保存不同域名的凭证
         if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(host)) {
             compatibleHost.split(",").forEach host@{ cHost ->
