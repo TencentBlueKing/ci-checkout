@@ -183,6 +183,11 @@ class GitErrorsTest {
             "fatal: No url found for submodule path 'aaaa' in .gitmodules"
         )
         Assert.assertEquals(gitError, GitErrors.NoSubmoduleMapping)
+
+        gitError = GitErrors.matchError(
+            "No url found for submodule path 'aaaa' in .gitmodules"
+        )
+        Assert.assertEquals(gitError, GitErrors.NoSubmoduleMapping)
     }
 
     @Test

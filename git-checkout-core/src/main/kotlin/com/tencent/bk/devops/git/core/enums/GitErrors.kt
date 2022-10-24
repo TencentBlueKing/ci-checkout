@@ -245,7 +245,8 @@ enum class GitErrors(
                 "(fatal: 在 .gitmodules 中未找到子模组路径 '(.+)' 的 url)|" +
                 "(fatal: 在 .gitmodules 中没有发现路径 '(.+)' 的子模组映射)|" +
                 "(fatal: 在 .gitmodules 中未找到子模组 '(.+)' 的 url)|" +
-                "(fatal: No url found for submodule path '(.+)' in .gitmodules)"
+                "(fatal: No url found for submodule path '(.+)' in .gitmodules)|" +
+                "(No url found for submodule path '(.+)' in .gitmodules)"
         ),
         title = GitErrorsText.get().noSubmoduleMapping,
         cause = GitErrorsText.get().noSubmoduleMappingCause,
