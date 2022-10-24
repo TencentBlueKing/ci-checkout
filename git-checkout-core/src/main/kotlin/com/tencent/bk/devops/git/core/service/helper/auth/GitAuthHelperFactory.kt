@@ -69,6 +69,9 @@ object GitAuthHelperFactory {
         return when {
             settings.authInfo.username.isNullOrBlank() || settings.authInfo.password.isNullOrBlank() ->
                 EmptyGitAuthHelper()
+            // 如果传入的url是http协议,但是凭证是ssh类型，也能支持拉取
+            !settings.authInfo.privateKey.isNullOrBlank() ->
+                SshGitAuthHelper(git, settings)
             git.isAtLeastVersion(GitConstants.SUPPORT_CRED_HELPER_GIT_VERSION) -> {
                 if (isUseCustomCredential(git)) {
                     CredentialCheckoutAuthHelper(git, settings)
