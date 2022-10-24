@@ -32,6 +32,8 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITO
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_TYPE
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_BRANCHES
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_CODE_PATHS
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_CODE_PATH
@@ -46,6 +48,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_BRAN
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_CODE_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_URL
+import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_URLS
 import com.tencent.bk.devops.git.core.constant.GitConstants.PARAM_SEPARATOR
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_ALIASNAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_BRANCHNAME
@@ -183,6 +186,21 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable(
                 key = BK_CI_GIT_URLS,
                 value = System.getenv(BK_CI_GIT_URLS)?.let { "$it$PARAM_SEPARATOR${repository.url}" } ?: repository.url
+            )
+            EnvHelper.addEnvVariable(
+                key = BK_CI_GIT_BRANCHES,
+                value = System.getenv(BK_CI_GIT_BRANCHES)?.let { "$it$PARAM_SEPARATOR$branchName" } ?: branchName
+            )
+            EnvHelper.addEnvVariable(
+                key = BK_CI_GIT_CODE_PATHS,
+                value = System.getenv(BK_CI_GIT_CODE_PATHS)?.let {
+                    "$it$PARAM_SEPARATOR$localPath}"
+                } ?: (localPath ?: "")
+            )
+
+            EnvHelper.addEnvVariable(
+                key = DEVOPS_GIT_URLS,
+                value = System.getenv(DEVOPS_GIT_URLS)?.let { "$it$PARAM_SEPARATOR${repository.url}" } ?: repository.url
             )
             EnvHelper.addEnvVariable(
                 key = DEVOPS_GIT_BRANCHES,

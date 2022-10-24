@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.AGENT_PID_VAR
 import com.tencent.bk.devops.git.core.constant.GitConstants.AGENT_PID_VAR2
 import com.tencent.bk.devops.git.core.constant.GitConstants.AUTH_SOCKET_VAR
 import com.tencent.bk.devops.git.core.constant.GitConstants.AUTH_SOCKET_VAR2
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_HEAD_COMMITS
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_CUR_COMMITS
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT
@@ -97,6 +98,9 @@ object EnvHelper {
         env[BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR] = commitMaterial.newCommitAuthor ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER] = commitMaterial.newCommitAuthor ?: ""
         env[DEVOPS_GIT_HEAD_COMMITS] = System.getenv(DEVOPS_GIT_HEAD_COMMITS)?.let {
+            "$it$PARAM_SEPARATOR${commitMaterial.newCommitId}"
+        } ?: ""
+        env[BK_CI_GIT_HEAD_COMMITS] = System.getenv(BK_CI_GIT_HEAD_COMMITS)?.let {
             "$it$PARAM_SEPARATOR${commitMaterial.newCommitId}"
         } ?: ""
     }
