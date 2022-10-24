@@ -67,11 +67,14 @@ object GitAuthHelperFactory {
          *    使用ask pass方式获取用户名密码,不然如果用户在拉代码后使用git config --global credential.helper 会报错
          */
         return when {
-            settings.authInfo.username.isNullOrBlank() || settings.authInfo.password.isNullOrBlank() ->
-                EmptyGitAuthHelper()
-            // 如果传入的url是http协议,但是凭证是ssh类型，也能支持拉取
-            !settings.authInfo.privateKey.isNullOrBlank() ->
-                SshGitAuthHelper(git, settings)
+            settings.authInfo.username.isNullOrBlank() || settings.authInfo.password.isNullOrBlank() -> {
+                if (!settings.authInfo.privateKey.isNullOrBlank()) {
+                    // 如果传入的url是http协议,但是凭证是ssh类型，也应能支持拉取
+                    SshGitAuthHelper(git, settings)
+                } else {
+                    EmptyGitAuthHelper()
+                }
+            }
             git.isAtLeastVersion(GitConstants.SUPPORT_CRED_HELPER_GIT_VERSION) -> {
                 if (isUseCustomCredential(git)) {
                     CredentialCheckoutAuthHelper(git, settings)
