@@ -28,8 +28,7 @@
 package com.tencent.bk.devops.git.credential
 
 import com.microsoft.alm.secret.Credential
-import com.tencent.bk.devops.git.credential.Constants.GIT_CREDENTIAL_COMPATIBLEHOST
-import com.tencent.bk.devops.git.credential.helper.GitHelper
+import com.tencent.bk.devops.git.credential.Constants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.credential.helper.LockHelper
 import com.tencent.bk.devops.git.credential.storage.CredentialStore
 import java.io.BufferedReader
@@ -103,10 +102,7 @@ class Program(
 
     @SuppressWarnings("NestedBlockDepth")
     private fun CredentialArguments.compatible(action: (URI) -> Unit) {
-        val compatibleHost = GitHelper.tryConfigGet(
-            configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
-            configScope = ConfigScope.GLOBAL
-        )
+        val compatibleHost = System.getenv(CREDENTIAL_COMPATIBLE_HOST)
         // 同一服务多个域名时，需要保存不同域名的凭证
         if (!compatibleHost.isNullOrBlank() && compatibleHost.contains(host)) {
             compatibleHost.split(",").forEach host@{ cHost ->

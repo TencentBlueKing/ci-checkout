@@ -66,11 +66,10 @@ class GitSubmodulesHandler(
                     git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
                 }
                 logger.groupEnd("")
-                if (settings.persistCredentials) {
-                    logger.groupStart("Persisting credentials for submodules")
-                    authHelper.configureSubmoduleAuth()
-                    logger.groupEnd("")
-                }
+
+                logger.groupStart("Persisting credentials for submodules")
+                authHelper.configureSubmoduleAuth()
+                logger.groupEnd("")
             }
         } finally {
             EnvHelper.putContext(

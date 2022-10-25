@@ -58,22 +58,22 @@ abstract class AbGitAuthHelper(
     protected val authInfo = settings.authInfo
 
     override fun configGlobalAuth() {
+        // 蓝盾默认镜像中有insteadOf,应该卸载,不然在凭证传递到下游插件时会导致凭证失效
         if (!AgentEnv.isThirdParty()) {
-            // 蓝盾默认镜像中有insteadOf,应该卸载,不然在凭证传递到下游插件时会导致凭证失效
             unsetInsteadOf()
+        }
+        // 如果凭证持久化并且是docker环境,则修改git全局配置,否则都修改临时的xdg配置
+        if (settings.persistCredentials && !AgentEnv.isThirdParty()) {
             insteadOf()
             configGlobalAuthCommand()
         } else {
-            /**
-             * 第三方构建机,为了不污染第三方构建机用户git环境,采用临时覆盖HOME环境变量,然后再执行insteadOf命令
-             */
             val tempHomePath = Files.createTempDirectory("checkout")
             val newGitConfigPath = Paths.get(tempHomePath.toString(), ".gitconfig")
             Files.createFile(newGitConfigPath)
             logger.info("Temporarily overriding HOME='$tempHomePath' for fetching submodules")
             git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
             insteadOf()
-            configGlobalAuthCommand()
+            configXdgAuthCommand()
             configureXDGConfig()
         }
     }
@@ -175,6 +175,11 @@ abstract class AbGitAuthHelper(
      * 子类添加全局配置 expand
      */
     open fun configGlobalAuthCommand() = Unit
+
+    /**
+     * 子类添加全局配置 expand
+     */
+    open fun configXdgAuthCommand() = Unit
 
     /**
      * 子类配置授权时submodule操作命令

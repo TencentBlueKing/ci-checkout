@@ -27,24 +27,18 @@
 
 package com.tencent.bk.devops.git.credential
 
-import com.tencent.bk.devops.git.credential.helper.GitHelper
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.PrintStream
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 
 @Ignore
 class ProgramTest {
 
     @Test
     fun innerMain() {
-        GitHelper.config(
-            configKey = Constants.GIT_CREDENTIAL_COMPATIBLEHOST,
-            configValue = "git.example.com,git.example2.com",
-            configScope = ConfigScope.GLOBAL
-        )
         val storeBuilder = StringBuilder().append("protocol=https\n").append("host=git.example.com\n")
             .append("path=\n").append("username=ming2\n").append("password=derafd\n")
         val storeInputStream = ByteArrayInputStream(storeBuilder.toString().toByteArray())

@@ -51,6 +51,9 @@ class GitAuthHandler(
             logger.groupStart("Setting up auth")
             authHelper.removePreviousAuth()
             authHelper.configureAuth()
+            logger.groupEnd("")
+
+            logger.groupStart("Setting up global auth")
             authHelper.configGlobalAuth()
             logger.groupEnd("")
         } finally {

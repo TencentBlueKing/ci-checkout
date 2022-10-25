@@ -30,9 +30,9 @@ package com.tencent.bk.devops.git.core.service.helper.auth
 import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
@@ -44,6 +44,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.VersionHelper
+import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.apache.commons.codec.digest.DigestUtils
@@ -83,27 +84,38 @@ class CredentialCheckoutAuthHelper(
     override fun configureAuth() {
         logger.info("using custom credential helper to set credentials ${authInfo.username}/******")
         EnvHelper.putContext(ContextConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
-        configCompatibleHost()
+
+        // 设置自定义凭证管理需要的环境变量
         val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
         EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         EnvHelper.addEnvVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
+        EnvHelper.addEnvVariable(
+            "${CREDENTIAL_COMPATIBLE_HOST}_$jobId",
+            settings.compatibleHostList?.joinToString(",") ?: ""
+        )
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         git.setEnvironmentVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
+        git.setEnvironmentVariable(
+            "${CREDENTIAL_COMPATIBLE_HOST}_$jobId",
+            settings.compatibleHostList?.joinToString(",") ?: ""
+        )
+
+        // 仓库凭证配置
         git.config(
             configKey = GitConstants.GIT_CREDENTIAL_AUTH_HELPER,
             configValue = AuthHelperType.CUSTOM_CREDENTIAL.name
         )
         EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.CUSTOM_CREDENTIAL.name)
 
-        if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
-            git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
-        }
         git.config(configKey = GitConstants.GIT_CREDENTIAL_TASKID, configValue = settings.pipelineTaskId)
         // 卸载子模块insteadOf时使用
         git.config(
             configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY,
             configValue = "url.${serverInfo.origin}/.insteadOf"
         )
+        if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
+            git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
+        }
         git.configAdd(
             configKey = GIT_CREDENTIAL_HELPER,
             configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}"
@@ -111,24 +123,6 @@ class CredentialCheckoutAuthHelper(
 
         install()
         store()
-    }
-
-    private fun configCompatibleHost() {
-        val compatibleHostList = settings.compatibleHostList
-        if (!compatibleHostList.isNullOrEmpty() && compatibleHostList.contains(serverInfo.hostName)) {
-            if (!git.configExists(
-                    configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
-                    configValueRegex = compatibleHostList.joinToString(","),
-                    configScope = GitConfigScope.GLOBAL
-                )
-            ) {
-                git.config(
-                    configKey = GIT_CREDENTIAL_COMPATIBLEHOST,
-                    configValue = compatibleHostList.joinToString(","),
-                    configScope = GitConfigScope.GLOBAL
-                )
-            }
-        }
     }
 
     private fun install() {
@@ -145,24 +139,20 @@ class CredentialCheckoutAuthHelper(
             sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
         )
-        // 第三方构建机不影响用户凭证，只卸载全局的git-checkout-credential凭证,为了兼容历史配置
-        git.tryConfigUnset(
-            configKey = GIT_CREDENTIAL_HELPER,
-            configValueRegex = GitConstants.GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
-            configScope = GitConfigScope.GLOBAL
-        )
-        // 凭证管理必须安装在全局,否则无法传递给其他插件
-        if (!git.configExists(
-                configKey = GIT_CREDENTIAL_HELPER,
-                configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX,
-                configScope = GitConfigScope.GLOBAL
-            )
-        ) {
-            git.configAdd(
-                configKey = GIT_CREDENTIAL_HELPER,
-                configValue = "!bash '$credentialShellPath'",
-                configScope = GitConfigScope.GLOBAL
-            )
+        if (!AgentEnv.isThirdParty()) {
+            // 凭证管理必须安装在全局,否则无法传递给其他插件
+            if (!git.configExists(
+                    configKey = GIT_CREDENTIAL_HELPER,
+                    configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX,
+                    configScope = GitConfigScope.GLOBAL
+                )
+            ) {
+                git.configAdd(
+                    configKey = GIT_CREDENTIAL_HELPER,
+                    configValue = "!bash '$credentialShellPath'",
+                    configScope = GitConfigScope.GLOBAL
+                )
+            }
         }
     }
 
@@ -179,7 +169,9 @@ class CredentialCheckoutAuthHelper(
                     "devopsStore"
                 ),
                 runtimeEnv = mapOf(
-                    GIT_REPO_PATH to settings.repositoryPath
+                    GIT_REPO_PATH to settings.repositoryPath,
+                    "${CREDENTIAL_COMPATIBLE_HOST}_${System.getenv(BK_CI_BUILD_JOB_ID)}" to
+                        (settings.compatibleHostList?.joinToString(",") ?: "")
                 ),
                 inputStream = CredentialArguments(
                     protocol = scheme,
@@ -238,7 +230,9 @@ class CredentialCheckoutAuthHelper(
                         "devopsErase"
                     ),
                     runtimeEnv = mapOf(
-                        GIT_REPO_PATH to settings.repositoryPath
+                        GIT_REPO_PATH to settings.repositoryPath,
+                        "${CREDENTIAL_COMPATIBLE_HOST}_${System.getenv(BK_CI_BUILD_JOB_ID)}" to
+                            (settings.compatibleHostList?.joinToString(",") ?: "")
                     ),
                     inputStream = CredentialArguments(
                         protocol = scheme,
@@ -251,6 +245,16 @@ class CredentialCheckoutAuthHelper(
         git.tryConfigUnset(configKey = GIT_CREDENTIAL_HELPER)
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
+    }
+
+    override fun configXdgAuthCommand() {
+        if (AgentEnv.isThirdParty()) {
+            git.config(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configValue = "!bash '$credentialShellPath'",
+                configScope = GitConfigScope.GLOBAL
+            )
+        }
     }
 
     override fun configSubmoduleAuthCommand(

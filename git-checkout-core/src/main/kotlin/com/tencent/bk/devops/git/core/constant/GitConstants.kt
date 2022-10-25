@@ -83,6 +83,7 @@ object GitConstants {
     const val AGENT_PID_VAR2 = "SSH2_AGENT_PID"
     const val CREDENTIAL_JAVA_PATH = "credential_java_path"
     const val CREDENTIAL_JAR_PATH = "credential_jar_path"
+    const val CREDENTIAL_COMPATIBLE_HOST = "credential_compatible_host"
     const val XDG_CONFIG_HOME = "XDG_CONFIG_HOME"
     const val GIT_ASKPASS = "GIT_ASKPASS"
     const val CORE_ASKPASS = "core.askpass"
