@@ -34,7 +34,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_COMPATIBL
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
@@ -44,7 +43,6 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.VersionHelper
-import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.apache.commons.codec.digest.DigestUtils
@@ -139,21 +137,6 @@ class CredentialCheckoutAuthHelper(
             sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
         )
-        if (!AgentEnv.isThirdParty()) {
-            // 凭证管理必须安装在全局,否则无法传递给其他插件
-            if (!git.configExists(
-                    configKey = GIT_CREDENTIAL_HELPER,
-                    configValueRegex = GIT_CREDENTIAL_HELPER_VALUE_REGEX,
-                    configScope = GitConfigScope.GLOBAL
-                )
-            ) {
-                git.configAdd(
-                    configKey = GIT_CREDENTIAL_HELPER,
-                    configValue = "!bash '$credentialShellPath'",
-                    configScope = GitConfigScope.GLOBAL
-                )
-            }
-        }
     }
 
     private fun store() {
@@ -247,14 +230,28 @@ class CredentialCheckoutAuthHelper(
         git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
     }
 
-    override fun configXdgAuthCommand() {
-        if (AgentEnv.isThirdParty()) {
-            git.config(
+    override fun configGlobalAuthCommand() {
+        // 凭证管理必须安装在全局,否则无法传递给其他插件
+        if (!git.configExists(
+                configKey = GIT_CREDENTIAL_HELPER,
+                configValueRegex = GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX,
+                configScope = GitConfigScope.GLOBAL
+            )
+        ) {
+            git.configAdd(
                 configKey = GIT_CREDENTIAL_HELPER,
                 configValue = "!bash '$credentialShellPath'",
                 configScope = GitConfigScope.GLOBAL
             )
         }
+    }
+
+    override fun configXdgAuthCommand() {
+        git.config(
+            configKey = GIT_CREDENTIAL_HELPER,
+            configValue = "!bash '$credentialShellPath'",
+            configScope = GitConfigScope.GLOBAL
+        )
     }
 
     override fun configSubmoduleAuthCommand(
