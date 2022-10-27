@@ -26,10 +26,8 @@ class GitLfsHandler(
                 if (lfsConcurrentTransfers != null && lfsConcurrentTransfers > 0) {
                     git.config(configKey = "lfs.concurrenttransfers", configValue = lfsConcurrentTransfers.toString())
                 }
-                git.lfsPull(
-                    fetchInclude = includeSubPath,
-                    fetchExclude = excludeSubPath
-                )
+                // lfs过滤规则跟sparse checkout不一样,不能直接用sparse checkout配置的路径
+                git.lfsPull()
                 logger.groupEnd("")
             }
         } finally {
