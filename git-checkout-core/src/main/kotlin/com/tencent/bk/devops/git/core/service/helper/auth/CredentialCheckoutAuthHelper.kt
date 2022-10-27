@@ -87,16 +87,9 @@ class CredentialCheckoutAuthHelper(
         val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
         EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         EnvHelper.addEnvVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
-        EnvHelper.addEnvVariable(
-            "${CREDENTIAL_COMPATIBLE_HOST}_$jobId",
-            settings.compatibleHostList?.joinToString(",") ?: ""
-        )
+
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         git.setEnvironmentVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
-        git.setEnvironmentVariable(
-            "${CREDENTIAL_COMPATIBLE_HOST}_$jobId",
-            settings.compatibleHostList?.joinToString(",") ?: ""
-        )
 
         // 仓库凭证配置
         git.config(
