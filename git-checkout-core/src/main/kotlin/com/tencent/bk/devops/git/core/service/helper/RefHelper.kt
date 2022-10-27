@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE
@@ -40,11 +41,20 @@ import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
+import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
+import com.tencent.bk.devops.git.core.util.RegexUtil
+import org.slf4j.LoggerFactory
 
 class RefHelper(
-    private val settings: GitSourceSettings
+    private val settings: GitSourceSettings,
+    private val git: GitCommandManager
 ) {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(RefHelper::class.java)
+    }
 
     fun getRefSpecForAllHistory(): List<String> {
         return listOf("+refs/heads/*:refs/remotes/$ORIGIN_REMOTE_NAME/*", "+refs/tags/*:refs/tags/*")
@@ -136,10 +146,21 @@ class RefHelper(
                     }
                 }
                 PullType.TAG -> {
+                    if (git.tagExists(ref)) {
+                        CheckoutInfo(ref = "refs/tags/$ref", startPoint = "")
+                    } else {
+                        EnvHelper.putContext(ContextConstants.CONTEXT_INVALID_REF, "1")
+                        logger.error("注意:拉取类型是TAG,但传入的ref不是一个tag")
+                        CheckoutInfo(ref = ref, startPoint = "")
+                    }
+                }
+                PullType.COMMIT_ID -> {
+                    if (!RegexUtil.checkSha(ref)) {
+                        EnvHelper.putContext(ContextConstants.CONTEXT_INVALID_REF, "1")
+                        logger.error("注意:拉取类型是COMMIT_ID,但传入的ref不是一个commitId")
+                    }
                     CheckoutInfo(ref = ref, startPoint = "")
                 }
-                PullType.COMMIT_ID ->
-                    CheckoutInfo(ref = ref, startPoint = "")
             }
         }
     }

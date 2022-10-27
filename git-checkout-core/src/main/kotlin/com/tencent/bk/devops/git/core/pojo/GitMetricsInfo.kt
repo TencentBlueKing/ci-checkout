@@ -34,5 +34,6 @@ data class GitMetricsInfo(
     val gitVersion: String,
     val osType: String,
     val jobType: String?,
-    val channel: String
+    val channel: String,
+    val invalidRef: Int = 0
 )

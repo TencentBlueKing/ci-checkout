@@ -92,4 +92,11 @@ class RegexUtilTest {
             )
         )
     }
+
+    @Test
+    fun testCheckSha() {
+        Assert.assertTrue(RegexUtil.checkSha("c43845b2015e1ba38682b763b0030bfd47bcb361"))
+        Assert.assertTrue(RegexUtil.checkSha("c43845b2"))
+        Assert.assertFalse(RegexUtil.checkSha("master"))
+    }
 }

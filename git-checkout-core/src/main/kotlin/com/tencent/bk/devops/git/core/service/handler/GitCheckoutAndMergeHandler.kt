@@ -46,7 +46,7 @@ class GitCheckoutAndMergeHandler(
     private val git: GitCommandManager
 ) : IGitHandler {
 
-    private val refHelper = RefHelper(settings = settings)
+    private val refHelper = RefHelper(settings = settings, git = git)
     companion object {
         private val logger = LoggerFactory.getLogger(GitCheckoutAndMergeHandler::class.java)
     }

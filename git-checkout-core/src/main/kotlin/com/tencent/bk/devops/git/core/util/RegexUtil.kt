@@ -51,6 +51,8 @@ object RegexUtil {
                 "\\(total size (?<totalSize>[0-9]*\\.?[0-9]*)M\\)"
     )
 
+    private val SHA_PATTERN = Pattern.compile("([0-9a-f]{40})|([0-9a-f]{6,8})")
+
     fun parseLog(log: String): CommitLogInfo? {
         val matcher = LOG_PATTERN.matcher(log)
         if (matcher.find()) {
@@ -79,4 +81,6 @@ object RegexUtil {
         }
         return null
     }
+
+    fun checkSha(commitId: String): Boolean = SHA_PATTERN.matcher(commitId).matches()
 }

@@ -45,6 +45,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_FETCH_ST
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_GIT_PROTOCOL
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_INIT_COST_TIME
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_INVALID_REF
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_LFS_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_LOG_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_PREPARE_COST_TIME
@@ -172,7 +173,8 @@ class GitCheckoutRunner {
                     gitVersion = EnvHelper.getContext(CONTEXT_GIT_VERSION) ?: "",
                     osType = AgentEnv.getOS().name,
                     jobType = SdkEnv.getSdkHeader()[Header.AUTH_HEADER_DEVOPS_BUILD_TYPE] ?: "",
-                    channel = System.getenv("BK_CI_START_CHANNEL") ?: ""
+                    channel = System.getenv("BK_CI_START_CHANNEL") ?: "",
+                    invalidRef = EnvHelper.getContext(CONTEXT_INVALID_REF)?.toInt() ?: 0
                 )
             }
             ServiceLoader.load(IGitMetricsHelper::class.java).firstOrNull()
