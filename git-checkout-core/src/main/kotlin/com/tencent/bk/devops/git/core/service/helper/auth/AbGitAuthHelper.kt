@@ -93,26 +93,31 @@ abstract class AbGitAuthHelper(
             repositoryDir = File(settings.repositoryPath),
             recursive = settings.nestedSubmodules
         ) { submodule ->
-            val moduleServerInfo = GitUtil.getServerInfo(submodule.url)
-            // 如果是相同的git服务端,但是域名不同,则执行insteadOf命令
-            // .gitmodules中声明了子模块,但是目录被删除了,这种子模块不会被初始化
-            if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
-                logger.info(
-                    "enter '${submodule.absolutePath.removePrefix(settings.repositoryPath).removePrefix("/")}'"
-                )
-                val commands = mutableListOf<String>()
-                configSubmoduleAuthCommand(moduleServerInfo, commands)
-                // 如果schema://HOSTNAME不相同,则统一转换成主库的协议拉取
-                if (moduleServerInfo.origin != serverInfo.origin) {
-                    submoduleInsteadOf(moduleServerInfo, commands)
+            try {
+                val moduleServerInfo = GitUtil.getServerInfo(submodule.url)
+                // 如果是相同的git服务端,但是域名不同,则执行insteadOf命令
+                // .gitmodules中声明了子模块,但是目录被删除了,这种子模块不会被初始化
+                if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
+                    println(
+                        "enter " +
+                            "'${submodule.absolutePath.removePrefix(settings.repositoryPath).removePrefix("/")}'"
+                    )
+                    val commands = mutableListOf<String>()
+                    configSubmoduleAuthCommand(moduleServerInfo, commands)
+                    // 如果schema://HOSTNAME不相同,则统一转换成主库的协议拉取
+                    if (moduleServerInfo.origin != serverInfo.origin) {
+                        submoduleInsteadOf(moduleServerInfo, commands)
+                    }
+                    CommandUtil.execute(
+                        command = commands.joinToString("\n"),
+                        workingDirectory = File(submodule.absolutePath),
+                        printLogger = true,
+                        logLevel = CommandLogLevel.DEBUG,
+                        allowAllExitCodes = true
+                    )
                 }
-                CommandUtil.execute(
-                    command = commands.joinToString("\n"),
-                    workingDirectory = File(submodule.absolutePath),
-                    printLogger = true,
-                    logLevel = CommandLogLevel.DEBUG,
-                    allowAllExitCodes = true
-                )
+            } catch (ignore: Throwable) {
+                logger.debug("Failed to config ${submodule.name} auth")
             }
         }
     }
@@ -122,25 +127,30 @@ abstract class AbGitAuthHelper(
             repositoryDir = File(settings.repositoryPath),
             recursive = settings.nestedSubmodules
         ) { submodule ->
-            val moduleServerInfo = GitUtil.getServerInfo(submodule.url)
-            // 如果是相同的git服务端,但是域名不同,则执行unset insteadOf命令
-            // .gitmodules中声明了子模块,但是目录被删除了,这种子模块不会被初始化
-            if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
-                logger.info(
-                    "enter '${submodule.absolutePath.removePrefix(settings.repositoryPath).removePrefix("/")}'"
-                )
-                val commands = mutableListOf<String>()
-                removeSubmoduleAuthCommand(moduleServerInfo, commands)
-                if (moduleServerInfo.origin != serverInfo.origin) {
-                    submoduleUnsetInsteadOf(moduleServerInfo, commands)
+            try {
+                val moduleServerInfo = GitUtil.getServerInfo(submodule.url)
+                // 如果是相同的git服务端,但是域名不同,则执行unset insteadOf命令
+                // .gitmodules中声明了子模块,但是目录被删除了,这种子模块不会被初始化
+                if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
+                    logger.info(
+                        "enter " +
+                            "'${submodule.absolutePath.removePrefix(settings.repositoryPath).removePrefix("/")}'"
+                    )
+                    val commands = mutableListOf<String>()
+                    removeSubmoduleAuthCommand(moduleServerInfo, commands)
+                    if (moduleServerInfo.origin != serverInfo.origin) {
+                        submoduleUnsetInsteadOf(moduleServerInfo, commands)
+                    }
+                    CommandUtil.execute(
+                        command = commands.joinToString("\n"),
+                        workingDirectory = File(submodule.absolutePath),
+                        printLogger = true,
+                        logLevel = CommandLogLevel.DEBUG,
+                        allowAllExitCodes = true
+                    )
                 }
-                CommandUtil.execute(
-                    command = commands.joinToString("\n"),
-                    workingDirectory = File(submodule.absolutePath),
-                    printLogger = true,
-                    logLevel = CommandLogLevel.DEBUG,
-                    allowAllExitCodes = true
-                )
+            } catch (ignore: Throwable) {
+                logger.debug("Failed to remove ${submodule.name} auth")
             }
         }
     }
