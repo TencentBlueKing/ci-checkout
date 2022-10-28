@@ -64,7 +64,7 @@ class CredentialStoreAuthHelper(
             configKey = GitConstants.GIT_CREDENTIAL_AUTH_HELPER,
             configValue = AuthHelperType.STORE_CREDENTIAL.name
         )
-        EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.CUSTOM_CREDENTIAL.name)
+        EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.STORE_CREDENTIAL.name)
         storeGlobalCredential()
         writeStoreFile()
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {

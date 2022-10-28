@@ -146,8 +146,7 @@ class CredentialCheckoutAuthHelper(
                 ),
                 runtimeEnv = mapOf(
                     GIT_REPO_PATH to settings.repositoryPath,
-                    "${CREDENTIAL_COMPATIBLE_HOST}_${System.getenv(BK_CI_BUILD_JOB_ID)}" to
-                        (settings.compatibleHostList?.joinToString(",") ?: "")
+                    CREDENTIAL_COMPATIBLE_HOST to (settings.compatibleHostList?.joinToString(",") ?: "")
                 ),
                 inputStream = CredentialArguments(
                     protocol = scheme,
@@ -207,8 +206,7 @@ class CredentialCheckoutAuthHelper(
                     ),
                     runtimeEnv = mapOf(
                         GIT_REPO_PATH to settings.repositoryPath,
-                        "${CREDENTIAL_COMPATIBLE_HOST}_${System.getenv(BK_CI_BUILD_JOB_ID)}" to
-                            (settings.compatibleHostList?.joinToString(",") ?: "")
+                        CREDENTIAL_COMPATIBLE_HOST to (settings.compatibleHostList?.joinToString(",") ?: "")
                     ),
                     inputStream = CredentialArguments(
                         protocol = scheme,
