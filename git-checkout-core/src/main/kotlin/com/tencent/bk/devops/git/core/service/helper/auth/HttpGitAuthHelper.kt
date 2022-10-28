@@ -78,6 +78,7 @@ abstract class HttpGitAuthHelper(
         val insteadOfHosts = getHostList()
         insteadOfHosts.forEach { host ->
             unsetGitInsteadOfHttp(host = host)
+            unsetHttpInsteadOfGit(host = host)
         }
     }
 
