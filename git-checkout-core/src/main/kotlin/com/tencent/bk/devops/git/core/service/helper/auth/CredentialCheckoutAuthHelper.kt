@@ -130,6 +130,22 @@ class CredentialCheckoutAuthHelper(
             sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
         )
+        try {
+            // 凭证管理必须安装在全局,否则无法传递给其他插件
+            if (!git.configExists(
+                    configKey = GIT_CREDENTIAL_HELPER,
+                    configValueRegex = GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX,
+                    configScope = GitConfigScope.GLOBAL
+                )
+            ) {
+                git.configAdd(
+                    configKey = GIT_CREDENTIAL_HELPER,
+                    configValue = "!bash '$credentialShellPath'",
+                    configScope = GitConfigScope.GLOBAL
+                )
+            }
+        } catch (ignore: Exception) {
+        }
     }
 
     private fun store() {
@@ -219,30 +235,6 @@ class CredentialCheckoutAuthHelper(
         git.tryConfigUnset(configKey = GIT_CREDENTIAL_HELPER)
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
-    }
-
-    override fun configGlobalAuthCommand() {
-        // 凭证管理必须安装在全局,否则无法传递给其他插件
-        if (!git.configExists(
-                configKey = GIT_CREDENTIAL_HELPER,
-                configValueRegex = GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX,
-                configScope = GitConfigScope.GLOBAL
-            )
-        ) {
-            git.configAdd(
-                configKey = GIT_CREDENTIAL_HELPER,
-                configValue = "!bash '$credentialShellPath'",
-                configScope = GitConfigScope.GLOBAL
-            )
-        }
-    }
-
-    override fun configXdgAuthCommand() {
-        git.config(
-            configKey = GIT_CREDENTIAL_HELPER,
-            configValue = "!bash '$credentialShellPath'",
-            configScope = GitConfigScope.GLOBAL
-        )
     }
 
     override fun configSubmoduleAuthCommand(
