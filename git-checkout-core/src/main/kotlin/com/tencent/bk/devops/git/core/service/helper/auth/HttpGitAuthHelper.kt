@@ -29,7 +29,6 @@ package com.tencent.bk.devops.git.core.service.helper.auth
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.CredentialActionEnum
-import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
@@ -62,10 +61,6 @@ abstract class HttpGitAuthHelper(
     override fun insteadOf() {
         val insteadOfHosts = getHostList()
         val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
-        git.tryConfigUnset(
-            configKey = insteadOfKey,
-            configScope = GitConfigScope.GLOBAL
-        )
         insteadOfHosts.forEach { host ->
             httpInsteadOfGit(
                 host = host,
