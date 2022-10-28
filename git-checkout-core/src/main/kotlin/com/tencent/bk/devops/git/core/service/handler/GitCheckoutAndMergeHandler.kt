@@ -33,6 +33,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MERGE_SO
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MERGE_TARGET_REF
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.PullStrategy
+import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -54,9 +55,9 @@ class GitCheckoutAndMergeHandler(
     override fun doHandle() {
         val startEpoch = System.currentTimeMillis()
         try {
+            logger.groupStart("Checking out")
             val checkoutInfo = refHelper.getCheckInfo()
-            logger.groupStart("Checking out the ref ${checkoutInfo.ref}")
-            settings.initSparseCheckout()
+            settings.initSparseCheckout(checkoutInfo)
             EnvHelper.putContext(CONTEXT_CHECKOUT_REF, checkoutInfo.ref)
             git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
             if (checkoutInfo.upstream.isNotBlank()) {
@@ -108,7 +109,7 @@ class GitCheckoutAndMergeHandler(
     /**
      * sparse checkout
      */
-    private fun GitSourceSettings.initSparseCheckout() {
+    private fun GitSourceSettings.initSparseCheckout(checkoutInfo: CheckoutInfo) {
         val sparseFile = File(repositoryPath, ".git/info/sparse-checkout")
         val content = StringBuilder()
         if (!excludeSubPath.isNullOrBlank()) {
@@ -124,7 +125,6 @@ class GitCheckoutAndMergeHandler(
         }
         logger.debug(".git/info/sparse-checkout content: $content")
 
-        val checkInfo = refHelper.getCheckInfo()
         if (content.toString().isBlank()) {
             /*
                 #24 如果由sparse checkout改成正常拉取,需要把内容设置为*, 不然执行`git checkout`文件内容不会发生改变.
@@ -134,10 +134,10 @@ class GitCheckoutAndMergeHandler(
             if (sparseFile.exists()) {
                 sparseFile.writeText("*")
                 git.config(configKey = "core.sparsecheckout", configValue = "true")
-                if (checkInfo.startPoint.isBlank()) {
-                    git.readTree(options = listOf("--reset", "-u", checkInfo.ref))
+                if (checkoutInfo.startPoint.isBlank()) {
+                    git.readTree(options = listOf("--reset", "-u", checkoutInfo.ref))
                 } else {
-                    git.readTree(options = listOf("--reset", "-u", checkInfo.startPoint))
+                    git.readTree(options = listOf("--reset", "-u", checkoutInfo.startPoint))
                 }
 
                 sparseFile.delete()
@@ -148,10 +148,10 @@ class GitCheckoutAndMergeHandler(
             if (!sparseFile.exists()) sparseFile.createNewFile()
             sparseFile.writeText(content.toString())
             git.config(configKey = "core.sparsecheckout", configValue = "true")
-            if (checkInfo.startPoint.isBlank()) {
-                git.readTree(options = listOf("-m", "-u", checkInfo.ref))
+            if (checkoutInfo.startPoint.isBlank()) {
+                git.readTree(options = listOf("-m", "-u", checkoutInfo.ref))
             } else {
-                git.readTree(options = listOf("-m", "-u", checkInfo.startPoint))
+                git.readTree(options = listOf("-m", "-u", checkoutInfo.startPoint))
             }
         }
     }
