@@ -150,14 +150,20 @@ class RefHelper(
                         CheckoutInfo(ref = "refs/tags/$ref", startPoint = "")
                     } else {
                         EnvHelper.putContext(ContextConstants.CONTEXT_INVALID_REF, "1")
-                        logger.error("注意:拉取类型是TAG,但传入的ref不是一个tag")
+                        logger.error(
+                            "警告：拉取方式[TAG]和拉取对象[$ref]不匹配，请修改流水线配置，避免拉取到不符合预期的代码!" +
+                                "（2022-11-25)时间后，检测到此类问题时插件将直接失败）"
+                        )
                         CheckoutInfo(ref = ref, startPoint = "")
                     }
                 }
                 PullType.COMMIT_ID -> {
                     if (!RegexUtil.checkSha(ref)) {
                         EnvHelper.putContext(ContextConstants.CONTEXT_INVALID_REF, "1")
-                        logger.error("注意:拉取类型是COMMIT_ID,但传入的ref不是一个commitId")
+                        logger.error(
+                            "警告：拉取方式[COMMIT_ID]和拉取对象[$ref]不匹配，请修改流水线配置，避免拉取到不符合预期的代码!" +
+                                "（2022-11-25)时间后，检测到此类问题时插件将直接失败）"
+                        )
                     }
                     CheckoutInfo(ref = ref, startPoint = "")
                 }
