@@ -118,6 +118,7 @@ class GitSourceProvider(
      * 如果凭证设置失败,导致拉取失败,使用明文拉取重试
      */
     private fun plaintextAuthRetry(git: GitCommandManager) {
+        logger.warn("************************************auth retry**********************************************")
         val handlerChain = HandlerExecutionChain(
             listOf(
                 GitAuthPlaintextHandler(settings, git),
