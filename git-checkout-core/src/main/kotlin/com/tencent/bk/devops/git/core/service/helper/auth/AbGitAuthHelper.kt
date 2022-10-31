@@ -61,6 +61,8 @@ abstract class AbGitAuthHelper(
         if (!AgentEnv.isThirdParty()) {
             // 蓝盾默认镜像中有insteadOf,应该卸载,不然在凭证传递到下游插件时会导致凭证失效
             unsetInsteadOf()
+        }
+        if (settings.enableGlobalInsteadOf) {
             insteadOf()
             configGlobalAuthCommand()
         } else {

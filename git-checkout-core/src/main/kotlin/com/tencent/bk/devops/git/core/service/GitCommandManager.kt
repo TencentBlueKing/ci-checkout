@@ -532,7 +532,7 @@ class GitCommandManager(
     }
 
     fun tagExists(tag: String): Boolean {
-        val args = mutableListOf("tag", "--list")
+        val args = mutableListOf("tag", "-l")
         args.add(tag)
         val output = execGit(args = args)
         return output.stdOut.trim().isNotBlank()

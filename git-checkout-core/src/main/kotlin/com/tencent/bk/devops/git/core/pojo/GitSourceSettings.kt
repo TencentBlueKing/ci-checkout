@@ -177,7 +177,12 @@ data class GitSourceSettings(
     /**
      * 缓存路径:自定义的制品库路径,保存仓库的.git压缩文件
      */
-    val cachePath: String? = ""
+    val cachePath: String? = "",
+
+    /**
+     * 是否开启全局insteadOf
+     */
+    val enableGlobalInsteadOf: Boolean = true
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(
