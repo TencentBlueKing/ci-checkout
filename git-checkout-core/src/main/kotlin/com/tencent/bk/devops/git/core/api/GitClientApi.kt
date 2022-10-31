@@ -27,14 +27,18 @@
 
 package com.tencent.bk.devops.git.core.api
 
+import com.tencent.bk.devops.git.core.constant.GitConstants.OAUTH2
 import com.tencent.bk.devops.git.core.enums.HttpStatus
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.util.HttpUtil
+import com.tencent.bk.devops.git.core.util.HttpUtil.sslSocketFactory
+import com.tencent.bk.devops.git.core.util.HttpUtil.trustAllCerts
 import okhttp3.Credentials
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.X509TrustManager
 
 /**
  * git 客户端api接口
@@ -52,6 +56,8 @@ class GitClientApi {
         .connectTimeout(connectTimeout, TimeUnit.SECONDS)
         .readTimeout(readTimeout, TimeUnit.SECONDS)
         .writeTimeout(writeTimeout, TimeUnit.SECONDS)
+        .sslSocketFactory(sslSocketFactory(), trustAllCerts[0] as X509TrustManager)
+        .hostnameVerifier { _, _ -> true }
         .followRedirects(false)
         .build()
 
@@ -67,11 +73,11 @@ class GitClientApi {
         )
 
         val candidates = mutableListOf<String>()
-        candidates.add("$repositoryUrl/info/refs") // dump-http
         candidates.add("$repositoryUrl/info/refs?service=git-upload-pack") // smart-http
+        candidates.add("$repositoryUrl/info/refs") // dump-http
         if (!repositoryUrl.endsWith(".git")) {
-            candidates.add("$repositoryUrl.git/info/refs") // dump-http
             candidates.add("$repositoryUrl.git/info/refs?service=git-upload-pack") // smart-http
+            candidates.add("$repositoryUrl.git/info/refs") // dump-http
         }
         var status = 0
         return try {
@@ -83,8 +89,12 @@ class GitClientApi {
                 ) {
                     response = redirect(response, headers)
                 }
-                status = response.code()
-                if (status == HttpStatus.OK.statusCode) break
+                if (response.code() == HttpStatus.OK.statusCode &&
+                    checkOauth2(username = authInfo.username, response = response)
+                ) {
+                    status = HttpStatus.OK.statusCode
+                    break
+                }
             }
             status == HttpStatus.OK.statusCode
         } catch (ignore: Exception) {
@@ -103,5 +113,18 @@ class GitClientApi {
             return okHttpClient.newCall(newRequest).execute()
         }
         return response
+    }
+
+    private fun checkOauth2(
+        username: String,
+        response: Response
+    ): Boolean {
+        if (username != OAUTH2) {
+            return true
+        }
+        // 工蜂oauth2授权,如果token已经过期,则状态返回的是200,但是内容是Git repository not found
+        return response.use {
+            !response.body()!!.string().contains("Git repository not found")
+        }
     }
 }

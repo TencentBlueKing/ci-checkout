@@ -2,19 +2,47 @@ package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.exception.ExceptionTranslator
+import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.service.helper.RetryHelper
 import okhttp3.Headers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.slf4j.LoggerFactory
+import java.security.cert.CertificateException
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 object HttpUtil {
     private const val connectTimeout = 5L
     private const val readTimeout = 30L
     private const val writeTimeout = 30L
     private val logger = LoggerFactory.getLogger(HttpUtil::class.java)
+
+    val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+        @Throws(CertificateException::class)
+        override fun checkClientTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) = Unit
+
+        @Throws(CertificateException::class)
+        override fun checkServerTrusted(chain: Array<java.security.cert.X509Certificate>, authType: String) = Unit
+
+        override fun getAcceptedIssuers(): Array<java.security.cert.X509Certificate> {
+            return arrayOf()
+        }
+    })
+
+    fun sslSocketFactory(): SSLSocketFactory {
+        try {
+            val sslContext = SSLContext.getInstance("SSL")
+            sslContext.init(null, trustAllCerts, java.security.SecureRandom())
+            return sslContext.socketFactory
+        } catch (ignore: Exception) {
+            throw ParamInvalidException(errorMsg = ignore.message!!)
+        }
+    }
 
     private val okHttpClient = OkHttpClient.Builder()
         .connectTimeout(connectTimeout, TimeUnit.SECONDS)
