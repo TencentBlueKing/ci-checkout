@@ -98,7 +98,8 @@ class CheckoutAtomParamInputAdapter(
             usernameConfig = usernameConfig,
             userEmailConfig = userEmailConfig,
             enablePartialClone = enablePartialClone,
-            cachePath = cachePath
+            cachePath = cachePath,
+            enableGlobalInsteadOf = true
         )
     ).getInputs()
 
@@ -162,7 +163,8 @@ class CheckoutAtomParamInputAdapter(
             usernameConfig = usernameConfig,
             userEmailConfig = userEmailConfig,
             enablePartialClone = enablePartialClone,
-            cachePath = cachePath
+            cachePath = cachePath,
+            enableGlobalInsteadOf = true
         )
     ).getInputs()
 }

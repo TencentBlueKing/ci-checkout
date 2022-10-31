@@ -256,7 +256,8 @@ class GitCodeAtomParamInputAdapter(
                 compatibleHostList = compatibleHostList,
                 enableTrace = enableTrace,
                 enablePartialClone = enablePartialClone,
-                cachePath = cachePath
+                cachePath = cachePath,
+                enableGlobalInsteadOf = enableGlobalInsteadOf
             )
         }
     }
