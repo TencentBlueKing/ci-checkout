@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.pojo
 
 data class ServerInfo(
+    val scheme: String,
     // origin is SCHEME://HOSTNAME[:PORT]
     val origin: String,
     val hostName: String,

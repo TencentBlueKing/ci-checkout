@@ -112,6 +112,10 @@ object SubmoduleUtil {
             repositoryDir = repositoryDir,
             recursive = recursive
         ).forEach { submodule ->
+            println(
+                "enter " +
+                    "'${submodule.absolutePath.removePrefix(repositoryDir.absolutePath).removePrefix("/")}'"
+            )
             action.invoke(submodule)
         }
     }

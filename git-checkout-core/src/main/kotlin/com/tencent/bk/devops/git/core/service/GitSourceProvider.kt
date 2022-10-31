@@ -27,18 +27,23 @@
 
 package com.tencent.bk.devops.git.core.service
 
+import com.tencent.bk.devops.git.core.api.GitClientApi
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_URL
+import com.tencent.bk.devops.git.core.enums.GitErrors
+import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.handler.GitAuthHandler
+import com.tencent.bk.devops.git.core.service.handler.GitAuthPlaintextHandler
 import com.tencent.bk.devops.git.core.service.handler.GitCheckoutAndMergeHandler
 import com.tencent.bk.devops.git.core.service.handler.GitFetchHandler
 import com.tencent.bk.devops.git.core.service.handler.GitLfsHandler
 import com.tencent.bk.devops.git.core.service.handler.GitLogHandler
 import com.tencent.bk.devops.git.core.service.handler.GitSubmodulesHandler
+import com.tencent.bk.devops.git.core.service.handler.GitSubmodulesPlaintextHandler
 import com.tencent.bk.devops.git.core.service.handler.HandlerExecutionChain
 import com.tencent.bk.devops.git.core.service.handler.InitRepoHandler
 import com.tencent.bk.devops.git.core.service.handler.PrepareWorkspaceHandler
@@ -85,10 +90,45 @@ class GitSourceProvider(
             )
             try {
                 handlerChain.doHandle()
+            } catch (ignore: GitExecuteException) {
+                if (!needRetry(ignore.errorCode)) {
+                    throw ignore
+                }
+                // 兜底方案
+                plaintextAuthRetry(git = git)
             } finally {
                 handlerChain.afterHandle()
             }
         }
+    }
+
+    // 先校验凭证是否是正确的,如果是正确的,表示自定义凭证管理有误,使用明文凭证
+    private fun needRetry(errorCode: Int): Boolean {
+        val gitClientApi = GitClientApi()
+        return listOf(
+            GitErrors.AuthenticationFailed.errorCode,
+            GitErrors.RepositoryNotFoundFailed.errorCode
+        ).contains(errorCode) && gitClientApi.checkCredentials(
+            repositoryUrl = settings.repositoryUrl,
+            authInfo = settings.authInfo
+        )
+    }
+
+    /**
+     * 如果凭证设置失败,导致拉取失败,使用明文拉取重试
+     */
+    private fun plaintextAuthRetry(git: GitCommandManager) {
+        val handlerChain = HandlerExecutionChain(
+            listOf(
+                GitAuthPlaintextHandler(settings, git),
+                GitFetchHandler(settings, git),
+                GitCheckoutAndMergeHandler(settings, git),
+                GitSubmodulesPlaintextHandler(settings, git),
+                GitLfsHandler(settings, git),
+                GitLogHandler(settings, git, devopsApi)
+            )
+        )
+        handlerChain.doHandle()
     }
 
     fun cleanUp() {

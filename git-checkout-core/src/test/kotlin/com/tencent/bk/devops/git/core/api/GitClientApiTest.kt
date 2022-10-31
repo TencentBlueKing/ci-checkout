@@ -25,12 +25,27 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.bk.devops.git.core.enums
+package com.tencent.bk.devops.git.core.api
 
-enum class AuthHelperType {
-    CUSTOM_CREDENTIAL,
-    STORE_CREDENTIAL,
-    USERNAME_PASSWORD,
-    PLAINTEXT,
-    SSH
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
+import org.junit.Assert
+import org.junit.Ignore
+import org.junit.Test
+
+@Ignore
+class GitClientApiTest {
+    private val gitClientApi = GitClientApi()
+
+    @Test
+    fun checkCredentials() {
+        Assert.assertTrue(
+            gitClientApi.checkCredentials(
+                repositoryUrl = "https://github.com/ci-plugins/git.git",
+                authInfo = AuthInfo(
+                    username = "oauth2",
+                    password = "34378988dfd343df3u9jid3434344398"
+                )
+            )
+        )
+    }
 }

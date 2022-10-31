@@ -320,7 +320,7 @@ class GitCommandManager(
         return gitEnv.remove(name)
     }
 
-    fun submoduleSync(recursive: Boolean, path: String) {
+    fun submoduleSync(repoDir: File? = null, recursive: Boolean, path: String) {
         val args = mutableListOf("submodule", "sync")
         // git submodule sync --recursive在1.8.1才支持
         if (recursive && isAtLeastVersion(SUPPORT_SUBMODULE_SYNC_RECURSIVE_GIT_VERSION)) {
@@ -329,19 +329,19 @@ class GitCommandManager(
         if (path.isNotBlank()) {
             args.addAll(path.split(","))
         }
-        execGit(args = args)
+        execGit(repoDir = repoDir, args = args)
     }
 
-    fun submoduleForeach(command: String, recursive: Boolean) {
+    fun submoduleForeach(repoDir: File? = null, command: String, recursive: Boolean) {
         val args = mutableListOf("submodule", "foreach")
         if (recursive) {
             args.add("--recursive")
         }
         args.add(command)
-        execGit(args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
+        execGit(repoDir = repoDir, args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
     }
 
-    fun submoduleUpdate(recursive: Boolean, path: String, submoduleRemote: Boolean) {
+    fun submoduleUpdate(repoDir: File? = null, recursive: Boolean, path: String, submoduleRemote: Boolean) {
         val args = mutableListOf("submodule", "update", "--init")
         if (isAtLeastVersion(SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION)) {
             args.add("--force")
@@ -355,7 +355,7 @@ class GitCommandManager(
         if (path.isNotBlank()) {
             args.addAll(path.split(","))
         }
-        doRetry(args = args)
+        doRetry(repoDir = repoDir, args = args)
     }
 
     fun fetch(
@@ -401,9 +401,9 @@ class GitCommandManager(
         doRetry(args = args)
     }
 
-    private fun doRetry(args: List<String>, retryTime: Int = 3) {
+    private fun doRetry(repoDir: File? = null, args: List<String>, retryTime: Int = 3) {
         try {
-            execGit(args = args, logType = LogType.PROGRESS)
+            execGit(repoDir = repoDir, args = args, logType = LogType.PROGRESS)
         } catch (e: GitExecuteException) {
             if (retryTime - 1 < 0) {
                 throw e
@@ -621,13 +621,14 @@ class GitCommandManager(
     }
 
     private fun execGit(
+        repoDir: File? = null,
         args: List<String>,
         allowAllExitCodes: Boolean = false,
         logType: LogType = LogType.TEXT,
         printLogger: Boolean = true
     ): GitOutput {
         return CommandUtil.execute(
-            workingDirectory = workingDirectory,
+            workingDirectory = repoDir ?: workingDirectory,
             executable = "git",
             args = args,
             runtimeEnv = gitEnv,

@@ -30,21 +30,23 @@ package com.tencent.bk.devops.git.core.service.handler
 import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
+import com.tencent.bk.devops.git.core.pojo.GitSubmodule
 import com.tencent.bk.devops.git.core.service.GitCommandManager
-import com.tencent.bk.devops.git.core.service.helper.auth.GitAuthHelperFactory
+import com.tencent.bk.devops.git.core.service.helper.auth.PlaintextGitAuthHelper
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.SubmoduleUtil
 import org.slf4j.LoggerFactory
 import java.io.File
 
-open class GitSubmodulesHandler(
+class GitSubmodulesPlaintextHandler(
     private val settings: GitSourceSettings,
     private val git: GitCommandManager
-) : IGitHandler {
+) : GitSubmodulesHandler(settings, git) {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(GitSubmodulesHandler::class.java)
+        private val logger = LoggerFactory.getLogger(GitSubmodulesPlaintextHandler::class.java)
     }
-    private val authHelper by lazy { GitAuthHelperFactory.getAuthHelper(settings = settings, git = git) }
+    private val authHelper = PlaintextGitAuthHelper(settings = settings, git = git)
 
     override fun doHandle() {
         val startEpoch = System.currentTimeMillis()
@@ -54,26 +56,7 @@ open class GitSubmodulesHandler(
                     return
                 }
                 logger.groupStart("Fetching submodules")
-                git.submoduleSync(recursive = nestedSubmodules, path = submodulesPath)
-                if (pullStrategy == PullStrategy.REVERT_UPDATE) {
-                    git.submoduleForeach(
-                        command = "${submoduleCleanCommand().joinToString(";")} || true",
-                        recursive = nestedSubmodules
-                    )
-                }
-                git.submoduleUpdate(
-                    recursive = nestedSubmodules,
-                    path = submodulesPath,
-                    submoduleRemote = submoduleRemote
-                )
-                git.submoduleForeach(command = "git config gc.auto 0", recursive = nestedSubmodules)
-                if (lfs) {
-                    git.submoduleForeach(command = "git lfs pull", recursive = nestedSubmodules)
-                }
-                logger.groupEnd("")
-
-                logger.groupStart("Persisting credentials for submodules")
-                authHelper.configureSubmoduleAuth()
+                updateSubmodule(repoDir = File(repositoryPath), submodulesPath = submodulesPath)
                 logger.groupEnd("")
             }
         } finally {
@@ -84,19 +67,60 @@ open class GitSubmodulesHandler(
         }
     }
 
-    protected fun GitSourceSettings.submoduleCleanCommand(): List<String> {
-        val commands = mutableListOf<String>()
-        commands.add("git reset --hard")
-        if (enableGitClean) {
-            val builder = StringBuilder("git clean -fd ")
-            if (enableGitCleanIgnore == true) {
-                builder.append(" -x ")
-            }
-            if (enableGitCleanNested == true) {
-                builder.append(" -f ")
-            }
-            commands.add(builder.toString())
+    private fun updateSubmodule(
+        repoDir: File,
+        submodulesPath: String
+    ) {
+        val submoduleConfigFile = File(repoDir, ".gitmodules")
+        if (!submoduleConfigFile.exists()) {
+            return
         }
-        return commands
+        println(
+            "enter " +
+                "'${repoDir.absolutePath.removePrefix(settings.repositoryPath).removePrefix("/")}'"
+        )
+        val modules = SubmoduleUtil.getSubmodules(repoDir, false)
+        authHelper.configureSubmoduleAuth(
+            repoDir = repoDir,
+            modules = modules
+        )
+        submoduleCommand(
+            repoDir = repoDir,
+            submodulesPath = submodulesPath,
+            modules = modules
+        )
+    }
+
+    private fun submoduleCommand(
+        repoDir: File,
+        submodulesPath: String,
+        modules: List<GitSubmodule>
+    ) {
+        if (settings.pullStrategy == PullStrategy.REVERT_UPDATE) {
+            git.submoduleForeach(
+                repoDir = repoDir,
+                command = "${settings.submoduleCleanCommand().joinToString(";")} || true",
+                recursive = false
+            )
+        }
+        git.submoduleSync(repoDir = repoDir, recursive = false, path = submodulesPath)
+        git.submoduleUpdate(
+            repoDir = repoDir,
+            recursive = false,
+            path = submodulesPath,
+            submoduleRemote = settings.submoduleRemote
+        )
+        git.submoduleForeach(repoDir = repoDir, command = "git config gc.auto 0", recursive = false)
+        if (settings.lfs) {
+            git.submoduleForeach(repoDir = repoDir, command = "git lfs pull", recursive = false)
+        }
+        if (settings.nestedSubmodules) {
+            modules.forEach { module ->
+                updateSubmodule(
+                    repoDir = File(repoDir, module.path),
+                    submodulesPath = ""
+                )
+            }
+        }
     }
 }

@@ -37,6 +37,7 @@ class GitUtilTest {
     fun getServerUrl() {
         var expected = GitUtil.getServerInfo("https://git.exaple.com/my-proj/my-repo.git")
         var actual = ServerInfo(
+            scheme = "https://",
             origin = "https://git.exaple.com",
             hostName = "git.exaple.com",
             repositoryName = "my-proj/my-repo",
@@ -46,6 +47,7 @@ class GitUtilTest {
 
         expected = GitUtil.getServerInfo("https://git.exaple.com/my-proj/my-repo")
         actual = ServerInfo(
+            scheme = "https://",
             origin = "https://git.exaple.com",
             hostName = "git.exaple.com",
             repositoryName = "my-proj/my-repo",
@@ -55,6 +57,7 @@ class GitUtilTest {
 
         expected = GitUtil.getServerInfo("https://git.exaple.com:8080/my-proj/my-repo.git")
         actual = ServerInfo(
+            scheme = "https://",
             origin = "https://git.exaple.com:8080",
             hostName = "git.exaple.com:8080",
             repositoryName = "my-proj/my-repo",
@@ -64,6 +67,7 @@ class GitUtilTest {
 
         expected = GitUtil.getServerInfo("https://oauth2:xxx@git.exaple.com:8080/my-proj/my-repo.git")
         actual = ServerInfo(
+            scheme = "https://",
             origin = "https://git.exaple.com:8080",
             hostName = "git.exaple.com:8080",
             repositoryName = "my-proj/my-repo",
@@ -73,6 +77,7 @@ class GitUtilTest {
 
         expected = GitUtil.getServerInfo("git@git.exaple.com:my-proj/my-repo.git")
         actual = ServerInfo(
+            scheme = "git@",
             origin = "git@git.exaple.com",
             hostName = "git.exaple.com",
             repositoryName = "my-proj/my-repo",
@@ -82,6 +87,7 @@ class GitUtilTest {
 
         expected = GitUtil.getServerInfo("git.exaple.com:my-proj/my-repo.git")
         actual = ServerInfo(
+            scheme = "git@",
             origin = "git@git.exaple.com",
             hostName = "git.exaple.com",
             repositoryName = "my-proj/my-repo",

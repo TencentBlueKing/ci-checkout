@@ -25,12 +25,39 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.tencent.bk.devops.git.core.enums
+package com.tencent.bk.devops.git.core.service.handler
 
-enum class AuthHelperType {
-    CUSTOM_CREDENTIAL,
-    STORE_CREDENTIAL,
-    USERNAME_PASSWORD,
-    PLAINTEXT,
-    SSH
+import com.tencent.bk.devops.git.core.constant.ContextConstants
+import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
+import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.service.helper.auth.PlaintextGitAuthHelper
+import com.tencent.bk.devops.git.core.util.EnvHelper
+import org.slf4j.LoggerFactory
+
+/**
+ * 凭证明文处理
+ */
+class GitAuthPlaintextHandler(
+    private val settings: GitSourceSettings,
+    private val git: GitCommandManager
+) : IGitHandler {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(GitAuthPlaintextHandler::class.java)
+    }
+    private val authHelper = PlaintextGitAuthHelper(settings = settings, git = git)
+
+    override fun doHandle() {
+        val startEpoch = System.currentTimeMillis()
+        try {
+            logger.groupStart("Setting up auth")
+            authHelper.configureAuth()
+            logger.groupEnd("")
+        } finally {
+            EnvHelper.putContext(
+                key = ContextConstants.CONTEXT_AUTH_COST_TIME,
+                value = (System.currentTimeMillis() - startEpoch).toString()
+            )
+        }
+    }
 }

@@ -55,6 +55,7 @@ object GitUtil {
             HTTP_URL_REGEX.matches(url) -> {
                 val groups = HTTP_URL_REGEX.find(url)!!.groups
                 ServerInfo(
+                    scheme = groups[1]!!.value,
                     origin = "${groups[1]!!.value}${groups[3]!!.value}",
                     hostName = groups[3]!!.value,
                     repositoryName = groups[6]!!.value,
@@ -64,6 +65,7 @@ object GitUtil {
             GIT_URL_REGEX.matches(url) -> {
                 val groups = GIT_URL_REGEX.find(url)!!.groups
                 ServerInfo(
+                    scheme = "git@",
                     origin = groups[1]!!.value,
                     hostName = groups[2]!!.value,
                     repositoryName = groups[3]!!.value,
@@ -73,6 +75,7 @@ object GitUtil {
             NOT_GIT_PROTOCOL_URL_REGEX.matches(url) -> {
                 val groups = NOT_GIT_PROTOCOL_URL_REGEX.find(url)!!.groups
                 ServerInfo(
+                    scheme = "git@",
                     origin = "git@${groups[1]!!.value}",
                     hostName = groups[1]!!.value,
                     repositoryName = groups[2]!!.value,
@@ -101,7 +104,7 @@ object GitUtil {
             serverUrl.repositoryName == sourceServerUrl.repositoryName
     }
 
-    private fun isSameHostName(targetHostName: String, sourceHostName: String, hostNameList: List<String>?): Boolean {
+    fun isSameHostName(targetHostName: String, sourceHostName: String, hostNameList: List<String>?): Boolean {
         val isContains = hostNameList?.containsAll(setOf(targetHostName, sourceHostName)) ?: false
         return targetHostName == sourceHostName || isContains
     }
