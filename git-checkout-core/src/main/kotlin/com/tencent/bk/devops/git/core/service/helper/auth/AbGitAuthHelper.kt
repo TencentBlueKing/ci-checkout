@@ -58,14 +58,15 @@ abstract class AbGitAuthHelper(
     protected val authInfo = settings.authInfo
 
     override fun configGlobalAuth() {
-        if (!AgentEnv.isThirdParty()) {
-            // 蓝盾默认镜像中有insteadOf,应该卸载,不然在凭证传递到下游插件时会导致凭证失效
+        if (settings.enableGlobalInsteadOf && !AgentEnv.isThirdParty()) {
             unsetInsteadOf()
-        }
-        if (settings.enableGlobalInsteadOf) {
             insteadOf()
             configGlobalAuthCommand()
         } else {
+            // 蓝盾默认镜像中有git insteadOf http,应该卸载,不然在凭证传递到下游插件时会导致凭证失效
+            if (!AgentEnv.isThirdParty() && serverInfo.httpProtocol) {
+                unsetInsteadOf()
+            }
             /**
              * 第三方构建机,为了不污染第三方构建机用户git环境,采用临时覆盖HOME环境变量,然后再执行insteadOf命令
              */
