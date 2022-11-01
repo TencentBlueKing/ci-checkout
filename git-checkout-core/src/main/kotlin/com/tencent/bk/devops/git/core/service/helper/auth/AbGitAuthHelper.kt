@@ -89,6 +89,11 @@ abstract class AbGitAuthHelper(
             logger.info("Deleting Temporarily XDG_CONFIG_HOME='$gitXdgConfigHome'")
             Files.deleteIfExists(gitXdgConfigFile)
         }
+        val homePath = git.removeEnvironmentVariable(GitConstants.HOME)
+        if (!homePath.isNullOrBlank()) {
+            logger.info("Deleting Temporarily HOME='$homePath'")
+            FileUtils.deleteDirectory(File(homePath))
+        }
     }
 
     override fun configureSubmoduleAuth() {
