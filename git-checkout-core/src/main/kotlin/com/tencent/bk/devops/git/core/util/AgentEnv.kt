@@ -58,4 +58,9 @@ object AgentEnv {
 
     @JvmStatic
     fun isThirdParty() = SdkEnv.getSdkHeader()[Header.AUTH_HEADER_DEVOPS_BUILD_TYPE] == "AGENT"
+
+    /**
+     * 常驻docker,构建完并不会被清理
+     */
+    fun isThirdDocker() = System.getenv("DEVOPS_SLAVE_ENVIRONMENT") == "pcg-devcloud"
 }
