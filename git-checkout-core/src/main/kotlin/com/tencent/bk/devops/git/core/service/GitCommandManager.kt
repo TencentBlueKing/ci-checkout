@@ -474,12 +474,13 @@ class GitCommandManager(
         } else {
             if (isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
                 args.addAll(listOf("-B", ref, startPoint))
-                execGit(args = args, logType = LogType.PROGRESS)
             } else {
                 args.add(ref)
-                execGit(args = args, logType = LogType.PROGRESS)
-                execGit(args = listOf("reset", "--hard", startPoint))
             }
+        }
+        execGit(args = args, logType = LogType.PROGRESS)
+        if (!isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
+            execGit(args = listOf("reset", "--hard", startPoint))
         }
     }
 
