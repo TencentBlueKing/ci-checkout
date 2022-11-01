@@ -107,7 +107,8 @@ class GitSourceProvider(
         val gitClientApi = GitClientApi()
         return listOf(
             GitErrors.AuthenticationFailed.errorCode,
-            GitErrors.RepositoryNotFoundFailed.errorCode
+            GitErrors.RepositoryNotFoundFailed.errorCode,
+            GitErrors.SshAuthenticationFailed.errorCode
         ).contains(errorCode) && gitClientApi.checkCredentials(
             repositoryUrl = settings.repositoryUrl,
             authInfo = settings.authInfo
