@@ -475,11 +475,14 @@ class GitCommandManager(
             if (isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
                 args.addAll(listOf("-B", ref, startPoint))
             } else {
-                execGit(args = listOf("branch", "-f", ref, startPoint))
                 args.add(ref)
             }
         }
         execGit(args = args, logType = LogType.PROGRESS)
+        // git 1.9之前的版本，没有-B参数，需要先切换分支然后再reset到远程分支
+        if (startPoint.isNotBlank() && !isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
+            execGit(args = listOf("reset", "--hard", startPoint))
+        }
     }
 
     fun branchUpstream(upstream: String) {
