@@ -63,8 +63,8 @@ abstract class AbGitAuthHelper(
             insteadOf()
             configGlobalAuthCommand()
         } else {
-            // 蓝盾默认镜像中有git insteadOf http,应该卸载,不然在凭证传递到下游插件时会导致凭证失效
-            if (!AgentEnv.isThirdParty() && serverInfo.httpProtocol) {
+            // 如果构建机上有git insteadOf http,应该卸载,不然凭证会失败
+            if (serverInfo.httpProtocol) {
                 unsetInsteadOf()
             }
             /**
