@@ -110,6 +110,7 @@ object GitAuthHelperFactory {
             configScope = GitConfigScope.GLOBAL
         )
         return AgentEnv.isThirdParty() ||
+            AgentEnv.isThirdDocker() ||
             credentialHelperConfig.isEmpty() ||
             credentialHelperConfig.any { it.contains(GIT_CREDENTIAL_HELPER_VALUE_REGEX) }
     }

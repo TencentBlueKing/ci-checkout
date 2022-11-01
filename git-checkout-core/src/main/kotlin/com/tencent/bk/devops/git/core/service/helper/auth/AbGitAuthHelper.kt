@@ -58,13 +58,13 @@ abstract class AbGitAuthHelper(
     protected val authInfo = settings.authInfo
 
     override fun configGlobalAuth() {
-        if (settings.enableGlobalInsteadOf && !AgentEnv.isThirdParty()) {
+        if (settings.enableGlobalInsteadOf && AgentEnv.isDocker()) {
             unsetInsteadOf()
             insteadOf()
             configGlobalAuthCommand()
         } else {
-            // 如果构建机上有git insteadOf http,应该卸载,不然凭证会失败
-            if ((!AgentEnv.isThirdParty() || AgentEnv.isThirdDocker()) && serverInfo.httpProtocol) {
+            // 如果构建机上有git insteadOf http,应该卸载,不然凭证会失败.只清理docker构建机,第三方构建机不清理
+            if (AgentEnv.isDocker() && serverInfo.httpProtocol) {
                 unsetInsteadOf()
             }
             /**
@@ -82,7 +82,6 @@ abstract class AbGitAuthHelper(
     }
 
     override fun removeGlobalAuth() {
-        if (!AgentEnv.isThirdParty()) return
         val gitXdgConfigHome = git.removeEnvironmentVariable(GitConstants.XDG_CONFIG_HOME)
         if (!gitXdgConfigHome.isNullOrBlank()) {
             val gitXdgConfigFile = Paths.get(gitXdgConfigHome, "git", "config")

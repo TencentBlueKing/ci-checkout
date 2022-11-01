@@ -63,4 +63,6 @@ object AgentEnv {
      * 常驻docker,构建完并不会被清理
      */
     fun isThirdDocker() = System.getenv("DEVOPS_SLAVE_ENVIRONMENT") == "pcg-devcloud"
+
+    fun isDocker() = isThirdDocker() || !isThirdParty()
 }
