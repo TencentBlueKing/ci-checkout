@@ -171,6 +171,7 @@ object GitConstants {
         VersionHelper.computeVersionFromBits(1, 8, 2, 0)
     val SUPPORT_MERGE_NO_VERIFY_GIT_VERSION =
         VersionHelper.computeVersionFromBits(2, 15, 0, 0)
+    val SUPPORT_XDG_CONFIG_HOME_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 7, 12, 0)
 
     const val USER_NEED_PROJECT_X_PERMISSION = 2101181
 }

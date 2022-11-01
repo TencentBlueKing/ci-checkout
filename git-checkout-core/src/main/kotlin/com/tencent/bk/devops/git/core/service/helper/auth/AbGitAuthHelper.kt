@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.helper.auth
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_XDG_CONFIG_HOME_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.CommandLogLevel
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -251,6 +252,10 @@ abstract class AbGitAuthHelper(
      * 先设置全局的凭证,然后将全局凭证的配置复制到xdg配置中
      */
     private fun configureXDGConfig() {
+        // git 1.7.12之后的版本才有xdg config home配置
+        if (!git.isAtLeastVersion(SUPPORT_XDG_CONFIG_HOME_GIT_VERSION)) {
+            return
+        }
         // 移除全局配置,然后把配置文件复制到xdg_config_home的git/config中，
         // git配置读取顺序是: home->xdg_config_home->~/.gitconfig->.git/config
         val tempHome = git.removeEnvironmentVariable(GitConstants.HOME)
