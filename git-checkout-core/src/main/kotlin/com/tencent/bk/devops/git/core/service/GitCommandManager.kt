@@ -98,7 +98,7 @@ class GitCommandManager(
 
     fun tryGetFetchUrl(): String {
         val output = execGit(
-            args = listOf("config", "--local", "--get", "remote.origin.url"),
+            args = listOf("config", "--get", "remote.origin.url"),
             allowAllExitCodes = true
         )
         if (output.exitCode != 0) {
