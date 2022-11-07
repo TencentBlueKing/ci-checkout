@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -103,6 +104,8 @@ class GitDirectoryHelper(
 
     private fun clean(): Boolean {
         var remove = false
+        // 清理阶段可能会拉取lfs，但是此时还没有权限，应该禁用lfs拉取
+        git.setEnvironmentVariable(GIT_LFS_SKIP_SMUDGE, "1")
         if (!git.tryClean(settings.enableGitCleanIgnore, settings.enableGitCleanNested)) {
             logger.info(
                 "The clean command failed. This might be caused by: " +
@@ -116,6 +119,7 @@ class GitDirectoryHelper(
             // If the last checkout failed, then the HEAD is empty
             remove = true
         }
+        git.removeEnvironmentVariable(GIT_LFS_SKIP_SMUDGE)
         return remove
     }
 
