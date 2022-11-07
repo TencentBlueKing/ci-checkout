@@ -27,7 +27,6 @@
 
 package com.tencent.bk.devops.git.core.api
 
-import com.tencent.bk.devops.git.core.constant.GitConstants.OAUTH2
 import com.tencent.bk.devops.git.core.enums.HttpStatus
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.util.HttpUtil
@@ -90,7 +89,7 @@ class GitClientApi {
                     response = redirect(response, headers)
                 }
                 if (response.code() == HttpStatus.OK.statusCode &&
-                    checkOauth2(username = authInfo.username, response = response)
+                    checkBody(response = response)
                 ) {
                     status = HttpStatus.OK.statusCode
                     break
@@ -115,14 +114,10 @@ class GitClientApi {
         return response
     }
 
-    private fun checkOauth2(
-        username: String,
+    private fun checkBody(
         response: Response
     ): Boolean {
-        if (username != OAUTH2) {
-            return true
-        }
-        // 工蜂oauth2授权,如果token已经过期,则状态返回的是200,但是内容是Git repository not found
+        // 工蜂如果用户名密码是正确的,则状态返回的是200,但是内容是Git repository not found
         return response.use {
             !response.body()!!.string().contains("Git repository not found")
         }
