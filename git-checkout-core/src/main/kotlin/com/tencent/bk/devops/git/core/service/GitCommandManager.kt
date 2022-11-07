@@ -396,8 +396,17 @@ class GitCommandManager(
         doRetry(args = args)
     }
 
-    fun lfsPull() {
+    fun lfsPull(
+        fetchInclude: String?,
+        fetchExclude: String?
+    ) {
         val args = mutableListOf("lfs", "pull")
+        if (!fetchInclude.isNullOrBlank()) {
+            args.addAll(listOf("-I", fetchInclude))
+        }
+        if (!fetchExclude.isNullOrBlank()) {
+            args.addAll(listOf("-X", fetchExclude))
+        }
         doRetry(args = args)
     }
 
