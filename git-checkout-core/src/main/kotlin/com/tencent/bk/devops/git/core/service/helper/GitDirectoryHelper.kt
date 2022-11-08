@@ -74,6 +74,11 @@ class GitDirectoryHelper(
                 hostNameList = compatibleHostList
             ) ->
                 remove = true
+            fetchDepth == 0 && File(File(repositoryPath, ".git"), "shallow").exists() -> {
+                // 工蜂的git fetch --unshallow命令总是会报错,所以如果由浅克隆转换成全量克隆,需要清理工作空间
+                logger.warn("previously build use shallow clone,cleaning workspace")
+                remove = true
+            }
             else -> {
                 removeLockFile(repositoryPath)
                 try {
