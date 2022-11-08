@@ -188,7 +188,7 @@ class GitFetchHandler(
             // 如果不存在,则单独再拉取一次
             if (!exists) {
                 git.fetch(
-                    refSpec = listOf(commitId!!, "--no-tags"),
+                    refSpec = listOf(commitId!!),
                     remoteName = GitConstants.ORIGIN_REMOTE_NAME,
                     fetchDepth = fetchDepth,
                     prune = false
