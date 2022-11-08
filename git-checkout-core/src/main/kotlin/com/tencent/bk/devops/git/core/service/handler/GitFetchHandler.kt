@@ -182,6 +182,18 @@ class GitFetchHandler(
             shallowSince = shallowSince,
             enablePartialClone = enablePartialClone
         )
+        // 如果是浅克隆,则判断要拉取的commitId是否已存在
+        if (fetchDepth > 0) {
+            val (exists, commitId) = refHelper.testRef()
+            // 如果不存在,则单独再拉取一次
+            if (!exists) {
+                git.fetch(
+                    refSpec = listOf(commitId!!),
+                    remoteName = GitConstants.ORIGIN_REMOTE_NAME,
+                    prune = false
+                )
+            }
+        }
     }
 
     /**

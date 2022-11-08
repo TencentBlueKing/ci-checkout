@@ -358,7 +358,7 @@ class GitCommandManager(
 
     fun fetch(
         refSpec: List<String>,
-        fetchDepth: Int,
+        fetchDepth: Int = 0,
         remoteName: String,
         shallowSince: String? = null,
         enablePartialClone: Boolean? = false,
@@ -628,6 +628,15 @@ class GitCommandManager(
             // git 低版本的credential-cache错误流没有关闭,导致程序会挂起,需要不捕获错误流
             handleErrStream = false
         )
+    }
+
+    fun shaExists(sha: String): Boolean {
+        val output = execGit(
+            args = listOf("rev-parse", "--verify", "--quiet", "$sha^{object}"),
+            allowAllExitCodes = true,
+            printLogger = false
+        )
+        return output.stdOut.trim().isNotBlank()
     }
 
     private fun execGit(

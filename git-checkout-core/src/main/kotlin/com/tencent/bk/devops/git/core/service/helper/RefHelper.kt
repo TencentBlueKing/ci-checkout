@@ -120,11 +120,37 @@ class RefHelper(
         )
     }
 
-    fun getCheckInfo(): CheckoutInfo {
+    /**
+     * 判断checkout的ref是否存在
+     *
+     * 当拉取所有ref并开启depth的时候,如果重试或者拉取commitId时,可能会出现要拉取的commitId没有找到,应该再拉一次
+     */
+    fun testRef(): Pair<Boolean, String?> {
         with(settings) {
-            val hookCommitId = getHookCommitId()
             return when (pullType) {
                 PullType.BRANCH -> {
+                    val hookCommitId = getHookCommitId()
+                    when {
+                        hookCommitId != null ->
+                            Pair(git.shaExists(hookCommitId), hookCommitId)
+                        commit.isNotBlank() ->
+                            Pair(git.shaExists(commit), commit)
+                        else -> Pair(true, null)
+                    }
+                }
+                PullType.COMMIT_ID -> {
+                    Pair(git.shaExists(ref), ref)
+                }
+                else -> Pair(true, null)
+            }
+        }
+    }
+
+    fun getCheckInfo(): CheckoutInfo {
+        with(settings) {
+            return when (pullType) {
+                PullType.BRANCH -> {
+                    val hookCommitId = getHookCommitId()
                     val (startPoint, upstream) = when {
                         GitUtil.isPrePushBranch(ref) ->
                             Pair("FETCH_HEAD", "")
