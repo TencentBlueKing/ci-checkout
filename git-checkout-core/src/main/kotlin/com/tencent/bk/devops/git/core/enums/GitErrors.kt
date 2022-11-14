@@ -54,7 +54,8 @@ enum class GitErrors(
                 "(fatal: '(.+)' 鉴权失败)|" +
                 "(fatal: could not read Username for '(.+)': No such device or address)|" +
                 "(error: The requested URL returned error: 401 Unauthorized while accessing .*)|" +
-                "(fatal: unable to access '(.+)': The requested URL returned error: 403)"
+                "(fatal: unable to access '(.+)': The requested URL returned error: 403)|" +
+                "(error: The requested URL returned error: 401 while accessing (.+))"
         ),
         title = GitErrorsText.get().httpAuthenticationFailed,
         cause = GitErrorsText.get().httpAuthenticationFailedCause,

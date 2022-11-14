@@ -81,51 +81,28 @@ class GitDirectoryHelper(
             }
             else -> {
                 removeLockFile(repositoryPath)
-                try {
-                    if (enableGitClean) {
-                        remove = clean()
-                    }
-                    if (remove) {
-                        logger.warn(
-                            "Unable to clean or reset the repository. " +
-                                "The repository will be recreated instead."
-                        )
-                    }
-                    // 如果拉取类型是tag,先删除旧的tag再拉取,防止切换到旧的tag
-                    if (settings.pullType == PullType.TAG) {
-                        git.tagDelete(settings.ref)
-                    }
-                } catch (ignore: Exception) {
-                    logger.warn(
-                        "Unable to prepare the existing repository. " +
-                            "The repository will be recreated instead."
-                    )
-                    remove = true
+                clean()
+                // 如果拉取类型是tag,先删除旧的tag再拉取,防止切换到旧的tag
+                if (settings.pullType == PullType.TAG) {
+                    git.tagDelete(settings.ref)
                 }
             }
         }
         return remove
     }
 
-    private fun clean(): Boolean {
-        var remove = false
+    private fun clean() {
         // 清理阶段可能会拉取lfs，但是此时还没有权限，应该禁用lfs拉取
         git.setEnvironmentVariable(GIT_LFS_SKIP_SMUDGE, "1")
-        if (!git.tryClean(settings.enableGitCleanIgnore, settings.enableGitCleanNested)) {
-            logger.info(
-                "The clean command failed. This might be caused by: " +
-                    "1) path too long, " +
-                    "2) permission issue, or " +
-                    "3) file in use. For futher investigation, " +
-                    "manually run 'git clean -ffdx' on the directory '\$repositoryPath."
-            )
-            remove = true
-        } else if (git.headExists() && !git.tryReset("HEAD")) {
-            // If the last checkout failed, then the HEAD is empty
-            remove = true
+        if (git.headExists()) {
+            git.tryReset("HEAD")
+        } else {
+            git.tryReset()
+        }
+        if (settings.enableGitClean) {
+            git.tryClean(settings.enableGitCleanIgnore, settings.enableGitCleanNested)
         }
         git.removeEnvironmentVariable(GIT_LFS_SKIP_SMUDGE)
-        return remove
     }
 
     private fun removeLockFile(repositoryPath: String) {
@@ -145,6 +122,10 @@ class GitDirectoryHelper(
     }
 
     private fun findRefLockFile(directory: File): List<File> {
-        return org.apache.commons.io.FileUtils.listFiles(directory, arrayOf("lock"), true).toList()
+        return if (directory.exists()) {
+            org.apache.commons.io.FileUtils.listFiles(directory, arrayOf("lock"), true).toList()
+        } else {
+            emptyList()
+        }
     }
 }

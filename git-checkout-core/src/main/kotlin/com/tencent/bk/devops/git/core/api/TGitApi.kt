@@ -18,7 +18,7 @@ class TGitApi(
     val repositoryUrl: String,
     val userId: String,
     private val token: String
-): GitApi {
+) : GitApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(TGitApi::class.java)
@@ -39,7 +39,9 @@ class TGitApi(
             val responseContent = HttpUtil.retryRequest(request, "获取工蜂项目信息失败")
             return JsonUtil.to(responseContent, TGitProjectInfo::class.java)
         } catch (ignore: RemoteServiceException) {
-            if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode) {
+            if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode ||
+                ignore.httpStatus == HttpStatus.FORBIDDEN.statusCode
+            ) {
                 throw ApiException(
                     errorType = ErrorType.USER,
                     errorCode = GitConstants.CONFIG_ERROR,

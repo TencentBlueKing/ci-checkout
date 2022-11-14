@@ -23,6 +23,10 @@ class GitErrorsTest {
             "fatal: unable to access 'http://example.com/demo.git/': The requested URL returned error: 403"
         )
         Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
+        gitError = GitErrors.matchError(
+            "error: The requested URL returned error: 401 while accessing http://example.com/demo.git/info/refs"
+        )
+        Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
     }
 
     @Test

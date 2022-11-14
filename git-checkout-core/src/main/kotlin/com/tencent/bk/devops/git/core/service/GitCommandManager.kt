@@ -121,8 +121,13 @@ class GitCommandManager(
         return output.exitCode == 0
     }
 
-    fun tryReset(commit: String): Boolean {
-        val output = execGit(args = listOf("reset", "--hard", commit), allowAllExitCodes = true)
+    fun tryReset(commit: String? = null): Boolean {
+        val args = if (commit.isNullOrBlank()) {
+            listOf("reset", "--hard")
+        } else {
+            listOf("reset", "--hard", commit)
+        }
+        val output = execGit(args = args, allowAllExitCodes = true)
         return output.exitCode == 0
     }
 
