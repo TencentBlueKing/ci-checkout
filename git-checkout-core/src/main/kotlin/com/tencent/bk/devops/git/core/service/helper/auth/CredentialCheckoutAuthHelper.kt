@@ -130,6 +130,12 @@ class CredentialCheckoutAuthHelper(
             sourceFilePath = "script/$credentialShellFileName",
             targetFile = File(credentialShellPath)
         )
+        // TODO 卸载历史的全局的git-checkout-credential凭证,后续需要删除
+        git.tryConfigUnset(
+            configKey = GIT_CREDENTIAL_HELPER,
+            configValueRegex = GitConstants.GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
+            configScope = GitConfigScope.GLOBAL
+        )
         try {
             // 凭证管理必须安装在全局,否则无法传递给其他插件
             if (!git.configExists(

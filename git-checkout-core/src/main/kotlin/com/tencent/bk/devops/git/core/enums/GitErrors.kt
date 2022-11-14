@@ -347,6 +347,16 @@ enum class GitErrors(
         solution = GitErrorsText.get().notAGitRepositorySolution,
         errorCode = 800023,
         wiki = GitErrorsText.get().notAGitRepositoryWiki
+    ),
+    LibcurlNotSupportHttps(
+        regex = Regex(
+            "fatal: unable to access '(.*)': Protocol \"https\" not supported or disabled in libcurl"
+        ),
+        title = GitErrorsText.get().libcurlNotSupportHttps,
+        cause = GitErrorsText.get().libcurlNotSupportHttpsCause,
+        solution = GitErrorsText.get().libcurlNotSupportHttpsSolution,
+        errorCode = 800024,
+        wiki = GitErrorsText.get().libcurlNotSupportHttpsWiki
     );
 
     companion object {
