@@ -364,7 +364,8 @@ enum class GitErrors(
     GitNotInstall(
         regex = Regex(
             "Cannot run program \"git\" \\(in directory (.*): CreateProcess error=2, " +
-                "The system cannot find the file specified\\)"
+                "The system cannot find the file specified\\)|" +
+                "('git' 不是内部或外部命令，也不是可运行的程序)"
         ),
         title = GitErrorsText.get().gitNotInstall,
         cause = GitErrorsText.get().gitNotInstallCause,
