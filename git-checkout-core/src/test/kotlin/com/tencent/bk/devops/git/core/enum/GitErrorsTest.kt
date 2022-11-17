@@ -146,6 +146,9 @@ class GitErrorsTest {
 
         gitError = GitErrors.matchError("Automatic merge failed; fix conflicts and then commit the result.")
         Assert.assertEquals(gitError, GitErrors.MergeConflicts)
+
+        gitError = GitErrors.matchError("Automatic merge failed; fix conflicts and then commit the result.")
+        Assert.assertEquals(gitError, GitErrors.MergeConflicts)
     }
 
     @Test

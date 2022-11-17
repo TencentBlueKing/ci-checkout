@@ -148,7 +148,8 @@ enum class GitErrors(
                 "(fatal: path '(.+)' does not exist .+)|" +
                 "(fatal: 路径 '(.+)' 不存在)|" +
                 "(fatal: 引用不是一个树：(.+))|" +
-                "(fatal: reference is not a tree: (.+))",
+                "(fatal: reference is not a tree: (.+))|" +
+                "(error: 请求的上游分支 '(.+)' 不存在)",
             options = setOf(RegexOption.IGNORE_CASE)
         ),
         title = GitErrorsText.get().noMatchingBranch,
@@ -193,6 +194,7 @@ enum class GitErrors(
     MergeConflicts(
         regex = Regex(
             "(Automatic merge failed; fix conflicts and then commit the result.)|" +
+                "(Automatischer Merge fehlgeschlagen; beheben Sie die Konflikte und committen Sie dann das Ergebnis)|" +
                 "(Resolve all conflicts manually, mark them as resolved with)|" +
                 "(自动合并失败，修正冲突然后提交修正的结果。)|" +
                 "(error: add_cacheinfo 无法刷新路径 '.+'，合并终止。)|" +
@@ -358,7 +360,19 @@ enum class GitErrors(
         solution = GitErrorsText.get().libcurlNotSupportHttpsSolution,
         errorCode = 800024,
         wiki = GitErrorsText.get().libcurlNotSupportHttpsWiki
-    );
+    ),
+    GitNotInstall(
+        regex = Regex(
+            "Cannot run program \"git\" \\(in directory (.*): CreateProcess error=2, " +
+                "The system cannot find the file specified\\)"
+        ),
+        title = GitErrorsText.get().gitNotInstall,
+        cause = GitErrorsText.get().gitNotInstallCause,
+        solution = GitErrorsText.get().gitNotInstallSolution,
+        errorCode = 800024,
+        wiki = GitErrorsText.get().gitNotInstallWiki
+    )
+    ;
 
     companion object {
         fun matchError(message: String): GitErrors? {

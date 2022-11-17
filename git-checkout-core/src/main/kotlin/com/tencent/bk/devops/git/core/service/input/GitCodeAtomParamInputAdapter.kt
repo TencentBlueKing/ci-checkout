@@ -194,7 +194,7 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable(
                 key = BK_CI_GIT_CODE_PATHS,
                 value = System.getenv(BK_CI_GIT_CODE_PATHS)?.let {
-                    "$it$PARAM_SEPARATOR$localPath}"
+                    "$it$PARAM_SEPARATOR$localPath"
                 } ?: (localPath ?: "")
             )
 
@@ -209,7 +209,7 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable(
                 key = DEVOPS_GIT_CODE_PATHS,
                 value = System.getenv(DEVOPS_GIT_CODE_PATHS)?.let {
-                    "$it$PARAM_SEPARATOR$localPath}"
+                    "$it$PARAM_SEPARATOR$localPath"
                 } ?: (localPath ?: "")
             )
 

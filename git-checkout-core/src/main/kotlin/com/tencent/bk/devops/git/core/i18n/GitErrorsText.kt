@@ -122,6 +122,10 @@ class GitErrorsText : TranslationBundle() {
     var libcurlNotSupportHttpsCause: String? = null
     var libcurlNotSupportHttpsSolution: String? = null
     var libcurlNotSupportHttpsWiki: String? = null
+    var gitNotInstall: String? = null
+    var gitNotInstallCause: String? = null
+    var gitNotInstallSolution: String? = null
+    var gitNotInstallWiki: String? = null
 
     companion object {
         fun get(): GitErrorsText {

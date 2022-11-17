@@ -487,14 +487,12 @@ class GitCommandManager(
             if (isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
                 args.addAll(listOf("-B", ref, startPoint))
             } else {
-                args.add(ref)
+                // git 1.7之前的版本，没有-B参数,需要先删除分支,然后再创建
+                branchDelete(ref)
+                args.addAll(listOf("-b", ref, startPoint))
             }
         }
         execGit(args = args, logType = LogType.PROGRESS)
-        // git 1.9之前的版本，没有-B参数，需要先切换分支然后再reset到远程分支
-        if (startPoint.isNotBlank() && !isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
-            execGit(args = listOf("reset", "--hard", startPoint))
-        }
     }
 
     fun branchUpstream(upstream: String) {
@@ -534,6 +532,14 @@ class GitCommandManager(
         val args = listOf("rev-parse", "-q", "--verify", "$commit^{commit}")
         val output = execGit(args = args, allowAllExitCodes = true, printLogger = false)
         return output.stdOut.trim().isNotBlank()
+    }
+
+    fun branchDelete(branch: String): Boolean {
+        val output = execGit(
+            args = listOf("branch", "-D", branch),
+            allowAllExitCodes = true
+        )
+        return output.exitCode == 0
     }
 
     fun branchExists(remote: Boolean, branchName: String): Boolean {
