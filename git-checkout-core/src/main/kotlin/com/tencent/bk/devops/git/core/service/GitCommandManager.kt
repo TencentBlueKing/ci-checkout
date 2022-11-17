@@ -488,11 +488,18 @@ class GitCommandManager(
                 args.addAll(listOf("-B", ref, startPoint))
             } else {
                 // git 1.7之前的版本，没有-B参数,需要先删除分支,然后再创建
-                branchDelete(ref)
-                args.addAll(listOf("-b", ref, startPoint))
+                if (branchExists(false, ref)) {
+                    args.add(ref)
+                } else {
+                    args.addAll(listOf("-b", ref))
+                }
             }
         }
         execGit(args = args, logType = LogType.PROGRESS)
+        // git 1.9之前的版本，没有-B参数，需要先切换分支然后再reset到远程分支
+        if (startPoint.isNotBlank() && !isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
+            execGit(args = listOf("reset", "--hard", startPoint))
+        }
     }
 
     fun branchUpstream(upstream: String) {
@@ -543,9 +550,9 @@ class GitCommandManager(
     }
 
     fun branchExists(remote: Boolean, branchName: String): Boolean {
-        val args = mutableListOf("branch", "--list")
+        val args = mutableListOf("branch", "-l")
         if (remote) {
-            args.add("--remote")
+            args.add("-a")
         }
         args.add(branchName)
         val output = execGit(args = args)
