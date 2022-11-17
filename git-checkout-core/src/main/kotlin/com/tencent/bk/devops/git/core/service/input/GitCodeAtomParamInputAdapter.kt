@@ -183,34 +183,49 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable("bk_repo_include_path_${input.pipelineTaskId}", input.includePath ?: "")
             EnvHelper.addEnvVariable("bk_repo_exclude_path_${input.pipelineTaskId}", input.excludePath ?: "")
 
+            val devopsGitUrls = System.getenv(BK_CI_GIT_URLS)
+            val gitUrls = if (devopsGitUrls.isNullOrBlank()) {
+                repository.url
+            } else {
+                devopsGitUrls + PARAM_SEPARATOR + repository.url
+            }
             EnvHelper.addEnvVariable(
                 key = BK_CI_GIT_URLS,
-                value = System.getenv(BK_CI_GIT_URLS)?.let { "$it$PARAM_SEPARATOR${repository.url}" } ?: repository.url
+                value = gitUrls
+            )
+            EnvHelper.addEnvVariable(
+                key = DEVOPS_GIT_URLS,
+                value = gitUrls
+            )
+
+            val devopsGitBranches = System.getenv(BK_CI_GIT_BRANCHES)
+            val gitBranches = if (devopsGitBranches.isNullOrBlank()) {
+                branchName
+            } else {
+                devopsGitBranches + PARAM_SEPARATOR + branchName
+            }
+            EnvHelper.addEnvVariable(
+                key = DEVOPS_GIT_BRANCHES,
+                value = gitBranches
             )
             EnvHelper.addEnvVariable(
                 key = BK_CI_GIT_BRANCHES,
-                value = System.getenv(BK_CI_GIT_BRANCHES)?.let { "$it$PARAM_SEPARATOR$branchName" } ?: branchName
+                value = gitBranches
+            )
+
+            val devopsGitCodePaths = System.getenv(DEVOPS_GIT_CODE_PATHS)
+            val gitCodePaths = if (devopsGitCodePaths.isNullOrBlank()) {
+                localPath ?: ""
+            } else {
+                devopsGitCodePaths + PARAM_SEPARATOR + (localPath ?: "")
+            }
+            EnvHelper.addEnvVariable(
+                key = DEVOPS_GIT_CODE_PATHS,
+                value = gitCodePaths
             )
             EnvHelper.addEnvVariable(
                 key = BK_CI_GIT_CODE_PATHS,
-                value = System.getenv(BK_CI_GIT_CODE_PATHS)?.let { paths ->
-                    localPath?.let { "$paths$PARAM_SEPARATOR$it" }
-                } ?: (localPath ?: "")
-            )
-
-            EnvHelper.addEnvVariable(
-                key = DEVOPS_GIT_URLS,
-                value = System.getenv(DEVOPS_GIT_URLS)?.let { "$it$PARAM_SEPARATOR${repository.url}" } ?: repository.url
-            )
-            EnvHelper.addEnvVariable(
-                key = DEVOPS_GIT_BRANCHES,
-                value = System.getenv(DEVOPS_GIT_BRANCHES)?.let { "$it$PARAM_SEPARATOR$branchName" } ?: branchName
-            )
-            EnvHelper.addEnvVariable(
-                key = DEVOPS_GIT_CODE_PATHS,
-                value = System.getenv(BK_CI_GIT_CODE_PATHS)?.let { paths ->
-                    localPath?.let { "$paths$PARAM_SEPARATOR$it" }
-                } ?: (localPath ?: "")
+                value = gitCodePaths
             )
 
             return GitSourceSettings(
