@@ -487,18 +487,14 @@ class GitCommandManager(
             if (isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
                 args.addAll(listOf("-B", ref, startPoint))
             } else {
-                // git 1.7之前的版本，没有-B参数,需要先删除分支,然后再创建
-                if (branchExists(false, ref)) {
-                    args.add(ref)
-                } else {
-                    args.addAll(listOf("-b", ref))
-                }
+                args.add(startPoint)
             }
         }
         execGit(args = args, logType = LogType.PROGRESS)
-        // git 1.9之前的版本，没有-B参数，需要先切换分支然后再reset到远程分支
+        // git 1.7.3之前的版本，没有-B参数，需要先切换startPoint然后再切换分支
         if (startPoint.isNotBlank() && !isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
-            execGit(args = listOf("reset", "--hard", startPoint))
+            branchDelete(ref)
+            execGit(args = listOf("checkout", "-f", "-b", ref))
         }
     }
 
