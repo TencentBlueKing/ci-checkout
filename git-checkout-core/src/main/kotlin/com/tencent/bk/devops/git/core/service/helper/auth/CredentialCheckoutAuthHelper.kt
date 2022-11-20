@@ -242,30 +242,29 @@ class CredentialCheckoutAuthHelper(
         git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
     }
 
-    override fun configGlobalAuthCommand() {
-        val configFile = Paths.get(
-            System.getProperty("user.home"),
-            ".gitconfig"
-        ).toFile()
-        appendCredential(configFile)
-    }
-
     override fun configXdgAuthCommand() {
         val configFile = Paths.get(
             git.getEnvironmentVariable(GitConstants.HOME).toString(),
             ".gitconfig"
         ).toFile()
+        logger.debug("configFile:$configFile")
         appendCredential(configFile)
     }
 
     private fun appendCredential(configFile: File) {
         val credentialValues = StringBuilder()
+        if (!configFile.exists()) {
+            return
+        }
+        val configContent = configFile.readText()
         combinableHost { protocol, host ->
-            credentialValues.append(
-                "[credential \"$protocol://$host/\"]\n" +
-                    "        helper =" +
-                    "        helper = !bash '$credentialShellPath'"
-            )
+            if (!configContent.contains("[credential \"$protocol://$host/\"]")) {
+                credentialValues.append(
+                    "[credential \"$protocol://$host/\"]\n" +
+                        "        helper =" +
+                        "        helper = !bash '$credentialShellPath'"
+                )
+            }
         }
         logger.debug("append checkout credential config to global config\n$credentialValues")
         if (configFile.exists()) {
