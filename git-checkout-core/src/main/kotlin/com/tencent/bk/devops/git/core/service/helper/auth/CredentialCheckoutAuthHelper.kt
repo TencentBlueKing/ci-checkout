@@ -50,13 +50,12 @@ import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL
+import java.nio.file.Paths
 
 /**
  * 使用自定义git-checkout-credential凭证
  *
  * 用于第三方构建机或公共构建机没有配置全局凭证的
- * 1. checkout->checkout(不同的域名，不持久化凭证)->bash 报错
-2. mac: checkout->checkout(相同域名，不持久化凭证) -> bash 报错，这个是因为原来构建机会缓存凭证，然后这次被移除了，
  */
 @Suppress("ALL")
 class CredentialCheckoutAuthHelper(
@@ -241,6 +240,37 @@ class CredentialCheckoutAuthHelper(
         git.tryConfigUnset(configKey = GIT_CREDENTIAL_HELPER)
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
+    }
+
+    override fun configGlobalAuthCommand() {
+        val configFile = Paths.get(
+            System.getProperty("user.home"),
+            ".gitconfig"
+        ).toFile()
+        appendCredential(configFile)
+    }
+
+    override fun configXdgAuthCommand() {
+        val configFile = Paths.get(
+            git.getEnvironmentVariable(GitConstants.HOME).toString(),
+            ".gitconfig"
+        ).toFile()
+        appendCredential(configFile)
+    }
+
+    private fun appendCredential(configFile: File) {
+        val credentialValues = StringBuilder()
+        combinableHost { protocol, host ->
+            credentialValues.append(
+                "[credential \"$protocol://$host/\"]\n" +
+                    "        helper =" +
+                    "        helper = !bash '$credentialShellPath'"
+            )
+        }
+        logger.debug("append checkout credential config to global config\n$credentialValues")
+        if (configFile.exists()) {
+            configFile.appendText(credentialValues.toString())
+        }
     }
 
     override fun configSubmoduleAuthCommand(

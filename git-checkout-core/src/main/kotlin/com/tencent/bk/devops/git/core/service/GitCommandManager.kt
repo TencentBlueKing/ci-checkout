@@ -323,6 +323,10 @@ class GitCommandManager(
         return gitEnv.remove(name)
     }
 
+    fun getEnvironmentVariable(name: String): String? {
+        return gitEnv[name]
+    }
+
     fun submoduleSync(repoDir: File? = null, recursive: Boolean, path: String) {
         val args = mutableListOf("submodule", "sync")
         // git submodule sync --recursive在1.8.1才支持
