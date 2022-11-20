@@ -107,6 +107,9 @@ class CredentialCheckoutAuthHelper(
         )
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
+        } else {
+            // 如果低于git 2.9版本以下,则通过设置一个不存在的username,禁用其他凭证管理
+            git.config(GitConstants.GIT_CREDENTIAL_USERNAME, settings.pipelineTaskId)
         }
         git.configAdd(
             configKey = GIT_CREDENTIAL_HELPER,
@@ -264,6 +267,9 @@ class CredentialCheckoutAuthHelper(
         }
         combinableHost { protocol, host ->
             credentialValues.append("[credential \"$protocol://$host/\"]\n")
+            /* mac和windows构建机版本肯定都大于2.9，
+            linux机器如果低于git 2.9，因为xdg配置优先于~/.gitconfig,所以低于git 2.9版本不需要禁用其他凭证
+             */
             if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
                 credentialValues.append("        helper =\n")
             }
@@ -281,6 +287,8 @@ class CredentialCheckoutAuthHelper(
     ) {
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             commands.add("git config --add credential.helper \"\" ")
+        } else {
+            commands.add("git config credential.username ${settings.pipelineTaskId}")
         }
         commands.add(
             "git config --add credential.helper " +
