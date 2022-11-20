@@ -247,7 +247,7 @@ class CredentialCheckoutAuthHelper(
             git.getEnvironmentVariable(GitConstants.HOME).toString(),
             ".gitconfig"
         ).toFile()
-        logger.debug("configFile:$configFile")
+        logger.info("configFile:$configFile")
         appendCredential(configFile)
     }
 
@@ -266,7 +266,7 @@ class CredentialCheckoutAuthHelper(
                 )
             }
         }
-        logger.debug("append checkout credential config to global config\n$credentialValues")
+        logger.info("append checkout credential config to global config\n$credentialValues")
         if (configFile.exists()) {
             configFile.appendText(credentialValues.toString())
         }
