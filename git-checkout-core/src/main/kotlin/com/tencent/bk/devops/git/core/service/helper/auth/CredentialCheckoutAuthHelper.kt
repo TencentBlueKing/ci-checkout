@@ -247,7 +247,6 @@ class CredentialCheckoutAuthHelper(
             git.getEnvironmentVariable(GitConstants.HOME).toString(),
             ".gitconfig"
         ).toFile()
-        logger.info("configFile:$configFile")
         appendCredential(configFile)
     }
 
@@ -261,8 +260,8 @@ class CredentialCheckoutAuthHelper(
             if (!configContent.contains("[credential \"$protocol://$host/\"]")) {
                 credentialValues.append(
                     "[credential \"$protocol://$host/\"]\n" +
-                        "        helper =" +
-                        "        helper = !bash '$credentialShellPath'"
+                        "        helper =\n" +
+                        "        helper = !bash '$credentialShellPath'\n"
                 )
             }
         }
