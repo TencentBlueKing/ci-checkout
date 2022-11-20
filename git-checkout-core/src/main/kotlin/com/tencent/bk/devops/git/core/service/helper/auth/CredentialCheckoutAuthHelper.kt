@@ -244,6 +244,9 @@ class CredentialCheckoutAuthHelper(
         }
         git.tryConfigUnset(configKey = GIT_CREDENTIAL_HELPER)
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
+        if (!git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
+            git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_USERNAME)
+        }
         git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
     }
 

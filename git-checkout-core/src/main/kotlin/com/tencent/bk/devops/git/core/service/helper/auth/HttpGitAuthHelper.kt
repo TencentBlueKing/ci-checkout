@@ -105,6 +105,9 @@ abstract class HttpGitAuthHelper(
         commands: MutableList<String>
     ) {
         commands.add("git config --unset-all credential.helper")
+        if (!git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
+            commands.add("git config --unset-all credential.username")
+        }
     }
 
     /**
