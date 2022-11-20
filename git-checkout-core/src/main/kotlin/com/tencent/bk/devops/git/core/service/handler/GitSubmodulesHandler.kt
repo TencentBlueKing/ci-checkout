@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.ContextConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -54,6 +55,7 @@ open class GitSubmodulesHandler(
                     return
                 }
                 logger.groupStart("Fetching submodules")
+                git.tryConfigGetAll(GitConstants.GIT_CREDENTIAL_HELPER)
                 git.submoduleSync(recursive = nestedSubmodules, path = submodulesPath)
                 if (pullStrategy == PullStrategy.REVERT_UPDATE) {
                     git.submoduleForeach(
