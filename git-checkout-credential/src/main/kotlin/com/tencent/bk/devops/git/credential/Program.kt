@@ -125,9 +125,9 @@ class Program(
                 credential = credentialStore.get(targetUri)
             }
             if (credential == null) {
-                credential = Credential.Empty
+                return
             }
-            standardOut.print(setCredentials(credential!!))
+            standardOut.print(setCredentials(credential))
         }
     }
 
