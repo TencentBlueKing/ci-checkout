@@ -65,7 +65,7 @@ abstract class AbGitAuthHelper(
             configGlobalAuthCommand()
         } else {
             // 如果构建机上有git insteadOf http,应该卸载,不然凭证会失败.只清理docker构建机,第三方构建机不清理
-            if (AgentEnv.isDocker()) {
+            if (AgentEnv.isDocker() && serverInfo.httpProtocol) {
                 unsetInsteadOf()
             }
             /**
