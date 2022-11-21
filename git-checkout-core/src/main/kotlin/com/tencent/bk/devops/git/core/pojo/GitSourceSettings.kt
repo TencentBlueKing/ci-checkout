@@ -180,9 +180,17 @@ data class GitSourceSettings(
     val cachePath: String? = "",
 
     /**
-     * 是否开启全局insteadOf
+     * 是否开启全局insteadOf,gitCodeRepo和gitCodeRepoCommand传的false,checkout传的true
      */
-    val enableGlobalInsteadOf: Boolean = true
+    val enableGlobalInsteadOf: Boolean = true,
+
+    /**
+     * 是否使用自定义凭证
+     *
+     * 只要是http[s]，都是用自定义的checkout凭证,不管有没有配置全局的凭证
+     * gitCodeRepo和gitCodeRepoCommand传的false,checkout传的true
+     */
+    val useCustomCredential: Boolean = false
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(

@@ -76,7 +76,7 @@ object GitAuthHelperFactory {
                 }
             }
             git.isAtLeastVersion(GitConstants.SUPPORT_CRED_HELPER_GIT_VERSION) -> {
-                if (isUseCustomCredential(git)) {
+                if (isUseCustomCredential(git, settings)) {
                     CredentialCheckoutAuthHelper(git, settings)
                 } else {
                     CredentialStoreAuthHelper(git, settings)
@@ -99,7 +99,7 @@ object GitAuthHelperFactory {
      * 1. 第三方构建机
      * 2. 公共构建机没有配置全局凭证，或者全局凭证已经包含了自定义凭证
      */
-    private fun isUseCustomCredential(git: GitCommandManager): Boolean {
+    private fun isUseCustomCredential(git: GitCommandManager, settings: GitSourceSettings): Boolean {
         // linux或mac构建机重启后,自启动agent可能导致HOME不存在
         if (AgentEnv.getOS() != OSType.WINDOWS && System.getenv(HOME) == null) {
             logger.warn("$HOME not set")
@@ -111,6 +111,7 @@ object GitAuthHelperFactory {
         )
         return AgentEnv.isThirdParty() ||
             AgentEnv.isThirdDocker() ||
+            settings.useCustomCredential ||
             credentialHelperConfig.isEmpty() ||
             credentialHelperConfig.any { it.contains(GIT_CREDENTIAL_HELPER_VALUE_REGEX) }
     }
