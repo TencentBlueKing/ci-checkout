@@ -94,5 +94,11 @@ data class GitCodeAtomParamInput(
     /**
      * 是否开启全局insteadOf
      */
-    val enableGlobalInsteadOf: Boolean = false
+    val enableGlobalInsteadOf: Boolean = false,
+    /**
+     * 是否使用自定义凭证
+     *
+     * 只要是http[s]，都是用自定义的checkout凭证,不管有没有配置全局的凭证
+     */
+    val useCustomCredential: Boolean = false
 )

@@ -272,7 +272,8 @@ class GitCodeAtomParamInputAdapter(
                 enableTrace = enableTrace,
                 enablePartialClone = enablePartialClone,
                 cachePath = cachePath,
-                enableGlobalInsteadOf = enableGlobalInsteadOf
+                enableGlobalInsteadOf = enableGlobalInsteadOf,
+                useCustomCredential = useCustomCredential
             )
         }
     }
