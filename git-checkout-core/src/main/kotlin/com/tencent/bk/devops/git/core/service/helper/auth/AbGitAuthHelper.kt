@@ -62,29 +62,33 @@ abstract class AbGitAuthHelper(
     protected val authInfo = settings.authInfo
 
     override fun configGlobalAuth() {
+        // 创建临时的.gitconfig文件
+        val tempHomePath = Files.createTempDirectory("checkout")
+        val newGitConfigPath = Paths.get(tempHomePath.toString(), ".gitconfig")
+        Files.createFile(newGitConfigPath)
+        // 如果开启全局insteadOf,则insteadOf需要配置到全局配置中,否则应该只在插件中生效
         if (settings.enableGlobalInsteadOf && AgentEnv.isDocker()) {
             unsetInsteadOf()
             insteadOf()
             configGlobalAuthCommand()
+            logger.info("Temporarily overriding HOME='$tempHomePath' for fetching submodules")
+            git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
         } else {
-            // 如果构建机上有git insteadOf http,应该卸载,不然凭证会失败.只清理docker构建机,第三方构建机不清理
+            // 如果构建机上已有的insteadOf.只清理docker构建机,第三方构建机不清理
             if (AgentEnv.isDocker()) {
                 // 卸载前备份insteadOf
                 backupInsteadOf()
                 unsetInsteadOf()
             }
             /**
-             * 第三方构建机,为了不污染第三方构建机用户git环境,采用临时覆盖HOME环境变量,然后再执行insteadOf命令
+             * 如果没有配置全局的insteadOf或者第三方构建机,采用临时覆盖HOME环境变量,然后再执行insteadOf命令
              */
-            val tempHomePath = Files.createTempDirectory("checkout")
-            val newGitConfigPath = Paths.get(tempHomePath.toString(), ".gitconfig")
-            Files.createFile(newGitConfigPath)
             logger.info("Temporarily overriding HOME='$tempHomePath' for fetching submodules")
             git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
             insteadOf()
-            configXdgAuthCommand()
-            configureXDGConfig()
         }
+        configXdgAuthCommand()
+        configureXDGConfig()
     }
 
     override fun removeGlobalAuth() {
