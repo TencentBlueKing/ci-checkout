@@ -29,4 +29,5 @@ object ContextConstants {
     const val CONTEXT_ERROR_INFO = "context_error_info"
     const val CONTEXT_GIT_VERSION = "context_git_version"
     const val CONTEXT_INVALID_REF = "context_invalid_ref"
+    const val CONTEXT_BACKUP_INSTEADOF = "context_backup_insteadOf"
 }

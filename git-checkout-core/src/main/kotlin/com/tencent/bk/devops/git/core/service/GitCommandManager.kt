@@ -214,6 +214,26 @@ class GitCommandManager(
         return output.stdOuts
     }
 
+    fun tryConfigGetRegexp(
+        configKeyRegex: String,
+        configValueRegex: String? = null,
+        configScope: GitConfigScope = GitConfigScope.LOCAL
+    ): List<String> {
+        val output = execGit(
+            args = configArgs(
+                configKey = configKeyRegex,
+                configValue = configValueRegex,
+                configScope = configScope,
+                action = "--get-regexp"
+            ),
+            allowAllExitCodes = true
+        )
+        if (output.exitCode != 0) {
+            return emptyList()
+        }
+        return output.stdOuts
+    }
+
     fun tryConfigUnset(
         configKey: String,
         configValueRegex: String? = null,

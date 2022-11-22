@@ -27,7 +27,9 @@
 
 package com.tencent.bk.devops.git.core.service.helper.auth
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_BACKUP_INSTEADOF
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.PARAM_SEPARATOR
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_XDG_CONFIG_HOME_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.CommandLogLevel
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
@@ -37,6 +39,7 @@ import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.IGitAuthHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.FileUtils
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.SubmoduleUtil
@@ -65,7 +68,9 @@ abstract class AbGitAuthHelper(
             configGlobalAuthCommand()
         } else {
             // 如果构建机上有git insteadOf http,应该卸载,不然凭证会失败.只清理docker构建机,第三方构建机不清理
-            if (AgentEnv.isDocker() && serverInfo.httpProtocol) {
+            if (AgentEnv.isDocker()) {
+                // 卸载前备份insteadOf
+                backupInsteadOf()
                 unsetInsteadOf()
             }
             /**
@@ -93,6 +98,10 @@ abstract class AbGitAuthHelper(
         if (!homePath.isNullOrBlank()) {
             logger.info("Deleting Temporarily HOME='$homePath'")
             FileUtils.deleteDirectory(File(homePath))
+        }
+        // 如果没有开启全局insteadOf,则需要将配置还原
+        if (!settings.enableGlobalInsteadOf && AgentEnv.isDocker()) {
+            revertInsteadOf()
         }
     }
 
@@ -152,6 +161,34 @@ abstract class AbGitAuthHelper(
             } catch (ignore: Throwable) {
                 logger.debug("Failed to remove ${submodule.name} auth")
             }
+        }
+    }
+
+    private fun backupInsteadOf() {
+        // 输出为url.git@git.example.com:.insteadof http://git.example.com/
+        val insteadOfValues = git.tryConfigGetRegexp(
+            configKeyRegex = "^url\\.(.+)\\.insteadOf",
+            configScope = GitConfigScope.GLOBAL
+        )
+        // 备份到上下文中
+        EnvHelper.putContext(CONTEXT_BACKUP_INSTEADOF, insteadOfValues.joinToString(PARAM_SEPARATOR))
+    }
+
+    private fun revertInsteadOf() {
+        try {
+            val insteadOfValues = EnvHelper.getContext(CONTEXT_BACKUP_INSTEADOF)
+            if (!insteadOfValues.isNullOrBlank()) {
+                insteadOfValues.split(PARAM_SEPARATOR).forEach { values ->
+                    val split = values.split(" ")
+                    git.configAdd(
+                        configKey = split[0],
+                        configValue = split[1],
+                        configScope = GitConfigScope.GLOBAL
+                    )
+                }
+            }
+        } catch (ignore: Exception) {
+            logger.warn("failed to revert global insteadof")
         }
     }
 
