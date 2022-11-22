@@ -174,23 +174,7 @@ abstract class AbGitAuthHelper(
         EnvHelper.putContext(CONTEXT_BACKUP_INSTEADOF, insteadOfValues.joinToString(PARAM_SEPARATOR))
     }
 
-    private fun revertInsteadOf() {
-        try {
-            val insteadOfValues = EnvHelper.getContext(CONTEXT_BACKUP_INSTEADOF)
-            if (!insteadOfValues.isNullOrBlank()) {
-                insteadOfValues.split(PARAM_SEPARATOR).forEach { values ->
-                    val split = values.split(" ")
-                    git.configAdd(
-                        configKey = split[0],
-                        configValue = split[1],
-                        configScope = GitConfigScope.GLOBAL
-                    )
-                }
-            }
-        } catch (ignore: Exception) {
-            logger.warn("failed to revert global insteadof")
-        }
-    }
+    open fun revertInsteadOf() = Unit
 
     /**
      * 配置全局的insteadOf
