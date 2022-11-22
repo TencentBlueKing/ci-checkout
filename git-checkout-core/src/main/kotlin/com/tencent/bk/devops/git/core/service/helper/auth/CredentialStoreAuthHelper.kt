@@ -65,7 +65,7 @@ class CredentialStoreAuthHelper(
             configValue = AuthHelperType.STORE_CREDENTIAL.name
         )
         EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.STORE_CREDENTIAL.name)
-        storeGlobalCredential()
+        storeGlobalCredential(writeCompatibleHost = true)
         writeStoreFile()
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)

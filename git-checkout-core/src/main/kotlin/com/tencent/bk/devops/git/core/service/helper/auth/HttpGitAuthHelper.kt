@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import org.slf4j.LoggerFactory
+import java.net.URI
 
 /**
  * http或https协议的授权管理
@@ -115,15 +116,28 @@ abstract class HttpGitAuthHelper(
      *    如果同时执行多条流水线,每条流水线拉代码的账号oauth不同就可能被覆盖
      *
      */
-    fun storeGlobalCredential() {
+    fun storeGlobalCredential(writeCompatibleHost: Boolean) {
         logger.info("store and overriding global credential for other plugins")
         println("##[command]$ git credential approve")
-        combinableHost { protocol, host ->
+        if (writeCompatibleHost) {
+            combinableHost { protocol, host ->
+                git.credential(
+                    action = CredentialActionEnum.APPROVE,
+                    inputStream = CredentialArguments(
+                        protocol = protocol,
+                        host = host,
+                        username = authInfo.username,
+                        password = authInfo.password
+                    ).convertInputStream()
+                )
+            }
+        } else {
+            val targetUri = URI(settings.repositoryUrl)
             git.credential(
                 action = CredentialActionEnum.APPROVE,
                 inputStream = CredentialArguments(
-                    protocol = protocol,
-                    host = host,
+                    protocol = targetUri.scheme,
+                    host = targetUri.host,
                     username = authInfo.username,
                     password = authInfo.password
                 ).convertInputStream()
