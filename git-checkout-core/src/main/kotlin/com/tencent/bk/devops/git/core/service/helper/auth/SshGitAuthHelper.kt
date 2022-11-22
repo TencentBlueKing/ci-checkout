@@ -112,7 +112,6 @@ class SshGitAuthHelper(
         moduleServerInfo: ServerInfo,
         commands: MutableList<String>
     ) {
-        val insteadOfKey = "url.${serverInfo.origin}:.insteadOf"
-        commands.add("git config --unset-all $insteadOfKey")
+        commands.add("git config --remove-section url.${serverInfo.origin}:")
     }
 }

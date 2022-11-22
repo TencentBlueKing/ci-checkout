@@ -96,18 +96,14 @@ abstract class HttpGitAuthHelper(
         moduleServerInfo: ServerInfo,
         commands: MutableList<String>
     ) {
-        val insteadOfKey = "url.${serverInfo.origin}/.insteadOf"
-        commands.add("git config --unset-all $insteadOfKey")
+        commands.add("git config --remove-section url.${serverInfo.origin}/")
     }
 
     override fun removeSubmoduleAuthCommand(
         moduleServerInfo: ServerInfo,
         commands: MutableList<String>
     ) {
-        commands.add("git config --unset-all credential.helper")
-        if (!git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
-            commands.add("git config --unset-all credential.username")
-        }
+        commands.add("git config --remove-section credential")
     }
 
     /**
