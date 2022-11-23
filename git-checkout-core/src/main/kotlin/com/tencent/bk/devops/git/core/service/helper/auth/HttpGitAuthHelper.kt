@@ -117,7 +117,7 @@ abstract class HttpGitAuthHelper(
      *
      */
     fun storeGlobalCredential(writeCompatibleHost: Boolean) {
-        logger.info("store and overriding global credential for other plugins")
+        logger.info("save username and password to global credentials")
         println("##[command]$ git credential approve")
         if (writeCompatibleHost) {
             combinableHost { protocol, host ->
