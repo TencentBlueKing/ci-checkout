@@ -34,7 +34,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import org.slf4j.LoggerFactory
-import java.net.URI
+import java.net.URL
 
 /**
  * http或https协议的授权管理
@@ -119,29 +119,33 @@ abstract class HttpGitAuthHelper(
     fun storeGlobalCredential(writeCompatibleHost: Boolean) {
         logger.info("save username and password to global credentials")
         println("##[command]$ git credential approve")
-        if (writeCompatibleHost) {
-            combinableHost { protocol, host ->
+        try {
+            if (writeCompatibleHost) {
+                combinableHost { protocol, host ->
+                    git.credential(
+                        action = CredentialActionEnum.APPROVE,
+                        inputStream = CredentialArguments(
+                            protocol = protocol,
+                            host = host,
+                            username = authInfo.username,
+                            password = authInfo.password
+                        ).convertInputStream()
+                    )
+                }
+            } else {
+                val targetUrl = URL(settings.repositoryUrl)
                 git.credential(
                     action = CredentialActionEnum.APPROVE,
                     inputStream = CredentialArguments(
-                        protocol = protocol,
-                        host = host,
+                        protocol = targetUrl.protocol,
+                        host = targetUrl.host,
                         username = authInfo.username,
                         password = authInfo.password
                     ).convertInputStream()
                 )
             }
-        } else {
-            val targetUri = URI(settings.repositoryUrl)
-            git.credential(
-                action = CredentialActionEnum.APPROVE,
-                inputStream = CredentialArguments(
-                    protocol = targetUri.scheme,
-                    host = targetUri.host,
-                    username = authInfo.username,
-                    password = authInfo.password
-                ).convertInputStream()
-            )
+        } catch (ignore: Exception) {
+            logger.warn("Failed to store global credential ${ignore.message}")
         }
     }
 
