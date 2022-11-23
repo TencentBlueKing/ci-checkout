@@ -106,9 +106,7 @@ class CredentialCheckoutAuthHelper(
             configValue = "url.${serverInfo.origin}/.insteadOf"
         )
         // 插件执行过程中,把构建机上所有的凭证管理都禁用了,导致构建机上的错误的凭证没有被覆盖,可能使编译过程报错，所以提前存储一次
-        if (AgentEnv.isDocker()) {
-            storeGlobalCredential(writeCompatibleHost = false)
-        }
+        storeGlobalCredential(writeCompatibleHost = false)
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
         } else {
