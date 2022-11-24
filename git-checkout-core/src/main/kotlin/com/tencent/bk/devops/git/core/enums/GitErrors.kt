@@ -143,7 +143,7 @@ enum class GitErrors(
                 "(您的配置中指定要合并远程的引用 '(.+)')|" +
                 "(fatal: '(.+)' is not a commit and a branch '(.+)' cannot be created from it)|" +
                 "(fatal: '.+' 不是一个提交，不能基于它创建分支 '.+')|" +
-                "(error: pathspec '(.+)' did not match any file\\(s\\) known to git)|" +
+                "(error: pathspec '(.+)' did not match any file\\(s\\) known to git\\.)|" +
                 "(error: 路径规格 '(.+)' 未匹配任何 git 已知文件)|" +
                 "(fatal: path '(.+)' does not exist .+)|" +
                 "(fatal: 路径 '(.+)' 不存在)|" +

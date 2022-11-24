@@ -33,8 +33,10 @@ import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.util.FileUtils
 import org.slf4j.LoggerFactory
 import java.net.URL
+import java.nio.file.Files
 
 /**
  * http或https协议的授权管理
@@ -119,10 +121,13 @@ abstract class HttpGitAuthHelper(
     fun storeGlobalCredential(writeCompatibleHost: Boolean) {
         logger.info("save username and password to global credentials")
         println("##[command]$ git credential approve")
+        // 存储凭证时,当前仓库已经配置了credential.helper='',不会保存到全局凭证,创建一个临时目录,在临时目录执行保存命令
+        val workDir = Files.createTempDirectory("git-credential-").toFile()
         try {
             if (writeCompatibleHost) {
                 combinableHost { protocol, host ->
                     git.credential(
+                        repoDir = workDir,
                         action = CredentialActionEnum.APPROVE,
                         inputStream = CredentialArguments(
                             protocol = protocol,
@@ -135,6 +140,7 @@ abstract class HttpGitAuthHelper(
             } else {
                 val targetUrl = URL(settings.repositoryUrl)
                 git.credential(
+                    repoDir = workDir,
                     action = CredentialActionEnum.APPROVE,
                     inputStream = CredentialArguments(
                         protocol = targetUrl.protocol,
@@ -146,6 +152,8 @@ abstract class HttpGitAuthHelper(
             }
         } catch (ignore: Exception) {
             logger.warn("Failed to store global credential ${ignore.message}")
+        } finally {
+            FileUtils.deleteDirectory(workDir)
         }
     }
 

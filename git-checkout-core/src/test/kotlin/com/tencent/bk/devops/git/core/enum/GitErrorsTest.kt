@@ -102,7 +102,7 @@ class GitErrorsTest {
         gitError = GitErrors.matchError("error: 路径规格 'aaa' 未匹配任何 git 已知文件")
         Assert.assertEquals(gitError, GitErrors.NoMatchingBranch)
 
-        gitError = GitErrors.matchError("error: pathspec 'aaa' did not match any file(s) known to git")
+        gitError = GitErrors.matchError("error: pathspec 'aaaa' did not match any file(s) known to git.")
         Assert.assertEquals(gitError, GitErrors.NoMatchingBranch)
 
         gitError = GitErrors.matchError("fatal: 引用不是一个树：b5a4cf350acdfae7d0afd2817dd83e7930f23197")
