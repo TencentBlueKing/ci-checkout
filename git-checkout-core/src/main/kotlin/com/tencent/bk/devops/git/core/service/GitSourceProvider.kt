@@ -73,7 +73,7 @@ class GitSourceProvider(
             logger.info("Working directory is: $repositoryPath")
             if (ref.isBlank()) {
                 throw ParamInvalidException(
-                    errorMsg = GitErrors.EmptyBranch.title!!,
+                    errorMsg = "拉取的【分支/TAG/COMMIT】不能为空",
                     errorCode = GitErrors.EmptyBranch.errorCode,
                     errorType = GitErrors.EmptyBranch.errorType,
                     reason = GitErrors.EmptyBranch.cause!!,
