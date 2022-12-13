@@ -72,7 +72,14 @@ class GitSourceProvider(
 
             logger.info("Working directory is: $repositoryPath")
             if (ref.isBlank()) {
-                throw ParamInvalidException(errorMsg = "拉取的【分支/TAG/COMMIT】不能为空")
+                throw ParamInvalidException(
+                    errorMsg = GitErrors.EmptyBranch.title!!,
+                    errorCode = GitErrors.EmptyBranch.errorCode,
+                    errorType = GitErrors.EmptyBranch.errorType,
+                    reason = GitErrors.EmptyBranch.cause!!,
+                    solution = GitErrors.EmptyBranch.solution!!,
+                    wiki = GitErrors.EmptyBranch.wiki!!
+                )
             }
             val workingDirectory = File(repositoryPath)
             val git = GitCommandManager(workingDirectory = workingDirectory, lfs = lfs)

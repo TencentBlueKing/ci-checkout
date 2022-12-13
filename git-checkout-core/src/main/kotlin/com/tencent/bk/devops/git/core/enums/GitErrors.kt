@@ -53,6 +53,7 @@ enum class GitErrors(
                 "(fatal: Authentication failed)|" +
                 "(fatal: '(.+)' 鉴权失败)|" +
                 "(fatal: could not read Username for '(.+)': No such device or address)|" +
+                "(fatal: could not read Password for '(.+)': No such device or address)|" +
                 "(error: The requested URL returned error: 401 Unauthorized while accessing .*)|" +
                 "(fatal: unable to access '(.+)': The requested URL returned error: 403)|" +
                 "(error: The requested URL returned error: 401 while accessing (.+))"
@@ -114,7 +115,11 @@ enum class GitErrors(
                 "(fatal: index-pack 失败)|" +
                 "(fatal: early EOF)|" +
                 "(fatal: index-pack failed)|" +
-                "(fatal: unable to access '(.+)': The requested URL returned error: 429)"
+                "(fatal: unable to access '(.+)': The requested URL returned error: 429)|" +
+                "(error: RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
+                "(error: RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
+                "(fatal: 协议错误：坏的包头)|" +
+                "(fatal: protocol error: bad pack header)"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         cause = GitErrorsText.get().remoteServerFailedCause,
@@ -149,7 +154,9 @@ enum class GitErrors(
                 "(fatal: 路径 '(.+)' 不存在)|" +
                 "(fatal: 引用不是一个树：(.+))|" +
                 "(fatal: reference is not a tree: (.+))|" +
-                "(error: 请求的上游分支 '(.+)' 不存在)",
+                "(error: 请求的上游分支 '(.+)' 不存在)|" +
+                "(fatal: 不能同时更新路径并切换到分支'(.+)'。)|" +
+                "(fatal: Cannot update paths and switch to branch '(.+)' at the same time.)",
             options = setOf(RegexOption.IGNORE_CASE)
         ),
         title = GitErrorsText.get().noMatchingBranch,
@@ -158,16 +165,16 @@ enum class GitErrors(
         errorCode = 800007,
         wiki = GitErrorsText.get().noMatchingBranchWiki
     ),
-    NoInitializeBranch(
+    EmptyBranch(
         regex = Regex(
             "(fatal: You are on a branch yet to be born)|" +
                 "(fatal: 您位于一个尚未初始化的分支)"
         ),
-        title = GitErrorsText.get().noInitializeBranch,
-        cause = GitErrorsText.get().noInitializeBranchCause,
-        solution = GitErrorsText.get().noInitializeBranchSolution,
+        title = GitErrorsText.get().emptyBranch,
+        cause = GitErrorsText.get().emptyBranchCause,
+        solution = GitErrorsText.get().emptyBranchSolution,
         errorCode = 800008,
-        wiki = GitErrorsText.get().noInitializeBranchWiki
+        wiki = GitErrorsText.get().emptyBranchWiki
     ),
     SparseCheckoutLeavesNoEntry(
         regex = Regex(
@@ -209,7 +216,8 @@ enum class GitErrors(
     InvalidMerge(
         regex = Regex(
             "(merge: (.+) - not something we can merge)|" +
-                "(merge：.+ - 不能合并)"
+                "(merge：.+ - 不能合并)|" +
+                "(fatal: .+ - not something we can merge)"
         ),
         title = GitErrorsText.get().invalidMerge,
         cause = GitErrorsText.get().invalidMergeCause,
@@ -323,7 +331,8 @@ enum class GitErrors(
     LockFileAlreadyExists(
         regex = Regex(
             "(Another git process seems to be running in this repository, e.g.)|" +
-                "(error: could not lock config file (.+): File exists)"
+                "(error: could not lock config file (.+): File exists)|" +
+                "(error: could not lock config file .+: 文件已存在)"
         ),
         title = GitErrorsText.get().lockFileAlreadyExists,
         cause = GitErrorsText.get().lockFileAlreadyExistsCause,
@@ -363,15 +372,27 @@ enum class GitErrors(
     ),
     GitNotInstall(
         regex = Regex(
-            "Cannot run program \"git\" \\(in directory (.*): CreateProcess error=2, " +
-                "The system cannot find the file specified\\)|" +
-                "('git' 不是内部或外部命令，也不是可运行的程序)"
+            "(Cannot run program \"git\" \\(in directory (.*): CreateProcess error=2, " +
+                "The system cannot find the file specified\\))|" +
+                "('git' 不是内部或外部命令，也不是可运行的程序)|" +
+                "(Cannot run program \"git\" \\(in directory (.*)\\): CreateProcess error=2, 系统找不到指定的文件。)"
         ),
         title = GitErrorsText.get().gitNotInstall,
         cause = GitErrorsText.get().gitNotInstallCause,
         solution = GitErrorsText.get().gitNotInstallSolution,
-        errorCode = 800024,
+        errorCode = 800025,
         wiki = GitErrorsText.get().gitNotInstallWiki
+    ),
+    NotFoundGitRemoteHttps(
+        regex = Regex(
+            "(fatal: 无法为 'http' 找到远程助手)|" +
+                "(git: 'remote-https' is not a git command. See 'git --help'.)"
+        ),
+        title = GitErrorsText.get().notFoundGitRemoteHttps,
+        cause = GitErrorsText.get().notFoundGitRemoteHttpsCause,
+        solution = GitErrorsText.get().notFoundGitRemoteHttpsSolution,
+        errorCode = 800026,
+        wiki = GitErrorsText.get().notFoundGitRemoteHttpsWiki
     )
     ;
 

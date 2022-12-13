@@ -34,7 +34,7 @@ object GitConstants {
 
     // error code
     const val DEFAULT_ERROR = 2199001 // 插件默认异常
-    const val CONFIG_ERROR = 2199002 // 用户配置有误
+    const val CONFIG_ERROR = 800001 // 用户配置有误
     const val DEPEND_ERROR = 2199003 // 插件依赖异常
     const val EXEC_FAILED = 2199004 // 用户任务执行失败
     const val GIT_ERROR = 2190001 // 工蜂服务异常
@@ -173,6 +173,7 @@ object GitConstants {
     val SUPPORT_MERGE_NO_VERIFY_GIT_VERSION =
         VersionHelper.computeVersionFromBits(2, 15, 0, 0)
     val SUPPORT_XDG_CONFIG_HOME_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 7, 12, 0)
+    val SUPPORT_SET_UPSTREAM_TO_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 8, 0, 0)
 
     const val USER_NEED_PROJECT_X_PERMISSION = 2101181
 }

@@ -37,6 +37,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_MERGE_NO_VERIFY_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_RECURSE_SUBMODULES_VERSION
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SET_UPSTREAM_TO_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_SYNC_RECURSIVE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.CredentialActionEnum
@@ -523,7 +524,11 @@ class GitCommandManager(
     }
 
     fun branchUpstream(upstream: String) {
-        val args = listOf("branch", "--set-upstream-to=$upstream")
+        val args = if (isAtLeastVersion(SUPPORT_SET_UPSTREAM_TO_GIT_VERSION)) {
+            listOf("branch", "--set-upstream-to=$upstream")
+        } else {
+            listOf("branch", "--track", upstream)
+        }
         execGit(args = args)
     }
 

@@ -105,10 +105,10 @@ class GitErrorsText : TranslationBundle() {
     var localChangesOverwrittenCause: String? = null
     var localChangesOverwrittenSolution: String? = null
     var localChangesOverwrittenWiki: String? = null
-    var noInitializeBranch: String? = null
-    var noInitializeBranchCause: String? = null
-    var noInitializeBranchSolution: String? = null
-    var noInitializeBranchWiki: String? = null
+    var emptyBranch: String? = null
+    var emptyBranchCause: String? = null
+    var emptyBranchSolution: String? = null
+    var emptyBranchWiki: String? = null
     var sparseCheckoutLeavesNoEntry: String? = null
     var sparseCheckoutLeavesNoEntryCause: String? = null
     var sparseCheckoutLeavesNoEntrySolution: String? = null
@@ -126,7 +126,10 @@ class GitErrorsText : TranslationBundle() {
     var gitNotInstallCause: String? = null
     var gitNotInstallSolution: String? = null
     var gitNotInstallWiki: String? = null
-
+    var notFoundGitRemoteHttps: String? = null
+    var notFoundGitRemoteHttpsCause: String? = null
+    var notFoundGitRemoteHttpsSolution: String? = null
+    var notFoundGitRemoteHttpsWiki: String? = null
     companion object {
         fun get(): GitErrorsText {
             return lookupBundle(Locale.SIMPLIFIED_CHINESE, GitErrorsText::class.java)

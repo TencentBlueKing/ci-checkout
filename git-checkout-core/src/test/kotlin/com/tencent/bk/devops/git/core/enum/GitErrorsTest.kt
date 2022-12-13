@@ -37,11 +37,6 @@ class GitErrorsTest {
         Assert.assertEquals(gitError, GitErrors.RepositoryNotFoundFailed)
 
         gitError = GitErrors.matchError(
-            "fatal: Could not read from remote repository."
-        )
-        Assert.assertEquals(gitError, GitErrors.RepositoryNotFoundFailed)
-
-        gitError = GitErrors.matchError(
             "fatal: remote error: Git:Project not found."
         )
         Assert.assertEquals(gitError, GitErrors.RepositoryNotFoundFailed)
@@ -50,6 +45,14 @@ class GitErrorsTest {
             "fatal: 远程错误：Git:Project not found."
         )
         Assert.assertEquals(gitError, GitErrors.RepositoryNotFoundFailed)
+    }
+
+    @Test
+    fun sshAuthenticationFailed() {
+        val gitError = GitErrors.matchError(
+            "fatal: Could not read from remote repository."
+        )
+        Assert.assertEquals(gitError, GitErrors.SshAuthenticationFailed)
     }
 
     @Test
@@ -119,12 +122,12 @@ class GitErrorsTest {
     }
 
     @Test
-    fun noInitializeBranch() {
+    fun emptyBranch() {
         var gitError = GitErrors.matchError("fatal: 您位于一个尚未初始化的分支")
-        Assert.assertEquals(gitError, GitErrors.NoInitializeBranch)
+        Assert.assertEquals(gitError, GitErrors.EmptyBranch)
 
         gitError = GitErrors.matchError("fatal: You are on a branch yet to be born")
-        Assert.assertEquals(gitError, GitErrors.NoInitializeBranch)
+        Assert.assertEquals(gitError, GitErrors.EmptyBranch)
     }
 
     @Test
@@ -153,7 +156,10 @@ class GitErrorsTest {
 
     @Test
     fun invalidMergeTest() {
-        val gitError = GitErrors.matchError("merge：aaa - 不能合并")
+        var gitError = GitErrors.matchError("merge：aaa - 不能合并")
+        Assert.assertEquals(gitError, GitErrors.InvalidMerge)
+
+        gitError = GitErrors.matchError("fatal: origin/20221130 - not something we can merge")
         Assert.assertEquals(gitError, GitErrors.InvalidMerge)
     }
 
@@ -228,8 +234,12 @@ class GitErrorsTest {
 
     @Test
     fun lockFileAlreadyExists() {
-        val gitError = GitErrors.matchError(
+        var gitError = GitErrors.matchError(
             "error: could not lock config file .git/config: File exists"
+        )
+        Assert.assertEquals(gitError, GitErrors.LockFileAlreadyExists)
+        gitError = GitErrors.matchError(
+            "error: could not lock config file /usr/local/app/.gitconfig: 文件已存在"
         )
         Assert.assertEquals(gitError, GitErrors.LockFileAlreadyExists)
     }
@@ -240,5 +250,13 @@ class GitErrorsTest {
             "fatal: not a git repository (or any of the parent directories): .git"
         )
         Assert.assertEquals(gitError, GitErrors.NotAGitRepository)
+    }
+
+    @Test
+    fun gitNotInstall() {
+        val gitError = GitErrors.matchError(
+            "Cannot run program \"git\" (in directory \"C:\\work\"): CreateProcess error=2, 系统找不到指定的文件。"
+        )
+        Assert.assertEquals(gitError, GitErrors.GitNotInstall)
     }
 }
