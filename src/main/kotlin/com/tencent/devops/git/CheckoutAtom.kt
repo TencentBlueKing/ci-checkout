@@ -12,6 +12,7 @@ import com.tencent.devops.git.pojo.CheckoutAtomParam
 
 @AtomService(paramClass = CheckoutAtomParam::class)
 class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
+    @Suppress("LongMethod")
     override fun execute(context: AtomContext<CheckoutAtomParam>) {
         val inputAdapter = CheckoutAtomParamInputAdapter(input = with(context.param) {
             // 配置环境变量
@@ -67,8 +68,16 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 persistCredentials = persistCredentials ?: true,
                 compatibleHostList = null,
                 enableTrace = enableTrace,
-                usernameConfig = pipelineStartUserName,
-                userEmailConfig = "$pipelineStartUserName@tencent.com",
+                usernameConfig = if (usernameConfig.isNullOrBlank()) {
+                    pipelineStartUserName
+                } else {
+                    usernameConfig
+                },
+                userEmailConfig = if (userEmailConfig.isNullOrBlank()) {
+                    "$pipelineStartUserName@xxx.com"
+                } else {
+                    userEmailConfig
+                },
                 enablePartialClone = enablePartialClone,
                 cachePath = cachePath
             )

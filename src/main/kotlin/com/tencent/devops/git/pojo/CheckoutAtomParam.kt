@@ -3,11 +3,7 @@ package com.tencent.devops.git.pojo
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.tencent.bk.devops.atom.pojo.AtomBaseParam
 import com.tencent.bk.devops.git.core.enums.AuthType
-import lombok.Data
-import lombok.EqualsAndHashCode
 
-@Data
-@EqualsAndHashCode(callSuper = true)
 class CheckoutAtomParam : AtomBaseParam() {
     var repositoryType: String = "ID"
     var repositoryHashId: String? = null
@@ -42,14 +38,19 @@ class CheckoutAtomParam : AtomBaseParam() {
     var excludePath: String? = ""
 
     // 非前端传递的参数
-    @JsonProperty("pipeline.start.type")
+    @JsonProperty("BK_CI_START_TYPE")
     val pipelineStartType: String? = null
+    @JsonProperty("BK_CI_HOOK_EVENT_TYPE")
     val hookEventType: String? = null
+    @JsonProperty("BK_CI_HOOK_SOURCE_BRANCH")
     val hookSourceBranch: String? = null
+    @JsonProperty("BK_CI_HOOK_TARGET_BRANCH")
     val hookTargetBranch: String? = null
+    @JsonProperty("BK_CI_HOOK_SOURCE_URL")
     val hookSourceUrl: String? = null
+    @JsonProperty("BK_CI_HOOK_TARGET_URL")
     val hookTargetUrl: String? = null
-    @JsonProperty("git_mr_number")
+    @JsonProperty("BK_CI_GIT_MR_NUMBER")
     val gitMrNumber: String? = null
 
     // 重试时检出的commitId
@@ -65,4 +66,6 @@ class CheckoutAtomParam : AtomBaseParam() {
      * 归档的缓存路径
      */
     val cachePath: String = ""
+    val usernameConfig: String? = null
+    val userEmailConfig: String? = null
 }

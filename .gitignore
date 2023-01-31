@@ -15,4 +15,8 @@ output.json
 **/.sdk.json
 notes/
 *.apk
+git-checkout-credential*.jar
+core-version.properties
+credential-version.properties
 .codecc
+build.yml
