@@ -86,7 +86,7 @@ task buildZip(type: Zip, dependsOn: shadowJar) {
         into("file")
     }
 
-    from("./README.MD") {
+    from("./readme.md") {
         into("file")
     }
 }
