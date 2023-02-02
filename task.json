@@ -29,7 +29,7 @@
 
       ],
       "summary": "checkout插件为蓝盾平台提供基本的git拉取操作，可以拉取所有的git仓库",
-      "description": "${{indexFile(\"README.MD\")}}",
+      "description": "${{indexFile(\"README.md\")}}",
       "configInfo": {
         "frontendType": "NORMAL"
       },
