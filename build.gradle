@@ -3,6 +3,7 @@ buildscript {
         mavenLocal()
         jcenter()
         maven { url "https://repo.maven.apache.org/maven2" }
+        maven { url "https://mirrors.tencent.com/nexus/repository/maven-public" }
         mavenCentral()
     }
 
@@ -33,6 +34,7 @@ repositories {
     mavenLocal()
     jcenter()
     maven { url "https://repo.maven.apache.org/maven2" }
+    maven { url "https://mirrors.tencent.com/nexus/repository/maven-public" }
     mavenCentral()
 }
 
@@ -79,4 +81,12 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
 task buildZip(type: Zip, dependsOn: shadowJar) {
     from "build/libs", "./task.json"
     into "${project.name}"
+
+    from("images/checkout.png") {
+        into("files")
+    }
+
+    from("README.MD") {
+        into("files")
+    }
 }
