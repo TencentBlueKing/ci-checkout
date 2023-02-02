@@ -83,10 +83,10 @@ task buildZip(type: Zip, dependsOn: shadowJar) {
     into "${project.name}"
 
     from("images/checkout.png") {
-        into("files")
+        into("file")
     }
 
-    from("README.MD") {
-        into("files")
+    from("./README.MD") {
+        into("file")
     }
 }
