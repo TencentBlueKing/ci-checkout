@@ -11,34 +11,34 @@
     "post": {
       "postEntryParam": "True",
       "postCondition": "always()"
-    },
-    "releaseInfo": {
-      "projectId": "Demo",
-      "name": "Checkout",
-      "language": "java",
-      "logoUrl": "${{indexFile(\"checkout.png\")}}",
-      "category": "TASK",
-      "classifyCode": "scm",
-      "jobType": "AGENT",
-      "os": [
-        "LINUX",
-        "MACOS",
-        "WINDOWS"
-      ],
-      "labelCodes": [
+    }
+  },
+  "releaseInfo": {
+    "projectId": "Demo",
+    "name": "Checkout",
+    "language": "java",
+    "logoUrl": "${{indexFile(\"checkout.png\")}}",
+    "category": "TASK",
+    "classifyCode": "scm",
+    "jobType": "AGENT",
+    "os": [
+      "LINUX",
+      "MACOS",
+      "WINDOWS"
+    ],
+    "labelCodes": [
 
-      ],
-      "summary": "checkout插件为蓝盾平台提供基本的git拉取操作，可以拉取所有的git仓库",
-      "description": "${{indexFile(\"README.md\")}}",
-      "configInfo": {
-        "frontendType": "NORMAL"
-      },
-      "versionInfo": {
-        "publisher": "admin",
-        "releaseType": "NEW",
-        "version": "1.0.0",
-        "versionContent": "init"
-      }
+    ],
+    "summary": "checkout插件为蓝盾平台提供基本的git拉取操作，可以拉取所有的git仓库",
+    "description": "${{indexFile(\"README.md\")}}",
+    "configInfo": {
+      "frontendType": "NORMAL"
+    },
+    "versionInfo": {
+      "publisher": "admin",
+      "releaseType": "NEW",
+      "version": "1.0.0",
+      "versionContent": "init"
     }
   },
   "inputGroups": [
