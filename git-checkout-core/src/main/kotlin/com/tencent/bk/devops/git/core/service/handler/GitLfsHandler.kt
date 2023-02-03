@@ -26,6 +26,11 @@ class GitLfsHandler(
                 if (lfsConcurrentTransfers != null && lfsConcurrentTransfers > 0) {
                     git.config(configKey = "lfs.concurrenttransfers", configValue = lfsConcurrentTransfers.toString())
                 }
+                if (settings.enableGitLfsClean == true) {
+                    logger.info("cleaning git lfs cache")
+                    git.tryCleanLfs()
+                    logger.info("cleaned git lfs cache")
+                }
                 git.lfsPull(
                     fetchInclude = includeSubPath,
                     fetchExclude = excludeSubPath
