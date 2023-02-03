@@ -73,7 +73,10 @@ data class GitCodeCommandAtomParamInput(
      * lfs并发上传下载的数量
      */
     val lfsConcurrentTransfers: Int? = 0,
-
+    /**
+     * 是否开启Git Lfs清理
+     */
+    val enableGitLfsClean: Boolean = false,
     var includePath: String? = "",
     var excludePath: String? = "",
 
