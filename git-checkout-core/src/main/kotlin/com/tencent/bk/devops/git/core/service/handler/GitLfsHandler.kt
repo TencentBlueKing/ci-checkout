@@ -26,10 +26,22 @@ class GitLfsHandler(
                 if (lfsConcurrentTransfers != null && lfsConcurrentTransfers > 0) {
                     git.config(configKey = "lfs.concurrenttransfers", configValue = lfsConcurrentTransfers.toString())
                 }
-                if (settings.enableGitLfsClean == true) {
-                    logger.info("cleaning git lfs cache")
+                EnvHelper.addEnvVariable(
+                    key = "BK_CI_GIT_REPO_STATR_LFS_PRUNE",
+                    value = "0"
+                )
+                var canStart = false
+                for (i in 1..4) {
+                    Thread.sleep(5 * 1000)
+                    canStart = EnvHelper.getEnvVariable(
+                        key = "BK_CI_GIT_REPO_STATR_LFS_PRUNE"
+                    ) == "1"
+                    if (canStart) {
+                        break
+                    }
+                }
+                if (settings.enableGitLfsClean == true && canStart) {
                     git.tryCleanLfs()
-                    logger.info("cleaned git lfs cache")
                 }
                 git.lfsPull(
                     fetchInclude = includeSubPath,
