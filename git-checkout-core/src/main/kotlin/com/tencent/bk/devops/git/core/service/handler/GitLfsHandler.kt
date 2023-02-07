@@ -26,10 +26,6 @@ class GitLfsHandler(
                 if (lfsConcurrentTransfers != null && lfsConcurrentTransfers > 0) {
                     git.config(configKey = "lfs.concurrenttransfers", configValue = lfsConcurrentTransfers.toString())
                 }
-                EnvHelper.addEnvVariable(
-                    key = "BK_CI_GIT_REPO_STATR_LFS_PRUNE",
-                    value = "0"
-                )
                 if (settings.enableGitLfsClean == true) {
                     git.tryCleanLfs()
                 }
