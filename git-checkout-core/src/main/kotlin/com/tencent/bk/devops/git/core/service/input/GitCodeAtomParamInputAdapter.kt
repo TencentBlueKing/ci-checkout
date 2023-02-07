@@ -261,7 +261,7 @@ class GitCodeAtomParamInputAdapter(
                 submoduleRemote = enableSubmoduleRemote,
                 includeSubPath = includePath,
                 excludeSubPath = excludePath,
-                submodulesConcurrentPull = submodulesConcurrentPull,
+                submoduleJobs = submoduleJobs,
                 authInfo = authInfo,
                 persistCredentials = persistCredentials,
                 preMerge = preMerge,

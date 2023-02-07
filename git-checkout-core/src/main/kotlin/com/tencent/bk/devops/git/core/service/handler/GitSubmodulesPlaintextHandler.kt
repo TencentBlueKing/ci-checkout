@@ -109,7 +109,7 @@ class GitSubmodulesPlaintextHandler(
             recursive = false,
             path = submodulesPath,
             submoduleRemote = settings.submoduleRemote,
-            submodulesConcurrentPull = settings.submodulesConcurrentPull
+            submoduleJobs = settings.submoduleJobs
         )
         git.submoduleForeach(repoDir = repoDir, command = "git config gc.auto 0", recursive = false)
         if (settings.lfs) {

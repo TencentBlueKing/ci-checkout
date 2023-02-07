@@ -69,7 +69,7 @@ data class CheckoutAtomParamInput(
     /**
      * submodule并发拉取数量
      */
-    val submodulesConcurrentPull: Int? = 0,
+    val submoduleJobs: Int? = 0,
     var autoCrlf: String? = "",
     var pullType: String = PullType.BRANCH.name,
     var refName: String = "master",

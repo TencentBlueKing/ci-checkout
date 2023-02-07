@@ -138,7 +138,7 @@ data class GitSourceSettings(
     /**
      * submodule并发拉取数量
      */
-    val submodulesConcurrentPull: Int? = 0,
+    val submoduleJobs: Int? = 0,
 
     /**
      * 授权信息
