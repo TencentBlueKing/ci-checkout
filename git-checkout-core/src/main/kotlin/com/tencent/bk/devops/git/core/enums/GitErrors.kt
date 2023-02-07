@@ -332,7 +332,8 @@ enum class GitErrors(
         regex = Regex(
             "(Another git process seems to be running in this repository, e.g.)|" +
                 "(error: could not lock config file (.+): File exists)|" +
-                "(error: could not lock config file .+: 文件已存在)"
+                "(error: could not lock config file .+: 文件已存在)|" +
+                "(fatal: 无法创建 '(.+)'：文件已存在。)"
         ),
         title = GitErrorsText.get().lockFileAlreadyExists,
         cause = GitErrorsText.get().lockFileAlreadyExistsCause,
