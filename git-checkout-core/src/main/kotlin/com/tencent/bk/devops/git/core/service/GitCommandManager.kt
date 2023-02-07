@@ -702,7 +702,7 @@ class GitCommandManager(
 
     fun tryCleanLfs(): Boolean {
         val args = mutableListOf("lfs", "prune")
-        val output = execGit(args = args, allowAllExitCodes = true)
+        val output = execGit(args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
         return output.exitCode == 0
     }
 }
