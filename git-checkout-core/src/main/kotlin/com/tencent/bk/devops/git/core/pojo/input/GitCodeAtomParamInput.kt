@@ -51,6 +51,10 @@ data class GitCodeAtomParamInput(
     var enableVirtualMergeBranch: Boolean = true,
     var enableSubmoduleRemote: Boolean = false,
     var enableSubmoduleRecursive: Boolean? = true,
+    /**
+     * submodule并发拉取数量
+     */
+    val submodulesConcurrentPull: Int? = 0,
     var autoCrlf: String? = "",
     var pullType: String = PullType.BRANCH.name,
     var branchName: String = "master",
