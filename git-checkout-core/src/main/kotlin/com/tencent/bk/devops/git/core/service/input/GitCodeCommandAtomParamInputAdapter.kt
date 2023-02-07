@@ -179,6 +179,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 fetchRefSpec = fetchRefSpec,
                 lfs = enableGitLfs,
                 lfsConcurrentTransfers = lfsConcurrentTransfers,
+                enableGitLfsClean = enableGitLfsClean,
                 submodules = enableSubmodule,
                 nestedSubmodules = enableSubmoduleRecursive ?: true,
                 submoduleRemote = enableSubmoduleRemote,
