@@ -30,17 +30,7 @@ class GitLfsHandler(
                     key = "BK_CI_GIT_REPO_STATR_LFS_PRUNE",
                     value = "0"
                 )
-                var canStart = false
-                for (i in 1..4) {
-                    Thread.sleep(5 * 1000)
-                    canStart = EnvHelper.getEnvVariable(
-                        key = "BK_CI_GIT_REPO_STATR_LFS_PRUNE"
-                    ) == "1"
-                    if (canStart) {
-                        break
-                    }
-                }
-                if (settings.enableGitLfsClean == true && canStart) {
+                if (settings.enableGitLfsClean == true) {
                     git.tryCleanLfs()
                 }
                 git.lfsPull(
