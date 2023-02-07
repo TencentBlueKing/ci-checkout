@@ -24,6 +24,10 @@ class CheckoutAtomParam : AtomBaseParam() {
     val enableFetchRefSpec: Boolean = false
     val fetchRefSpec: String? = null
     var enableGitLfs: Boolean = true
+    /**
+     * 是否开启Git Lfs清理, 默认: false
+     */
+    val enableGitLfsClean: Boolean  = false
     var enableVirtualMergeBranch: Boolean = true
 
     var enableSubmodule: Boolean = true

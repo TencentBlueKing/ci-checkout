@@ -45,6 +45,7 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 enableFetchRefSpec = enableFetchRefSpec,
                 fetchRefSpec = fetchRefSpec,
                 enableGitLfs = enableGitLfs,
+                enableGitLfsClean = enableGitLfsClean,
                 enableSubmodule = enableSubmodule,
                 submodulePath = submodulePath,
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
