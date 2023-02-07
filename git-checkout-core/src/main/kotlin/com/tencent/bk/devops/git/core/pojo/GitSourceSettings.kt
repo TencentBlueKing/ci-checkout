@@ -102,6 +102,11 @@ data class GitSourceSettings(
     val lfsConcurrentTransfers: Int? = 0,
 
     /**
+     * 是否进行LFS清理
+     */
+    val enableGitLfsClean: Boolean? = false,
+
+    /**
      * Indicates whether to checkout submodules
      */
     val submodules: Boolean = true,

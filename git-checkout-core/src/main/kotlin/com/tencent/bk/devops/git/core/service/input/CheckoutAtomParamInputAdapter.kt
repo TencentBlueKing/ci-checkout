@@ -84,7 +84,7 @@ class CheckoutAtomParamInputAdapter(
             enableGitCleanNested = enableGitCleanNested,
             enableGitLfs = enableGitLfs,
             lfsConcurrentTransfers = lfsConcurrentTransfers,
-
+            enableGitLfsClean = enableGitLfsClean,
             pipelineStartType = pipelineStartType,
             hookEventType = hookEventType,
             hookSourceBranch = hookSourceBranch,
@@ -150,7 +150,7 @@ class CheckoutAtomParamInputAdapter(
             enableGitCleanNested = enableGitCleanNested,
             enableGitLfs = enableGitLfs,
             lfsConcurrentTransfers = lfsConcurrentTransfers,
-
+            enableGitLfsClean = enableGitLfsClean,
             pipelineStartType = pipelineStartType,
             hookEventType = hookEventType,
             hookSourceBranch = hookSourceBranch,
