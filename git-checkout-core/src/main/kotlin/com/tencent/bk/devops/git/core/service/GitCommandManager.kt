@@ -383,14 +383,14 @@ class GitCommandManager(
         if (recursive) {
             args.add("--recursive")
         }
+        if (submodulesConcurrentPull != null && submodulesConcurrentPull > 0) {
+            args.addAll(listOf("--jobs", submodulesConcurrentPull.toString()))
+        }
         if (submoduleRemote) {
             args.add("--remote")
         }
         if (path.isNotBlank()) {
             args.addAll(path.split(","))
-        }
-        if (submodulesConcurrentPull != null && submodulesConcurrentPull > 0) {
-            args.addAll(listOf("--jobs", submodulesConcurrentPull.toString()))
         }
         doRetry(repoDir = repoDir, args = args)
     }
