@@ -136,6 +136,11 @@ data class GitSourceSettings(
     var excludeSubPath: String? = "",
 
     /**
+     * submodule并发拉取数量
+     */
+    val submoduleJobs: Int? = 0,
+
+    /**
      * 授权信息
      */
     val authInfo: AuthInfo,

@@ -184,6 +184,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 nestedSubmodules = enableSubmoduleRecursive ?: true,
                 submoduleRemote = enableSubmoduleRemote,
                 submodulesPath = submodulePath ?: "",
+                submoduleJobs = submoduleJobs,
                 includeSubPath = includePath,
                 excludeSubPath = excludePath,
                 authInfo = authInfo,

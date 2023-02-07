@@ -66,6 +66,10 @@ data class CheckoutAtomParamInput(
     var enableVirtualMergeBranch: Boolean = true,
     var enableSubmoduleRemote: Boolean = false,
     var enableSubmoduleRecursive: Boolean? = true,
+    /**
+     * submodule并发拉取数量
+     */
+    val submoduleJobs: Int? = 0,
     var autoCrlf: String? = "",
     var pullType: String = PullType.BRANCH.name,
     var refName: String = "master",

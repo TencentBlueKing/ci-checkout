@@ -369,13 +369,22 @@ class GitCommandManager(
         execGit(repoDir = repoDir, args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
     }
 
-    fun submoduleUpdate(repoDir: File? = null, recursive: Boolean, path: String, submoduleRemote: Boolean) {
+    fun submoduleUpdate(
+        repoDir: File? = null,
+        recursive: Boolean,
+        path: String,
+        submoduleRemote: Boolean,
+        submoduleJobs: Int?
+    ) {
         val args = mutableListOf("submodule", "update", "--init")
         if (isAtLeastVersion(SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION)) {
             args.add("--force")
         }
         if (recursive) {
             args.add("--recursive")
+        }
+        if (submoduleJobs != null && submoduleJobs > 0) {
+            args.addAll(listOf("--jobs", submoduleJobs.toString()))
         }
         if (submoduleRemote) {
             args.add("--remote")

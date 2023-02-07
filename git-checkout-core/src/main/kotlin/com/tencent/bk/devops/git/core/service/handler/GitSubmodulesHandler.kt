@@ -64,7 +64,8 @@ open class GitSubmodulesHandler(
                 git.submoduleUpdate(
                     recursive = nestedSubmodules,
                     path = submodulesPath,
-                    submoduleRemote = submoduleRemote
+                    submoduleRemote = submoduleRemote,
+                    submoduleJobs = submoduleJobs
                 )
                 git.submoduleForeach(command = "git config gc.auto 0", recursive = nestedSubmodules)
                 if (lfs) {
