@@ -119,6 +119,10 @@ class GitErrorsTest {
 
         gitError = GitErrors.matchError("Your configuration specifies to merge with the ref 'refs/heads/aaa'")
         Assert.assertEquals(gitError, GitErrors.NoMatchingBranch)
+
+        gitError = GitErrors.matchError("fatal: 不能同时更新路径并切换到分支'pre-release'。" +
+            "\n您是想要检出 'refs/remotes/origin/pre-release' 但其未能解析为提交么？")
+        Assert.assertEquals(gitError, GitErrors.NoMatchingBranch)
     }
 
     @Test

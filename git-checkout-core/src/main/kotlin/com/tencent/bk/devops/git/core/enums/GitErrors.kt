@@ -156,6 +156,7 @@ enum class GitErrors(
                 "(fatal: reference is not a tree: (.+))|" +
                 "(error: 请求的上游分支 '(.+)' 不存在)|" +
                 "(fatal: 不能同时更新路径并切换到分支'(.+)'。)|" +
+                "(fatal: 不能同时更新路径并切换到分支'(.+)'。\\s+您是想要检出 '(.+)' 但其未能解析为提交么？)|" +
                 "(fatal: Cannot update paths and switch to branch '(.+)' at the same time.)",
             options = setOf(RegexOption.IGNORE_CASE)
         ),
