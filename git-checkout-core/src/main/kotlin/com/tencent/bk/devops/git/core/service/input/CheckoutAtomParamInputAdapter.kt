@@ -69,6 +69,7 @@ class CheckoutAtomParamInputAdapter(
             enableVirtualMergeBranch = enableVirtualMergeBranch,
             enableSubmoduleRemote = enableSubmoduleRemote,
             enableSubmoduleRecursive = enableSubmoduleRecursive,
+            submoduleJobs = submoduleJobs,
             autoCrlf = autoCrlf,
             pullType = pullType,
             branchName = refName,
@@ -84,7 +85,7 @@ class CheckoutAtomParamInputAdapter(
             enableGitCleanNested = enableGitCleanNested,
             enableGitLfs = enableGitLfs,
             lfsConcurrentTransfers = lfsConcurrentTransfers,
-
+            enableGitLfsClean = enableGitLfsClean,
             pipelineStartType = pipelineStartType,
             hookEventType = hookEventType,
             hookSourceBranch = hookSourceBranch,
@@ -137,6 +138,7 @@ class CheckoutAtomParamInputAdapter(
             enableVirtualMergeBranch = enableVirtualMergeBranch,
             enableSubmoduleRemote = enableSubmoduleRemote,
             enableSubmoduleRecursive = enableSubmoduleRecursive,
+            submoduleJobs = submoduleJobs,
             autoCrlf = autoCrlf,
             pullType = pullType,
             refName = refName,
@@ -150,7 +152,7 @@ class CheckoutAtomParamInputAdapter(
             enableGitCleanNested = enableGitCleanNested,
             enableGitLfs = enableGitLfs,
             lfsConcurrentTransfers = lfsConcurrentTransfers,
-
+            enableGitLfsClean = enableGitLfsClean,
             pipelineStartType = pipelineStartType,
             hookEventType = hookEventType,
             hookSourceBranch = hookSourceBranch,

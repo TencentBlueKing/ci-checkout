@@ -102,6 +102,11 @@ data class GitSourceSettings(
     val lfsConcurrentTransfers: Int? = 0,
 
     /**
+     * 是否进行LFS清理
+     */
+    val enableGitLfsClean: Boolean? = false,
+
+    /**
      * Indicates whether to checkout submodules
      */
     val submodules: Boolean = true,
@@ -129,6 +134,11 @@ data class GitSourceSettings(
      *
      */
     var excludeSubPath: String? = "",
+
+    /**
+     * submodule并发拉取数量
+     */
+    val submoduleJobs: Int? = 0,
 
     /**
      * 授权信息

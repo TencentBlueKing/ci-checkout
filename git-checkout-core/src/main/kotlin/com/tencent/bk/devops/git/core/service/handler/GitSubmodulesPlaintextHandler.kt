@@ -108,7 +108,8 @@ class GitSubmodulesPlaintextHandler(
             repoDir = repoDir,
             recursive = false,
             path = submodulesPath,
-            submoduleRemote = settings.submoduleRemote
+            submoduleRemote = settings.submoduleRemote,
+            submoduleJobs = settings.submoduleJobs
         )
         git.submoduleForeach(repoDir = repoDir, command = "git config gc.auto 0", recursive = false)
         if (settings.lfs) {

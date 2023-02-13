@@ -66,6 +66,10 @@ data class CheckoutAtomParamInput(
     var enableVirtualMergeBranch: Boolean = true,
     var enableSubmoduleRemote: Boolean = false,
     var enableSubmoduleRecursive: Boolean? = true,
+    /**
+     * submodule并发拉取数量
+     */
+    val submoduleJobs: Int? = 0,
     var autoCrlf: String? = "",
     var pullType: String = PullType.BRANCH.name,
     var refName: String = "master",
@@ -78,6 +82,10 @@ data class CheckoutAtomParamInput(
      * lfs并发上传下载的数量
      */
     val lfsConcurrentTransfers: Int? = 0,
+    /**
+     * 是否开启Git Lfs清理
+     */
+    val enableGitLfsClean: Boolean = false,
 
     var includePath: String? = "",
     var excludePath: String? = "",

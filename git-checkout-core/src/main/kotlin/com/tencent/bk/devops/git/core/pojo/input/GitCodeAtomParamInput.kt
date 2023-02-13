@@ -51,6 +51,10 @@ data class GitCodeAtomParamInput(
     var enableVirtualMergeBranch: Boolean = true,
     var enableSubmoduleRemote: Boolean = false,
     var enableSubmoduleRecursive: Boolean? = true,
+    /**
+     * submodule并发拉取数量
+     */
+    val submoduleJobs: Int? = 0,
     var autoCrlf: String? = "",
     var pullType: String = PullType.BRANCH.name,
     var branchName: String = "master",
@@ -69,7 +73,10 @@ data class GitCodeAtomParamInput(
      * lfs并发上传下载的数量
      */
     val lfsConcurrentTransfers: Int? = 0,
-
+    /**
+     * 是否开启Git Lfs清理
+     */
+    val enableGitLfsClean: Boolean = false,
     // 非前端传递的参数
     val pipelineStartType: String? = null,
     val hookEventType: String? = null,
