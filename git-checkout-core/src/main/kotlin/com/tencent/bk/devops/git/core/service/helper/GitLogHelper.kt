@@ -85,7 +85,8 @@ class GitLogHelper(
                 newCommitAuthor = log.authorName,
                 newCommitCommitter = log.committerName,
                 commitTimes = commits.size,
-                commitIds = commitIds
+                commitIds = commitIds,
+                scmType = settings.scmType
             )
         }.first()
         saveBuildMaterial(commitMaterial = commitMaterial)
@@ -241,7 +242,8 @@ class GitLogHelper(
                     branchName = EnvHelper.getEnvVariable(BK_CI_GIT_REPO_REF),
                     newCommitId = commitMaterial.newCommitId ?: commitMaterial.lastCommitId,
                     newCommitComment = commitMaterial.newCommitComment,
-                    commitTimes = commitMaterial.commitTimes
+                    commitTimes = commitMaterial.commitTimes,
+                    scmType = commitMaterial.scmType
                 )
             )
         )
