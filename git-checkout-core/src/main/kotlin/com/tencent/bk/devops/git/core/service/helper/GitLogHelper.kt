@@ -45,6 +45,7 @@ import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CommitMaterial
 import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
+import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -111,6 +112,7 @@ class GitLogHelper(
         preCommitData: CommitData?,
         repositoryConfig: RepositoryConfig
     ): List<CommitData> {
+        val repositoryType = EnvHelper.getEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE)
         val commits = getLogs(preCommitData)
             .map { log ->
                 CommitData(
@@ -122,8 +124,16 @@ class GitLogHelper(
                     author = log.authorName,
                     commitTime = log.commitTime, // 单位:秒
                     comment = log.commitMessage,
-                    repoId = repositoryConfig.repositoryHashId,
-                    repoName = repositoryConfig.repositoryName,
+                    repoId = if (repositoryType != RepositoryType.URL.name) {
+                        repositoryConfig.repositoryHashId
+                    } else {
+                        ""
+                    },
+                    repoName = if (repositoryType != RepositoryType.URL.name) {
+                        repositoryConfig.repositoryName
+                    } else {
+                        ""
+                    },
                     elementId = settings.pipelineTaskId,
                     url = settings.repositoryUrl
                 )
@@ -141,9 +151,17 @@ class GitLogHelper(
                         "",
                         0L,
                         "",
-                        repositoryConfig.repositoryHashId,
-                        repositoryConfig.repositoryName,
-                        settings.pipelineTaskId,
+                        repoId = if (repositoryType != RepositoryType.URL.name) {
+                            repositoryConfig.repositoryHashId
+                        } else {
+                            ""
+                        },
+                        repoName = if (repositoryType != RepositoryType.URL.name) {
+                            repositoryConfig.repositoryName
+                        } else {
+                            ""
+                        },
+                        elementId = settings.pipelineTaskId,
                         url = settings.repositoryUrl
                     )
                 )
