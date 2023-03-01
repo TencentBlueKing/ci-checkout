@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service.input
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
@@ -34,12 +35,14 @@ import com.tencent.bk.devops.git.core.pojo.input.CheckoutAtomParamInput
 import com.tencent.bk.devops.git.core.pojo.input.GitCodeAtomParamInput
 import com.tencent.bk.devops.git.core.pojo.input.GitCodeCommandAtomParamInput
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
+import com.tencent.bk.devops.git.core.util.EnvHelper
 
 class CheckoutAtomParamInputAdapter(
     private val input: CheckoutAtomParamInput
 ) : IInputAdapter {
 
     override fun getInputs(): GitSourceSettings {
+        EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, input.repositoryType)
         return when (RepositoryType.valueOf(input.repositoryType)) {
             RepositoryType.ID, RepositoryType.NAME -> {
                 input.byRepositoryIdOrName()
