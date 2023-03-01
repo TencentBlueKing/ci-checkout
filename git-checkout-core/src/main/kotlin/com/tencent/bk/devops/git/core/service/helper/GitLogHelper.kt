@@ -124,7 +124,8 @@ class GitLogHelper(
                     comment = log.commitMessage,
                     repoId = repositoryConfig.repositoryHashId,
                     repoName = repositoryConfig.repositoryName,
-                    elementId = settings.pipelineTaskId
+                    elementId = settings.pipelineTaskId,
+                    url = settings.repositoryUrl
                 )
             }
         if (commits.isEmpty()) {
@@ -142,7 +143,8 @@ class GitLogHelper(
                         "",
                         repositoryConfig.repositoryHashId,
                         repositoryConfig.repositoryName,
-                        settings.pipelineTaskId
+                        settings.pipelineTaskId,
+                        url = settings.repositoryUrl
                     )
                 )
             )
