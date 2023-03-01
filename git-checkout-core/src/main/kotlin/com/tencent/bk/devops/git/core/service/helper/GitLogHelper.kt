@@ -124,15 +124,11 @@ class GitLogHelper(
                     author = log.authorName,
                     commitTime = log.commitTime, // 单位:秒
                     comment = log.commitMessage,
-                    repoId = if (repositoryType != RepositoryType.URL.name) {
-                        repositoryConfig.repositoryHashId
-                    } else {
-                        ""
-                    },
+                    repoId = repositoryConfig.repositoryHashId,
                     repoName = if (repositoryType != RepositoryType.URL.name) {
                         repositoryConfig.repositoryName
                     } else {
-                        ""
+                        settings.repositoryUrl
                     },
                     elementId = settings.pipelineTaskId,
                     url = settings.repositoryUrl
@@ -151,15 +147,11 @@ class GitLogHelper(
                         "",
                         0L,
                         "",
-                        repoId = if (repositoryType != RepositoryType.URL.name) {
-                            repositoryConfig.repositoryHashId
-                        } else {
-                            ""
-                        },
+                        repoId = repositoryConfig.repositoryHashId,
                         repoName = if (repositoryType != RepositoryType.URL.name) {
                             repositoryConfig.repositoryName
                         } else {
-                            ""
+                            settings.repositoryUrl
                         },
                         elementId = settings.pipelineTaskId,
                         url = settings.repositoryUrl
