@@ -125,10 +125,11 @@ class GitLogHelper(
                     commitTime = log.commitTime, // 单位:秒
                     comment = log.commitMessage,
                     repoId = repositoryConfig.repositoryHashId,
-                    repoName = if (repositoryType != RepositoryType.URL.name) {
-                        repositoryConfig.repositoryName
-                    } else {
+                    // 以URL形式进行拉取，则repoName取代码库url
+                    repoName = if (repositoryType == RepositoryType.URL.name) {
                         settings.repositoryUrl
+                    } else {
+                        repositoryConfig.repositoryName
                     },
                     elementId = settings.pipelineTaskId,
                     url = settings.repositoryUrl
@@ -148,10 +149,11 @@ class GitLogHelper(
                         0L,
                         "",
                         repoId = repositoryConfig.repositoryHashId,
-                        repoName = if (repositoryType != RepositoryType.URL.name) {
-                            repositoryConfig.repositoryName
-                        } else {
+                        // 以URL形式进行拉取，则repoName取代码库url
+                        repoName = if (repositoryType == RepositoryType.URL.name) {
                             settings.repositoryUrl
+                        } else {
+                            repositoryConfig.repositoryName
                         },
                         elementId = settings.pipelineTaskId,
                         url = settings.repositoryUrl
