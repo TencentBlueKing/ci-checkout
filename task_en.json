@@ -4,9 +4,7 @@
     "packagePath": "checkout.jar",
     "language": "java",
     "minimumVersion": "1.8",
-    "demands": [
-
-    ],
+    "demands": [],
     "target": "$bk_java_path -Dfile.encoding=utf8 -jar checkout.jar",
     "post": {
       "postEntryParam": "True",
@@ -29,8 +27,8 @@
     "labelCodes": [
 
     ],
-    "summary": "checkout插件为蓝盾平台提供基本的git拉取操作，可以拉取所有的git仓库",
-    "description": "${{indexFile(\"README.md\")}}",
+    "summary": "The checkout plugin provides basic git pull operations for the BK-CI platform, and can pull all git repositories.",
+    "description": "${{indexFile(\"readme_en.md\")}}",
     "configInfo": {
       "frontendType": "NORMAL"
     },
@@ -44,12 +42,12 @@
   "inputGroups": [
     {
       "name": "fetch",
-      "label": "fetch",
+      "label": "Fetch",
       "isExpanded": true
     },
     {
       "name": "submodule",
-      "label": "子模块",
+      "label": "Sub-Module",
       "isExpanded": true
     },
     {
@@ -64,15 +62,15 @@
     },
     {
       "name": "config",
-      "label": "配置",
+      "label": "Configration",
       "isExpanded": true
     }
   ],
   "input": {
     "repositoryType": {
-      "label": "代码库",
+      "label": "Repository",
       "default": "ID",
-      "desc": "值为ID/NAME/URL",
+      "desc": "Value Including ID/NAME/URL",
       "type": "enum-input",
       "required": true,
       "disabled": false,
@@ -80,23 +78,23 @@
       "isSensitive": false,
       "list": [
         {
-          "label": "按代码库选择",
+          "label": "Select by Repository ID",
           "value": "ID"
         },
         {
-          "label": "按代码库别名输入",
+          "label": "Select by Repository NAME",
           "value": "NAME"
         },
         {
-          "label": "按仓库URL输入",
+          "label": "Insert Repository URL",
           "value": "URL"
         }
       ]
     },
     "repositoryHashId": {
-      "label": "按代码库选择",
+      "label": "Select by Repository ID",
       "default": "",
-      "placeholder": "请选择代码库名称",
+      "placeholder": "Please Select Repository ID",
       "type": "selector",
       "desc": "",
       "required": false,
@@ -110,7 +108,7 @@
         "paramId": "repositoryHashId",
         "paramName": "aliasName",
         "itemTargetUrl": "/codelib/{projectId}/",
-        "itemText": "关联代码库",
+        "itemText": "Repository Association",
         "hasAddItem": true
       },
       "rely": {
@@ -124,11 +122,11 @@
       }
     },
     "repositoryName": {
-      "label": "按代码库别名输入",
+      "label": "Select by Repository NAME",
       "default": "",
-      "placeholder": "请输入代码库别名",
+      "placeholder": "Please insert Repository NAME",
       "type": "vuex-input",
-      "desc": "描述",
+      "desc": "Description",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -144,9 +142,9 @@
       }
     },
     "repositoryUrl": {
-      "label": "代码库链接",
+      "label": "Repository URL",
       "default": "",
-      "placeholder": "请输入代码库URL",
+      "placeholder": "Please insert Repository URL",
       "type": "vuex-input",
       "desc": "",
       "required": false,
@@ -164,7 +162,7 @@
       }
     },
     "authType": {
-      "label": "授权类型",
+      "label": "Authorization Type",
       "default": "TICKET",
       "type": "selector",
       "required": false,
@@ -173,11 +171,11 @@
       "isSensitive": false,
       "options": [
         {
-          "name": "空",
+          "name": "empty",
           "id": "EMPTY"
         },
         {
-          "name": "凭证",
+          "name": "ticket",
           "id": "TICKET"
         },
         {
@@ -189,11 +187,11 @@
           "id": "USERNAME_PASSWORD"
         },
         {
-          "name": "流水线启动人token",
+          "name": "start user token",
           "id": "START_USER_TOKEN"
         },
         {
-          "name": "工蜂personal_access_token",
+          "name": "GIT personal_access_token",
           "id": "PERSONAL_ACCESS_TOKEN"
         }
       ],
@@ -208,8 +206,8 @@
       }
     },
     "ticketId": {
-      "label": "代码库凭证",
-      "placeholder": "请选中对应凭证",
+      "label": "Repository Tickct",
+      "placeholder": "Please Select Ticket ID",
       "type": "select-input",
       "desc": "",
       "required": false,
@@ -236,13 +234,13 @@
         "paramId": "credentialId",
         "paramName": "credentialId",
         "itemTargetUrl": "/ticket/{projectId}/",
-        "itemText": "添加新的凭证",
+        "itemText": "Add New Ticket",
         "hasAddItem": true
       }
     },
     "accessToken": {
       "label": "access token",
-      "placeholder": "请输入对应access token",
+      "placeholder": "please insert access token",
       "type": "vuex-input",
       "inputType": "password",
       "desc": "",
@@ -265,8 +263,8 @@
       }
     },
     "personalAccessToken": {
-      "label": "工蜂personal_access_token",
-      "placeholder": "请输入对应personal_access_token",
+      "label": "Git personal_access_token",
+      "placeholder": "Please insert personal_access_token",
       "type": "vuex-input",
       "inputType": "password",
       "desc": "",
@@ -290,7 +288,7 @@
     },
     "username": {
       "label": "username",
-      "placeholder": "请输入用户名",
+      "placeholder": "Please insert username",
       "type": "vuex-input",
       "inputType": "password",
       "desc": "",
@@ -314,7 +312,7 @@
     },
     "password": {
       "label": "password",
-      "placeholder": "请输入密码",
+      "placeholder": "Please insert password",
       "type": "vuex-input",
       "inputType": "password",
       "desc": "",
@@ -341,15 +339,15 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "是否持久化凭证",
-      "desc": "如果后面job需要用到git凭证,则持久化,凭证只对当前仓库有效",
+      "text": "Ticket Persistence",
+      "desc": "Please persist if the git ticket will be used in follow-up jobs. The persisted ticket will only be available for the current repository",
       "required": false,
       "disabled": false,
       "hidden": false,
       "isSensitive": false
     },
     "pullType": {
-      "label": "指定拉取方式",
+      "label": "Select input",
       "default": "BRANCH",
       "type": "select-input",
       "required": false,
@@ -372,9 +370,9 @@
       ]
     },
     "refName": {
-      "label": "分支/TAG/COMMIT",
+      "label": "Branch/TAG/COMMIT",
       "default": "master",
-      "placeholder": "请输入",
+      "placeholder": "Please insert",
       "type": "vuex-input",
       "desc": "",
       "required": true,
@@ -383,21 +381,21 @@
       "isSensitive": false
     },
     "localPath": {
-      "label": "代码保存路径",
+      "label": "Code save path",
       "default": "",
-      "placeholder": "请填写工作空间相对目录，不填则默认为工作空间目录",
+      "placeholder": "Please fill in the relative directory of the workspace, if not filled, the default is the workspace directory",
       "type": "vuex-input",
-      "desc": "当前流水线存在多个代码拉取插件，你需设置此字段以解决冲突问题",
+      "desc": "There are multiple code checkout plugins in the current pipeline, you need to set this field to resolve conflicts",
       "required": false,
       "disabled": false,
       "hidden": false,
       "isSensitive": false
     },
     "strategy": {
-      "label": "拉取策略",
+      "label": "Checkout Strategy",
       "default": "REVERT_UPDATE",
       "type": "enum-input",
-      "desc": "Revert Update: 增量,每次先\"git reset --hard HEAD\",再\"git pull\"\n\n Fresh Checkout: 全量,每次都会全新clone代码,之前会delete整个工作空间\n\n Increment Update: 增量,只使用\"git pull\",并不清除冲突及历史缓存文件  ",
+      "desc": "Revert Update: For incremental update,Fisrt \"git reset --hard HEAD\", then \"git pull\"\n\n Fresh Checkout: For full volume update,then whole workspace will be deleted and clone new codes\n\n Increment Update: Incremental Update,only use \"git pull\",and will not clean crashes and history cache file  ",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -418,7 +416,7 @@
       ]
     },
     "fetchDepth": {
-      "label": "git fetch的depth参数值",
+      "label": "The depth parameter value of git fetch",
       "default": "",
       "placeholder": "",
       "type": "vuex-input",
@@ -434,8 +432,8 @@
       "default": false,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "仅fetch当前配置的分支",
-      "desc": "默认从远端获取所有的分支，配置后只fetch当前分支,如果后续有插件需要切换分支,插件需要先fetch分支再切换",
+      "text": "Only fetch the currently configured branch",
+      "desc": "By default, all branches are obtained from the remote end. After configuration, only the current branch is fetched. If there is a plug-in that needs to switch branches later, the plug-in needs to fetch the branch first and then switch",
       "required": false,
       "disabled": false,
       "hidden": true,
@@ -447,8 +445,8 @@
       "default": false,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "启用拉取指定分支",
-      "desc": "默认会拉取所有分支，启用后只会拉取指定的分支",
+      "text": "Enable pull specified branches",
+      "desc": "By default, all branches will be pulled. When enabled, only the specified branch will be pulled",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -458,9 +456,9 @@
     "fetchRefSpec": {
       "label": "",
       "default": "",
-      "placeholder": "请填写分支名,多个以,分割,支持通配符，不填默认拉取插件配置的分支",
+      "placeholder": "Please fill in the branch name, multiple splits with, wildcards allowed. Empty in the branch that pulls the plug-in configuration by default",
       "type": "vuex-input",
-      "desc": "插件配置的分支不需要设置，默认会设置.配置的分支必须存在，否则会报错",
+      "desc": "The branch of the plug-in configuration does not need to be set, it will be set by default. The configured branch must exist, otherwise an error will be reported",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -481,8 +479,8 @@
       "default": false,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "启动部分克隆",
-      "desc": "部分克隆git版本必须高于2.22.0版本,使用部分克隆时，建议指定检出的目录，性能更好。部分克隆和depth不能同时用，开启部分克隆会把depth关闭",
+      "text": "Enable partial clone",
+      "desc": "The git version of partial clone must be higher than version 2.22.0. When using partial clone, it is recommended to specify the checkout directory for better performance. Partial cloning and depth cannot be used at the same time, enabling partial cloning will turn off depth",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -490,9 +488,9 @@
       "groupName": "fetch"
     },
     "includePath": {
-      "label": "代码库拉取相对子路径",
+      "label": "The repository pulls relative subpaths",
       "default": "",
-      "placeholder": "请填写代码库相对目录，多个用逗号分隔",
+      "placeholder": "Please fill in the relative directory of the repository, multiple separated by commas",
       "type": "vuex-input",
       "desc": "",
       "required": false,
@@ -511,9 +509,9 @@
       }
     },
     "excludePath": {
-      "label": "排除代码库以下路径",
+      "label": "Exclude the following paths from the repository",
       "default": "",
-      "placeholder": "请填写代码库相对目录，多个用逗号分隔",
+      "placeholder": "Please fill in the relative directory of the repository, multiple separated by commas",
       "type": "vuex-input",
       "desc": "",
       "required": false,
@@ -532,11 +530,11 @@
       }
     },
     "cachePath": {
-      "label": "归档的缓存路径",
+      "label": "Archive cache path",
       "default": "",
       "placeholder": "",
       "type": "vuex-input",
-      "desc": "输入归档的缓存路径，全量拉取时先拉取归档的文件,再增量拉取.文件必须是tar.gz格式",
+      "desc": "Enter the cache path of the archive. When pulling in full, first pull the archived file, and then pull it incrementally. The file must be in tar.gz format",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -545,11 +543,11 @@
     },
     "enableGitLfs": {
       "label": "",
-      "default": false,
+      "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "是否开启Git Lfs",
-      "desc": "选中则执行git lfs pull",
+      "text": "Enable Git Lfs",
+      "desc": "If selected, execute git lfs pull",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -561,8 +559,8 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "启用Submodule",
-      "desc": "勾选则启用外链，不勾选则不启用",
+      "text": "Enable Submodule",
+      "desc": "Check it to enable the external link, and uncheck it to disable it",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -572,7 +570,7 @@
     "submodulePath": {
       "label": "",
       "default": "",
-      "placeholder": "请填写需拉取的Submodule path，多个用逗号分隔，不填默认拉所有Submodule",
+      "placeholder": "Please fill in the Submodule path to be pulled, multiples are separated by commas, if not filled, all Submodules will be pulled by default",
       "type": "vuex-input",
       "desc": "",
       "required": false,
@@ -595,7 +593,7 @@
       "default": false,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "执行git submodule update后面是否带上--remote参数",
+      "text": "execute git submodule update and check whether there is --remote parameter behind",
       "desc": "",
       "required": false,
       "disabled": false,
@@ -617,7 +615,7 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "执行git submodule update后面是否带上--recursive参数",
+      "text": "executegit submodule updateand check whether there is--recursive parameter behind",
       "desc": "",
       "required": false,
       "disabled": false,
@@ -639,8 +637,8 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "MR事件触发时执行Pre-Merge",
-      "desc": "我们会在MR事件触发时尝试Merge源分支到目标分支，冲突将直接判定为失败",
+      "text": "Execute Pre-Merge when MR event is triggered",
+      "desc": "We will try to merge the source branch to the target branch when the MR event is triggered, and the conflict will be directly judged as failure",
       "required": true,
       "disabled": false,
       "hidden": false,
@@ -652,8 +650,8 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "是否开启Git Clean",
-      "desc": "选中删除未进行版本管理的文件,排除.gitignore中配置的文件和目录(git clean -df)",
+      "text": "Enable Git Clean",
+      "desc": "Select to delete files that are not under version management, and exclude files and directories configured in .gitignore (git clean -df)",
       "required": true,
       "disabled": false,
       "hidden": false,
@@ -674,8 +672,8 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "git clean时清理.gitignore配置的文件和目录",
-      "desc": "在git clean命令增加-x参数(git clean -xdf)",
+      "text": "Clean up the files and directories configured by .gitignore when git clean",
+      "desc": "Add the -x parameter to the git clean command (git clean -xdf)",
       "required": true,
       "disabled": false,
       "hidden": false,
@@ -696,7 +694,7 @@
       }
     },
     "usernameConfig": {
-      "label": "user.name配置值",
+      "label": "user.name configuration value",
       "default": "",
       "placeholder": "",
       "type": "vuex-input",
@@ -708,7 +706,7 @@
       "groupName": "config"
     },
     "userEmailConfig": {
-      "label": "user.email配置值",
+      "label": "user.email configuration value",
       "default": "",
       "placeholder": "",
       "type": "vuex-input",
@@ -720,7 +718,7 @@
       "groupName": "config"
     },
     "autoCrlf": {
-      "label": "AutoCrlf配置值",
+      "label": "AutoCrlf configuration value",
       "default": "false",
       "type": "select-input",
       "optionsConf": {
@@ -747,8 +745,8 @@
       "default": false,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "是否开启调试",
-      "desc": "开启后，会输出调试日志，插件运行正常建议关闭",
+      "text": "Enable debugging",
+      "desc": "After it is enabled, the debug log will be output, and it is recommended to disable it if the plug-in is running normally.",
       "required": true,
       "disabled": false,
       "hidden": false,
@@ -759,51 +757,51 @@
   "output": {
     "BK_CI_GIT_REPO_URL": {
       "type": "string",
-      "description": "代码库的URL"
+      "description": "RepositoryURL"
     },
     "BK_CI_GIT_REPO_ALIAS_NAME": {
       "type": "string",
-      "description": "代码库别名,只有选择`按代码库选择`或`按代码库别名输入`才有值"
+      "description": "Repository NAME,only if you choose `select by Repository` or `Insert Repository Name` to have a value"
     },
     "BK_CI_GIT_REPO_NAME": {
       "type": "string",
-      "description": "代码库的工程名称"
+      "description": "Repository REPO NAME"
     },
     "BK_CI_GIT_REPO_REF": {
       "type": "string",
-      "description": "当前代码库分支"
+      "description": "Repository branch"
     },
     "BK_CI_GIT_REPO_CODE_PATH": {
       "type": "string",
-      "description": "当前代码库本地存放路径"
+      "description": "Current Repository local storage path"
     },
     "BK_CI_GIT_REPO_LAST_COMMIT_ID": {
       "type": "string",
-      "description": "拉取代码时，上次构建最后的commit id"
+      "description": "When pulling the code, the last commit id of the last build"
     },
     "BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID": {
       "type": "string",
-      "description": "拉取代码时，目标分支的commitId,只有mr事件触发并启用pre-merge功能才有值"
+      "description": "When pulling the code, the commitId of the target branch has a value only when the mr event is triggered and the pre-merge function is enabled"
     },
     "BK_CI_GIT_REPO_HEAD_COMMIT_ID": {
       "type": "string",
-      "description": "拉取代码时，本次构建最后的commit id,如果启用pre-merge,则是合并完后的commitId"
+      "description": "When pulling the code, the last commit id of this build, if pre-merge is enabled, is the commitId after the merge"
     },
     "BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT": {
       "type": "string",
-      "description": "拉取代码时，本次构建最后的commit注释"
+      "description": "When pulling the code, the last commit comment of this build"
     },
     "BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR": {
       "type": "string",
-      "description": "本次产生的新的author"
+      "description": "The new author generated this time"
     },
     "BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER": {
       "type": "string",
-      "description": "本次产生的新的committer"
+      "description": "The new committer generated this time"
     },
     "BK_CI_GIT_REPO_COMMITS": {
       "type": "string",
-      "description": "本次产生的新的commit id"
+      "description": "The new commit id generated this time"
     }
   }
 }

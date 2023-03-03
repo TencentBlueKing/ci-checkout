@@ -53,3 +53,48 @@ jobs:
         asset_path: ./build/distributions/checkout.zip
         asset_name: checkout.zip
         asset_content_type: application/zip
+    # This workflow contains a single job called "build"
+    build_en:
+      # The type of runner that the job will run on
+      runs-on: ubuntu-latest
+
+      # Steps represent a sequence of tasks that will be executed as part of the job
+      steps:
+        - uses: actions/checkout@v2
+          with:
+            submodules: true
+        - name: Set up JDK 1.8
+          uses: actions/setup-java@v1
+          with:
+            java-version: 1.8
+        - name: Cache Gradle
+          uses: actions/cache@v1
+          with:
+            path: ~/.gradle/caches
+            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+            restore-keys: |
+              ${{ runner.os }}-gradle-
+        - name: Gradle Build
+          run: |
+            chmod +x ./gradlew
+            ./gradlew :ci-git-checkout:git-checkout-credential:clean shadowJar
+            ./gradlew clean buildEnZip
+        - name: Create Release
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            tag_name: ${{ github.ref }}
+            release_name: ${{ github.ref }}
+            draft: true
+            prerelease: true
+        - name: Upload Release Asset
+          uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: ./build/distributions/checkout_en.zip
+            asset_name: checkout.zip
+            asset_content_type: application/zip

@@ -90,3 +90,22 @@ task buildZip(type: Zip, dependsOn: shadowJar) {
         into("file")
     }
 }
+
+/**
+ * 打包英文环境包
+ */
+task buildEnZip(type: Zip, dependsOn: shadowJar) {
+    archiveFileName = "checkout_en.zip"
+    from "build/libs" , "./task_en.json"
+    into "${project.name}"
+
+    rename("task_en.json", "task.json")
+
+    from("images/checkout.png") {
+        into("file")
+    }
+
+    from("./readme_en.md") {
+        into("file")
+    }
+}
