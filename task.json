@@ -556,6 +556,19 @@
       "isSensitive": false,
       "groupName": "lfs"
     },
+    "enableGitLfsClean":{
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否开启Git Lfs清理",
+      "desc": "选中则执行git lfs prune，会影响代码拉取效率",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "lfs"
+    },
     "enableSubmodule": {
       "label": "",
       "default": true,
