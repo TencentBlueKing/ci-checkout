@@ -34,10 +34,11 @@ jobs:
         chmod +x ./gradlew
         ./gradlew :ci-git-checkout:git-checkout-credential:clean shadowJar
         ./gradlew clean buildZip
-    - uses: actions/upload-artifact@v1
-        with:
-          name: checkout
-          path: ./build/distributions/checkout.zip
+    - name: Create checkout
+      uses: actions/upload-artifact@v1
+      with:
+        name: checkout
+        path: ./build/distributions/checkout.zip
 
   # This workflow contains a single job called "build"
   build_en:
@@ -65,30 +66,12 @@ jobs:
           chmod +x ./gradlew
           ./gradlew :ci-git-checkout:git-checkout-credential:clean shadowJar
           ./gradlew clean buildEnZip
-      - uses: actions/upload-artifact@v1
+      - name: Create checkout_en
+        uses: actions/upload-artifact@v1
         with:
           name: checkout_en
           path: ./build/distributions/checkout_en.zip
 
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: ${{ github.ref }}
-          draft: true
-          prerelease: true
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/distributions/checkout_en.zip
-          asset_name: checkout.zip
-          asset_content_type: application/zip
   # This workflow contains a single job called "build"
   release:
     # The type of runner that the job will run on
