@@ -91,10 +91,10 @@ jobs:
           draft: true
           prerelease: true
       - name: download checkout
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v3
       - name: ls
         run: |
-          ls -l
+          ls -la
       - name: Upload checkout.zip
         uses: actions/upload-release-asset@v1
         env:
