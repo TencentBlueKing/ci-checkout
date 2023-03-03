@@ -37,7 +37,7 @@ jobs:
     - name: Create checkout
       uses: actions/upload-artifact@v1
       with:
-        name: checkout
+        name: checkout.zip
         path: ./build/distributions/checkout.zip
 
   # This workflow contains a single job called "build"
@@ -69,7 +69,7 @@ jobs:
       - name: Create checkout_en
         uses: actions/upload-artifact@v1
         with:
-          name: checkout_en
+          name: checkout_en.zip
           path: ./build/distributions/checkout_en.zip
 
   # This workflow contains a single job called "build"
