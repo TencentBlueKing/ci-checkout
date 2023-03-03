@@ -92,6 +92,8 @@ jobs:
           prerelease: true
       - name: download checkout
         uses: actions/download-artifact@v3
+        with:
+          path: ./
       - name: ls
         run: |
           ls -la
