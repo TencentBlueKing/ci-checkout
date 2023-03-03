@@ -93,6 +93,12 @@ jobs:
       - name: download checkout
         uses: actions/download-artifact@v3
         with:
+          name: checkout.zip
+          path: ./
+      - name: download checkout_en
+        uses: actions/download-artifact@v3
+        with:
+          name: checkout_en.zip
           path: ./
       - name: ls
         run: |
