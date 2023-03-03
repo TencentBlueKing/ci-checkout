@@ -101,7 +101,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./checkout.zip
+          asset_path: checkout.zip
           asset_name: checkout.zip
           asset_content_type: application/zip
       - name: Upload checkout_en.zip
@@ -110,6 +110,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./checkout_en.zip
+          asset_path: checkout_en.zip
           asset_name: checkout_en.zip
           asset_content_type: application/zip
