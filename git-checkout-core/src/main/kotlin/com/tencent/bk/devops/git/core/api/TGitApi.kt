@@ -36,7 +36,10 @@ class TGitApi(
                     "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}" +
                     "?access_token=$token"
             val request = HttpUtil.buildGet(apiUrl)
-            val responseContent = HttpUtil.retryRequest(request, "获取工蜂项目信息失败")
+            val responseContent = HttpUtil.retryRequest(
+                request,
+                "Failed to get tgit repository info"
+            )
             return JsonUtil.to(responseContent, TGitProjectInfo::class.java)
         } catch (ignore: RemoteServiceException) {
             if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode ||
@@ -46,7 +49,8 @@ class TGitApi(
                     errorType = ErrorType.USER,
                     errorCode = GitConstants.CONFIG_ERROR,
                     httpStatus = ignore.httpStatus,
-                    errorMsg = "验证权限失败，用户【$userId】没有仓库【$repositoryUrl】访问权限"
+                    errorMsg = "Failed to verify permissions, " +
+                        "user [$$userId] does not have access permissions to repository [$repositoryUrl]"
                 )
             }
             throw ignore
@@ -59,7 +63,7 @@ class TGitApi(
                 "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}/members/all" +
                 "?access_token=$token&query=$username"
         val request = HttpUtil.buildGet(apiUrl)
-        val responseContent = HttpUtil.retryRequest(request, "获取工蜂项目成员信息失败")
+        val responseContent = HttpUtil.retryRequest(request, "Failed to get tgit repository members info")
         return JsonUtil.to(responseContent, object : TypeReference<List<TGitProjectMember>>() {})
     }
 

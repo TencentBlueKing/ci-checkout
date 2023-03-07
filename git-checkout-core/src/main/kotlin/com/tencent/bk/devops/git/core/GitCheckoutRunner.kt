@@ -185,19 +185,11 @@ class GitCheckoutRunner {
     }
 
     private fun printSummaryLog() {
-        val summary = StringBuilder("本次构建")
+        val summary = StringBuilder("This build")
         if (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL) == GitProtocolEnum.HTTP.name &&
             EnvHelper.getContext(CONTEXT_USER_ID) != null
         ) {
-            summary.append("使用【${EnvHelper.getContext(CONTEXT_USER_ID)}】的权限")
-        }
-        when (EnvHelper.getContext(CONTEXT_FETCH_STRATEGY)) {
-            FetchStrategy.FULL.name ->
-                summary.append("【全量】拉取代码")
-            FetchStrategy.VM_CACHE.name ->
-                summary.append("【构建机缓存】拉取代码")
-            FetchStrategy.BKREPO_CACHE.name ->
-                summary.append("【制品库缓存】拉取代码")
+            summary.append("use 【${EnvHelper.getContext(CONTEXT_USER_ID)}】 permission")
         }
         logger.warn(summary.toString())
     }

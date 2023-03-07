@@ -48,7 +48,7 @@ class UserTokenGitAuthProvider(
 
     override fun getAuthInfo(): AuthInfo {
         if (userId.isNullOrBlank()) {
-            throw ParamInvalidException(errorMsg = "授权用户ID不能为空")
+            throw ParamInvalidException(errorMsg = "Authorized user ID cannot be empty")
         }
         val token = if (scmType == ScmType.GITHUB) {
             getGithubOauthToken(userId)

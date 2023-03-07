@@ -61,7 +61,7 @@ class GithubApi(
                 "Accept" to "application/vnd.github.v3+json"
             )
             val request = HttpUtil.buildGet(apiUrl, headers)
-            val responseContent = HttpUtil.retryRequest(request, "获取GITHUB项目信息失败")
+            val responseContent = HttpUtil.retryRequest(request, "Failed to get github repository info")
             return JsonUtil.to(responseContent, GithubRepo::class.java)
         } catch (ignore: RemoteServiceException) {
             if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode) {
@@ -69,7 +69,8 @@ class GithubApi(
                     errorType = ErrorType.USER,
                     errorCode = GitConstants.CONFIG_ERROR,
                     httpStatus = ignore.httpStatus,
-                    errorMsg = "验证权限失败，用户【$userId】没有仓库【$repositoryUrl】访问权限"
+                    errorMsg = "Failed to verify permissions, " +
+                        "user [$$userId] does not have access permissions to repository [$repositoryUrl]"
                 )
             }
             throw ignore
@@ -84,7 +85,7 @@ class GithubApi(
             "Accept" to "application/vnd.github.v3+json"
         )
         val request = HttpUtil.buildGet(apiUrl, headers)
-        val responseContent = HttpUtil.retryRequest(request, "获取GITHUB成员权限信息失败")
+        val responseContent = HttpUtil.retryRequest(request, "Failed to get github repository members info")
         return JsonUtil.to(responseContent, GithubMemberPermissions::class.java)
     }
 

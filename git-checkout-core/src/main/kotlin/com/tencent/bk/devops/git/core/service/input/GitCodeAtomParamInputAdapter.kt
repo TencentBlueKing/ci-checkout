@@ -84,17 +84,17 @@ class GitCodeAtomParamInputAdapter(
             val repositoryType = RepositoryType.valueOf(repositoryType)
             val repositoryId = when (repositoryType) {
                 RepositoryType.ID -> {
-                    repositoryHashId ?: throw ParamInvalidException(errorMsg = "代码库ID不能为空")
+                    repositoryHashId ?: throw ParamInvalidException(errorMsg = "Repository ID cannot be empty")
                     EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_ID, repositoryHashId!!)
                     repositoryHashId
                 }
                 RepositoryType.NAME -> {
-                    repositoryName ?: throw ParamInvalidException(errorMsg = "代码库名称不能为空")
+                    repositoryName ?: throw ParamInvalidException(errorMsg = "Repository name cannot be empty")
                     EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_NAME, repositoryName!!)
                     repositoryName
                 }
                 else ->
-                    throw ParamInvalidException(errorMsg = "代码库类型错误")
+                    throw ParamInvalidException(errorMsg = "repository type not found")
             }
             val repositoryConfig = RepositoryUtils.buildConfig(repositoryId!!, repositoryType)
             val repository = devopsApi.getRepository(repositoryConfig).data
@@ -109,18 +109,22 @@ class GitCodeAtomParamInputAdapter(
                     branchName
                 PullType.TAG.name -> {
                     if (tagName.isNullOrBlank()) {
-                        throw ParamInvalidException(errorMsg = "拉取方式是TAG,tag名不能为空")
+                        throw ParamInvalidException(
+                            errorMsg = "The pull type is TAG, and the tag name cannot be empty"
+                        )
                     }
                     tagName!!
                 }
                 PullType.COMMIT_ID.name -> {
                     if (commitId.isNullOrBlank()) {
-                        throw ParamInvalidException(errorMsg = "拉取方式是commitId,commitId名不能为空")
+                        throw ParamInvalidException(
+                            errorMsg = "The pull type is COMMIT, and the commit_id name cannot be empty"
+                        )
                     }
                     commitId!!
                 }
                 else ->
-                    throw ParamInvalidException(errorMsg = "拉取方式只能是BRANCH/TAG/COMMIT_ID")
+                    throw ParamInvalidException(errorMsg = "The pull method can only be BRANCH/TAG/COMMIT_ID")
             }
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_REF, ref)
 

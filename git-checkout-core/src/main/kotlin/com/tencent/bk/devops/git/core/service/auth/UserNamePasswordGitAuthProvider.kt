@@ -38,10 +38,10 @@ class UserNamePasswordGitAuthProvider(
 ) : IGitAuthProvider {
     override fun getAuthInfo(): AuthInfo {
         if (username.isNullOrBlank()) {
-            throw ParamInvalidException(errorMsg = "username不能为空")
+            throw ParamInvalidException(errorMsg = "username cannot be empty")
         }
         if (password.isNullOrBlank()) {
-            throw ParamInvalidException(errorMsg = "password不能为空")
+            throw ParamInvalidException(errorMsg = "password cannot be empty")
         }
         EnvHelper.putContext(ContextConstants.CONTEXT_USER_ID, username)
         return AuthInfo(

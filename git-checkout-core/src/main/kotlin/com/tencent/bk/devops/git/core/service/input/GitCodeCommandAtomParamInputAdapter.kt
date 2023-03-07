@@ -65,7 +65,7 @@ class GitCodeCommandAtomParamInputAdapter(
     override fun getInputs(): GitSourceSettings {
         with(input) {
             if (repositoryUrl.isBlank()) {
-                throw ParamInvalidException(errorMsg = "代码库url不能为空")
+                throw ParamInvalidException(errorMsg = "Repository url cannot be empty")
             }
 
             // 获取鉴权信息,post action阶段不需要查询凭证

@@ -38,7 +38,7 @@ class PrivateGitAuthProvider(
 ) : IGitAuthProvider {
     override fun getAuthInfo(): AuthInfo {
         if (token.isNullOrBlank()) {
-            throw ParamInvalidException(errorMsg = "accessToken不能为空")
+            throw ParamInvalidException(errorMsg = "access Token cannot be empty")
         }
         return AuthInfo(
             username = "private",

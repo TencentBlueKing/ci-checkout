@@ -50,7 +50,11 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun addCommit(commits: List<CommitData>): Result<Int> {
         val path = "/repository/api/build/commit/addCommit"
         val request = buildPost(path, getJsonRequest(commits), mutableMapOf())
-        val responseContent = retryRequest(request, "添加代码库commit信息失败", 1)
+        val responseContent = retryRequest(
+            request = request,
+            errorMessage = "Failed to add repository commit information",
+            maxAttempts = 1
+        )
         return JsonUtil.to(responseContent, object : TypeReference<Result<Int>>() {})
     }
 
@@ -62,34 +66,47 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val path = "/repository/api/build/commit/getLatestCommit?pipelineId=$pipelineId&elementId=$elementId" +
             "&repoId=${repositoryConfig.getRepositoryId()}&repositoryType=${repositoryConfig.repositoryType.name}"
         val request = buildGet(path)
-        val responseContent = retryRequest(request, "获取最后一次代码commit信息失败")
+        val responseContent = retryRequest(
+            request = request,
+            errorMessage = "Failed to get the last code commit information"
+        )
         return JsonUtil.to(responseContent, object : TypeReference<Result<List<CommitData>>>() {})
     }
 
     override fun saveBuildMaterial(materialList: List<PipelineBuildMaterial>): Result<Int> {
         val path = "/process/api/build/repository/saveBuildMaterial"
         val request = buildPost(path, getJsonRequest(materialList), mutableMapOf())
-        val responseContent = retryRequest(request, "添加源材料信息失败", 1)
+        val responseContent = retryRequest(
+            request = request,
+            errorMessage = "Failed to add source material information",
+            maxAttempts = 1
+        )
         return JsonUtil.to(responseContent, object : TypeReference<Result<Int>>() {})
     }
 
     override fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo> {
         val path = "/ticket/api/build/credentials/$credentialId?publicKey=${encode(publicKey)}"
         val request = buildGet(path)
-        val responseContent = retryRequest(request, "获取凭据失败")
+        val responseContent = retryRequest(
+            request = request,
+            errorMessage = "Failed to get credentials"
+        )
         return JsonUtil.to(responseContent, object : TypeReference<Result<CredentialInfo>>() {})
     }
 
     override fun getOauthToken(userId: String): Result<GitToken> {
         val path = "/repository/api/build/oauth/git/$userId"
         val request = buildGet(path)
-        val responseContent = retryRequest(request, "获取oauth认证信息失败")
+        val responseContent = retryRequest(
+            request = request,
+            errorMessage = "Failed to get oauth token information"
+        )
         val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
         if (result.data == null) {
             throw ApiException(
                 errorType = ErrorType.USER,
                 errorCode = GitConstants.CONFIG_ERROR,
-                errorMsg = "用户【$userId】没有oauth授权"
+                errorMsg = "User [$userId] has no oauth authorization"
             )
         }
         return result
@@ -98,13 +115,13 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun getGithubOauthToken(userId: String): Result<GithubToken> {
         val path = "/repository/api/build/oauth/github/$userId"
         val request = buildGet(path)
-        val responseContent = retryRequest(request, "获取oauth认证信息失败")
+        val responseContent = retryRequest(request, "Failed to get oauth token information")
         val result = JsonUtil.to(responseContent, object : TypeReference<Result<GithubToken>>() {})
         if (result.data == null) {
             throw ApiException(
                 errorType = ErrorType.USER,
                 errorCode = GitConstants.CONFIG_ERROR,
-                errorMsg = "用户【$userId】没有oauth授权"
+                errorMsg = "User [$userId] has no oauth authorization"
             )
         }
         return result
@@ -116,7 +133,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
                 "repositoryId=${repositoryConfig.getURLEncodeRepositoryId()}&" +
                 "repositoryType=${repositoryConfig.repositoryType.name}"
             val request = buildGet(path)
-            val responseContent = retryRequest(request, "获取代码库失败")
+            val responseContent = retryRequest(request, "Failed to get repository information")
             return JsonUtil.to(responseContent, object : TypeReference<Result<Repository>>() {})
         } catch (ignore: ApiException) {
             if (ignore.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
@@ -124,8 +141,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
                     errorType = ErrorType.USER,
                     errorCode = GitConstants.CONFIG_ERROR,
                     httpStatus = ignore.httpStatus,
-                    errorMsg = "代码库${repositoryConfig.getRepositoryId()}不存在或已删除，" +
-                        "请联系当前流水线的管理人员检查代码库信息是否正确"
+                    errorMsg = "Repository does not exist or has been deleted"
                 )
             }
             throw ignore
@@ -136,7 +152,11 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val path = "/monitoring/api/build/atom/metrics/report/$atomCode"
         val requestBody = RequestBody.create(JSON_CONTENT_TYPE, data)
         val request = buildPost(path, requestBody, mutableMapOf())
-        val responseContent = retryRequest(request, "上报插件度量信息失败", 1)
+        val responseContent = retryRequest(
+            request = request,
+            errorMessage = "Failed to report measurement information",
+            maxAttempts = 1
+        )
         return JsonUtil.to(responseContent, object : TypeReference<Result<Boolean>>() {})
     }
 }
