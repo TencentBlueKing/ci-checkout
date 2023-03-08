@@ -55,7 +55,6 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TRANSFER
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_USER_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
-import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.exception.TaskExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitMetricsInfo
