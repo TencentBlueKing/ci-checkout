@@ -123,12 +123,15 @@ class GitCommandManager(
     }
 
     fun tryReset(commit: String? = null): Boolean {
-        val args = if (commit.isNullOrBlank()) {
-            listOf("reset", "--hard")
-        } else {
-            listOf("reset", "--hard", commit)
+        return tryReset(mode = "--hard", commit = commit)
+    }
+
+    fun tryReset(mode: String, commit: String? = null): Boolean {
+        val args = mutableListOf("reset", mode)
+        if (!commit.isNullOrBlank()) {
+            args.add(commit)
         }
-        val output = execGit(args = args, allowAllExitCodes = true)
+        val output = execGit(args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
         return output.exitCode == 0
     }
 

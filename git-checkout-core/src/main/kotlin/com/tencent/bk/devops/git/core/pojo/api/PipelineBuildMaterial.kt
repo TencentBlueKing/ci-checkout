@@ -27,6 +27,8 @@
 
 package com.tencent.bk.devops.git.core.pojo.api
 
+import com.tencent.bk.devops.git.core.enums.ScmType
+
 /**
  * 构建历史中的源材料
  */
@@ -36,5 +38,6 @@ data class PipelineBuildMaterial(
     val branchName: String?,
     val newCommitId: String?,
     val newCommitComment: String?,
-    val commitTimes: Int?
+    val commitTimes: Int?,
+    val scmType: ScmType?
 )
