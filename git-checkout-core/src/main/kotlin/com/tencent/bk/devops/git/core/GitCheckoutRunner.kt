@@ -185,7 +185,7 @@ class GitCheckoutRunner {
     }
 
     private fun printSummaryLog() {
-        val summary = StringBuilder("This build")
+        val summary = StringBuilder("This build ")
         if (EnvHelper.getContext(CONTEXT_GIT_PROTOCOL) == GitProtocolEnum.HTTP.name &&
             EnvHelper.getContext(CONTEXT_USER_ID) != null
         ) {
