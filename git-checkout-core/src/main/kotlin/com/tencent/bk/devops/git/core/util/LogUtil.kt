@@ -15,7 +15,7 @@ object LogUtil {
         }
         printSplit("【问题原因】", reason)
         printSplit("【解决办法】", solution)
-        logger.warn("详情参考>>", "<a target='_blank' href='$wiki'>$errMsg</a>")
+        logger.warn("详情参考>> <a target='_blank' href='$wiki'>$errMsg</a>")
         logger.warn("********************************************************************************************")
     }
 
