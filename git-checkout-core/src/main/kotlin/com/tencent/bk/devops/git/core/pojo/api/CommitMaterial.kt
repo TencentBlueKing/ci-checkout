@@ -27,6 +27,8 @@
 
 package com.tencent.bk.devops.git.core.pojo.api
 
+import com.tencent.bk.devops.git.core.enums.ScmType
+
 data class CommitMaterial(
     val lastCommitId: String?,
     val newCommitId: String?,
@@ -34,5 +36,6 @@ data class CommitMaterial(
     val newCommitAuthor: String?,
     val newCommitCommitter: String?,
     val commitTimes: Int,
-    val commitIds: List<String>
+    val commitIds: List<String>,
+    val scmType: ScmType
 )

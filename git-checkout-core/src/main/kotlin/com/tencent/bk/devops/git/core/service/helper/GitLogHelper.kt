@@ -45,6 +45,7 @@ import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CommitMaterial
 import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
+import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -85,7 +86,8 @@ class GitLogHelper(
                 newCommitAuthor = log.authorName,
                 newCommitCommitter = log.committerName,
                 commitTimes = commits.size,
-                commitIds = commitIds
+                commitIds = commitIds,
+                scmType = settings.scmType
             )
         }.first()
         saveBuildMaterial(commitMaterial = commitMaterial)
@@ -110,6 +112,7 @@ class GitLogHelper(
         preCommitData: CommitData?,
         repositoryConfig: RepositoryConfig
     ): List<CommitData> {
+        val repositoryType = EnvHelper.getEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE)
         val commits = getLogs(preCommitData)
             .map { log ->
                 CommitData(
@@ -122,8 +125,14 @@ class GitLogHelper(
                     commitTime = log.commitTime, // 单位:秒
                     comment = log.commitMessage,
                     repoId = repositoryConfig.repositoryHashId,
-                    repoName = repositoryConfig.repositoryName,
-                    elementId = settings.pipelineTaskId
+                    // 以URL形式进行拉取，则repoName取代码库url
+                    repoName = if (repositoryType == RepositoryType.URL.name) {
+                        settings.repositoryUrl
+                    } else {
+                        repositoryConfig.repositoryName
+                    },
+                    elementId = settings.pipelineTaskId,
+                    url = settings.repositoryUrl
                 )
             }
         if (commits.isEmpty()) {
@@ -139,9 +148,15 @@ class GitLogHelper(
                         "",
                         0L,
                         "",
-                        repositoryConfig.repositoryHashId,
-                        repositoryConfig.repositoryName,
-                        settings.pipelineTaskId
+                        repoId = repositoryConfig.repositoryHashId,
+                        // 以URL形式进行拉取，则repoName取代码库url
+                        repoName = if (repositoryType == RepositoryType.URL.name) {
+                            settings.repositoryUrl
+                        } else {
+                            repositoryConfig.repositoryName
+                        },
+                        elementId = settings.pipelineTaskId,
+                        url = settings.repositoryUrl
                     )
                 )
             )
@@ -241,7 +256,8 @@ class GitLogHelper(
                     branchName = EnvHelper.getEnvVariable(BK_CI_GIT_REPO_REF),
                     newCommitId = commitMaterial.newCommitId ?: commitMaterial.lastCommitId,
                     newCommitComment = commitMaterial.newCommitComment,
-                    commitTimes = commitMaterial.commitTimes
+                    commitTimes = commitMaterial.commitTimes,
+                    scmType = commitMaterial.scmType
                 )
             )
         )

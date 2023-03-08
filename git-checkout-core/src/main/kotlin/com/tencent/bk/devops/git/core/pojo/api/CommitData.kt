@@ -38,5 +38,6 @@ data class CommitData(
     val comment: String?,
     val repoId: String?,
     val repoName: String?,
-    val elementId: String
+    val elementId: String,
+    val url: String?
 )

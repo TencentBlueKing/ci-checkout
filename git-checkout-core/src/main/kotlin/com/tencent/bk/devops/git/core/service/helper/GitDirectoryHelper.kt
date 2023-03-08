@@ -94,8 +94,10 @@ class GitDirectoryHelper(
     private fun clean() {
         // 清理阶段可能会拉取lfs，但是此时还没有权限，应该禁用lfs拉取
         git.setEnvironmentVariable(GIT_LFS_SKIP_SMUDGE, "1")
+        // 暂存区的文件不在sparse checkout监控范围
+        git.tryReset(mode = "--mixed", commit = "HEAD")
         if (git.headExists()) {
-            git.tryReset("HEAD")
+            git.tryReset(commit = "HEAD")
         } else {
             git.tryReset()
         }
