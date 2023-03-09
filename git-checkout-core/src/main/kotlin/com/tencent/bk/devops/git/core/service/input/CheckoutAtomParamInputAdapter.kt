@@ -119,14 +119,7 @@ class CheckoutAtomParamInputAdapter(
             postEntryParam = postEntryParam,
 
             repositoryUrl = repositoryUrl,
-            scmType = if (
-                repositoryUrl.contains("https://github.com") ||
-                repositoryUrl.contains("git@github.com")
-            ) {
-                ScmType.GITHUB
-            } else {
-                ScmType.CODE_GIT
-            },
+            scmType = scmType,
             authType = authType,
             ticketId = ticketId,
             accessToken = accessToken,
