@@ -28,7 +28,6 @@
 package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
-import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.CheckoutAtomParamInput
@@ -119,14 +118,7 @@ class CheckoutAtomParamInputAdapter(
             postEntryParam = postEntryParam,
 
             repositoryUrl = repositoryUrl,
-            scmType = if (
-                repositoryUrl.contains("https://github.com") ||
-                repositoryUrl.contains("git@github.com")
-            ) {
-                ScmType.GITHUB
-            } else {
-                ScmType.CODE_GIT
-            },
+            scmType = scmType,
             authType = authType,
             ticketId = ticketId,
             accessToken = accessToken,
