@@ -119,7 +119,8 @@ enum class GitErrors(
                 "(error: RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
                 "(error: RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
                 "(fatal: 协议错误：坏的包头)|" +
-                "(fatal: protocol error: bad pack header)"
+                "(fatal: protocol error: bad pack header)|" +
+                "(fatal: 远程错误：(.+) unavailable)"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         cause = GitErrorsText.get().remoteServerFailedCause,

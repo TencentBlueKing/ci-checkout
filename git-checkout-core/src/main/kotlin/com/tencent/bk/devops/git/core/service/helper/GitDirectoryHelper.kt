@@ -111,7 +111,8 @@ class GitDirectoryHelper(
         val lockFiles = mutableListOf(
             File(repositoryPath, ".git/index.lock"),
             File(repositoryPath, ".git/shallow.lock"),
-            File(repositoryPath, ".git/config.lock")
+            File(repositoryPath, ".git/config.lock"),
+            File(repositoryPath, ".git/packed-refs.lock")
         )
         lockFiles.addAll(findRefLockFile(File(repositoryPath, ".git/refs")))
         lockFiles.forEach { lockFile ->

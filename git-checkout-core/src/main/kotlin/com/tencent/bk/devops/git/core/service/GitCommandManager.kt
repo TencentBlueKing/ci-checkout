@@ -478,7 +478,8 @@ class GitCommandManager(
         return listOf(
             GitErrors.RemoteServerFailed.errorCode,
             GitErrors.AuthenticationFailed.errorCode,
-            GitErrors.RepositoryNotFoundFailed.errorCode
+            GitErrors.RepositoryNotFoundFailed.errorCode,
+            GitErrors.LockFileAlreadyExists.errorCode
         ).contains(errorCode)
     }
 
@@ -527,7 +528,7 @@ class GitCommandManager(
                 args.add(startPoint)
             }
         }
-        execGit(args = args, logType = LogType.PROGRESS)
+        doRetry(args = args)
         // git 1.7.3之前的版本，没有-B参数，需要先切换startPoint然后再切换分支
         if (startPoint.isNotBlank() && !isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
             branchDelete(ref)
