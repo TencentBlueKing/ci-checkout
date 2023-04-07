@@ -554,6 +554,14 @@ class GitCommandManager(
         execGit(args = args)
     }
 
+    /**
+     * 中止merge
+     */
+    fun mergeAbort() {
+        val args = mutableListOf("merge", "--abort")
+        execGit(args = args, allowAllExitCodes = true)
+    }
+
     fun log(maxCount: Int = 1, revisionRange: String = "", branchName: String = ""): List<CommitLogInfo> {
         val args = mutableListOf(
             "log",

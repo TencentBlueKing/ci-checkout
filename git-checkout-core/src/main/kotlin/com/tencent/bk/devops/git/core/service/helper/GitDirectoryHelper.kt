@@ -81,6 +81,8 @@ class GitDirectoryHelper(
             }
             else -> {
                 removeLockFile(repositoryPath)
+                // 判断当前工作空间是否在merge中,如果是,则中断merge
+                mergeAbort(repositoryPath)
                 clean()
                 // 如果拉取类型是tag,先删除旧的tag再拉取,防止切换到旧的tag
                 if (settings.pullType == PullType.TAG) {
@@ -129,6 +131,13 @@ class GitDirectoryHelper(
             org.apache.commons.io.FileUtils.listFiles(directory, arrayOf("lock"), true).toList()
         } else {
             emptyList()
+        }
+    }
+
+    private fun mergeAbort(repositoryPath: String) {
+        val mergeHeadFile = File(repositoryPath, ".git/MERGE_HEAD")
+        if (mergeHeadFile.exists()) {
+            git.mergeAbort()
         }
     }
 }
