@@ -52,6 +52,10 @@ data class GitCodeAtomParamInput(
     var enableSubmoduleRemote: Boolean = false,
     var enableSubmoduleRecursive: Boolean? = true,
     /**
+     * submodule depth
+     */
+    var submoduleDepth:Int? = null,
+    /**
      * submodule并发拉取数量
      */
     val submoduleJobs: Int? = 0,

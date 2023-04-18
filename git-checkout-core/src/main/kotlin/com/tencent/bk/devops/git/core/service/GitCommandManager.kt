@@ -377,7 +377,8 @@ class GitCommandManager(
         recursive: Boolean,
         path: String,
         submoduleRemote: Boolean,
-        submoduleJobs: Int?
+        submoduleJobs: Int?,
+        submoduleDepth: Int?
     ) {
         val args = mutableListOf("submodule", "update", "--init")
         if (isAtLeastVersion(SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION)) {
@@ -388,6 +389,9 @@ class GitCommandManager(
         }
         if (submoduleJobs != null && submoduleJobs > 0) {
             args.addAll(listOf("--jobs", submoduleJobs.toString()))
+        }
+        if (submoduleDepth != null && submoduleDepth > 0) {
+            args.addAll(listOf("--depth", submoduleDepth.toString()))
         }
         if (submoduleRemote) {
             args.add("--remote")

@@ -76,4 +76,11 @@ object RepositoryUtils {
                 ScmType.CODE_GIT
         }
     }
+
+    fun getGitProjectId(repository: Repository) = when (repository) {
+        is CodeGitRepository -> repository.gitProjectId
+        is CodeGitlabRepository -> repository.gitProjectId
+        is CodeTGitRepository -> repository.gitProjectId
+        else -> 0L
+    }
 }

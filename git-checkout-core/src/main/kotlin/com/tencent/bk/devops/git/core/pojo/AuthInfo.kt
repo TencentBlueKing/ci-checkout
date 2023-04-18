@@ -40,5 +40,8 @@ data class AuthInfo(
     val passPhrase: String? = null,
 
     // git config user.name配置的值
-    val usernameConfig: String? = null
+    val usernameConfig: String? = null,
+
+    // token 信息用于获取代码库信息
+    val token: String? = ""
 )

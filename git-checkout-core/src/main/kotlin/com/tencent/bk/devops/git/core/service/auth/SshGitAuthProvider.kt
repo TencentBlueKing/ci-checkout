@@ -31,13 +31,15 @@ import com.tencent.bk.devops.git.core.pojo.AuthInfo
 
 class SshGitAuthProvider(
     private val privateKey: String,
-    private val passPhrase: String?
+    private val passPhrase: String?,
+    private val token: String? = ""
 ) : IGitAuthProvider {
 
     override fun getAuthInfo(): AuthInfo {
         return AuthInfo(
             privateKey = privateKey,
-            passPhrase = passPhrase
+            passPhrase = passPhrase,
+            token = token
         )
     }
 }
