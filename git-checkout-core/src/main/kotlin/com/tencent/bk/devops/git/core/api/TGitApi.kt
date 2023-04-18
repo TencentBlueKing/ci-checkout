@@ -67,7 +67,7 @@ class TGitApi(
     fun getProjectInfo(): TGitProjectInfo {
         try {
             val apiUrl =
-                "${serverInfo.origin}/$API_PATH/" +
+                "https://${serverInfo.hostName}/$API_PATH/" +
                     "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}" +
                     "?access_token=$token"
             val request = HttpUtil.buildGet(apiUrl)
@@ -94,7 +94,7 @@ class TGitApi(
 
     fun getProjectMembers(username: String): List<TGitProjectMember> {
         val apiUrl =
-            "${serverInfo.origin}/$API_PATH/" +
+            "https://${serverInfo.hostName}/$API_PATH/" +
                 "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}/members/all" +
                 "?access_token=$token&query=$username"
         val request = HttpUtil.buildGet(apiUrl)
