@@ -111,15 +111,14 @@ class GitCodeCommandAtomParamInputAdapter(
                     else -> EmptyGitAuthProvider()
                 }
             }
+            val authInfo = authProvider.getAuthInfo()
             val gitProjectId = GitScmService(
                 scmType = scmType,
                 repositoryUrl = repositoryUrl,
-                authProvider = authProvider
+                authInfo = authInfo
             ).getGitProjectId() ?: ""
             // 保存代码库相关信息
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
-            val authInfo = authProvider.getAuthInfo()
-
             var ref: String = refName
             val preMerge = GitUtil.isEnablePreMerge(
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
