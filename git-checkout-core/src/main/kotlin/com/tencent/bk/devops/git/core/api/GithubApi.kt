@@ -46,7 +46,7 @@ class GithubApi(
 ) : GitApi {
 
     companion object {
-        private const val GITHUB_API = "https://api.github.com/"
+        private const val GITHUB_API = "https://api.github.com"
         private val logger = LoggerFactory.getLogger(GithubApi::class.java)
     }
     private val serverInfo = GitUtil.getServerInfo(repositoryUrl)
