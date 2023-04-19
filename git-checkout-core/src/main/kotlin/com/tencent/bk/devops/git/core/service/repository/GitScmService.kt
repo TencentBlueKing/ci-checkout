@@ -1,11 +1,13 @@
 package com.tencent.bk.devops.git.core.service.repository
 
+import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.api.GitApi
 import com.tencent.bk.devops.git.core.api.GithubApi
 import com.tencent.bk.devops.git.core.api.GitlabApi
 import com.tencent.bk.devops.git.core.api.TGitApi
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
+import com.tencent.bk.devops.git.core.service.auth.UserTokenGitAuthProvider
 import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
 
@@ -27,14 +29,23 @@ class GitScmService(
     }
 
     private fun getGitApi(): GitApi {
-        val token = authInfo.token ?: ""
+        var token = authInfo.token ?: ""
         val username = authInfo.username ?: ""
         return when (scmType) {
-            ScmType.GITHUB -> GithubApi(
-                repositoryUrl = repositoryUrl,
-                userId = username,
-                token = token
-            )
+            ScmType.GITHUB -> {
+                if (token.isEmpty() && username.isNotEmpty()) {
+                    token = UserTokenGitAuthProvider(
+                        userId = username,
+                        scmType = ScmType.GITHUB,
+                        devopsApi = DevopsApi()
+                    ).getAuthInfo().token ?: ""
+                }
+                GithubApi(
+                    repositoryUrl = repositoryUrl,
+                    userId = username,
+                    token = token
+                )
+            }
             ScmType.CODE_TGIT, ScmType.CODE_GIT -> {
                 var targetToken = token
                 val password = authInfo.password ?: ""
