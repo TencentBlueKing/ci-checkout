@@ -103,7 +103,8 @@ class GitCodeAtomParamInputAdapter(
                 )
             logger.info("get the repo:$repository")
             // 保存代码库相关信息
-            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "${RepositoryUtils.getGitProjectId(repository)}")
+            val gitProjectId = RepositoryUtils.getGitProjectId(repository, devopsApi)
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
             // 2. 确定分支和commit
             var ref: String = when (pullType) {
                 PullType.BRANCH.name ->

@@ -40,14 +40,13 @@ class GitScmService(
                 val password = authInfo.password ?: ""
                 // 使用[用户名+密码]拉取工蜂代码库，可尝试获取私人令牌
                 if (username.isNotEmpty() && password.isNotEmpty() && targetToken.isEmpty()) {
-                    logger.info("try get tgit session info,userId[$username],password[$password]")
+                    logger.info("try get tgit session info by user[$username]")
                     targetToken = TGitApi.getSession(
                         hostName = GitUtil.getServerInfo(repositoryUrl).hostName,
                         userId = username,
                         password = password
                     )?.private_token ?: ""
                 }
-                logger.info("create tgitApi,userId[$username],token[$token],isOauth[${authInfo.isOauth}]")
                 TGitApi(
                     repositoryUrl = repositoryUrl,
                     userId = username,
