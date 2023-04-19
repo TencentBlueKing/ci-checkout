@@ -29,17 +29,10 @@ class GitScmService(
     }
 
     private fun getGitApi(): GitApi {
-        var token = authInfo.token ?: ""
+        val token = authInfo.token ?: ""
         val username = authInfo.username ?: ""
         return when (scmType) {
             ScmType.GITHUB -> {
-                if (token.isEmpty() && username.isNotEmpty()) {
-                    token = UserTokenGitAuthProvider(
-                        userId = username,
-                        scmType = ScmType.GITHUB,
-                        devopsApi = DevopsApi()
-                    ).getAuthInfo().token ?: ""
-                }
                 GithubApi(
                     repositoryUrl = repositoryUrl,
                     userId = username,
