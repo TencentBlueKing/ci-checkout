@@ -30,7 +30,12 @@ class AuthUserTokenGitAuthProvider(
         ).getAuthInfo()
         // 如果授权用户与启动用户不相同,并且事件类型不是定时触发，需要验证启动用户是否有权限下载代码
         if (System.getenv(CI_EVENT) != "schedule" && pipelineStartUserName != userId && scmType == ScmType.CODE_GIT) {
-            val gitApi = TGitApi(repositoryUrl = repositoryUrl, userId = userId!!, token = authInfo.password!!)
+            val gitApi = TGitApi(
+                repositoryUrl = repositoryUrl,
+                userId = userId!!,
+                token = authInfo.password!!,
+                isOauth = authInfo.isOauth
+            )
             if (!gitApi.canViewProject(pipelineStartUserName)) {
                 throw ParamInvalidException(
                     errorMsg = defaultResolver.resolveByMap(

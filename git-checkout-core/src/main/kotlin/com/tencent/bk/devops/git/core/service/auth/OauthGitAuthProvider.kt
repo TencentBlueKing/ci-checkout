@@ -42,7 +42,8 @@ class OauthGitAuthProvider(
             username = "oauth2",
             password = token,
             usernameConfig = userId,
-            token = token
+            token = token,
+            isOauth = true
         )
     }
 }

@@ -21,7 +21,7 @@ class TGitApi(
     val repositoryUrl: String,
     val userId: String,
     private val token: String,
-    private val password: String? = ""
+    private val isOauth: Boolean? = false
 ) : GitApi {
 
     companion object {
@@ -66,10 +66,14 @@ class TGitApi(
 
     fun getProjectInfo(): TGitProjectInfo {
         try {
-            val apiUrl =
+            var apiUrl =
                 "https://${serverInfo.hostName}/$API_PATH/" +
-                    "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}" +
-                    "?access_token=$token"
+                    "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}"
+            if (isOauth == true) {
+                apiUrl += "?access_token=$token"
+            } else {
+                apiUrl += "?private_token=$token"
+            }
             val request = HttpUtil.buildGet(apiUrl)
             val responseContent = HttpUtil.retryRequest(
                 request,
@@ -93,10 +97,15 @@ class TGitApi(
     }
 
     fun getProjectMembers(username: String): List<TGitProjectMember> {
-        val apiUrl =
+        var apiUrl =
             "https://${serverInfo.hostName}/$API_PATH/" +
                 "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}/members/all" +
-                "?access_token=$token&query=$username"
+                "?query=$username"
+        if (isOauth == true) {
+            apiUrl += "&access_token=$token"
+        } else {
+            apiUrl += "&private_token=$token"
+        }
         val request = HttpUtil.buildGet(apiUrl)
         val responseContent = HttpUtil.retryRequest(request, "Failed to get tgit repository members info")
         return JsonUtil.to(responseContent, object : TypeReference<List<TGitProjectMember>>() {})

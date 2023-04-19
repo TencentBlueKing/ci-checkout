@@ -30,7 +30,11 @@ class GitScmService(
         val token = authInfo.token ?: ""
         val username = authInfo.username ?: ""
         return when (scmType) {
-            ScmType.GITHUB -> GithubApi(repositoryUrl, userId = username, token = token)
+            ScmType.GITHUB -> GithubApi(
+                repositoryUrl = repositoryUrl,
+                userId = username,
+                token = token
+            )
             ScmType.CODE_TGIT, ScmType.CODE_GIT -> {
                 var targetToken = token
                 val password = authInfo.password ?: ""
@@ -43,11 +47,24 @@ class GitScmService(
                         password = password
                     )?.private_token ?: ""
                 }
-                logger.info("create tgitApi,userId[$username],token[$token]")
-                TGitApi(repositoryUrl, userId = username, token = targetToken)
+                logger.info("create tgitApi,userId[$username],token[$token],isOauth[${authInfo.isOauth}]")
+                TGitApi(
+                    repositoryUrl = repositoryUrl,
+                    userId = username,
+                    token = targetToken,
+                    isOauth = authInfo.isOauth
+                )
             }
-            ScmType.CODE_GITLAB -> GitlabApi(repositoryUrl, userId = username, token = token)
-            else -> TGitApi(repositoryUrl, userId = username, token = token)
+            ScmType.CODE_GITLAB -> GitlabApi(
+                repositoryUrl = repositoryUrl,
+                userId = username,
+                token = token
+            )
+            else -> TGitApi(
+                repositoryUrl = repositoryUrl,
+                userId = username,
+                token = token
+            )
         }
     }
 
