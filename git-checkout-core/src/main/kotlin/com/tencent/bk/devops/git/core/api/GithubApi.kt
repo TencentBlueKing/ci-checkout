@@ -27,7 +27,6 @@
 
 package com.tencent.bk.devops.git.core.api
 
-import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.GithubAccessLevelEnum
 import com.tencent.bk.devops.git.core.enums.HttpStatus
@@ -55,7 +54,7 @@ class GithubApi(
     private fun getProjectInfo(authAccess: Boolean? = true): GithubRepo {
         try {
             val apiUrl =
-                "$GITHUB_API/repositories/${serverInfo.repositoryName}"
+                "$GITHUB_API/repos/${serverInfo.repositoryName}"
             val headers = if (authAccess == true){
                 mapOf(
                     "Authorization" to "token  $token",
@@ -83,7 +82,7 @@ class GithubApi(
 
     private fun getMemberPermissions(username: String): GithubMemberPermissions {
         val apiUrl =
-            "$GITHUB_API/repositories/${serverInfo.repositoryName}/collaborators/$username/permission"
+            "$GITHUB_API/repos/${serverInfo.repositoryName}/collaborators/$username/permission"
         val headers = mapOf(
             "Authorization" to "token  $token",
             "Accept" to "application/vnd.github.v3+json"
