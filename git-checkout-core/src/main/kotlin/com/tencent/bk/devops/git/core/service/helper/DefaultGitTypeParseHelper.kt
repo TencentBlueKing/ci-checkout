@@ -6,9 +6,6 @@ class DefaultGitTypeParseHelper : IGitTypeParseHelper {
 
     override fun getScmType(hostName: String): ScmType {
         return when {
-            hostName.contains("gitlab")  -> {
-                ScmType.CODE_GITLAB
-            }
             hostName.contains("github.com") -> {
                 ScmType.GITHUB
             }
@@ -16,7 +13,7 @@ class DefaultGitTypeParseHelper : IGitTypeParseHelper {
                 ScmType.CODE_TGIT
             }
             else -> {
-                ScmType.CODE_GIT
+                ScmType.CODE_GITLAB
             }
         }
     }
