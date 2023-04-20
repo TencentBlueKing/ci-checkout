@@ -34,7 +34,8 @@ import com.tencent.bk.devops.git.core.util.EnvHelper
 
 class UserNamePasswordGitAuthProvider(
     private val username: String?,
-    private val password: String?
+    private val password: String?,
+    private val token: String? = ""
 ) : IGitAuthProvider {
     override fun getAuthInfo(): AuthInfo {
         if (username.isNullOrBlank()) {
@@ -47,7 +48,8 @@ class UserNamePasswordGitAuthProvider(
         return AuthInfo(
             username = username,
             password = password,
-            usernameConfig = username
+            usernameConfig = username,
+            token = token
         )
     }
 }

@@ -74,8 +74,13 @@ class RepositoryGitAuthProvider(
                 )
             }
             is GithubRepository -> {
-                // 目前还没有获取github的token,先留空
-                EmptyGitAuthProvider()
+                // ID或别名 拉取代码库时，github默认为OAUTH授权
+                getGitAuthProvider(
+                    repoAuthType = RepoAuthType.OAUTH,
+                    userId = repository.userName,
+                    credentialId = repository.credentialId,
+                    scmType = ScmType.GITHUB
+                )
             }
             else ->
                 EmptyGitAuthProvider()

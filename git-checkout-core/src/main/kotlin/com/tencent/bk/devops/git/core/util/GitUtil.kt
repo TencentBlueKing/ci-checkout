@@ -29,10 +29,14 @@ package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.CodeEventType
+import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
+import com.tencent.bk.devops.git.core.service.helper.DefaultGitTypeParseHelper
+import com.tencent.bk.devops.git.core.service.helper.IGitTypeParseHelper
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.util.ServiceLoader
 
 @Suppress("ALL")
 object GitUtil {
@@ -152,5 +156,11 @@ object GitUtil {
             gitHookEventType == CodeEventType.MERGE_REQUEST.name ||
             gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name ||
             gitHookEventType == CodeEventType.PULL_REQUEST.name
+    }
+
+    fun getScmType(hostName: String): ScmType {
+        val gitTypeParseHelper = ServiceLoader.load(IGitTypeParseHelper::class.java).firstOrNull()
+            ?: DefaultGitTypeParseHelper()
+        return gitTypeParseHelper.getScmType(hostName)
     }
 }
