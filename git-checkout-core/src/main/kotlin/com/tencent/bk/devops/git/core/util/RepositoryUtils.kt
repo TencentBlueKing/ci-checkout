@@ -27,7 +27,6 @@
 
 package com.tencent.bk.devops.git.core.util
 
-import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_TYPE
@@ -40,7 +39,6 @@ import com.tencent.bk.devops.git.core.pojo.api.GithubRepository
 import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
-import com.tencent.bk.devops.git.core.service.auth.UserTokenGitAuthProvider
 import com.tencent.bk.devops.git.core.service.repository.GitScmService
 
 object RepositoryUtils {
