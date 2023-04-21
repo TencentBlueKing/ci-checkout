@@ -463,7 +463,7 @@ class GitCommandManager(
             }
             if (needRetry(errorCode = e.errorCode)) {
                 gitEnv[GitConstants.GIT_TRACE] = "1"
-                if (e.errorCode == GitErrors.RemoteServerFailed.errorCode) {
+                if (needSleep(errorCode = e.errorCode)) {
                     // 服务端故障,睡眠后再重试
                     Thread.sleep(LONG_RETRY_PERIOD_MILLS)
                 }
@@ -479,6 +479,16 @@ class GitCommandManager(
             GitErrors.RemoteServerFailed.errorCode,
             GitErrors.AuthenticationFailed.errorCode,
             GitErrors.RepositoryNotFoundFailed.errorCode,
+            GitErrors.LockFileAlreadyExists.errorCode
+        ).contains(errorCode)
+    }
+
+    /**
+     * 错误码是否需要睡眠再重试
+     */
+    private fun needSleep(errorCode: Int): Boolean {
+        return listOf(
+            GitErrors.RemoteServerFailed.errorCode,
             GitErrors.LockFileAlreadyExists.errorCode
         ).contains(errorCode)
     }
