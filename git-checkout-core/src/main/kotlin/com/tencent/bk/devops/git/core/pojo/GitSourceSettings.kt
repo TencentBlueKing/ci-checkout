@@ -140,6 +140,8 @@ data class GitSourceSettings(
      */
     val submoduleJobs: Int? = 0,
 
+    val submoduleDepth: Int? = 0,
+
     /**
      * 授权信息
      */

@@ -37,7 +37,8 @@ data class CodeGitlabRepository(
     override var userName: String,
     override val projectId: String?,
     override val repoHashId: String?,
-    val authType: RepoAuthType? = RepoAuthType.HTTP
+    val authType: RepoAuthType? = RepoAuthType.HTTP,
+    val gitProjectId: Long?
 ) : Repository {
     companion object {
         const val classType = "codeGitLab"

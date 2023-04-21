@@ -37,7 +37,8 @@ data class CodeTGitRepository(
     override var userName: String,
     val authType: RepoAuthType? = RepoAuthType.SSH,
     override val projectId: String?,
-    override val repoHashId: String?
+    override val repoHashId: String?,
+    val gitProjectId: Long?
 ) : Repository {
     companion object {
         const val classType = "codeTGit"

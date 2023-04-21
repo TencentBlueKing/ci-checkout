@@ -27,7 +27,6 @@
 
 package com.tencent.bk.devops.git.core.api
 
-import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.GithubAccessLevelEnum
 import com.tencent.bk.devops.git.core.enums.HttpStatus
@@ -47,23 +46,27 @@ class GithubApi(
 ) : GitApi {
 
     companion object {
-        private const val GITHUB_API = "https://api.github.com/"
+        private const val GITHUB_API = "https://api.github.com"
         private val logger = LoggerFactory.getLogger(GithubApi::class.java)
     }
     private val serverInfo = GitUtil.getServerInfo(repositoryUrl)
 
-    private fun getProjectInfo(): GithubRepo {
+    private fun getProjectInfo(authAccess: Boolean? = true): GithubRepo {
         try {
             val apiUrl =
-                "$GITHUB_API/repositories/${serverInfo.repositoryName}"
-            val headers = mapOf(
-                "Authorization" to "token  $token",
-                "Accept" to "application/vnd.github.v3+json"
-            )
+                "$GITHUB_API/repos/${serverInfo.repositoryName}"
+            val headers = if (authAccess == true){
+                mapOf(
+                    "Authorization" to "token  $token",
+                    "Accept" to "application/vnd.github.v3+json"
+                )
+            }else {
+                mapOf()
+            }
             val request = HttpUtil.buildGet(apiUrl, headers)
             val responseContent = HttpUtil.retryRequest(request, "Failed to get github repository info")
             return JsonUtil.to(responseContent, GithubRepo::class.java)
-        } catch (ignore: RemoteServiceException) {
+        } catch (ignore: ApiException) {
             if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode) {
                 throw ApiException(
                     errorType = ErrorType.USER,
@@ -79,7 +82,7 @@ class GithubApi(
 
     private fun getMemberPermissions(username: String): GithubMemberPermissions {
         val apiUrl =
-            "$GITHUB_API/repositories/${serverInfo.repositoryName}/collaborators/$username/permission"
+            "$GITHUB_API/repos/${serverInfo.repositoryName}/collaborators/$username/permission"
         val headers = mapOf(
             "Authorization" to "token  $token",
             "Accept" to "application/vnd.github.v3+json"
@@ -103,5 +106,20 @@ class GithubApi(
         } catch (ignore: Throwable) {
             false
         }
+    }
+
+    override fun getProjectId(): Long {
+        val gitProjectId: Long
+        try {
+            gitProjectId = getProjectInfo().id
+        } catch (ignore: ApiException) {
+            if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode) {
+                // 尝试直接访问GitHub API，不携带token，仅public仓库可用
+                logger.warn("can't to get github repository info,try non-authorization access repository ")
+                return getProjectInfo(false).id
+            }
+            throw ignore
+        }
+        return gitProjectId
     }
 }

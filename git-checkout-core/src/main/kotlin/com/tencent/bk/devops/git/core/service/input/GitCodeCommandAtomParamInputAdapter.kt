@@ -49,6 +49,7 @@ import com.tencent.bk.devops.git.core.service.auth.PrivateGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.UserNamePasswordGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.UserTokenGitAuthProvider
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
+import com.tencent.bk.devops.git.core.service.repository.GitScmService
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import java.io.File
@@ -111,7 +112,13 @@ class GitCodeCommandAtomParamInputAdapter(
                 }
             }
             val authInfo = authProvider.getAuthInfo()
-
+            val gitProjectId = GitScmService(
+                scmType = scmType,
+                repositoryUrl = repositoryUrl,
+                authInfo = authInfo
+            ).getGitProjectId() ?: ""
+            // 保存代码库相关信息
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
             var ref: String = refName
             val preMerge = GitUtil.isEnablePreMerge(
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
@@ -184,6 +191,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 nestedSubmodules = enableSubmoduleRecursive ?: true,
                 submoduleRemote = enableSubmoduleRemote,
                 submodulesPath = submodulePath ?: "",
+                submoduleDepth = submoduleDepth,
                 submoduleJobs = submoduleJobs,
                 includeSubPath = includePath,
                 excludeSubPath = excludePath,

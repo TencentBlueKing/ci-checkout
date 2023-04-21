@@ -30,4 +30,6 @@ package com.tencent.bk.devops.git.core.api
 interface GitApi {
 
     fun canViewProject(username: String): Boolean
+
+    fun getProjectId(): Long
 }

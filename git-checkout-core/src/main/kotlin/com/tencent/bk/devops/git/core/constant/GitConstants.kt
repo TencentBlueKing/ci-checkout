@@ -76,6 +76,7 @@ object GitConstants {
     const val GIT_CREDENTIAL_AUTH_HELPER = "credential.authHelper"
     const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
     const val GIT_REPO_PATH = "GIT_REPO_PATH"
+    const val BK_CI_GIT_PROJECT_ID = "BK_CI_GIT_PROJECT_ID"
 
     // auth env
     const val AUTH_SOCKET_VAR = "SSH_AUTH_SOCK"

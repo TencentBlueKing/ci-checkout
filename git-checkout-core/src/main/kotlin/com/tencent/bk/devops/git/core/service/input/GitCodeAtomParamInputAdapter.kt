@@ -102,7 +102,6 @@ class GitCodeAtomParamInputAdapter(
                     errorMsg = "repository ${repositoryConfig.getRepositoryId()} is not found"
                 )
             logger.info("get the repo:$repository")
-
             // 2. 确定分支和commit
             var ref: String = when (pullType) {
                 PullType.BRANCH.name ->
@@ -151,7 +150,9 @@ class GitCodeAtomParamInputAdapter(
                 )
             }
             val authInfo = authProvider.getAuthInfo()
-
+            // 保存代码库相关信息
+            val gitProjectId = RepositoryUtils.getGitProjectId(repository, authInfo)
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.putContext(CONTEXT_REPOSITORY_ALIAS_NAME, repository.aliasName)
@@ -265,6 +266,7 @@ class GitCodeAtomParamInputAdapter(
                 submoduleRemote = enableSubmoduleRemote,
                 includeSubPath = includePath,
                 excludeSubPath = excludePath,
+                submoduleDepth = submoduleDepth,
                 submoduleJobs = submoduleJobs,
                 authInfo = authInfo,
                 persistCredentials = persistCredentials,

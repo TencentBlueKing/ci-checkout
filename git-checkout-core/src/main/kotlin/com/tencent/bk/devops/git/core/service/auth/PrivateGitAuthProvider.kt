@@ -42,7 +42,8 @@ class PrivateGitAuthProvider(
         }
         return AuthInfo(
             username = "private",
-            password = token
+            password = token,
+            token = token
         )
     }
 }
