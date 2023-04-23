@@ -187,6 +187,7 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable("bk_repo_container_id_${input.pipelineTaskId}", System.getenv(BK_CI_BUILD_JOB_ID))
             EnvHelper.addEnvVariable("bk_repo_include_path_${input.pipelineTaskId}", input.includePath ?: "")
             EnvHelper.addEnvVariable("bk_repo_exclude_path_${input.pipelineTaskId}", input.excludePath ?: "")
+            EnvHelper.addEnvVariable("bk_repo_git_project_id_${input.pipelineTaskId}", "$gitProjectId")
 
             val devopsGitUrls = System.getenv(BK_CI_GIT_URLS)
             val gitUrls = if (devopsGitUrls.isNullOrBlank()) {

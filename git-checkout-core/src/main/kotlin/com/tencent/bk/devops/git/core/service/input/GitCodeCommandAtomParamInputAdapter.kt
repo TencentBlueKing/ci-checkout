@@ -159,6 +159,7 @@ class GitCodeCommandAtomParamInputAdapter(
             EnvHelper.addEnvVariable("bk_repo_include_path_${input.pipelineTaskId}", input.includePath ?: "")
             EnvHelper.addEnvVariable("bk_repo_exclude_path_${input.pipelineTaskId}", input.excludePath ?: "")
             EnvHelper.putContext(CONTEXT_REPOSITORY_TYPE, RepositoryType.URL.name)
+            EnvHelper.addEnvVariable("bk_repo_git_project_id_${input.pipelineTaskId}", "$gitProjectId")
 
             return GitSourceSettings(
                 bkWorkspace = bkWorkspace,
