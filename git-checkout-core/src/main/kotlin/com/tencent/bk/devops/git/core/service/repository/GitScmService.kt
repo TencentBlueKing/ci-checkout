@@ -1,11 +1,11 @@
 package com.tencent.bk.devops.git.core.service.repository
 
-import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.api.GitApi
 import com.tencent.bk.devops.git.core.api.GithubApi
 import com.tencent.bk.devops.git.core.api.GitlabApi
 import com.tencent.bk.devops.git.core.api.TGitApi
 import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
@@ -21,7 +21,7 @@ class GitScmService(
     fun getGitProjectId(): Long? {
         return try {
             getGitApi().getProjectId()
-        } catch (e: RemoteServiceException) {
+        } catch (e: ApiException) {
             logger.warn("can't to get gitProjectId")
             null
         }
