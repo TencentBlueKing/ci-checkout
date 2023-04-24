@@ -6,6 +6,7 @@ import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.service.helper.RetryHelper
 import okhttp3.Headers
 import okhttp3.OkHttpClient
+import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.slf4j.LoggerFactory
@@ -48,6 +49,7 @@ object HttpUtil {
         .connectTimeout(connectTimeout, TimeUnit.SECONDS)
         .readTimeout(readTimeout, TimeUnit.SECONDS)
         .writeTimeout(writeTimeout, TimeUnit.SECONDS)
+        .protocols(listOf(Protocol.HTTP_1_1))
         .build()
 
     fun buildGet(url: String, headers: Map<String, String>? = null): Request {
