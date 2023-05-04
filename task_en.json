@@ -632,6 +632,28 @@
         ]
       }
     },
+    ,
+    "submoduleDepth": {
+      "label": "submodule depth",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
     "enableVirtualMergeBranch": {
       "label": "",
       "default": true,
