@@ -112,7 +112,6 @@ class GitLogHelper(
         preCommitData: CommitData?,
         repositoryConfig: RepositoryConfig
     ): List<CommitData> {
-        val repositoryType = EnvHelper.getEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE)
         val commits = getLogs(preCommitData)
             .map { log ->
                 CommitData(
@@ -125,12 +124,7 @@ class GitLogHelper(
                     commitTime = log.commitTime, // 单位:秒
                     comment = log.commitMessage,
                     repoId = repositoryConfig.repositoryHashId,
-                    // 以URL形式进行拉取，则repoName取代码库url
-                    repoName = if (repositoryType == RepositoryType.URL.name) {
-                        settings.repositoryUrl
-                    } else {
-                        repositoryConfig.repositoryName
-                    },
+                    repoName = repositoryConfig.repositoryName,
                     elementId = settings.pipelineTaskId,
                     url = settings.repositoryUrl
                 )
@@ -149,12 +143,7 @@ class GitLogHelper(
                         0L,
                         "",
                         repoId = repositoryConfig.repositoryHashId,
-                        // 以URL形式进行拉取，则repoName取代码库url
-                        repoName = if (repositoryType == RepositoryType.URL.name) {
-                            settings.repositoryUrl
-                        } else {
-                            repositoryConfig.repositoryName
-                        },
+                        repoName = repositoryConfig.repositoryName,
                         elementId = settings.pipelineTaskId,
                         url = settings.repositoryUrl
                     )
