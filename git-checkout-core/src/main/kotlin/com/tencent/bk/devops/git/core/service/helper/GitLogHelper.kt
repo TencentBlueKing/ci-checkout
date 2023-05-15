@@ -252,7 +252,7 @@ class GitLogHelper(
             listOf(
                 PipelineBuildMaterial(
                     aliasName = aliasName,
-                    url = settings.repositoryUrl,
+                    url = getCommitHtmlUrl(commitMaterial),
                     branchName = EnvHelper.getEnvVariable(BK_CI_GIT_REPO_REF),
                     newCommitId = commitMaterial.newCommitId ?: commitMaterial.lastCommitId,
                     newCommitComment = commitMaterial.newCommitComment,
@@ -262,4 +262,19 @@ class GitLogHelper(
             )
         )
     }
+
+    /**
+     * 获取提交链接
+     */
+    private fun getCommitHtmlUrl(commitMaterial: CommitMaterial) =
+        with(GitUtil.getServerInfo(settings.repositoryUrl)) {
+            // gitlab_commit_url: https://${hostName}/${repositoryName}/-/commit/${commitId}
+            // other_commit_url: https://${hostName}/${repositoryName}/commit/${commitId}
+            val separator = if (commitMaterial.scmType == ScmType.CODE_GITLAB) {
+                "/-"
+            } else {
+                ""
+            }
+            "https://$hostName/$repositoryName$separator/commit/${commitMaterial.newCommitId}"
+        }
 }
