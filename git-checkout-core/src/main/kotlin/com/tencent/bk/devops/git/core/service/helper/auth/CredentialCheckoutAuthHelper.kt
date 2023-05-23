@@ -120,6 +120,15 @@ class CredentialCheckoutAuthHelper(
 
         install()
         store()
+        // 是否保存fork凭证
+        if (settings.storeForkRepoCredential) {
+            try {
+                forkInstall()
+                forkStore()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     private fun install() {
@@ -297,7 +306,55 @@ class CredentialCheckoutAuthHelper(
         }
         commands.add(
             "git config --add credential.helper " +
-                "\"!bash '${File(credentialShellPath).canonicalPath}' ${settings.pipelineTaskId}\""
+                    "\"!bash '${File(credentialShellPath).canonicalPath}' ${settings.pipelineTaskId}\""
         )
+    }
+
+    /**
+     * 安装fork库凭证
+     */
+    private fun forkInstall() {
+        git.configAdd(
+            configKey = "credential.${settings.sourceRepositoryUrl}.helper",
+            configValue = "!bash '$credentialShellPath' fork_${settings.pipelineTaskId}",
+            configScope = GitConfigScope.LOCAL
+        )
+    }
+
+    /**
+     * 保存fork库凭证
+     */
+    private fun forkStore() {
+        with(URL(settings.sourceRepositoryUrl).toURI()) {
+            val credentialArguments = CredentialArguments(
+                protocol = scheme,
+                host = host,
+                path = path.removePrefix("/"),
+                username = "oauth2",
+                password = settings.forkRepoAuthInfo!!.password
+            )
+            println("credentialArguments = ${credentialArguments}")
+            CommandUtil.execute(
+                executable = getJavaFilePath(),
+                args = listOf(
+                    "-Dfile.encoding=utf-8",
+                    "-Ddebug=${settings.enableTrace}",
+                    "-jar",
+                    credentialJarPath,
+                    "fork_${settings.pipelineTaskId}",
+                    "devopsStore"
+                ),
+                runtimeEnv = mapOf(
+                    GIT_REPO_PATH to settings.repositoryPath
+                ),
+                inputStream = CredentialArguments(
+                    protocol = scheme,
+                    host = host,
+                    path = path.removePrefix("/"),
+                    username = "oauth2",
+                    password = settings.forkRepoAuthInfo!!.password
+                ).convertInputStream()
+            )
+        }
     }
 }

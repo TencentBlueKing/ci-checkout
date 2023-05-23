@@ -32,6 +32,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -66,7 +67,8 @@ class CredentialStoreAuthHelper(
         )
         EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.STORE_CREDENTIAL.name)
         storeGlobalCredential(writeCompatibleHost = true)
-        writeStoreFile()
+        // 写入代码库授权信息
+        writeStoreFile(settings.authInfo, storeFile)
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
         }
@@ -79,6 +81,17 @@ class CredentialStoreAuthHelper(
             configKey = GitConstants.GIT_CREDENTIAL_HELPER,
             configValue = "store --file='${storeFile.absolutePath}'"
         )
+        // 是否保存fork凭证
+        if (settings.storeForkRepoCredential) {
+            // fork库凭证文件
+            val forkRepoStoreFile = File.createTempFile("git_", "_fork_credentials")
+            // 写入凭证
+            writeStoreFile(settings.forkRepoAuthInfo!!, forkRepoStoreFile)
+            git.configAdd(
+                configKey = GitConstants.GIT_CREDENTIAL_HELPER,
+                configValue = "store --file='${forkRepoStoreFile.absolutePath}'"
+            )
+        }
     }
 
     override fun removeAuth() {
@@ -108,9 +121,9 @@ class CredentialStoreAuthHelper(
         commands.add("git config --add credential.helper 'store --file=${storeFile.absolutePath}'")
     }
 
-    private fun writeStoreFile() {
+    private fun writeStoreFile(authInfo: AuthInfo,file: File) {
         combinableHost { protocol, host ->
-            storeFile.appendText(
+            file.appendText(
                 "$protocol://" +
                     "${GitUtil.urlEncode(authInfo.username!!)}:${GitUtil.urlEncode(authInfo.password!!)}@$host\n"
             )

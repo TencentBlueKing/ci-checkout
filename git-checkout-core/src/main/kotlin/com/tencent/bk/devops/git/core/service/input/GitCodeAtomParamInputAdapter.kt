@@ -55,12 +55,15 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_BR
 import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_URL
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
+import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
+import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.GitCodeAtomParamInput
 import com.tencent.bk.devops.git.core.service.auth.EmptyGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.RepositoryGitAuthProvider
+import com.tencent.bk.devops.git.core.service.auth.UserTokenGitAuthProvider
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -103,28 +106,7 @@ class GitCodeAtomParamInputAdapter(
                 )
             logger.info("get the repo:$repository")
             // 2. 确定分支和commit
-            var ref: String = when (pullType) {
-                PullType.BRANCH.name ->
-                    branchName
-                PullType.TAG.name -> {
-                    if (tagName.isNullOrBlank()) {
-                        throw ParamInvalidException(
-                            errorMsg = "The pull type is TAG, and the tag name cannot be empty"
-                        )
-                    }
-                    tagName!!
-                }
-                PullType.COMMIT_ID.name -> {
-                    if (commitId.isNullOrBlank()) {
-                        throw ParamInvalidException(
-                            errorMsg = "The pull type is COMMIT, and the commit_id name cannot be empty"
-                        )
-                    }
-                    commitId!!
-                }
-                else ->
-                    throw ParamInvalidException(errorMsg = "The pull method can only be BRANCH/TAG/COMMIT_ID")
-            }
+            var ref: String = getRef()
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_REF, ref)
 
             // 3. 确定是否开启pre-merge功能
@@ -141,15 +123,13 @@ class GitCodeAtomParamInputAdapter(
             }
 
             // 4. 得到授权信息,post action阶段不需要查询凭证
-            val authProvider = if (postEntryParam == "True") {
-                EmptyGitAuthProvider()
-            } else {
-                RepositoryGitAuthProvider(
-                    repository = repository,
-                    devopsApi = devopsApi
-                )
-            }
+            val authProvider = getAuthProvider(repository)
+            val scmType = RepositoryUtils.getScmType(repository)
+            // 主库凭证信息
             val authInfo = authProvider.getAuthInfo()
+            // fork库凭证信息
+            val forkRepoAuthInfo = getForkRepoAuthInfo(scmType)
+            // fork库凭证信息
             // 保存代码库相关信息
             val gitProjectId = RepositoryUtils.getGitProjectId(repository, authInfo)
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
@@ -241,7 +221,7 @@ class GitCodeAtomParamInputAdapter(
                 pipelineBuildId = pipelineBuildId,
                 pipelineStartUserName = pipelineStartUserName,
                 postEntryParam = postEntryParam,
-                scmType = RepositoryUtils.getScmType(repository),
+                scmType = scmType,
                 repositoryUrl = repository.url,
                 repositoryPath = if (localPath.isNullOrBlank()) {
                     File(bkWorkspace)
@@ -282,8 +262,71 @@ class GitCodeAtomParamInputAdapter(
                 enablePartialClone = enablePartialClone,
                 cachePath = cachePath,
                 enableGlobalInsteadOf = enableGlobalInsteadOf,
-                useCustomCredential = useCustomCredential
+                useCustomCredential = useCustomCredential,
+                forkRepoAuthInfo = forkRepoAuthInfo
             )
+        }
+    }
+
+    /**
+     * 获取代码库授权提供者
+     */
+
+    private fun getAuthProvider(repository: Repository) = with(input){
+        if (postEntryParam == "True") {
+            EmptyGitAuthProvider()
+        } else {
+            RepositoryGitAuthProvider(
+                repository = repository,
+                devopsApi = devopsApi
+            )
+        }
+    }
+
+    /**
+     * 获取fork仓库授权信息
+     */
+    private fun getForkRepoAuthInfo(scmType: ScmType) = with(input) {
+        if (enableVirtualMergeBranch && hookSourceUrl != hookTargetUrl) {
+            try {
+                UserTokenGitAuthProvider(
+                    userId = pipelineStartUserName,
+                    devopsApi = devopsApi,
+                    scmType = scmType
+                ).getAuthInfo()
+            } catch (e: Exception) {
+                null
+            }
+        } else {
+            null
+        }
+    }
+
+    /**
+     * 获取引用，确定分支和commit
+     */
+    private fun getRef() = with(input){
+        when (pullType) {
+            PullType.BRANCH.name ->
+                branchName
+            PullType.TAG.name -> {
+                if (tagName.isNullOrBlank()) {
+                    throw ParamInvalidException(
+                        errorMsg = "The pull type is TAG, and the tag name cannot be empty"
+                    )
+                }
+                tagName!!
+            }
+            PullType.COMMIT_ID.name -> {
+                if (commitId.isNullOrBlank()) {
+                    throw ParamInvalidException(
+                        errorMsg = "The pull type is COMMIT, and the commit_id name cannot be empty"
+                    )
+                }
+                commitId!!
+            }
+            else ->
+                throw ParamInvalidException(errorMsg = "The pull method can only be BRANCH/TAG/COMMIT_ID")
         }
     }
 }

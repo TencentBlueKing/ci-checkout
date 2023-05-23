@@ -202,7 +202,14 @@ data class GitSourceSettings(
      * 只要是http[s]，都是用自定义的checkout凭证,不管有没有配置全局的凭证
      * gitCodeRepo和gitCodeRepoCommand传的false,checkout传的true
      */
-    val useCustomCredential: Boolean = false
+    val useCustomCredential: Boolean = false,
+
+    /**
+     * fork库凭证信息
+     *
+     * 当启用preMr，且为[fork库]向[main库]发MR时，以此凭证信息拉取fork库
+     */
+    val forkRepoAuthInfo: AuthInfo? = null
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(
@@ -210,4 +217,13 @@ data class GitSourceSettings(
             otherRepositoryUrl = sourceRepositoryUrl,
             hostNameList = compatibleHostList
         )
+
+    /**
+     * 是否保存fork库凭证
+     * 1.开启preMr
+     * 2.webhook触发的源库和目标库不一致
+     * 3.fork库授权信息不为空
+     */
+    val storeForkRepoCredential: Boolean
+        get() = preMerge && !sourceRepoUrlEqualsRepoUrl && forkRepoAuthInfo != null
 }

@@ -32,6 +32,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.CommandLogLevel
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.GitSubmodule
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -62,19 +63,27 @@ class PlaintextGitAuthHelper(
         logger.info("using plaintext auth to set credentials ${authInfo.username}/******")
         EnvHelper.putContext(ContextConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
         with(settings) {
-            replaceUrl(repositoryUrl, GitConstants.ORIGIN_REMOTE_NAME)
+            replaceUrl(
+                url = repositoryUrl,
+                remoteName = GitConstants.ORIGIN_REMOTE_NAME,
+                authInfo = authInfo
+            )
             if (preMerge && !sourceRepoUrlEqualsRepoUrl) {
-                replaceUrl(sourceRepositoryUrl, GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME)
+                replaceUrl(
+                    url = sourceRepositoryUrl,
+                    remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME,
+                    authInfo = forkRepoAuthInfo ?: authInfo
+                )
             }
         }
         EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.PLAINTEXT.name)
     }
 
-    private fun replaceUrl(url: String, remoteName: String) {
+    private fun replaceUrl(url: String, remoteName: String, authInfo: AuthInfo) {
         val uri = URI(url)
         val authUrl = "${uri.scheme}://" +
-            "${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}@" +
-            "${uri.host}${uri.path}"
+                "${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}@" +
+                "${uri.host}${uri.path}"
         git.remoteSetUrl(remoteName = remoteName, remoteUrl = authUrl)
     }
 
