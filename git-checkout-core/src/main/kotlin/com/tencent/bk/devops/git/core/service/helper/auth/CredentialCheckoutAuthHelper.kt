@@ -114,7 +114,7 @@ class CredentialCheckoutAuthHelper(
             git.config(GitConstants.GIT_CREDENTIAL_USERNAME, settings.pipelineTaskId)
         }
         git.configAdd(
-            configKey = GIT_CREDENTIAL_HELPER,
+            configKey = repoCredentialHelperKey(),
             configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}"
         )
 
@@ -147,20 +147,20 @@ class CredentialCheckoutAuthHelper(
         )
         // TODO 卸载历史的全局的git-checkout-credential凭证,后续需要删除
         git.tryConfigUnset(
-            configKey = GIT_CREDENTIAL_HELPER,
+            configKey = repoCredentialHelperKey(),
             configValueRegex = GitConstants.GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
             configScope = GitConfigScope.GLOBAL
         )
         try {
             // 凭证管理必须安装在全局,否则无法传递给其他插件
             if (!git.configExists(
-                    configKey = GIT_CREDENTIAL_HELPER,
+                    configKey = repoCredentialHelperKey(),
                     configValueRegex = GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX,
                     configScope = GitConfigScope.GLOBAL
                 )
             ) {
                 git.configAdd(
-                    configKey = GIT_CREDENTIAL_HELPER,
+                    configKey = repoCredentialHelperKey(),
                     configValue = "!bash '$credentialShellPath'",
                     configScope = GitConfigScope.GLOBAL
                 )
@@ -314,9 +314,10 @@ class CredentialCheckoutAuthHelper(
      * 安装fork库凭证
      */
     private fun forkInstall() {
+        git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
         git.configAdd(
             configKey = "credential.${settings.sourceRepositoryUrl}.helper",
-            configValue = "!bash '$credentialShellPath' fork_${settings.pipelineTaskId}",
+            configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}-fork",
             configScope = GitConfigScope.LOCAL
         )
     }
@@ -326,14 +327,6 @@ class CredentialCheckoutAuthHelper(
      */
     private fun forkStore() {
         with(URL(settings.sourceRepositoryUrl).toURI()) {
-            val credentialArguments = CredentialArguments(
-                protocol = scheme,
-                host = host,
-                path = path.removePrefix("/"),
-                username = "oauth2",
-                password = settings.forkRepoAuthInfo!!.password
-            )
-            println("credentialArguments = ${credentialArguments}")
             CommandUtil.execute(
                 executable = getJavaFilePath(),
                 args = listOf(
@@ -341,7 +334,7 @@ class CredentialCheckoutAuthHelper(
                     "-Ddebug=${settings.enableTrace}",
                     "-jar",
                     credentialJarPath,
-                    "fork_${settings.pipelineTaskId}",
+                    "${settings.pipelineTaskId}-fork",
                     "devopsStore"
                 ),
                 runtimeEnv = mapOf(
@@ -351,7 +344,7 @@ class CredentialCheckoutAuthHelper(
                     protocol = scheme,
                     host = host,
                     path = path.removePrefix("/"),
-                    username = "oauth2",
+                    username = settings.forkRepoAuthInfo!!.username,
                     password = settings.forkRepoAuthInfo!!.password
                 ).convertInputStream()
             )

@@ -164,4 +164,14 @@ abstract class HttpGitAuthHelper(
             }
         }
     }
+
+    /**
+     * 主库凭证配置Key
+     */
+    fun repoCredentialHelperKey() = "credential.${settings.repositoryUrl}.helper"
+
+    /**
+     * fork库凭证配置Key
+     */
+    fun forkRepoCredentialHelperKey() = "credential.${settings.sourceRepositoryUrl}.helper"
 }
