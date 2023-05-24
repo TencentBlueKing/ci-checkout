@@ -33,7 +33,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
@@ -253,12 +253,16 @@ class CredentialCheckoutAuthHelper(
                 )
             }
         }
-        git.tryConfigUnset(configKey = GIT_CREDENTIAL_HELPER)
+        git.tryConfigUnset(configKey = repoCredentialHelperKey())
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         if (!git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_USERNAME)
         }
-        git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
+        git.tryConfigGetAll(configKey = repoCredentialHelperKey())
+
+        if (settings.storeForkRepoCredential) {
+            removeForkAuth(taskId)
+        }
     }
 
     override fun configXdgAuthCommand() {
@@ -349,5 +353,34 @@ class CredentialCheckoutAuthHelper(
                 ).convertInputStream()
             )
         }
+    }
+
+    private fun removeForkAuth(taskId: String) {
+        // 清理构建机上凭证
+        if (File(credentialJarPath).exists()) {
+            with(URL(settings.sourceRepositoryUrl).toURI()) {
+                CommandUtil.execute(
+                    executable = getJavaFilePath(),
+                    args = listOf(
+                        "-Dfile.encoding=utf-8",
+                        "-Ddebug=${settings.enableTrace}",
+                        "-jar",
+                        credentialJarPath,
+                        "$taskId-fork",
+                        "devopsErase"
+                    ),
+                    runtimeEnv = mapOf(
+                        GIT_REPO_PATH to settings.repositoryPath
+                    ),
+                    inputStream = CredentialArguments(
+                        protocol = scheme,
+                        host = host,
+                        path = path.removePrefix("/")
+                    ).convertInputStream()
+                )
+            }
+        }
+        git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
+        git.tryConfigGetAll(configKey = forkRepoCredentialHelperKey())
     }
 }

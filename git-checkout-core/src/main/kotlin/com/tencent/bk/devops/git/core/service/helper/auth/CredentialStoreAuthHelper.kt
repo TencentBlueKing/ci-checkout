@@ -71,10 +71,15 @@ class CredentialStoreAuthHelper(
         writeStoreFile(settings.authInfo, storeFile)
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
+            git.config(
+                configKey = repoCredentialHelperKey(),
+                configValue = "\"\"",
+                configScope = GitConfigScope.LOCAL
+            )
         }
         // 卸载子模块insteadOf时使用
         git.config(
-            configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY,
+            configKey = repoCredentialHelperKey(),
             configValue = "url.${serverInfo.origin}/.insteadOf"
         )
         git.configAdd(
@@ -95,19 +100,9 @@ class CredentialStoreAuthHelper(
     }
 
     override fun removeAuth() {
-        val storeCredentialValue = git.tryConfigGet(
-            configKey = GitConstants.GIT_CREDENTIAL_HELPER,
-            configValueRegex = "store"
-        )
-        if (storeCredentialValue.isNotEmpty()) {
-            val credentialFilePath = storeCredentialValue.substringAfter("--file=")
-                .removePrefix("'").removeSuffix("'")
-            if (credentialFilePath.isNotEmpty()) {
-                Files.deleteIfExists(Paths.get(credentialFilePath))
-            }
-            git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
-            git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
-            git.tryConfigGetAll(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
+        removeRepoAuth(repoAuthKey = repoCredentialHelperKey())
+        if (settings.storeForkRepoCredential) {
+            removeRepoAuth(repoAuthKey = forkRepoCredentialHelperKey())
         }
     }
 
@@ -121,12 +116,29 @@ class CredentialStoreAuthHelper(
         commands.add("git config --add credential.helper 'store --file=${storeFile.absolutePath}'")
     }
 
-    private fun writeStoreFile(authInfo: AuthInfo,file: File) {
+    private fun writeStoreFile(authInfo: AuthInfo, file: File) {
         combinableHost { protocol, host ->
             file.appendText(
                 "$protocol://" +
                     "${GitUtil.urlEncode(authInfo.username!!)}:${GitUtil.urlEncode(authInfo.password!!)}@$host\n"
             )
+        }
+    }
+
+    private fun removeRepoAuth(repoAuthKey: String) {
+        val storeCredentialValue = git.tryConfigGet(
+            configKey = repoAuthKey,
+            configValueRegex = "store"
+        )
+        if (storeCredentialValue.isNotEmpty()) {
+            val credentialFilePath = storeCredentialValue.substringAfter("--file=")
+                .removePrefix("'").removeSuffix("'")
+            if (credentialFilePath.isNotEmpty()) {
+                Files.deleteIfExists(Paths.get(credentialFilePath))
+            }
+            git.tryConfigUnset(configKey = repoAuthKey)
+            git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
+            git.tryConfigGetAll(configKey = repoAuthKey)
         }
     }
 }

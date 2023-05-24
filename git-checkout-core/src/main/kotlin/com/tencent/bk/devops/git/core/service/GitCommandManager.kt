@@ -563,6 +563,7 @@ class GitCommandManager(
         val args = mutableListOf("merge")
         if (isAtLeastVersion(SUPPORT_MERGE_NO_VERIFY_GIT_VERSION)) {
             args.add("--no-verify")
+            args.add("--allow-unrelated-histories")
         }
         args.add(ref)
         execGit(args = args)
