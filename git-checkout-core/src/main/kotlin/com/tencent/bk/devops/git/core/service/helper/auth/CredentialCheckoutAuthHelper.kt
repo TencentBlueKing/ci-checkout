@@ -310,7 +310,7 @@ class CredentialCheckoutAuthHelper(
         }
         commands.add(
             "git config --add credential.helper " +
-                    "\"!bash '${File(credentialShellPath).canonicalPath}' ${settings.pipelineTaskId}\""
+                "\"!bash '${File(credentialShellPath).canonicalPath}' ${settings.pipelineTaskId}\""
         )
     }
 

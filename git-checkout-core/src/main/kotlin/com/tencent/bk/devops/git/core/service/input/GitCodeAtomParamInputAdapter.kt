@@ -295,6 +295,7 @@ class GitCodeAtomParamInputAdapter(
                     scmType = scmType
                 ).getAuthInfo()
             } catch (e: Exception) {
+                logger.warn("can't get fork repository auth info,${e.message}")
                 null
             }
         } else {

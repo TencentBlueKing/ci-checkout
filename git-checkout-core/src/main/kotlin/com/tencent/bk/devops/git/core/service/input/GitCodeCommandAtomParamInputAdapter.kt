@@ -63,7 +63,6 @@ class GitCodeCommandAtomParamInputAdapter(
 
     companion object {
         private val devopsApi = DevopsApi()
-
         private val logger = LoggerFactory.getLogger(GitCodeCommandAtomParamInputAdapter::class.java)
     }
 
@@ -254,7 +253,7 @@ class GitCodeCommandAtomParamInputAdapter(
                     scmType = scmType
                 ).getAuthInfo()
             } catch (e: Exception) {
-                logger.warn("get fork repository auth info,${e.message}")
+                logger.warn("can't get fork repository auth info,${e.message}")
                 null
             }
         } else {
