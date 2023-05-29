@@ -126,7 +126,7 @@ class CredentialCheckoutAuthHelper(
                 forkInstall()
                 forkStore()
             } catch (e: Exception) {
-                e.printStackTrace()
+                logger.debug("Failure to save forkRepo credential", e)
             }
         }
     }

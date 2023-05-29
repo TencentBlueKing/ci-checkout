@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.GitCodeCommandAtomParamInput
@@ -48,12 +49,10 @@ import com.tencent.bk.devops.git.core.service.auth.OauthGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.PrivateGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.UserNamePasswordGitAuthProvider
 import com.tencent.bk.devops.git.core.service.auth.UserTokenGitAuthProvider
-import com.tencent.bk.devops.git.core.service.handler.GitAuthHandler
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.service.repository.GitScmService
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
-import com.tencent.bk.devops.git.core.util.RepositoryUtils
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -78,7 +77,7 @@ class GitCodeCommandAtomParamInputAdapter(
             // 主库凭证信息
             val authInfo = authProvider.getAuthInfo()
             // fork库凭证信息
-            val forkRepoAuthInfo = getForkRepoAuthInfo()
+            var forkRepoAuthInfo: AuthInfo? = null
             // 代码库ID
             val gitProjectId = GitScmService(
                 scmType = scmType,
@@ -98,6 +97,7 @@ class GitCodeCommandAtomParamInputAdapter(
             if (preMerge) {
                 ref = hookTargetBranch!!
                 pullType = PullType.BRANCH.name
+                forkRepoAuthInfo = getForkRepoAuthInfo()
             }
 
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
@@ -245,7 +245,9 @@ class GitCodeCommandAtomParamInputAdapter(
      * 获取fork仓库授权信息
      */
     private fun getForkRepoAuthInfo() = with(input) {
-        if (enableVirtualMergeBranch && hookSourceUrl != hookTargetUrl) {
+        if (postEntryParam == "True") {
+            null
+        } else {
             try {
                 UserTokenGitAuthProvider(
                     userId = pipelineStartUserName,
@@ -256,8 +258,6 @@ class GitCodeCommandAtomParamInputAdapter(
                 logger.warn("can't get fork repository auth info,${e.message}")
                 null
             }
-        } else {
-            null
         }
     }
 }

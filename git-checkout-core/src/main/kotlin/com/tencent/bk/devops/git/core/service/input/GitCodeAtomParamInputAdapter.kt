@@ -57,6 +57,7 @@ import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
@@ -117,19 +118,19 @@ class GitCodeAtomParamInputAdapter(
                 hookTargetUrl = hookTargetUrl,
                 compatibleHostList = compatibleHostList
             )
+            // fork库凭证信息
+            var forkRepoAuthInfo: AuthInfo? = null
+            val scmType = RepositoryUtils.getScmType(repository)
             if (preMerge) {
                 ref = hookTargetBranch!!
                 pullType = PullType.BRANCH.name
+                forkRepoAuthInfo = getForkRepoAuthInfo(scmType)
             }
 
             // 4. 得到授权信息,post action阶段不需要查询凭证
             val authProvider = getAuthProvider(repository)
-            val scmType = RepositoryUtils.getScmType(repository)
             // 主库凭证信息
             val authInfo = authProvider.getAuthInfo()
-            // fork库凭证信息
-            val forkRepoAuthInfo = getForkRepoAuthInfo(scmType)
-            // fork库凭证信息
             // 保存代码库相关信息
             val gitProjectId = RepositoryUtils.getGitProjectId(repository, authInfo)
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
@@ -287,7 +288,9 @@ class GitCodeAtomParamInputAdapter(
      * 获取fork仓库授权信息
      */
     private fun getForkRepoAuthInfo(scmType: ScmType) = with(input) {
-        if (enableVirtualMergeBranch && hookSourceUrl != hookTargetUrl) {
+        if (postEntryParam == "True") {
+            null
+        } else {
             try {
                 UserTokenGitAuthProvider(
                     userId = pipelineStartUserName,
@@ -298,8 +301,6 @@ class GitCodeAtomParamInputAdapter(
                 logger.warn("can't get fork repository auth info,${e.message}")
                 null
             }
-        } else {
-            null
         }
     }
 
