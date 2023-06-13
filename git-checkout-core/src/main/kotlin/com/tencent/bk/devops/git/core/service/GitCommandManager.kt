@@ -37,6 +37,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_MERGE_NO_VERIFY_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_RECURSE_SUBMODULES_VERSION
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SET_CURRENT_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SET_UPSTREAM_TO_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_SYNC_RECURSIVE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION
@@ -739,5 +740,17 @@ class GitCommandManager(
         val args = mutableListOf("lfs", "prune")
         val output = execGit(args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
         return output.exitCode == 0
+    }
+
+    /**
+     * 输出当前分支名
+     */
+    fun currentBranch() {
+        val args = if (isAtLeastVersion(SUPPORT_SET_CURRENT_BRANCH)) {
+            listOf("branch", "--show-current")
+        } else {
+            listOf("branch", "rev-parse", "--abbrev-ref", "HEAD")
+        }
+        execGit(args = args)
     }
 }

@@ -56,6 +56,7 @@ class GitCheckoutAndMergeHandler(
         val startEpoch = System.currentTimeMillis()
         try {
             logger.groupStart("Checking out")
+            git.currentBranch()
             val checkoutInfo = refHelper.getCheckInfo()
             settings.initSparseCheckout(checkoutInfo)
             EnvHelper.putContext(CONTEXT_CHECKOUT_REF, checkoutInfo.ref)
