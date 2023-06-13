@@ -259,7 +259,7 @@ class CredentialCheckoutAuthHelper(
             git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_USERNAME)
         }
         git.tryConfigGetAll(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
-
+        logger.info("settings:${settings}")
         // 卸载时不校验fork库凭证是否存在，直接卸载
         if (settings.preMerge && settings.sourceRepoUrlEqualsRepoUrl) {
             removeForkAuth(taskId)
