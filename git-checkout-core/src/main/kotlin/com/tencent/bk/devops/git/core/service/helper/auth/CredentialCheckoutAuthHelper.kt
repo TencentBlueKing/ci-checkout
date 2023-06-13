@@ -114,7 +114,7 @@ class CredentialCheckoutAuthHelper(
             git.config(GitConstants.GIT_CREDENTIAL_USERNAME, settings.pipelineTaskId)
         }
         git.configAdd(
-            configKey = repoCredentialHelperKey(),
+            configKey = GitConstants.GIT_CREDENTIAL_HELPER,
             configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}"
         )
 
@@ -147,20 +147,20 @@ class CredentialCheckoutAuthHelper(
         )
         // TODO 卸载历史的全局的git-checkout-credential凭证,后续需要删除
         git.tryConfigUnset(
-            configKey = repoCredentialHelperKey(),
+            configKey = GitConstants.GIT_CREDENTIAL_HELPER,
             configValueRegex = GitConstants.GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
             configScope = GitConfigScope.GLOBAL
         )
         try {
             // 凭证管理必须安装在全局,否则无法传递给其他插件
             if (!git.configExists(
-                    configKey = repoCredentialHelperKey(),
+                    configKey = GitConstants.GIT_CREDENTIAL_HELPER,
                     configValueRegex = GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX,
                     configScope = GitConfigScope.GLOBAL
                 )
             ) {
                 git.configAdd(
-                    configKey = repoCredentialHelperKey(),
+                    configKey = GitConstants.GIT_CREDENTIAL_HELPER,
                     configValue = "!bash '$credentialShellPath'",
                     configScope = GitConfigScope.GLOBAL
                 )
@@ -253,12 +253,12 @@ class CredentialCheckoutAuthHelper(
                 )
             }
         }
-        git.tryConfigUnset(configKey = repoCredentialHelperKey())
+        git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         if (!git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_USERNAME)
         }
-        git.tryConfigGetAll(configKey = repoCredentialHelperKey())
+        git.tryConfigGetAll(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
 
         if (settings.storeForkRepoCredential) {
             removeForkAuth(taskId)

@@ -168,7 +168,7 @@ abstract class HttpGitAuthHelper(
     /**
      * 主库凭证配置Key
      */
-    fun repoCredentialHelperKey() = GitConstants.GIT_CREDENTIAL_HELPER
+    fun repoCredentialHelperKey() = "credential.${settings.repositoryUrl}.helper"
 
     /**
      * fork库凭证配置Key
