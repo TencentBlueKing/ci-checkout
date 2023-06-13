@@ -33,7 +33,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
@@ -114,7 +114,7 @@ class CredentialCheckoutAuthHelper(
             git.config(GitConstants.GIT_CREDENTIAL_USERNAME, settings.pipelineTaskId)
         }
         git.configAdd(
-            configKey = GitConstants.GIT_CREDENTIAL_HELPER,
+            configKey = GIT_CREDENTIAL_HELPER,
             configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}"
         )
 
@@ -147,20 +147,20 @@ class CredentialCheckoutAuthHelper(
         )
         // TODO 卸载历史的全局的git-checkout-credential凭证,后续需要删除
         git.tryConfigUnset(
-            configKey = GitConstants.GIT_CREDENTIAL_HELPER,
+            configKey = GIT_CREDENTIAL_HELPER,
             configValueRegex = GitConstants.GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX,
             configScope = GitConfigScope.GLOBAL
         )
         try {
             // 凭证管理必须安装在全局,否则无法传递给其他插件
             if (!git.configExists(
-                    configKey = GitConstants.GIT_CREDENTIAL_HELPER,
+                    configKey = GIT_CREDENTIAL_HELPER,
                     configValueRegex = GitConstants.GIT_CREDENTIAL_HELPER_VALUE_REGEX,
                     configScope = GitConfigScope.GLOBAL
                 )
             ) {
                 git.configAdd(
-                    configKey = GitConstants.GIT_CREDENTIAL_HELPER,
+                    configKey = GIT_CREDENTIAL_HELPER,
                     configValue = "!bash '$credentialShellPath'",
                     configScope = GitConfigScope.GLOBAL
                 )
@@ -253,12 +253,12 @@ class CredentialCheckoutAuthHelper(
                 )
             }
         }
-        git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
+        git.tryConfigUnset(configKey = GIT_CREDENTIAL_HELPER)
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         if (!git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_USERNAME)
         }
-        git.tryConfigGetAll(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
+        git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
         // 卸载时不校验fork库凭证是否存在，直接卸载
         if (settings.preMerge && !settings.sourceRepoUrlEqualsRepoUrl) {
             removeForkAuth(taskId)
