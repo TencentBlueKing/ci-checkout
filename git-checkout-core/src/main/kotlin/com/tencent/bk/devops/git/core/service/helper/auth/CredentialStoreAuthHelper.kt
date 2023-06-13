@@ -102,7 +102,7 @@ class CredentialStoreAuthHelper(
     override fun removeAuth() {
         removeRepoAuth(repoAuthKey = repoCredentialHelperKey())
         // 卸载时不校验fork库凭证是否存在，直接卸载
-        if (settings.preMerge && settings.sourceRepoUrlEqualsRepoUrl) {
+        if (settings.preMerge && !settings.sourceRepoUrlEqualsRepoUrl) {
             removeRepoAuth(repoAuthKey = forkRepoCredentialHelperKey())
         }
     }
