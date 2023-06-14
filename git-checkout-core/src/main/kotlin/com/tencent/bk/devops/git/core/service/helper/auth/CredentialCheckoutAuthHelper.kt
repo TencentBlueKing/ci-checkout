@@ -33,6 +33,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
