@@ -753,4 +753,11 @@ class GitCommandManager(
         }
         execGit(args = args)
     }
+
+    /**
+     * 输出当前lfs版本
+     */
+    fun lfsVersion() {
+        execGit(args = listOf("lfs", "version"))
+    }
 }

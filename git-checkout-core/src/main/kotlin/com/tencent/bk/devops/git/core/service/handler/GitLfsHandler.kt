@@ -23,6 +23,7 @@ class GitLfsHandler(
                     return
                 }
                 logger.groupStart("Fetching lfs")
+                git.lfsVersion()
                 if (lfsConcurrentTransfers != null && lfsConcurrentTransfers > 0) {
                     git.config(configKey = "lfs.concurrenttransfers", configValue = lfsConcurrentTransfers.toString())
                 }
