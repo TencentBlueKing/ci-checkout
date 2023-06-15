@@ -79,7 +79,7 @@ class CredentialStoreAuthHelper(
         }
         // 卸载子模块insteadOf时使用
         git.config(
-            configKey = repoCredentialHelperKey(),
+            configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY,
             configValue = "url.${serverInfo.origin}/.insteadOf"
         )
         git.configAdd(
