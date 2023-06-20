@@ -57,7 +57,7 @@ class GitCheckoutAndMergeHandler(
         try {
             logger.groupStart("Checking out")
             if (settings.pullStrategy != PullStrategy.FRESH_CHECKOUT) {
-                git.currentBranch()
+                git.currentStatus()
             }
             val checkoutInfo = refHelper.getCheckInfo()
             settings.initSparseCheckout(checkoutInfo)

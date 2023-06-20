@@ -743,15 +743,10 @@ class GitCommandManager(
     }
 
     /**
-     * 输出当前分支名
+     * 输出当前git状态
      */
-    fun currentBranch() {
-        val args = if (isAtLeastVersion(SUPPORT_SET_CURRENT_BRANCH)) {
-            listOf("branch", "--show-current")
-        } else {
-            listOf("rev-parse", "--abbrev-ref", "HEAD")
-        }
-        execGit(args = args)
+    fun currentStatus() {
+        execGit(args = listOf("status"))
     }
 
     /**
