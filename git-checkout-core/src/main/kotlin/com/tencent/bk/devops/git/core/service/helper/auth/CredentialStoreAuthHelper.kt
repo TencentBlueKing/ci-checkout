@@ -71,11 +71,6 @@ class CredentialStoreAuthHelper(
         writeStoreFile(settings.authInfo, storeFile)
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
-            git.config(
-                configKey = repoCredentialHelperKey(),
-                configValue = "\"\"",
-                configScope = GitConfigScope.LOCAL
-            )
         }
         // 卸载子模块insteadOf时使用
         git.config(
