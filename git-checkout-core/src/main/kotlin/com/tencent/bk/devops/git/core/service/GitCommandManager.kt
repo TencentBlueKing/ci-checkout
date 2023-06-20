@@ -749,7 +749,7 @@ class GitCommandManager(
         val args = if (isAtLeastVersion(SUPPORT_SET_CURRENT_BRANCH)) {
             listOf("branch", "--show-current")
         } else {
-            listOf("branch", "rev-parse", "--abbrev-ref", "HEAD")
+            listOf("rev-parse", "--abbrev-ref", "HEAD")
         }
         execGit(args = args)
     }
