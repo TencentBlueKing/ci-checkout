@@ -22,7 +22,7 @@ class GitScmService(
         return try {
             getGitApi().getProjectId()
         } catch (e: ApiException) {
-            logger.info("can't to get gitProjectId")
+            logger.debug("can't to get gitProjectId")
             null
         }
     }

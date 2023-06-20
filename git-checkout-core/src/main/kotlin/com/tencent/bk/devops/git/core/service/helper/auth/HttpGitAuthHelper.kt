@@ -51,7 +51,7 @@ abstract class HttpGitAuthHelper(
     }
 
     override fun removePreviousAuth() {
-        git.tryConfigUnset(configKey = repoCredentialHelperKey())
+        git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
         val insteadOfKey = git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         if (insteadOfKey.isNotBlank()) {
             git.submoduleForeach(
