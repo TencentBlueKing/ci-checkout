@@ -78,7 +78,7 @@ class CredentialStoreAuthHelper(
             configValue = "url.${serverInfo.origin}/.insteadOf"
         )
         git.configAdd(
-            configKey = repoCredentialHelperKey(),
+            configKey = GitConstants.GIT_CREDENTIAL_HELPER,
             configValue = "store --file='${storeFile.absolutePath}'"
         )
         // 是否保存fork凭证
