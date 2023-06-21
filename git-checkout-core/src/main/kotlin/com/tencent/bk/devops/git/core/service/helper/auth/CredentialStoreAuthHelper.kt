@@ -32,7 +32,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
-import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -67,8 +66,7 @@ class CredentialStoreAuthHelper(
         )
         EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.STORE_CREDENTIAL.name)
         storeGlobalCredential(writeCompatibleHost = true)
-        // 写入代码库授权信息
-        writeStoreFile(settings.authInfo, storeFile)
+        writeStoreFile()
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
         }
@@ -78,27 +76,25 @@ class CredentialStoreAuthHelper(
             configValue = "url.${serverInfo.origin}/.insteadOf"
         )
         git.configAdd(
-            configKey = repoCredentialHelperKey(),
+            configKey = GitConstants.GIT_CREDENTIAL_HELPER,
             configValue = "store --file='${storeFile.absolutePath}'"
         )
-        // 是否保存fork凭证
-        if (settings.storeForkRepoCredential) {
-            // fork库凭证文件
-            val forkRepoStoreFile = File.createTempFile("git_", "_fork_credentials")
-            // 写入凭证
-            writeStoreFile(settings.forkRepoAuthInfo!!, forkRepoStoreFile)
-            git.configAdd(
-                configKey = forkRepoCredentialHelperKey(),
-                configValue = "store --file='${forkRepoStoreFile.absolutePath}'"
-            )
-        }
     }
 
     override fun removeAuth() {
-        removeRepoAuth(repoAuthKey = repoCredentialHelperKey())
-        // 卸载时不校验fork库凭证是否存在，直接卸载
-        if (settings.preMerge && !settings.sourceRepoUrlEqualsRepoUrl) {
-            removeRepoAuth(repoAuthKey = forkRepoCredentialHelperKey())
+        val storeCredentialValue = git.tryConfigGet(
+            configKey = GitConstants.GIT_CREDENTIAL_HELPER,
+            configValueRegex = "store"
+        )
+        if (storeCredentialValue.isNotEmpty()) {
+            val credentialFilePath = storeCredentialValue.substringAfter("--file=")
+                .removePrefix("'").removeSuffix("'")
+            if (credentialFilePath.isNotEmpty()) {
+                Files.deleteIfExists(Paths.get(credentialFilePath))
+            }
+            git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
+            git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
+            git.tryConfigGetAll(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
         }
     }
 
@@ -112,29 +108,12 @@ class CredentialStoreAuthHelper(
         commands.add("git config --add credential.helper 'store --file=${storeFile.absolutePath}'")
     }
 
-    private fun writeStoreFile(authInfo: AuthInfo, file: File) {
+    private fun writeStoreFile() {
         combinableHost { protocol, host ->
-            file.appendText(
+            storeFile.appendText(
                 "$protocol://" +
                     "${GitUtil.urlEncode(authInfo.username!!)}:${GitUtil.urlEncode(authInfo.password!!)}@$host\n"
             )
-        }
-    }
-
-    private fun removeRepoAuth(repoAuthKey: String) {
-        val storeCredentialValue = git.tryConfigGet(
-            configKey = repoAuthKey,
-            configValueRegex = "store"
-        )
-        if (storeCredentialValue.isNotEmpty()) {
-            val credentialFilePath = storeCredentialValue.substringAfter("--file=")
-                .removePrefix("'").removeSuffix("'")
-            if (credentialFilePath.isNotEmpty()) {
-                Files.deleteIfExists(Paths.get(credentialFilePath))
-            }
-            git.tryConfigUnset(configKey = repoAuthKey)
-            git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
-            git.tryConfigGetAll(configKey = repoAuthKey)
         }
     }
 }

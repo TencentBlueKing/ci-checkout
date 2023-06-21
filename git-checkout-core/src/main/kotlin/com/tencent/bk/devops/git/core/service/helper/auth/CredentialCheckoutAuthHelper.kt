@@ -321,7 +321,7 @@ class CredentialCheckoutAuthHelper(
     private fun forkInstall() {
         git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
         git.configAdd(
-            configKey = "credential.${settings.sourceRepositoryUrl}.helper",
+            configKey = forkRepoCredentialHelperKey(),
             configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}-fork",
             configScope = GitConfigScope.LOCAL
         )
