@@ -37,6 +37,7 @@ import com.tencent.bk.devops.git.core.enums.AuthType
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -254,7 +255,7 @@ class GitCodeCommandAtomParamInputAdapter(
                     devopsApi = devopsApi,
                     scmType = scmType
                 ).getAuthInfo()
-            } catch (e: Exception) {
+            } catch (e: ApiException) {
                 logger.warn("can't get fork repository auth info,${e.message}")
                 null
             }
