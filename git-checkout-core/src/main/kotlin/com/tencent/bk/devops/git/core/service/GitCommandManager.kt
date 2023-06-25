@@ -740,4 +740,18 @@ class GitCommandManager(
         val output = execGit(args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
         return output.exitCode == 0
     }
+
+    /**
+     * 输出当前git状态
+     */
+    fun currentStatus() {
+        execGit(args = listOf("status"))
+    }
+
+    /**
+     * 输出当前lfs版本
+     */
+    fun lfsVersion() {
+        execGit(args = listOf("lfs", "version"))
+    }
 }

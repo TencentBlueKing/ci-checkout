@@ -32,11 +32,14 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.SSHAgentUtils
+import java.net.URI
 
 class SshGitAuthHelper(
     private val git: GitCommandManager,
@@ -70,11 +73,23 @@ class SshGitAuthHelper(
             configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY,
             configValue = "url.git@${serverInfo.hostName}:.insteadof"
         )
+        if (settings.storeForkRepoCredential){
+            replaceUrl(
+                url = settings.sourceRepositoryUrl,
+                remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME,
+                authInfo = settings.forkRepoAuthInfo!!
+            )
+        }
     }
 
     override fun removeAuth() {
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
+        with(settings){
+            if (preMerge && !sourceRepoUrlEqualsRepoUrl) {
+                git.remoteSetUrl(remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME, remoteUrl = sourceRepositoryUrl)
+            }
+        }
     }
 
     override fun insteadOf() {
@@ -113,5 +128,11 @@ class SshGitAuthHelper(
         commands: MutableList<String>
     ) {
         commands.add("git config --remove-section url.${serverInfo.origin}:")
+    }
+
+    private fun replaceUrl(url: String, remoteName: String, authInfo: AuthInfo) {
+        val uri = URI(url)
+        val authUrl = "${uri.scheme}://${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}@${uri.host}${uri.path}"
+        git.remoteSetUrl(remoteName = remoteName, remoteUrl = authUrl)
     }
 }

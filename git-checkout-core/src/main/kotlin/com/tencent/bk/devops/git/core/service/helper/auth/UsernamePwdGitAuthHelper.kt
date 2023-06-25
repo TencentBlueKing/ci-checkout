@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -55,9 +56,17 @@ class UsernamePwdGitAuthHelper(
         logger.info("using username and password to set credentials ${authInfo.username}/******")
         EnvHelper.putContext(ContextConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.HTTP.name)
         with(settings) {
-            replaceUrl(repositoryUrl, GitConstants.ORIGIN_REMOTE_NAME)
+            replaceUrl(
+                url = repositoryUrl,
+                remoteName = GitConstants.ORIGIN_REMOTE_NAME,
+                authInfo = authInfo
+            )
             if (preMerge && !sourceRepoUrlEqualsRepoUrl) {
-                replaceUrl(sourceRepositoryUrl, GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME)
+                replaceUrl(
+                    url = sourceRepositoryUrl,
+                    remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME,
+                    authInfo = forkRepoAuthInfo ?: authInfo
+                )
             }
         }
         git.config(
@@ -72,7 +81,7 @@ class UsernamePwdGitAuthHelper(
         EnvHelper.putContext(GitConstants.GIT_CREDENTIAL_AUTH_HELPER, AuthHelperType.USERNAME_PASSWORD.name)
     }
 
-    private fun replaceUrl(url: String, remoteName: String) {
+    private fun replaceUrl(url: String, remoteName: String, authInfo: AuthInfo) {
         val uri = URI(url)
         val authUrl = "${uri.scheme}://${authInfo.username}:${urlEncode(authInfo.password!!)}@${uri.host}${uri.path}"
         git.remoteSetUrl(remoteName = remoteName, remoteUrl = authUrl)

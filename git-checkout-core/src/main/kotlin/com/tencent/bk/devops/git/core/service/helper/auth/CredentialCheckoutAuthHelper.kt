@@ -33,6 +33,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_COMPATIBLEHOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
@@ -120,6 +121,15 @@ class CredentialCheckoutAuthHelper(
 
         install()
         store()
+        // 是否保存fork凭证
+        if (settings.storeForkRepoCredential) {
+            try {
+                forkInstall()
+                forkStore()
+            } catch (e: Exception) {
+                logger.debug("Failure to save forkRepo credential", e)
+            }
+        }
     }
 
     private fun install() {
@@ -250,6 +260,10 @@ class CredentialCheckoutAuthHelper(
             git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_USERNAME)
         }
         git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
+        // 卸载时不校验fork库凭证是否存在，直接卸载
+        if (settings.preMerge && !settings.sourceRepoUrlEqualsRepoUrl) {
+            removeForkAuth(taskId)
+        }
     }
 
     override fun configXdgAuthCommand() {
@@ -299,5 +313,75 @@ class CredentialCheckoutAuthHelper(
             "git config --add credential.helper " +
                 "\"!bash '${File(credentialShellPath).canonicalPath}' ${settings.pipelineTaskId}\""
         )
+    }
+
+    /**
+     * 安装fork库凭证
+     */
+    private fun forkInstall() {
+        git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
+        git.configAdd(
+            configKey = forkRepoCredentialHelperKey(),
+            configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}-fork",
+            configScope = GitConfigScope.LOCAL
+        )
+    }
+
+    /**
+     * 保存fork库凭证
+     */
+    private fun forkStore() {
+        with(URL(settings.sourceRepositoryUrl).toURI()) {
+            CommandUtil.execute(
+                executable = getJavaFilePath(),
+                args = listOf(
+                    "-Dfile.encoding=utf-8",
+                    "-Ddebug=${settings.enableTrace}",
+                    "-jar",
+                    credentialJarPath,
+                    "${settings.pipelineTaskId}-fork",
+                    "devopsStore"
+                ),
+                runtimeEnv = mapOf(
+                    GIT_REPO_PATH to settings.repositoryPath
+                ),
+                inputStream = CredentialArguments(
+                    protocol = scheme,
+                    host = host,
+                    path = path.removePrefix("/"),
+                    username = settings.forkRepoAuthInfo!!.username,
+                    password = settings.forkRepoAuthInfo!!.password
+                ).convertInputStream()
+            )
+        }
+    }
+
+    private fun removeForkAuth(taskId: String) {
+        // 清理构建机上凭证
+        if (File(credentialJarPath).exists()) {
+            with(URL(settings.sourceRepositoryUrl).toURI()) {
+                CommandUtil.execute(
+                    executable = getJavaFilePath(),
+                    args = listOf(
+                        "-Dfile.encoding=utf-8",
+                        "-Ddebug=${settings.enableTrace}",
+                        "-jar",
+                        credentialJarPath,
+                        "$taskId-fork",
+                        "devopsErase"
+                    ),
+                    runtimeEnv = mapOf(
+                        GIT_REPO_PATH to settings.repositoryPath
+                    ),
+                    inputStream = CredentialArguments(
+                        protocol = scheme,
+                        host = host,
+                        path = path.removePrefix("/")
+                    ).convertInputStream()
+                )
+            }
+        }
+        git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
+        git.tryConfigGetAll(configKey = forkRepoCredentialHelperKey())
     }
 }

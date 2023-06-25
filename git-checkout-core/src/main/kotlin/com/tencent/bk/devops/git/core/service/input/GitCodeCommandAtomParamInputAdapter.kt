@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.GitCodeCommandAtomParamInput
@@ -52,6 +53,7 @@ import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.service.repository.GitScmService
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
+import org.slf4j.LoggerFactory
 import java.io.File
 
 class GitCodeCommandAtomParamInputAdapter(
@@ -60,6 +62,7 @@ class GitCodeCommandAtomParamInputAdapter(
 
     companion object {
         private val devopsApi = DevopsApi()
+        private val logger = LoggerFactory.getLogger(GitCodeCommandAtomParamInputAdapter::class.java)
     }
 
     @Suppress("ALL")
@@ -70,48 +73,12 @@ class GitCodeCommandAtomParamInputAdapter(
             }
 
             // 获取鉴权信息,post action阶段不需要查询凭证
-            val authProvider = if (postEntryParam == "True") {
-                EmptyGitAuthProvider()
-            } else {
-                when (authType) {
-                    AuthType.ACCESS_TOKEN -> OauthGitAuthProvider(token = accessToken, userId = "")
-                    AuthType.USERNAME_PASSWORD -> UserNamePasswordGitAuthProvider(
-                        username = username,
-                        password = password
-                    )
-                    AuthType.TICKET -> CredentialGitAuthProvider(
-                        credentialId = ticketId,
-                        devopsApi = devopsApi,
-                        defaultGitAuthProvider = if (scmType == ScmType.CODE_GIT) {
-                            UserTokenGitAuthProvider(
-                                userId = pipelineStartUserName,
-                                devopsApi = devopsApi,
-                                scmType = scmType
-                            )
-                        } else {
-                            EmptyGitAuthProvider()
-                        }
-                    )
-                    AuthType.START_USER_TOKEN -> UserTokenGitAuthProvider(
-                        userId = pipelineStartUserName,
-                        devopsApi = devopsApi,
-                        scmType = scmType
-                    )
-                    AuthType.PERSONAL_ACCESS_TOKEN -> PrivateGitAuthProvider(
-                        token = personalAccessToken
-                    )
-                    AuthType.AUTH_USER_TOKEN ->
-                        AuthUserTokenGitAuthProvider(
-                            pipelineStartUserName = pipelineStartUserName,
-                            userId = authUserId,
-                            repositoryUrl = repositoryUrl,
-                            devopsApi = devopsApi,
-                            scmType = scmType
-                        )
-                    else -> EmptyGitAuthProvider()
-                }
-            }
+            val authProvider = getAuthProvider()
+            // 主库凭证信息
             val authInfo = authProvider.getAuthInfo()
+            // fork库凭证信息
+            var forkRepoAuthInfo: AuthInfo? = null
+            // 代码库ID
             val gitProjectId = GitScmService(
                 scmType = scmType,
                 repositoryUrl = repositoryUrl,
@@ -130,6 +97,7 @@ class GitCodeCommandAtomParamInputAdapter(
             if (preMerge) {
                 ref = hookTargetBranch!!
                 pullType = PullType.BRANCH.name
+                forkRepoAuthInfo = getForkRepoAuthInfo()
             }
 
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
@@ -209,7 +177,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 enablePartialClone = enablePartialClone,
                 cachePath = cachePath,
                 enableGlobalInsteadOf = enableGlobalInsteadOf,
-                useCustomCredential = useCustomCredential
+                useCustomCredential = useCustomCredential,
+                forkRepoAuthInfo = forkRepoAuthInfo
             )
         }
     }
@@ -221,6 +190,74 @@ class GitCodeCommandAtomParamInputAdapter(
             repositoryUrl.toUpperCase().startsWith("HTTP") -> "HTTP"
             else ->
                 "SSH"
+        }
+    }
+
+    /**
+     * 获取代码库授权提供者
+     */
+
+    private fun getAuthProvider() = with(input){
+        if (postEntryParam == "True") {
+            EmptyGitAuthProvider()
+        } else {
+            when (authType) {
+                AuthType.ACCESS_TOKEN -> OauthGitAuthProvider(token = accessToken, userId = "")
+                AuthType.USERNAME_PASSWORD -> UserNamePasswordGitAuthProvider(
+                    username = username,
+                    password = password
+                )
+                AuthType.TICKET -> CredentialGitAuthProvider(
+                    credentialId = ticketId,
+                    devopsApi = devopsApi,
+                    defaultGitAuthProvider = if (scmType == ScmType.CODE_GIT) {
+                        UserTokenGitAuthProvider(
+                            userId = pipelineStartUserName,
+                            devopsApi = devopsApi,
+                            scmType = scmType
+                        )
+                    } else {
+                        EmptyGitAuthProvider()
+                    }
+                )
+                AuthType.START_USER_TOKEN -> UserTokenGitAuthProvider(
+                    userId = pipelineStartUserName,
+                    devopsApi = devopsApi,
+                    scmType = scmType
+                )
+                AuthType.PERSONAL_ACCESS_TOKEN -> PrivateGitAuthProvider(
+                    token = personalAccessToken
+                )
+                AuthType.AUTH_USER_TOKEN ->
+                    AuthUserTokenGitAuthProvider(
+                        pipelineStartUserName = pipelineStartUserName,
+                        userId = authUserId,
+                        repositoryUrl = repositoryUrl,
+                        devopsApi = devopsApi,
+                        scmType = scmType
+                    )
+                else -> EmptyGitAuthProvider()
+            }
+        }
+    }
+
+    /**
+     * 获取fork仓库授权信息
+     */
+    private fun getForkRepoAuthInfo() = with(input) {
+        if (postEntryParam == "True") {
+            null
+        } else {
+            try {
+                UserTokenGitAuthProvider(
+                    userId = pipelineStartUserName,
+                    devopsApi = devopsApi,
+                    scmType = scmType
+                ).getAuthInfo()
+            } catch (e: Exception) {
+                logger.warn("can't get fork repository auth info,${e.message}")
+                null
+            }
         }
     }
 }
