@@ -132,7 +132,8 @@ class SshGitAuthHelper(
 
     private fun replaceUrl(url: String, remoteName: String, authInfo: AuthInfo) {
         val uri = URI(url)
-        val authUrl = "${uri.scheme}://${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}@${uri.host}${uri.path}"
+        val authUrl = "${uri.scheme}://${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}" +
+            "@${uri.host}${uri.path}"
         git.remoteSetUrl(remoteName = remoteName, remoteUrl = authUrl)
     }
 }
