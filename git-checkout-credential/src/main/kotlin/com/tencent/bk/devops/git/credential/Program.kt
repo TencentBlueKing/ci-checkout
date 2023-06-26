@@ -215,9 +215,4 @@ class Program(
             forkPassword = forkPassword
         )
     }
-
-    /**
-     * 是否为主库凭证操作，taskId不包含[fork]即为主库
-     */
-    private fun isMainRepoCredential() = !(taskId?.contains("fork") ?: false)
 }
