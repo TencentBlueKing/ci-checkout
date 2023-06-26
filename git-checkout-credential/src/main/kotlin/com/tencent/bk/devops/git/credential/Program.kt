@@ -46,7 +46,7 @@ class Program(
     private val credentialStore = CredentialStore()
     private var taskId: String? = null
 
-    private fun getTaskUri(targetUri: URI): URI {
+    private fun getTaskUri(targetUri: URI, taskId: String? = this.taskId): URI {
         return with(targetUri) {
             URI("$scheme://$taskId.$host")
         }
@@ -78,12 +78,10 @@ class Program(
 
         with(credentialArguments) {
             // 仅主库写入此凭证，fork库不写入，避免覆盖主库凭证
-            if (isMainRepoCredential()) {
-                credentialStore.add(
-                    targetUri,
-                    Credential(username, password)
-                )
-            }
+            credentialStore.add(
+                targetUri,
+                Credential(username, password)
+            )
             compatible { compatibleUri ->
                 credentialStore.add(
                     compatibleUri,
@@ -96,6 +94,13 @@ class Program(
                 credentialStore.add(
                     getTaskUri(targetUri),
                     Credential(username, password)
+                )
+            }
+            // 保存fork库凭证
+            if (!forkUsername.isNullOrBlank() && !forkPassword.isNullOrBlank()){
+                credentialStore.add(
+                    getTaskUri(forkTargetUri, "$taskId-fork"),
+                    Credential(forkUsername, forkPassword)
                 )
             }
         }
@@ -124,8 +129,7 @@ class Program(
             if (!taskId.isNullOrBlank()) {
                 credential = credentialStore.get(getTaskUri(targetUri))
             }
-            // fork库不通过Uri获取凭证，避免引用主库的凭证
-            if ((credential == null || credential == Credential.Empty) && isMainRepoCredential()) {
+            if (credential == null || credential == Credential.Empty) {
                 credential = credentialStore.get(targetUri)
             }
             if (credential == null || credential == Credential.Empty) {
@@ -145,15 +149,17 @@ class Program(
         }
         val credentialArguments = readInput()
         with(credentialArguments) {
-            // 仅删除主库的此项凭证，fork库没有此项凭证
-            if (isMainRepoCredential()) {
-                credentialStore.delete(targetUri)
-            }
+            credentialStore.delete(targetUri)
             compatible { compatibleUri ->
                 credentialStore.delete(compatibleUri)
             }
             if (!taskId.isNullOrBlank()) {
+                // 卸载主库凭证
                 credentialStore.delete(getTaskUri(targetUri))
+                // 存在fork库凭证，卸载fork库凭证
+                if (!forkProtocol.isNullOrBlank() && !forkHost.isNullOrBlank()) {
+                    credentialStore.delete(getTaskUri(forkTargetUri, "$taskId-fork"))
+                }
             }
         }
     }
@@ -165,6 +171,11 @@ class Program(
         var path: String? = null
         var username: String? = null
         var password: String? = null
+        // fork库相关凭证信息
+        var forkProtocol: String? = null
+        var forkHost: String? = null
+        var forkUsername: String? = null
+        var forkPassword: String? = null
         reader.useLines { lines ->
             for (line in lines) {
                 if (line.isEmpty()) {
@@ -178,8 +189,10 @@ class Program(
                         "path" -> path = pair[1]
                         "username" -> username = pair[1]
                         "password" -> password = pair[1]
-                        "forkUsername" -> username = pair[1]
-                        "forkPassword" -> password = pair[1]
+                        "forkProtocol" -> forkProtocol = pair[1]
+                        "forkHost" -> forkHost = pair[1]
+                        "forkUsername" -> forkUsername = pair[1]
+                        "forkPassword" -> forkPassword = pair[1]
                     }
                 }
             }
@@ -195,7 +208,11 @@ class Program(
             host = host!!,
             path = path,
             username = username,
-            password = password
+            password = password,
+            forkProtocol = forkProtocol,
+            forkHost = forkHost,
+            forkUsername = forkUsername,
+            forkPassword = forkPassword
         )
     }
 

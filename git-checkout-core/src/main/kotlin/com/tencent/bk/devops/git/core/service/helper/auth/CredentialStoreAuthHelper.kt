@@ -46,6 +46,10 @@ import java.nio.file.Paths
  * 使用store凭证使凭证传递
  *
  * 用于公共构建机并且配置了全局凭证
+ * 避免因原始镜像配置导致的[credential.helper]配置重复，场景：
+ * step1.bash插件或镜像中配置了 [credential.helper = xxx]
+ * step2.引入拉代码插件，增加配置 [credential.helper !bash 'git-checkout.sh']
+ * step3.bash插件，执行 [git config credential.helper xxx]出现报错
  */
 class CredentialStoreAuthHelper(
     private val git: GitCommandManager,

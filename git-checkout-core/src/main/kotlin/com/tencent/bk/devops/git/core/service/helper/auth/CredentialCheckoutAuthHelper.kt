@@ -109,6 +109,15 @@ class CredentialCheckoutAuthHelper(
         storeGlobalCredential(writeCompatibleHost = false)
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
+            // 针对fork库禁用其他凭证管理
+            if (settings.storeForkRepoCredential){
+                git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
+                git.configAdd(
+                    configKey = forkRepoCredentialHelperKey(),
+                    configValue = "\"\"",
+                    configScope = GitConfigScope.LOCAL
+                )
+            }
         } else {
             // 如果低于git 2.9版本以下,则通过设置一个不存在的username,禁用其他凭证管理
             git.config(GitConstants.GIT_CREDENTIAL_USERNAME, settings.pipelineTaskId)
@@ -122,12 +131,7 @@ class CredentialCheckoutAuthHelper(
         store()
         // 是否保存fork凭证
         if (settings.storeForkRepoCredential) {
-            try {
-                forkInstall()
-                forkStore()
-            } catch (e: Exception) {
-                logger.debug("Failure to save forkRepo credential", e)
-            }
+            forkInstall()
         }
     }
 
@@ -171,6 +175,8 @@ class CredentialCheckoutAuthHelper(
 
     private fun store() {
         with(URL(settings.repositoryUrl).toURI()) {
+            // fork库URI
+            val forkRepoURI = getForkRepoURI()
             CommandUtil.execute(
                 executable = getJavaFilePath(),
                 args = listOf(
@@ -190,7 +196,11 @@ class CredentialCheckoutAuthHelper(
                     host = host,
                     path = path.removePrefix("/"),
                     username = authInfo.username,
-                    password = authInfo.password
+                    password = authInfo.password,
+                    forkProtocol = forkRepoURI?.scheme,
+                    forkHost = forkRepoURI?.host,
+                    forkUsername = settings.forkRepoAuthInfo?.username,
+                    forkPassword = settings.forkRepoAuthInfo?.password
                 ).convertInputStream()
             )
         }
@@ -228,6 +238,8 @@ class CredentialCheckoutAuthHelper(
             return
         }
         val taskId = git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_TASKID)
+        // fork库URI
+        val forkRepoURI = getForkRepoURI()
         // 清理构建机上凭证
         if (File(credentialJarPath).exists()) {
             with(URL(settings.repositoryUrl).toURI()) {
@@ -248,7 +260,9 @@ class CredentialCheckoutAuthHelper(
                     inputStream = CredentialArguments(
                         protocol = scheme,
                         host = host,
-                        path = path.removePrefix("/")
+                        path = path.removePrefix("/"),
+                        forkProtocol = forkRepoURI?.scheme,
+                        forkHost = forkRepoURI?.host
                     ).convertInputStream()
                 )
             }
@@ -261,7 +275,8 @@ class CredentialCheckoutAuthHelper(
         git.tryConfigGetAll(configKey = GIT_CREDENTIAL_HELPER)
         // 卸载时不校验fork库凭证是否存在，直接卸载
         if (settings.preMerge && !settings.sourceRepoUrlEqualsRepoUrl) {
-            removeForkAuth(taskId)
+            git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
+            git.tryConfigGetAll(configKey = forkRepoCredentialHelperKey())
         }
     }
 
@@ -318,7 +333,6 @@ class CredentialCheckoutAuthHelper(
      * 安装fork库凭证
      */
     private fun forkInstall() {
-        git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
         git.configAdd(
             configKey = forkRepoCredentialHelperKey(),
             configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}-fork",
@@ -327,60 +341,11 @@ class CredentialCheckoutAuthHelper(
     }
 
     /**
-     * 保存fork库凭证
+     * 获取fork库URI
      */
-    private fun forkStore() {
-        with(URL(settings.sourceRepositoryUrl).toURI()) {
-            CommandUtil.execute(
-                executable = getJavaFilePath(),
-                args = listOf(
-                    "-Dfile.encoding=utf-8",
-                    "-Ddebug=${settings.enableTrace}",
-                    "-jar",
-                    credentialJarPath,
-                    "${settings.pipelineTaskId}-fork",
-                    "devopsStore"
-                ),
-                runtimeEnv = mapOf(
-                    GIT_REPO_PATH to settings.repositoryPath
-                ),
-                inputStream = CredentialArguments(
-                    protocol = scheme,
-                    host = host,
-                    path = path.removePrefix("/"),
-                    forkUsername = settings.forkRepoAuthInfo!!.username,
-                    forkPassword = settings.forkRepoAuthInfo.password
-                ).convertInputStream()
-            )
-        }
-    }
-
-    private fun removeForkAuth(taskId: String) {
-        // 清理构建机上凭证
-        if (File(credentialJarPath).exists()) {
-            with(URL(settings.sourceRepositoryUrl).toURI()) {
-                CommandUtil.execute(
-                    executable = getJavaFilePath(),
-                    args = listOf(
-                        "-Dfile.encoding=utf-8",
-                        "-Ddebug=${settings.enableTrace}",
-                        "-jar",
-                        credentialJarPath,
-                        "$taskId-fork",
-                        "devopsErase"
-                    ),
-                    runtimeEnv = mapOf(
-                        GIT_REPO_PATH to settings.repositoryPath
-                    ),
-                    inputStream = CredentialArguments(
-                        protocol = scheme,
-                        host = host,
-                        path = path.removePrefix("/")
-                    ).convertInputStream()
-                )
-            }
-        }
-        git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
-        git.tryConfigGetAll(configKey = forkRepoCredentialHelperKey())
+    private fun getForkRepoURI() = if (settings.sourceRepositoryUrl.isNotBlank()) {
+        URL(settings.sourceRepositoryUrl).toURI()
+    } else {
+        null
     }
 }

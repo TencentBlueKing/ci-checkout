@@ -36,9 +36,15 @@ data class CredentialArguments(
     val host: String,
     val path: String? = null,
     val username: String? = null,
-    val password: String? = null
+    val password: String? = null,
+    val forkProtocol: String? = null,
+    val forkHost: String? = null,
+    val forkUsername: String? = null,
+    val forkPassword: String? = null
 ) {
     val targetUri get() = URI("$protocol://$host/")
+
+    val forkTargetUri get() = URI("$forkProtocol://$forkHost/")
 
     override fun toString(): String {
         val builder = StringBuilder()
