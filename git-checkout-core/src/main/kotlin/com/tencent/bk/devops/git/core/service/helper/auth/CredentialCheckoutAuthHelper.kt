@@ -110,12 +110,11 @@ class CredentialCheckoutAuthHelper(
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
             // 针对fork库禁用其他凭证管理
-            if (settings.storeForkRepoCredential){
+            if (settings.storeForkRepoCredential) {
                 git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
-                git.configAdd(
-                    configKey = forkRepoCredentialHelperKey(),
-                    configValue = "\"\"",
-                    configScope = GitConfigScope.LOCAL
+                git.tryDisableOtherGitHelpers(
+                    configScope = GitConfigScope.LOCAL,
+                    configKey = forkRepoCredentialHelperKey()
                 )
             }
         } else {
