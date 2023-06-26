@@ -348,8 +348,8 @@ class CredentialCheckoutAuthHelper(
                     protocol = scheme,
                     host = host,
                     path = path.removePrefix("/"),
-                    username = settings.forkRepoAuthInfo!!.username,
-                    password = settings.forkRepoAuthInfo!!.password
+                    forkUsername = settings.forkRepoAuthInfo!!.username,
+                    forkPassword = settings.forkRepoAuthInfo.password
                 ).convertInputStream()
             )
         }

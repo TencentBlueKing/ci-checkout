@@ -77,10 +77,13 @@ class Program(
         val credentialArguments = readInput()
 
         with(credentialArguments) {
-            credentialStore.add(
-                targetUri,
-                Credential(username, password)
-            )
+            // 仅主库写入此凭证，fork库不写入，避免覆盖主库凭证
+            if (isMainRepoCredential()) {
+                credentialStore.add(
+                    targetUri,
+                    Credential(username, password)
+                )
+            }
             compatible { compatibleUri ->
                 credentialStore.add(
                     compatibleUri,
@@ -121,7 +124,8 @@ class Program(
             if (!taskId.isNullOrBlank()) {
                 credential = credentialStore.get(getTaskUri(targetUri))
             }
-            if (credential == null || credential == Credential.Empty) {
+            // fork库不通过Uri获取凭证，避免引用主库的凭证
+            if ((credential == null || credential == Credential.Empty) && isMainRepoCredential()) {
                 credential = credentialStore.get(targetUri)
             }
             if (credential == null || credential == Credential.Empty) {
@@ -141,7 +145,10 @@ class Program(
         }
         val credentialArguments = readInput()
         with(credentialArguments) {
-            credentialStore.delete(targetUri)
+            // 仅删除主库的此项凭证，fork库没有此项凭证
+            if (isMainRepoCredential()) {
+                credentialStore.delete(targetUri)
+            }
             compatible { compatibleUri ->
                 credentialStore.delete(compatibleUri)
             }
@@ -171,6 +178,8 @@ class Program(
                         "path" -> path = pair[1]
                         "username" -> username = pair[1]
                         "password" -> password = pair[1]
+                        "forkUsername" -> username = pair[1]
+                        "forkPassword" -> password = pair[1]
                     }
                 }
             }
@@ -189,4 +198,9 @@ class Program(
             password = password
         )
     }
+
+    /**
+     * 是否为主库凭证操作，taskId不包含[fork]即为主库
+     */
+    private fun isMainRepoCredential() = !(taskId?.contains("fork") ?: false)
 }
