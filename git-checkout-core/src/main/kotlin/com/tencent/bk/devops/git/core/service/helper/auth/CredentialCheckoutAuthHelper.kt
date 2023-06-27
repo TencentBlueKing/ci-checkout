@@ -109,14 +109,6 @@ class CredentialCheckoutAuthHelper(
         storeGlobalCredential(writeCompatibleHost = false)
         if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
             git.tryDisableOtherGitHelpers(configScope = GitConfigScope.LOCAL)
-            // 针对fork库禁用其他凭证管理
-            if (settings.storeForkRepoCredential) {
-                git.tryConfigUnset(configKey = forkRepoCredentialHelperKey())
-                git.tryDisableOtherGitHelpers(
-                    configScope = GitConfigScope.LOCAL,
-                    configKey = forkRepoCredentialHelperKey()
-                )
-            }
         } else {
             // 如果低于git 2.9版本以下,则通过设置一个不存在的username,禁用其他凭证管理
             git.config(GitConstants.GIT_CREDENTIAL_USERNAME, settings.pipelineTaskId)
@@ -125,7 +117,7 @@ class CredentialCheckoutAuthHelper(
             configKey = GIT_CREDENTIAL_HELPER,
             configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}"
         )
-
+        // 安装并保存主库凭证
         install()
         store()
         // 是否保存fork凭证
@@ -332,6 +324,13 @@ class CredentialCheckoutAuthHelper(
      * 安装fork库凭证
      */
     private fun forkInstall() {
+        // 针对fork库禁用其他凭证管理
+        if (git.isAtLeastVersion(GitConstants.SUPPORT_EMPTY_CRED_HELPER_GIT_VERSION)) {
+            git.tryDisableOtherGitHelpers(
+                configScope = GitConfigScope.LOCAL,
+                configKey = forkRepoCredentialHelperKey()
+            )
+        }
         git.configAdd(
             configKey = forkRepoCredentialHelperKey(),
             configValue = "!bash '$credentialShellPath' ${settings.pipelineTaskId}-fork",

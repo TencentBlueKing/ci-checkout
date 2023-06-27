@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.helper.auth
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_AUTH_HELPER
 import com.tencent.bk.devops.git.core.enums.CredentialActionEnum
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -50,8 +51,13 @@ abstract class HttpGitAuthHelper(
         private val logger = LoggerFactory.getLogger(HttpGitAuthHelper::class.java)
     }
 
+    /**
+     * 卸载前序构建遗留的凭证配置
+     */
     override fun removePreviousAuth() {
-        git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_HELPER)
+        // 卸载credential.helper
+        removePreviousCredentialHelperAuth()
+        // 卸载insteadof
         val insteadOfKey = git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         if (insteadOfKey.isNotBlank()) {
             git.submoduleForeach(
@@ -169,4 +175,28 @@ abstract class HttpGitAuthHelper(
      * fork库凭证配置Key
      */
     fun forkRepoCredentialHelperKey() = "credential.${settings.sourceRepositoryUrl}.helper"
+
+    /**
+     * 卸载前序构建遗留的[credential.helper]配置
+     * 包含主库/fork库
+     */
+    private fun removePreviousCredentialHelperAuth() {
+        git.tryConfigGetRegexp(
+            configKeyRegex = "credential.*.helper"
+        ).map {
+            val configItem = it.split(" ")
+            // 配置Key
+            if (configItem.isNotEmpty() && GIT_CREDENTIAL_AUTH_HELPER != configItem[0]) {
+                configItem[0]
+            } else {
+                ""
+            }
+        }.filter {
+            it.isNotBlank()
+        }.forEach {
+            git.tryConfigUnset(
+                configKey = it
+            )
+        }
+    }
 }
