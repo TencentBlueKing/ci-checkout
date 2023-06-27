@@ -186,12 +186,12 @@ abstract class HttpGitAuthHelper(
         ).map {
             val configItem = it.split(" ")
             // 配置Key
-            if (configItem.isNotEmpty() && GIT_CREDENTIAL_AUTH_HELPER != configItem[0]) {
+            if (configItem.isNotEmpty() && !GIT_CREDENTIAL_AUTH_HELPER.equals(configItem[0], true)) {
                 configItem[0]
             } else {
                 ""
             }
-        }.filter {
+        }.toSet().filter {
             it.isNotBlank()
         }.forEach {
             git.tryConfigUnset(
