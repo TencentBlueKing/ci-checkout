@@ -42,6 +42,7 @@ import java.nio.file.Files
 /**
  * http或https协议的授权管理
  */
+@SuppressWarnings("TooManyFunctions")
 abstract class HttpGitAuthHelper(
     private val git: GitCommandManager,
     private val settings: GitSourceSettings
