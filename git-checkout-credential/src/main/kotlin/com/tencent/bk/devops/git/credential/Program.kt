@@ -164,6 +164,7 @@ class Program(
         }
     }
 
+    @SuppressWarnings("ComplexMethod")
     private fun readInput(): CredentialArguments {
         val reader = BufferedReader(BufferedReader(InputStreamReader(standardIn)))
         var protocol: String? = null
