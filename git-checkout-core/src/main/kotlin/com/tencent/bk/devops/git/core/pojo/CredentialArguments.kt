@@ -35,7 +35,11 @@ data class CredentialArguments(
     val host: String,
     val path: String? = null,
     val username: String? = null,
-    val password: String? = null
+    val password: String? = null,
+    val forkProtocol: String? = null,
+    val forkHost: String? = null,
+    val forkUsername: String? = null,
+    val forkPassword: String? = null
 ) {
 
     companion object {
@@ -53,6 +57,18 @@ data class CredentialArguments(
         }
         if (password != null) {
             builder.append("password=").append(password).append("\n")
+        }
+        if (forkProtocol != null) {
+            builder.append("forkProtocol=").append(forkProtocol).append("\n")
+        }
+        if (forkHost != null) {
+            builder.append("forkHost=").append(forkHost).append("\n")
+        }
+        if (forkUsername != null) {
+            builder.append("forkUsername=").append(forkUsername).append("\n")
+        }
+        if (forkPassword != null) {
+            builder.append("forkPassword=").append(forkPassword).append("\n")
         }
         logger.debug("host:$host,protocol:$protocol")
         return builder.toString()

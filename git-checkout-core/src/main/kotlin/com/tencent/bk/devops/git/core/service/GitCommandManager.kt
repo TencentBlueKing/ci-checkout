@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_GIT_VERS
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.GCM_INTERACTIVE
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRESS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
@@ -330,9 +331,12 @@ class GitCommandManager(
         return AgentEnv.getOS() != OSType.WINDOWS && System.getenv(HOME) == null && gitEnv[HOME] == null
     }
 
-    fun tryDisableOtherGitHelpers(configScope: GitConfigScope = GitConfigScope.LOCAL) {
+    fun tryDisableOtherGitHelpers(
+        configScope: GitConfigScope = GitConfigScope.LOCAL,
+        configKey: String = GIT_CREDENTIAL_HELPER
+    ) {
         CommandUtil.execute(
-            command = "git config ${configScope.arg} credential.helper \"\"",
+            command = "git config ${configScope.arg} $configKey \"\"",
             workingDirectory = workingDirectory,
             printLogger = true,
             allowAllExitCodes = true
