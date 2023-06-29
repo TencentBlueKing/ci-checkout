@@ -341,7 +341,7 @@ class CredentialCheckoutAuthHelper(
     /**
      * 获取fork库URI
      */
-    private fun getForkRepoURI() = if (settings.sourceRepositoryUrl.isNotBlank()) {
+    private fun getForkRepoURI() = if (settings.preMerge && settings.sourceRepositoryUrl.isNotBlank()) {
         URL(settings.sourceRepositoryUrl).toURI()
     } else {
         null
