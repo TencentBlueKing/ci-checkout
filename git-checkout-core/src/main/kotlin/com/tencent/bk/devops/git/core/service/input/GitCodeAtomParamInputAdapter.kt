@@ -291,7 +291,7 @@ class GitCodeAtomParamInputAdapter(
      * 2.非git、github代码库不获取，后续支持tgit
      */
     private fun getForkRepoAuthInfo(scmType: ScmType) = with(input) {
-        if (postEntryParam == "True" &&
+        if (postEntryParam == "True" ||
             !listOf(ScmType.CODE_GIT, ScmType.GITHUB).contains(scmType)
         ) {
             null
