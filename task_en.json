@@ -1,5 +1,6 @@
 {
   "atomCode": "checkout",
+  "defaultLocaleLanguage": "en_US",
   "execution": {
     "packagePath": "checkout.jar",
     "language": "java",
@@ -52,12 +53,12 @@
     },
     {
       "name": "lfs",
-      "label": "lfs",
+      "label": "Lfs",
       "isExpanded": true
     },
     {
       "name": "merge",
-      "label": "merge",
+      "label": "Merge",
       "isExpanded": true
     },
     {
@@ -171,23 +172,23 @@
       "isSensitive": false,
       "options": [
         {
-          "name": "empty",
+          "name": "Empty",
           "id": "EMPTY"
         },
         {
-          "name": "ticket",
+          "name": "Ticket",
           "id": "TICKET"
         },
         {
-          "name": "access token",
+          "name": "Access token",
           "id": "ACCESS_TOKEN"
         },
         {
-          "name": "username/password",
+          "name": "Username/password",
           "id": "USERNAME_PASSWORD"
         },
         {
-          "name": "start user token",
+          "name": "Start user token",
           "id": "START_USER_TOKEN"
         },
         {
@@ -239,8 +240,8 @@
       }
     },
     "accessToken": {
-      "label": "access token",
-      "placeholder": "please insert access token",
+      "label": "Access token",
+      "placeholder": "Please insert access token",
       "type": "vuex-input",
       "inputType": "password",
       "desc": "",
@@ -287,7 +288,7 @@
       }
     },
     "username": {
-      "label": "username",
+      "label": "Username",
       "placeholder": "Please insert username",
       "type": "vuex-input",
       "inputType": "password",
@@ -311,7 +312,7 @@
       }
     },
     "password": {
-      "label": "password",
+      "label": "Password",
       "placeholder": "Please insert password",
       "type": "vuex-input",
       "inputType": "password",
@@ -554,6 +555,19 @@
       "isSensitive": false,
       "groupName": "lfs"
     },
+    "enableGitLfsClean":{
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "Enable Git Lfs Clean",
+      "desc": "Selecting this option will execute \"git lfs prune\", which can impact code retrieval efficiency",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "lfs"
+    },
     "enableSubmodule": {
       "label": "",
       "default": true,
@@ -593,7 +607,7 @@
       "default": false,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "execute git submodule update and check whether there is --remote parameter behind",
+      "text": "Execute git submodule update and check whether there is --remote parameter behind",
       "desc": "",
       "required": false,
       "disabled": false,
@@ -615,7 +629,7 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "executegit submodule updateand check whether there is--recursive parameter behind",
+      "text": "Execute git submodule updateand check whether there is--recursive parameter behind",
       "desc": "",
       "required": false,
       "disabled": false,
@@ -632,7 +646,27 @@
         ]
       }
     },
-    ,
+    "submoduleJobs": {
+      "label": "Number of parallel submodule pulls",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "Concurrent submodule pulls disabled by default",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
     "submoduleDepth": {
       "label": "submodule depth",
       "default": "",

@@ -1,5 +1,6 @@
 {
   "atomCode": "checkout",
+  "defaultLocaleLanguage": "zh_CN",
   "execution": {
     "packagePath": "checkout.jar",
     "language": "java",
@@ -44,7 +45,7 @@
   "inputGroups": [
     {
       "name": "fetch",
-      "label": "fetch",
+      "label": "Fetch",
       "isExpanded": true
     },
     {
@@ -54,12 +55,12 @@
     },
     {
       "name": "lfs",
-      "label": "lfs",
+      "label": "Lfs",
       "isExpanded": true
     },
     {
       "name": "merge",
-      "label": "merge",
+      "label": "Merge",
       "isExpanded": true
     },
     {
@@ -632,6 +633,27 @@
       "type": "atom-checkbox",
       "text": "执行git submodule update后面是否带上--recursive参数",
       "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
+    "submoduleJobs": {
+      "label": "submodule并发拉取数",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "默认不启用并发拉取",
       "required": false,
       "disabled": false,
       "hidden": false,
