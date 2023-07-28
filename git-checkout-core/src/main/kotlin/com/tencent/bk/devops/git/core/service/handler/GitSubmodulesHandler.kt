@@ -54,6 +54,7 @@ open class GitSubmodulesHandler(
                     return
                 }
                 logger.groupStart("Fetching submodules")
+                checkSubmoduleParam()
                 git.submoduleSync(recursive = nestedSubmodules, path = submodulesPath)
                 if (pullStrategy == PullStrategy.REVERT_UPDATE) {
                     git.submoduleForeach(
@@ -100,5 +101,17 @@ open class GitSubmodulesHandler(
             commands.add(builder.toString())
         }
         return commands
+    }
+
+    /**
+     * 检查submodule参数
+     */
+    private fun checkSubmoduleParam() {
+        if (settings.submoduleRemote &&
+            settings.submoduleDepth != null &&
+            settings.submoduleDepth > 0) {
+            logger.warn("git submodule enabling both --remote and depth parameters at " +
+                            "the same time may cause issues with fetching.")
+        }
     }
 }
