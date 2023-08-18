@@ -21,7 +21,7 @@ class GitScmService(
     fun getGitProjectId(): Long? {
         return try {
             getGitApi().getProjectId()
-        } catch (e: ApiException) {
+        } catch (ignored: Exception) {
             logger.debug("can't to get gitProjectId")
             null
         }
