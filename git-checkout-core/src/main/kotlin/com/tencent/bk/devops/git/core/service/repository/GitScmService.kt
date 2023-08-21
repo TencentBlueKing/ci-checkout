@@ -5,7 +5,6 @@ import com.tencent.bk.devops.git.core.api.GithubApi
 import com.tencent.bk.devops.git.core.api.GitlabApi
 import com.tencent.bk.devops.git.core.api.TGitApi
 import com.tencent.bk.devops.git.core.enums.ScmType
-import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory

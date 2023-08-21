@@ -56,7 +56,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_UR
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
-import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
