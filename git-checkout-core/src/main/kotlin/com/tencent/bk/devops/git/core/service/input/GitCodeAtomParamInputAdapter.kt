@@ -302,8 +302,8 @@ class GitCodeAtomParamInputAdapter(
                     devopsApi = devopsApi,
                     scmType = scmType
                 ).getAuthInfo()
-            } catch (e: ApiException) {
-                logger.warn("can't get fork repository auth info,${e.message}")
+            } catch (ignored: Exception) {
+                logger.warn("can't get fork repository auth info,${ignored.message}")
                 null
             }
         }
