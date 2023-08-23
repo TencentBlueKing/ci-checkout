@@ -28,13 +28,13 @@
     "labelCodes": [
 
     ],
-    "summary": "The checkout plugin provides basic git pull operations for the BK-CI platform, and can pull all git repositories.",
+    "summary": "Compatible with all Git repositories, faster, safer, and more universal for code retrieval",
     "description": "${{indexFile(\"readme_en.md\")}}",
     "configInfo": {
       "frontendType": "NORMAL"
     },
     "versionInfo": {
-      "publisher": "Blueking",
+      "publisher": "BlueKing",
       "releaseType": "NEW",
       "version": "1.0.0",
       "versionContent": "init"
@@ -47,7 +47,7 @@
       "isExpanded": true
     },
     {
-      "name": "submodule",
+      "name": "Submodule",
       "label": "Sub-Module",
       "isExpanded": true
     },
@@ -71,7 +71,7 @@
     "repositoryType": {
       "label": "Repository",
       "default": "ID",
-      "desc": "Value Including ID/NAME/URL",
+      "desc": "Based on input method, Filed value is ID or Alias Name or URL",
       "type": "enum-input",
       "required": true,
       "disabled": false,
@@ -79,21 +79,21 @@
       "isSensitive": false,
       "list": [
         {
-          "label": "Select by Repository ID",
+          "label": "Select Repository",
           "value": "ID"
         },
         {
-          "label": "Select by Repository NAME",
+          "label": "Enter by Repository Alias Name",
           "value": "NAME"
         },
         {
-          "label": "Insert Repository URL",
+          "label": "Enter by Repository URL",
           "value": "URL"
         }
       ]
     },
     "repositoryHashId": {
-      "label": "Select by Repository ID",
+      "label": "",
       "default": "",
       "placeholder": "Please Select Repository ID",
       "type": "selector",
@@ -123,9 +123,9 @@
       }
     },
     "repositoryName": {
-      "label": "Select by Repository NAME",
-      "default": "",
-      "placeholder": "Please insert Repository NAME",
+      "label": "",
+      "default": "Repository Alias Name",
+      "placeholder": "Please enter repository alias name",
       "type": "vuex-input",
       "desc": "Description",
       "required": false,
@@ -340,15 +340,15 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "Ticket Persistence",
-      "desc": "Please persist if the git ticket will be used in follow-up jobs. The persisted ticket will only be available for the current repository",
+      "text": "Persist the credential for subsequent steps of the current job",
+      "desc": "If the Git credential is required for subsequent steps of the current job, then persist it. The credential is only valid for the current repository.",
       "required": false,
       "disabled": false,
       "hidden": false,
       "isSensitive": false
     },
     "pullType": {
-      "label": "Select input",
+      "label": "Checkout by",
       "default": "BRANCH",
       "type": "select-input",
       "required": false,
@@ -371,7 +371,7 @@
       ]
     },
     "refName": {
-      "label": "Branch/TAG/COMMIT",
+      "label": "BRANCH/TAG/COMMIT",
       "default": "master",
       "placeholder": "Please insert",
       "type": "vuex-input",
@@ -382,11 +382,11 @@
       "isSensitive": false
     },
     "localPath": {
-      "label": "Code save path",
+      "label": "Directory for storing code",
       "default": "",
-      "placeholder": "Please fill in the relative directory of the workspace, if not filled, the default is the workspace directory",
+      "placeholder": "Relative path to the workspace. Default is the root directory of the workspace",
       "type": "vuex-input",
-      "desc": "There are multiple code checkout plugins in the current pipeline, you need to set this field to resolve conflicts",
+      "desc": "If the current job has multiple code pull steps, please set this field to resolve code path conflicts.",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -396,7 +396,7 @@
       "label": "Checkout Strategy",
       "default": "REVERT_UPDATE",
       "type": "enum-input",
-      "desc": "Revert Update: For incremental update,Fisrt \"git reset --hard HEAD\", then \"git pull\"\n\n Fresh Checkout: For full volume update,then whole workspace will be deleted and clone new codes\n\n Increment Update: Incremental Update,only use \"git pull\",and will not clean crashes and history cache file  ",
+      "desc": "Revert Update: For incremental update, Fisrt \"git reset --hard HEAD\", then \"git pull\"\n\n Fresh Checkout: For full volume update, then whole workspace will be deleted and clone new codes\n\n Increment Update: Incremental Update, only use \"git pull\", and will not clean crashes and history cache file",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -457,7 +457,7 @@
     "fetchRefSpec": {
       "label": "",
       "default": "",
-      "placeholder": "Please fill in the branch name, multiple splits with, wildcards allowed. Empty in the branch that pulls the plug-in configuration by default",
+      "placeholder": "Please fill in the branch name(s), multiple splits with ',', wildcards allowed. If left blank, the the plugin configuration's default branch will be fetched",
       "type": "vuex-input",
       "desc": "The branch of the plug-in configuration does not need to be set, it will be set by default. The configured branch must exist, otherwise an error will be reported",
       "required": false,
@@ -510,7 +510,7 @@
       }
     },
     "excludePath": {
-      "label": "Exclude the following paths from the repository",
+      "label": "Path to the archived cache",
       "default": "",
       "placeholder": "Please fill in the relative directory of the repository, multiple separated by commas",
       "type": "vuex-input",
@@ -584,7 +584,7 @@
     "submodulePath": {
       "label": "",
       "default": "",
-      "placeholder": "Please fill in the Submodule path to be pulled, multiples are separated by commas, if not filled, all Submodules will be pulled by default",
+      "placeholder": "Please enter submodel paths to pull, separated by \",\". If empty, all submodels will be pulled by default",
       "type": "vuex-input",
       "desc": "",
       "required": false,
@@ -607,7 +607,7 @@
       "default": false,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "Execute git submodule update and check whether there is --remote parameter behind",
+      "text": "When executing 'git submodule update', include the '--remote' parameter.",
       "desc": "",
       "required": false,
       "disabled": false,
@@ -629,7 +629,7 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "Execute git submodule updateand check whether there is--recursive parameter behind",
+      "text": "When executing 'git submodule update', include the '--recursive' parameter.",
       "desc": "",
       "required": false,
       "disabled": false,
@@ -668,7 +668,7 @@
       }
     },
     "submoduleDepth": {
-      "label": "submodule depth",
+      "label": "Submodule depth",
       "default": "",
       "placeholder": "",
       "type": "vuex-input",
@@ -694,7 +694,7 @@
       "placeholder": "",
       "type": "atom-checkbox",
       "text": "Execute Pre-Merge when MR event is triggered",
-      "desc": "We will try to merge the source branch to the target branch when the MR event is triggered, and the conflict will be directly judged as failure",
+      "desc": "We will attempt to merge the source branch to the target branch when the MR event is triggered, If there is a conflict, the merge will fail immediately.",
       "required": true,
       "disabled": false,
       "hidden": false,
@@ -774,7 +774,7 @@
       "groupName": "config"
     },
     "autoCrlf": {
-      "label": "AutoCrlf configuration value",
+      "label": "Set AutoCrlf",
       "default": "false",
       "type": "select-input",
       "optionsConf": {
@@ -817,7 +817,7 @@
     },
     "BK_CI_GIT_REPO_ALIAS_NAME": {
       "type": "string",
-      "description": "Repository NAME,only if you choose `select by Repository` or `Insert Repository Name` to have a value"
+      "description": "Repository Alias Name, only if you choose \"Select Repository \"or \" Enter by Repository Alias Name\" to have a value"
     },
     "BK_CI_GIT_REPO_NAME": {
       "type": "string",
@@ -825,7 +825,7 @@
     },
     "BK_CI_GIT_REPO_REF": {
       "type": "string",
-      "description": "Repository branch"
+      "description": "Current code repository REF, BRANCH/TAG/COMMIT values"
     },
     "BK_CI_GIT_REPO_CODE_PATH": {
       "type": "string",
@@ -858,6 +858,14 @@
     "BK_CI_GIT_REPO_COMMITS": {
       "type": "string",
       "description": "The new commit id generated this time"
+    },
+    "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID": {
+      "type": "string",
+      "description": "Merge commitId from the source branch before merging"
+    },
+    "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT": {
+      "type": "string",
+      "description": "Merge commit message from the source branch before merging"
     }
   }
 }
