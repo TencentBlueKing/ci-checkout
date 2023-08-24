@@ -25,9 +25,7 @@
       "MACOS",
       "WINDOWS"
     ],
-    "labelCodes": [
-
-    ],
+    "labelCodes": [],
     "summary": "Compatible with all Git repositories, faster, safer, and more universal for code retrieval",
     "description": "${{indexFile(\"readme_en.md\")}}",
     "configInfo": {
@@ -555,7 +553,7 @@
       "isSensitive": false,
       "groupName": "lfs"
     },
-    "enableGitLfsClean":{
+    "enableGitLfsClean": {
       "label": "",
       "default": false,
       "placeholder": "",

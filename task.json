@@ -5,9 +5,7 @@
     "packagePath": "checkout.jar",
     "language": "java",
     "minimumVersion": "1.8",
-    "demands": [
-
-    ],
+    "demands": [],
     "target": "$bk_java_path -Dfile.encoding=utf8 -jar checkout.jar",
     "post": {
       "postEntryParam": "True",
@@ -27,9 +25,7 @@
       "MACOS",
       "WINDOWS"
     ],
-    "labelCodes": [
-
-    ],
+    "labelCodes": [],
     "summary": "checkout插件为蓝盾平台提供基本的git拉取操作，可以拉取所有的git仓库",
     "description": "${{indexFile(\"README.md\")}}",
     "configInfo": {
@@ -539,7 +535,7 @@
       "isSensitive": false,
       "groupName": "lfs"
     },
-    "enableGitLfsClean":{
+    "enableGitLfsClean": {
       "label": "",
       "default": false,
       "placeholder": "",

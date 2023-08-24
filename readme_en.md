@@ -91,5 +91,3 @@ echo -e "Host xxx\nStrictHostKeyChecking no\n" > ~/.ssh/config
 
 ## Install
 [Add checkout plugin](./install.md)
-
-## Synergy
