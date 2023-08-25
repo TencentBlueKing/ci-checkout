@@ -99,10 +99,10 @@ object EnvHelper {
         env[BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER] = commitMaterial.newCommitAuthor ?: ""
         env[DEVOPS_GIT_HEAD_COMMITS] = System.getenv(DEVOPS_GIT_HEAD_COMMITS)?.let {
             "$it$PARAM_SEPARATOR${commitMaterial.newCommitId}"
-        } ?: ""
+        } ?: commitMaterial.newCommitId ?: ""
         env[BK_CI_GIT_HEAD_COMMITS] = System.getenv(BK_CI_GIT_HEAD_COMMITS)?.let {
             "$it$PARAM_SEPARATOR${commitMaterial.newCommitId}"
-        } ?: ""
+        } ?: commitMaterial.newCommitId ?: ""
     }
 
     fun getAuthEnv(): Map<String, String> {
