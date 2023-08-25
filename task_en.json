@@ -542,7 +542,7 @@
     },
     "enableGitLfs": {
       "label": "",
-      "default": true,
+      "default": false,
       "placeholder": "",
       "type": "atom-checkbox",
       "text": "Enable Git Lfs",
