@@ -1,12 +1,11 @@
 {
   "atomCode": "checkout",
+  "defaultLocaleLanguage": "zh_CN",
   "execution": {
     "packagePath": "checkout.jar",
     "language": "java",
     "minimumVersion": "1.8",
-    "demands": [
-
-    ],
+    "demands": [],
     "target": "$bk_java_path -Dfile.encoding=utf8 -jar checkout.jar",
     "post": {
       "postEntryParam": "True",
@@ -26,16 +25,14 @@
       "MACOS",
       "WINDOWS"
     ],
-    "labelCodes": [
-
-    ],
+    "labelCodes": [],
     "summary": "checkout插件为蓝盾平台提供基本的git拉取操作，可以拉取所有的git仓库",
     "description": "${{indexFile(\"README.md\")}}",
     "configInfo": {
       "frontendType": "NORMAL"
     },
     "versionInfo": {
-      "publisher": "Blueking",
+      "publisher": "BlueKing",
       "releaseType": "NEW",
       "version": "1.0.0",
       "versionContent": "init"
@@ -44,7 +41,7 @@
   "inputGroups": [
     {
       "name": "fetch",
-      "label": "fetch",
+      "label": "Fetch",
       "isExpanded": true
     },
     {
@@ -54,12 +51,12 @@
     },
     {
       "name": "lfs",
-      "label": "lfs",
+      "label": "Lfs",
       "isExpanded": true
     },
     {
       "name": "merge",
-      "label": "merge",
+      "label": "Merge",
       "isExpanded": true
     },
     {
@@ -94,7 +91,7 @@
       ]
     },
     "repositoryHashId": {
-      "label": "按代码库选择",
+      "label": "",
       "default": "",
       "placeholder": "请选择代码库名称",
       "type": "selector",
@@ -124,11 +121,11 @@
       }
     },
     "repositoryName": {
-      "label": "按代码库别名输入",
+      "label": "",
       "default": "",
       "placeholder": "请输入代码库别名",
       "type": "vuex-input",
-      "desc": "描述",
+      "desc": "",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -144,7 +141,7 @@
       }
     },
     "repositoryUrl": {
-      "label": "代码库链接",
+      "label": "",
       "default": "",
       "placeholder": "请输入代码库URL",
       "type": "vuex-input",
@@ -342,7 +339,7 @@
       "placeholder": "",
       "type": "atom-checkbox",
       "text": "是否持久化凭证",
-      "desc": "如果后面job需要用到git凭证,则持久化,凭证只对当前仓库有效",
+      "desc": "如果当前 Job 的后续步骤需要使用 Git 凭证，则持久化。凭证仅对当前仓库有效。",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -387,7 +384,7 @@
       "default": "",
       "placeholder": "请填写工作空间相对目录，不填则默认为工作空间目录",
       "type": "vuex-input",
-      "desc": "当前流水线存在多个代码拉取插件，你需设置此字段以解决冲突问题",
+      "desc": "若当前 Job 有多个代码拉取步骤，请设置此字段以解决代码存储路径冲突问题",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -397,7 +394,7 @@
       "label": "拉取策略",
       "default": "REVERT_UPDATE",
       "type": "enum-input",
-      "desc": "Revert Update: 增量,每次先\"git reset --hard HEAD\",再\"git pull\"\n\n Fresh Checkout: 全量,每次都会全新clone代码,之前会delete整个工作空间\n\n Increment Update: 增量,只使用\"git pull\",并不清除冲突及历史缓存文件  ",
+      "desc": "Revert Update: 增量，每次先\"git reset --hard HEAD\"，再\"git pull\"\n\n Fresh Checkout: 全量，每次都会全新clone代码，之前会delete整个工作空间\n\n Increment Update: 增量，只使用\"git pull\"，并不清除冲突及历史缓存文件  ",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -435,7 +432,7 @@
       "placeholder": "",
       "type": "atom-checkbox",
       "text": "仅fetch当前配置的分支",
-      "desc": "默认从远端获取所有的分支，配置后只fetch当前分支,如果后续有插件需要切换分支,插件需要先fetch分支再切换",
+      "desc": "默认从远端获取所有的分支，配置后只fetch当前分支，如果后续有插件需要切换分支，插件需要先fetch分支再切换",
       "required": false,
       "disabled": false,
       "hidden": true,
@@ -448,7 +445,7 @@
       "placeholder": "",
       "type": "atom-checkbox",
       "text": "启用拉取指定分支",
-      "desc": "默认会拉取所有分支，启用后只会拉取指定的分支",
+      "desc": "默认会拉取所有分支，启用后只会拉取指定的分支，配置分支总是都会拉取",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -458,9 +455,9 @@
     "fetchRefSpec": {
       "label": "",
       "default": "",
-      "placeholder": "请填写分支名,多个以,分割,支持通配符，不填默认拉取插件配置的分支",
+      "placeholder": "请填写分支名，多个以,分割，支持通配符，不填默认拉取插件配置的分支",
       "type": "vuex-input",
-      "desc": "插件配置的分支不需要设置，默认会设置.配置的分支必须存在，否则会报错",
+      "desc": "插件配置的分支不需要设置，默认会设置。配置的分支必须存在，否则会报错",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -482,7 +479,7 @@
       "placeholder": "",
       "type": "atom-checkbox",
       "text": "启动部分克隆",
-      "desc": "部分克隆git版本必须高于2.22.0版本,使用部分克隆时，建议指定检出的目录，性能更好。部分克隆和depth不能同时用，开启部分克隆会把depth关闭",
+      "desc": "部分克隆git版本必须高于2.22.0版本，使用部分克隆时，建议指定检出的目录，性能更好。部分克隆和depth不能同时用，开启部分克隆会把depth关闭",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -490,7 +487,7 @@
       "groupName": "fetch"
     },
     "includePath": {
-      "label": "代码库拉取相对子路径",
+      "label": "拉取代码库以下路径",
       "default": "",
       "placeholder": "请填写代码库相对目录，多个用逗号分隔",
       "type": "vuex-input",
@@ -499,16 +496,7 @@
       "disabled": false,
       "hidden": false,
       "isSensitive": false,
-      "groupName": "fetch",
-      "rely": {
-        "operation": "AND",
-        "expression": [
-          {
-            "key": "enablePartialClone",
-            "value": true
-          }
-        ]
-      }
+      "groupName": "fetch"
     },
     "excludePath": {
       "label": "排除代码库以下路径",
@@ -520,23 +508,14 @@
       "disabled": false,
       "hidden": false,
       "isSensitive": false,
-      "groupName": "fetch",
-      "rely": {
-        "operation": "AND",
-        "expression": [
-          {
-            "key": "enablePartialClone",
-            "value": true
-          }
-        ]
-      }
+      "groupName": "fetch"
     },
     "cachePath": {
       "label": "归档的缓存路径",
       "default": "",
       "placeholder": "",
       "type": "vuex-input",
-      "desc": "输入归档的缓存路径，全量拉取时先拉取归档的文件,再增量拉取.文件必须是tar.gz格式",
+      "desc": "输入归档的缓存路径，全量拉取时先拉取归档的文件，再增量拉取。文件必须是tar.gz格式",
       "required": false,
       "disabled": false,
       "hidden": false,
@@ -556,7 +535,7 @@
       "isSensitive": false,
       "groupName": "lfs"
     },
-    "enableGitLfsClean":{
+    "enableGitLfsClean": {
       "label": "",
       "default": false,
       "placeholder": "",
@@ -564,6 +543,18 @@
       "text": "是否开启Git Lfs清理",
       "desc": "选中则执行git lfs prune，会影响代码拉取效率",
       "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "lfs"
+    },
+    "lfsConcurrentTransfers": {
+      "label": "lfs并发拉取数",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "默认值：8",
+      "required": false,
       "disabled": false,
       "hidden": false,
       "isSensitive": false,
@@ -647,6 +638,27 @@
         ]
       }
     },
+    "submoduleJobs": {
+      "label": "submodule并发拉取数",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "默认不启用并发拉取",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
     "submoduleDepth": {
       "label": "submodule depth参数值",
       "default": "",
@@ -687,7 +699,7 @@
       "placeholder": "",
       "type": "atom-checkbox",
       "text": "是否开启Git Clean",
-      "desc": "选中删除未进行版本管理的文件,排除.gitignore中配置的文件和目录(git clean -df)",
+      "desc": "选中删除未进行版本管理的文件，排除.gitignore中配置的文件和目录(git clean -df)",
       "required": true,
       "disabled": false,
       "hidden": false,
@@ -708,8 +720,8 @@
       "default": true,
       "placeholder": "",
       "type": "atom-checkbox",
-      "text": "git clean时清理.gitignore配置的文件和目录",
-      "desc": "在git clean命令增加-x参数(git clean -xdf)",
+      "text": "清理没有版本跟踪的ignored文件",
+      "desc": "在git clean命令增加-x参数(git clean -x)",
       "required": true,
       "disabled": false,
       "hidden": false,
@@ -729,29 +741,31 @@
         ]
       }
     },
-    "usernameConfig": {
-      "label": "user.name配置值",
-      "default": "",
+    "enableGitCleanNested": {
+      "label": "",
+      "default": false,
       "placeholder": "",
-      "type": "vuex-input",
-      "desc": "git config user.name",
-      "required": false,
+      "type": "atom-checkbox",
+      "text": "清理没有版本跟踪的嵌套仓库",
+      "desc": "git clean使用两个f(git clean -ff)，当删除子模块时，工作空间子模块目录默认不会删除，启用后才会删除",
+      "required": true,
       "disabled": false,
       "hidden": false,
       "isSensitive": false,
-      "groupName": "config"
-    },
-    "userEmailConfig": {
-      "label": "user.email配置值",
-      "default": "",
-      "placeholder": "",
-      "type": "vuex-input",
-      "desc": "git config user.email",
-      "required": false,
-      "disabled": false,
-      "hidden": false,
-      "isSensitive": false,
-      "groupName": "config"
+      "groupName": "config",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "strategy",
+            "value": "REVERT_UPDATE"
+          },
+          {
+            "key": "enableGitClean",
+            "value": true
+          }
+        ]
+      }
     },
     "autoCrlf": {
       "label": "AutoCrlf配置值",
@@ -797,7 +811,7 @@
     },
     "BK_CI_GIT_REPO_ALIAS_NAME": {
       "type": "string",
-      "description": "代码库别名,只有选择`按代码库选择`或`按代码库别名输入`才有值"
+      "description": "代码库别名，只有选择`按代码库选择`或`按代码库别名输入`才有值"
     },
     "BK_CI_GIT_REPO_NAME": {
       "type": "string",
@@ -805,7 +819,7 @@
     },
     "BK_CI_GIT_REPO_REF": {
       "type": "string",
-      "description": "当前代码库分支"
+      "description": "当前代码库REF，分支/TAG/COMMIT的值"
     },
     "BK_CI_GIT_REPO_CODE_PATH": {
       "type": "string",
@@ -817,11 +831,11 @@
     },
     "BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID": {
       "type": "string",
-      "description": "拉取代码时，目标分支的commitId,只有mr事件触发并启用pre-merge功能才有值"
+      "description": "拉取代码时，目标分支的commitId，只有mr事件触发并启用pre-merge功能才有值"
     },
     "BK_CI_GIT_REPO_HEAD_COMMIT_ID": {
       "type": "string",
-      "description": "拉取代码时，本次构建最后的commit id,如果启用pre-merge,则是合并完后的commitId"
+      "description": "拉取代码时，本次构建最后的commit id，如果启用pre-merge，则是合并完后的commitId"
     },
     "BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT": {
       "type": "string",
@@ -838,6 +852,14 @@
     "BK_CI_GIT_REPO_COMMITS": {
       "type": "string",
       "description": "本次产生的新的commit id"
+    },
+    "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID": {
+      "type": "string",
+      "description": "MR合并之前源分支的commitId"
+    },
+    "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT": {
+      "type": "string",
+      "description": "MR合并之前源分支的提交信息"
     }
   }
 }

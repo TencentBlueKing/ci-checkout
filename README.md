@@ -91,5 +91,3 @@ echo -e "Host xxx\nStrictHostKeyChecking no\n" > ~/.ssh/config
 
 ## 安装
 [上架checkout插件](./install.md)
-
-## 协同

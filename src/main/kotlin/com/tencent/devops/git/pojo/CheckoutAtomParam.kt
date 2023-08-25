@@ -34,7 +34,14 @@ class CheckoutAtomParam : AtomBaseParam() {
     var submodulePath: String? = ""
     var enableSubmoduleRemote: Boolean = false
     var enableSubmoduleRecursive: Boolean? = false
-
+    /**
+     * submodule并发拉取数量
+     */
+    val submoduleJobs: Int = 0
+    /**
+     * submodule depth
+     */
+    val submoduleDepth: Int? = 0
     var autoCrlf: String? = ""
     var enableGitClean: Boolean = true
     val enableGitCleanIgnore: Boolean = true
