@@ -89,6 +89,10 @@ task buildZip(type: Zip, dependsOn: shadowJar) {
     from("./README.md") {
         into("file")
     }
+
+    from("src/main/resources/i18n") {
+        into("i18n")
+    }
 }
 
 /**
