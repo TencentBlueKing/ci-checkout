@@ -61,7 +61,7 @@ class SshGitAuthHelper(
             throw ParamInvalidException(errorMsg = "private key must not be empty")
         }
         EnvHelper.putContext(ContextConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
-        SSHAgentUtils(privateKey = authInfo.privateKey, passPhrase = authInfo.passPhrase).addIdentity()
+        SSHAgentUtils().addIdentity(privateKey = authInfo.privateKey, passPhrase = authInfo.passPhrase)
         git.setEnvironmentVariable(GitConstants.GIT_SSH_COMMAND, GitConstants.GIT_SSH_COMMAND_VALUE)
         git.config(
             configKey = GitConstants.GIT_CREDENTIAL_AUTH_HELPER,
@@ -85,11 +85,12 @@ class SshGitAuthHelper(
     override fun removeAuth() {
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
-        with(settings){
+        with(settings) {
             if (preMerge && !sourceRepoUrlEqualsRepoUrl) {
                 git.remoteSetUrl(remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME, remoteUrl = sourceRepositoryUrl)
             }
         }
+        SSHAgentUtils().stop()
     }
 
     override fun insteadOf() {

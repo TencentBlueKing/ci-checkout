@@ -14,7 +14,7 @@ import java.nio.file.attribute.PosixFilePermissions
 import java.util.concurrent.TimeUnit
 
 @SuppressWarnings("TooManyFunctions")
-class SSHAgentUtils constructor(private val privateKey: String, private val passPhrase: String?) {
+class SSHAgentUtils {
 
     companion object {
         private const val AUTH_SOCKET_VAR = "SSH_AUTH_SOCK"
@@ -24,7 +24,7 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         private val logger = LoggerFactory.getLogger(SSHAgentUtils::class.java)
     }
 
-    fun addIdentity(): Map<String, String> {
+    fun addIdentity(privateKey: String, passPhrase: String?): Map<String, String> {
         var keyFile: File? = null
         var askPass: File? = null
         var sshAgentFile: File? = null
@@ -39,7 +39,6 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
                 sshAddFile = createWindowsSshAddFile(keyFile)
 
                 askPass = if (passPhrase != null) createWindowsAskpassScript() else null
-                Pair(sshAgentFile, sshAddFile)
             } else {
                 sshAgentFile = createUnixSshAgent()
 
@@ -52,7 +51,6 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
                 sshAddFile = createUnixSshAddFile(keyFile)
 
                 askPass = if (passPhrase != null) createUnixAskpassScript() else null
-                Pair(sshAgentFile, sshAddFile)
             }
             val agentEnv = parseAgentEnv(executeCommand(sshAgentFile.absolutePath, null))
             val env = HashMap(agentEnv)
@@ -67,8 +65,8 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
                 EnvHelper.addSshAgent(agentEnv)
             }
             return agentEnv
-        } catch (ignore: Throwable) {
-            logger.warn("Fail to add the ssh key to ssh-agent", ignore)
+        } catch (ignored: Throwable) {
+            logger.warn("Fail to add the ssh key to ssh-agent", ignored)
         } finally {
             deleteTempFile(sshAgentFile)
             deleteTempFile(sshAddFile)
@@ -77,6 +75,22 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         }
 
         return mapOf()
+    }
+
+    fun stop() {
+        var sshAgentFile: File? = null
+        try {
+            sshAgentFile = if (AgentEnv.getOS() == OSType.WINDOWS) {
+                createWindowsStop()
+            } else {
+                createUnixStop()
+            }
+            executeCommand(sshAgentFile.absolutePath, EnvHelper.getAuthEnv())
+        } catch (ignored: Throwable) {
+            logger.warn("Fail to stop ssh-agent", ignored)
+        } finally {
+            deleteTempFile(sshAgentFile)
+        }
     }
 
     private fun createWindowsSshAgent(): File {
@@ -128,6 +142,20 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         askpass.writeText("#!/bin/sh\necho \"\$SSH_PASSPHRASE\"\nrm \"$0\"\n")
         executeCommand("chmod +x ${askpass.absolutePath}", null)
         return askpass
+    }
+
+    private fun createWindowsStop(): File {
+        val sshAgentFile = File.createTempFile("ssh-agent-stop-", ".bat")
+        sshAgentFile.setExecutable(true, true)
+        sshAgentFile.writeText("@echo off\n\"${getWindowsSshExecutable("ssh-agent.exe")} -k\"")
+        return sshAgentFile
+    }
+
+    private fun createUnixStop(): File {
+        val sshAgentFile = File.createTempFile("ssh-agent-stop-", ".sh")
+        sshAgentFile.setExecutable(true, true)
+        sshAgentFile.writeText("#!/bin/sh\nssh-agent -k")
+        return sshAgentFile
     }
 
     private fun deleteTempFile(tempFile: File?) {
