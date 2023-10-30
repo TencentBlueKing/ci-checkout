@@ -53,9 +53,11 @@ class GitFetchHandler(
     override fun doHandle() {
         val startEpoch = System.currentTimeMillis()
         try {
+            logger.groupStart("Fetching the repository")
             // 清理本地已经删除的分支,git fetch --prune也能清理,但是如果git fetch指定分支,就只能清理指定的分支,无法清理所有的
             git.tryPrune(ORIGIN_REMOTE_NAME)
             doFetch()
+            logger.groupEnd("")
         } finally {
             EnvHelper.putContext(
                 key = ContextConstants.CONTEXT_FETCH_COST_TIME,
@@ -66,13 +68,11 @@ class GitFetchHandler(
 
     private fun doFetch() {
         with(settings) {
-            logger.groupStart("Fetching the repository")
             val shallowSince = calculateShallowSince()
             fetchTargetRepository(shallowSince = shallowSince)
             fetchSourceRepository(shallowSince = shallowSince)
             fetchPrePushBranch(shallowSince = shallowSince)
             testMerge()
-            logger.groupEnd("")
         }
     }
 

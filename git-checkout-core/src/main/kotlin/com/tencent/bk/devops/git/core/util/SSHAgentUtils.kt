@@ -78,6 +78,11 @@ class SSHAgentUtils {
     }
 
     fun stop() {
+        val sshAgentPid = System.getenv(AGENT_PID_VAR)
+        if (sshAgentPid.isNullOrBlank()) {
+            logger.warn("SSH_AGENT_PID not set, cannot kill agent")
+            return
+        }
         var sshAgentFile: File? = null
         try {
             sshAgentFile = if (AgentEnv.getOS() == OSType.WINDOWS) {
@@ -85,7 +90,7 @@ class SSHAgentUtils {
             } else {
                 createUnixStop()
             }
-            executeCommand(sshAgentFile.absolutePath, EnvHelper.getAuthEnv())
+            executeCommand(sshAgentFile.absolutePath, mapOf(AGENT_PID_VAR to sshAgentPid))
         } catch (ignored: Throwable) {
             logger.warn("Fail to stop ssh-agent", ignored)
         } finally {
