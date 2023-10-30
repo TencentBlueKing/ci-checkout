@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_BASE_COMMIT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT
+import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
@@ -52,6 +53,8 @@ class GitFetchHandler(
     override fun doHandle() {
         val startEpoch = System.currentTimeMillis()
         try {
+            // 清理本地已经删除的分支,git fetch --prune也能清理,但是如果git fetch指定分支,就只能清理指定的分支,无法清理所有的
+            git.tryPrune(ORIGIN_REMOTE_NAME)
             doFetch()
         } finally {
             EnvHelper.putContext(

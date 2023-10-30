@@ -745,6 +745,12 @@ class GitCommandManager(
         return output.exitCode == 0
     }
 
+    fun tryPrune(remoteName: String): Boolean {
+        val args = mutableListOf("remote", "prune", remoteName)
+        val output = execGit(args = args, allowAllExitCodes = true, logType = LogType.PROGRESS)
+        return output.exitCode == 0
+    }
+
     /**
      * 输出当前git状态
      */
