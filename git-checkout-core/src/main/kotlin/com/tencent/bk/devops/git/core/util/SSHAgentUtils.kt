@@ -82,6 +82,8 @@ class SSHAgentUtils {
         if (sshAgentPid.isNullOrBlank()) {
             logger.warn("SSH_AGENT_PID not set, cannot kill agent")
             return
+        } else {
+            logger.info("kill ssh-agent $sshAgentPid")
         }
         var sshAgentFile: File? = null
         try {
