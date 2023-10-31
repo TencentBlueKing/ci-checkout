@@ -66,7 +66,7 @@ class SshGitAuthHelper(
         if (sshAgentPidFile.exists()) {
             val sshAgentPid = sshAgentPidFile.readText()
             if (sshAgentPid.isNotBlank()) {
-                logger.info("kill previous build ssh-agent $sshAgentPid")
+                logger.info("Kill the previous build started ssh-agent $sshAgentPid")
                 SSHAgentUtils().stop(sshAgentPid)
                 sshAgentPidFile.delete()
             }

@@ -60,7 +60,7 @@ class SSHAgentUtils {
                 env["SSH_ASKPASS"] = askPass!!.absolutePath
             }
             val output = executeCommand(sshAddFile.absolutePath, env)
-            logger.info("Finish add the ssh-agent - ($output)")
+            logger.info("Finish add the ssh-agent - (${output.trim()})")
             if (agentEnv.isNotEmpty()) {
                 EnvHelper.addSshAgent(agentEnv)
             }
@@ -87,7 +87,7 @@ class SSHAgentUtils {
             }
             executeCommand(sshAgentFile.absolutePath, mapOf(AGENT_PID_VAR to sshAgentPid))
         } catch (ignored: Throwable) {
-            logger.warn("Fail to stop ssh-agent", ignored)
+            logger.warn("Fail to stop ssh-agent ${ignored.message}")
         } finally {
             deleteTempFile(sshAgentFile)
         }
@@ -147,7 +147,7 @@ class SSHAgentUtils {
     private fun createWindowsStop(): File {
         val sshAgentFile = File.createTempFile("ssh-agent-stop-", ".bat")
         sshAgentFile.setExecutable(true, true)
-        sshAgentFile.writeText("@echo off\n\"${getWindowsSshExecutable("ssh-agent.exe")} -k\"")
+        sshAgentFile.writeText("@echo off\n\"${getWindowsSshExecutable("ssh-agent.exe")}\" -k")
         return sshAgentFile
     }
 
@@ -184,7 +184,7 @@ class SSHAgentUtils {
                 )
             }
         } catch (ignore: Throwable) {
-            logger.warn("Error message($output)", ignore)
+            logger.warn("Error message(${output.trim()})", ignore)
         }
         return output.toString()
     }
