@@ -68,6 +68,7 @@ class SshGitAuthHelper(
             if (sshAgentPid.isNotBlank()) {
                 logger.info("kill previous build ssh-agent $sshAgentPid")
                 SSHAgentUtils().stop(sshAgentPid)
+                sshAgentPidFile.delete()
             }
         }
     }
@@ -81,7 +82,11 @@ class SshGitAuthHelper(
         // 将ssh-agent启动产生的pid写入文件,方便post-action阶段时清理
         val sshAgentPid = EnvHelper.getEnvVariable(AGENT_PID_VAR)
         if (!sshAgentPid.isNullOrBlank()) {
-            File(SSH_AGENT_PID_PATH).writeText(sshAgentPid)
+            val sshAgentPidFile = File(SSH_AGENT_PID_PATH)
+            if (!sshAgentPidFile.exists()) {
+                sshAgentPidFile.createNewFile()
+            }
+            sshAgentPidFile.writeText(sshAgentPid)
         }
         git.setEnvironmentVariable(GitConstants.GIT_SSH_COMMAND, GitConstants.GIT_SSH_COMMAND_VALUE)
         git.config(
@@ -119,6 +124,7 @@ class SshGitAuthHelper(
             } else {
                 logger.info("kill ssh-agent $sshAgentPid")
                 SSHAgentUtils().stop(sshAgentPid)
+                sshAgentPidFile.delete()
             }
         }
     }
