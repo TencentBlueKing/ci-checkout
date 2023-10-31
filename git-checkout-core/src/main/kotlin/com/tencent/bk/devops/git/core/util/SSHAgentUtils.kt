@@ -85,10 +85,12 @@ class SSHAgentUtils {
             } else {
                 createUnixStop()
             }
+            logger.info("start to execute $sshAgentFile")
             executeCommand(sshAgentFile.absolutePath, mapOf(AGENT_PID_VAR to sshAgentPid))
         } catch (ignored: Throwable) {
             logger.warn("Fail to stop ssh-agent ${ignored.message}")
         } finally {
+            logger.info("delete file $sshAgentFile")
             deleteTempFile(sshAgentFile)
         }
     }
