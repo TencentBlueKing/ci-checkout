@@ -171,6 +171,7 @@ class SSHAgentUtils {
         val output = StringBuilder()
         val outputStream = object : LogOutputStream() {
             override fun processLine(line: String?, level: Int) {
+                logger.debug(line)
                 output.append(line).append("\n")
             }
         }
