@@ -77,14 +77,7 @@ class SSHAgentUtils {
         return mapOf()
     }
 
-    fun stop() {
-        val sshAgentPid = System.getenv(AGENT_PID_VAR)
-        if (sshAgentPid.isNullOrBlank()) {
-            logger.warn("SSH_AGENT_PID not set, cannot kill agent")
-            return
-        } else {
-            logger.info("kill ssh-agent $sshAgentPid")
-        }
+    fun stop(sshAgentPid: String) {
         var sshAgentFile: File? = null
         try {
             sshAgentFile = if (AgentEnv.getOS() == OSType.WINDOWS) {
