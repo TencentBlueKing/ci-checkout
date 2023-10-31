@@ -177,7 +177,7 @@ class SSHAgentUtils {
                 output.append(line).append("\n")
             }
         }
-        executor.streamHandler = PumpStreamHandler(outputStream)
+        executor.streamHandler = PumpStreamHandler(outputStream, outputStream)
         executor.watchdog = ExecuteWatchdog(TimeUnit.MINUTES.toMillis(5))
         try {
             val exitCode = executor.execute(cmdLine, env)
