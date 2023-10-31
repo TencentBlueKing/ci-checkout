@@ -62,7 +62,7 @@ class SshGitAuthHelper(
                 recursive = true
             )
         }
-        val sshAgentPidFile = File(SSH_AGENT_PID_PATH)
+        val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
         if (sshAgentPidFile.exists()) {
             val sshAgentPid = sshAgentPidFile.readText()
             if (sshAgentPid.isNotBlank()) {
@@ -82,7 +82,7 @@ class SshGitAuthHelper(
         // 将ssh-agent启动产生的pid写入文件,方便post-action阶段时清理
         val sshAgentPid = EnvHelper.getEnvVariable(AGENT_PID_VAR)
         if (!sshAgentPid.isNullOrBlank()) {
-            val sshAgentPidFile = File(SSH_AGENT_PID_PATH)
+            val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
             if (!sshAgentPidFile.exists()) {
                 sshAgentPidFile.createNewFile()
             }
@@ -116,7 +116,7 @@ class SshGitAuthHelper(
                 git.remoteSetUrl(remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME, remoteUrl = sourceRepositoryUrl)
             }
         }
-        val sshAgentPidFile = File(SSH_AGENT_PID_PATH)
+        val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
         if (sshAgentPidFile.exists()) {
             val sshAgentPid = sshAgentPidFile.readText()
             if (sshAgentPid.isBlank()) {
