@@ -2,8 +2,9 @@ package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
+import com.tencent.bk.devops.plugin.script.CommandLineExecutor
+import com.tencent.bk.devops.plugin.script.ScriptUtils
 import org.apache.commons.exec.CommandLine
-import org.apache.commons.exec.DefaultExecutor
 import org.apache.commons.exec.ExecuteWatchdog
 import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
@@ -14,7 +15,7 @@ import java.nio.file.attribute.PosixFilePermissions
 import java.util.concurrent.TimeUnit
 
 @SuppressWarnings("TooManyFunctions")
-class SSHAgentUtils constructor(private val privateKey: String, private val passPhrase: String?) {
+class SSHAgentUtils {
 
     companion object {
         private const val AUTH_SOCKET_VAR = "SSH_AUTH_SOCK"
@@ -24,7 +25,7 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         private val logger = LoggerFactory.getLogger(SSHAgentUtils::class.java)
     }
 
-    fun addIdentity(): Map<String, String> {
+    fun addIdentity(privateKey: String, passPhrase: String?): Map<String, String> {
         var keyFile: File? = null
         var askPass: File? = null
         var sshAgentFile: File? = null
@@ -39,7 +40,6 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
                 sshAddFile = createWindowsSshAddFile(keyFile)
 
                 askPass = if (passPhrase != null) createWindowsAskpassScript() else null
-                Pair(sshAgentFile, sshAddFile)
             } else {
                 sshAgentFile = createUnixSshAgent()
 
@@ -52,7 +52,6 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
                 sshAddFile = createUnixSshAddFile(keyFile)
 
                 askPass = if (passPhrase != null) createUnixAskpassScript() else null
-                Pair(sshAgentFile, sshAddFile)
             }
             val agentEnv = parseAgentEnv(executeCommand(sshAgentFile.absolutePath, null))
             val env = HashMap(agentEnv)
@@ -62,13 +61,13 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
                 env["SSH_ASKPASS"] = askPass!!.absolutePath
             }
             val output = executeCommand(sshAddFile.absolutePath, env)
-            logger.info("Finish add the ssh-agent - ($output)")
+            logger.info("Finish add the ssh-agent - (${output.trim()})")
             if (agentEnv.isNotEmpty()) {
                 EnvHelper.addSshAgent(agentEnv)
             }
             return agentEnv
-        } catch (ignore: Throwable) {
-            logger.warn("Fail to add the ssh key to ssh-agent", ignore)
+        } catch (ignored: Throwable) {
+            logger.warn("Fail to add the ssh key to ssh-agent", ignored)
         } finally {
             deleteTempFile(sshAgentFile)
             deleteTempFile(sshAddFile)
@@ -77,6 +76,20 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
         }
 
         return mapOf()
+    }
+
+    fun stop(repositoryPath: String, sshAgentPid: String) {
+        val script = if (AgentEnv.getOS() == OSType.WINDOWS) {
+            "\"${getWindowsSshExecutable("ssh-agent.exe")}\" -k"
+        } else {
+            "ssh-agent -k"
+        }
+        ScriptUtils.execute(
+            script = script,
+            dir = File(repositoryPath),
+            runtimeVariables = mapOf(AGENT_PID_VAR to sshAgentPid),
+            failExit = false
+        )
     }
 
     private fun createWindowsSshAgent(): File {
@@ -139,24 +152,25 @@ class SSHAgentUtils constructor(private val privateKey: String, private val pass
     @SuppressWarnings("MagicNumber")
     private fun executeCommand(commandLine: String, env: Map<String, String>?): String {
         val cmdLine = CommandLine.parse(commandLine)
-        val executor = DefaultExecutor()
+        val executor = CommandLineExecutor()
         val output = StringBuilder()
         val outputStream = object : LogOutputStream() {
             override fun processLine(line: String?, level: Int) {
+                logger.debug(line)
                 output.append(line).append("\n")
             }
         }
-        executor.streamHandler = PumpStreamHandler(outputStream)
+        executor.streamHandler = PumpStreamHandler(outputStream, outputStream)
         executor.watchdog = ExecuteWatchdog(TimeUnit.MINUTES.toMillis(5))
         try {
-            val exitCode = executor.execute(cmdLine, env)
+            val exitCode = executor.execute(cmdLine, env?.toMutableMap())
             if (exitCode != 0) {
                 logger.warn(
                     "Fail to execute the command($commandLine) because of exitCode($exitCode) and output($output)"
                 )
             }
         } catch (ignore: Throwable) {
-            logger.warn("Error message($output)", ignore)
+            logger.warn("Error message(${output.trim()})")
         }
         return output.toString()
     }

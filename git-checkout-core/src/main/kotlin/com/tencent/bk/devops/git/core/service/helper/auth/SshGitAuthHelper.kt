@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.helper.auth
 
 import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.AGENT_PID_VAR
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
@@ -39,12 +40,19 @@ import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.SSHAgentUtils
+import org.slf4j.LoggerFactory
+import java.io.File
 import java.net.URI
 
 class SshGitAuthHelper(
     private val git: GitCommandManager,
     private val settings: GitSourceSettings
 ) : AbGitAuthHelper(git = git, settings = settings) {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(SshGitAuthHelper::class.java)
+        private const val SSH_AGENT_PID_PATH = ".git/ssh_agent_pid"
+    }
 
     override fun removePreviousAuth() {
         val insteadOfKey = git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
@@ -54,6 +62,7 @@ class SshGitAuthHelper(
                 recursive = true
             )
         }
+        stopSshAgent()
     }
 
     override fun configureAuth() {
@@ -61,7 +70,7 @@ class SshGitAuthHelper(
             throw ParamInvalidException(errorMsg = "private key must not be empty")
         }
         EnvHelper.putContext(ContextConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
-        SSHAgentUtils(privateKey = authInfo.privateKey, passPhrase = authInfo.passPhrase).addIdentity()
+        startSshAgent()
         git.setEnvironmentVariable(GitConstants.GIT_SSH_COMMAND, GitConstants.GIT_SSH_COMMAND_VALUE)
         git.config(
             configKey = GitConstants.GIT_CREDENTIAL_AUTH_HELPER,
@@ -85,11 +94,12 @@ class SshGitAuthHelper(
     override fun removeAuth() {
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
         git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
-        with(settings){
+        with(settings) {
             if (preMerge && !sourceRepoUrlEqualsRepoUrl) {
                 git.remoteSetUrl(remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME, remoteUrl = sourceRepositoryUrl)
             }
         }
+        stopSshAgent()
     }
 
     override fun insteadOf() {
@@ -135,5 +145,30 @@ class SshGitAuthHelper(
         val authUrl = "${uri.scheme}://${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}" +
             "@${uri.host}${uri.path}"
         git.remoteSetUrl(remoteName = remoteName, remoteUrl = authUrl)
+    }
+
+    private fun startSshAgent() {
+        SSHAgentUtils().addIdentity(privateKey = authInfo.privateKey!!, passPhrase = authInfo.passPhrase)
+        // 将ssh-agent启动产生的pid写入文件,方便post-action阶段时清理
+        val sshAgentPid = EnvHelper.getEnvVariable(AGENT_PID_VAR)
+        if (!sshAgentPid.isNullOrBlank()) {
+            val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
+            if (!sshAgentPidFile.exists()) {
+                sshAgentPidFile.createNewFile()
+            }
+            sshAgentPidFile.writeText(sshAgentPid)
+        }
+    }
+
+    private fun stopSshAgent() {
+        val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
+        if (sshAgentPidFile.exists()) {
+            val sshAgentPid = sshAgentPidFile.readText()
+            if (sshAgentPid.isNotBlank()) {
+                logger.info("kill ssh-agent $sshAgentPid")
+                SSHAgentUtils().stop(repositoryPath = settings.repositoryPath, sshAgentPid = sshAgentPid)
+                sshAgentPidFile.delete()
+            }
+        }
     }
 }

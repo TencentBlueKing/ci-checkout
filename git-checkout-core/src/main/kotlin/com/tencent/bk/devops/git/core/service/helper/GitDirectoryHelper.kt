@@ -120,6 +120,7 @@ class GitDirectoryHelper(
             File(repositoryPath, ".git/packed-refs.lock")
         )
         lockFiles.addAll(findRefLockFile(File(repositoryPath, ".git/refs")))
+        lockFiles.addAll(findRefLockFile(File(repositoryPath, ".git/modules")))
         lockFiles.forEach { lockFile ->
             try {
                 lockFile.delete()
