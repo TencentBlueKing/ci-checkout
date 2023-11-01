@@ -2,8 +2,8 @@ package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
+import com.tencent.bk.devops.plugin.script.CommandLineExecutor
 import org.apache.commons.exec.CommandLine
-import org.apache.commons.exec.DefaultExecutor
 import org.apache.commons.exec.ExecuteWatchdog
 import org.apache.commons.exec.LogOutputStream
 import org.apache.commons.exec.PumpStreamHandler
@@ -81,16 +81,14 @@ class SSHAgentUtils {
         var sshAgentFile: File? = null
         try {
             sshAgentFile = if (AgentEnv.getOS() == OSType.WINDOWS) {
-                createWindowsStop()
+                createWindowsStop(sshAgentPid)
             } else {
                 createUnixStop()
             }
-            logger.info("start to execute $sshAgentFile")
             executeCommand(sshAgentFile.absolutePath, mapOf(AGENT_PID_VAR to sshAgentPid))
         } catch (ignored: Throwable) {
             logger.warn("Fail to stop ssh-agent ${ignored.message}")
         } finally {
-            logger.info("delete file $sshAgentFile")
             deleteTempFile(sshAgentFile)
         }
     }
@@ -146,18 +144,22 @@ class SSHAgentUtils {
         return askpass
     }
 
-    private fun createWindowsStop(): File {
-        val sshAgentFile = File.createTempFile("ssh-agent-stop-", ".bat")
-        sshAgentFile.setExecutable(true, true)
-        sshAgentFile.writeText("@echo off\n\"${getWindowsSshExecutable("ssh-agent.exe")}\" -k")
-        return sshAgentFile
+    /**
+     * windows如果登录启动用户NT AUTHORITY\SYSTEM,如果ssh-agent进程已经退出,那么执行ssh-agent -k命令会卡住,原因未知.
+     * 所以通过kill命令终止ssh-agent程序
+     */
+    private fun createWindowsStop(sshAgentPid: String): File {
+        val sshAgentKillFile = File.createTempFile("ssh-agent-kill-", ".bat")
+        sshAgentKillFile.setExecutable(true, true)
+        sshAgentKillFile.writeText("@echo off\n\"${getWindowsSshExecutable("kill.exe")}\" $sshAgentPid")
+        return sshAgentKillFile
     }
 
     private fun createUnixStop(): File {
-        val sshAgentFile = File.createTempFile("ssh-agent-stop-", ".sh")
-        sshAgentFile.setExecutable(true, true)
-        sshAgentFile.writeText("#!/bin/sh\nssh-agent -k")
-        return sshAgentFile
+        val sshAgentStopFile = File.createTempFile("ssh-agent-stop-", ".sh")
+        sshAgentStopFile.setExecutable(true, true)
+        sshAgentStopFile.writeText("#!/bin/sh\nssh-agent -k")
+        return sshAgentStopFile
     }
 
     private fun deleteTempFile(tempFile: File?) {
@@ -169,7 +171,7 @@ class SSHAgentUtils {
     @SuppressWarnings("MagicNumber")
     private fun executeCommand(commandLine: String, env: Map<String, String>?): String {
         val cmdLine = CommandLine.parse(commandLine)
-        val executor = DefaultExecutor()
+        val executor = CommandLineExecutor()
         val output = StringBuilder()
         val outputStream = object : LogOutputStream() {
             override fun processLine(line: String?, level: Int) {
@@ -180,14 +182,14 @@ class SSHAgentUtils {
         executor.streamHandler = PumpStreamHandler(outputStream, outputStream)
         executor.watchdog = ExecuteWatchdog(TimeUnit.MINUTES.toMillis(5))
         try {
-            val exitCode = executor.execute(cmdLine, env)
+            val exitCode = executor.execute(cmdLine, env?.toMutableMap())
             if (exitCode != 0) {
                 logger.warn(
                     "Fail to execute the command($commandLine) because of exitCode($exitCode) and output($output)"
                 )
             }
         } catch (ignore: Throwable) {
-            logger.warn("Error message(${output.trim()})", ignore)
+            logger.warn("Error message(${output.trim()})")
         }
         return output.toString()
     }
