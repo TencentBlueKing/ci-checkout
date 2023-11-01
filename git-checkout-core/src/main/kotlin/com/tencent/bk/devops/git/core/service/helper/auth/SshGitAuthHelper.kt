@@ -62,15 +62,7 @@ class SshGitAuthHelper(
                 recursive = true
             )
         }
-        val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
-        if (sshAgentPidFile.exists()) {
-            val sshAgentPid = sshAgentPidFile.readText()
-            if (sshAgentPid.isNotBlank()) {
-                logger.info("Kill the previous build started ssh-agent $sshAgentPid")
-                SSHAgentUtils().stop(repositoryPath = settings.repositoryPath, sshAgentPid = sshAgentPid)
-                sshAgentPidFile.delete()
-            }
-        }
+        stopSshAgent()
     }
 
     override fun configureAuth() {
@@ -78,16 +70,7 @@ class SshGitAuthHelper(
             throw ParamInvalidException(errorMsg = "private key must not be empty")
         }
         EnvHelper.putContext(ContextConstants.CONTEXT_GIT_PROTOCOL, GitProtocolEnum.SSH.name)
-        SSHAgentUtils().addIdentity(privateKey = authInfo.privateKey, passPhrase = authInfo.passPhrase)
-        // 将ssh-agent启动产生的pid写入文件,方便post-action阶段时清理
-        val sshAgentPid = EnvHelper.getEnvVariable(AGENT_PID_VAR)
-        if (!sshAgentPid.isNullOrBlank()) {
-            val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
-            if (!sshAgentPidFile.exists()) {
-                sshAgentPidFile.createNewFile()
-            }
-            sshAgentPidFile.writeText(sshAgentPid)
-        }
+        startSshAgent()
         git.setEnvironmentVariable(GitConstants.GIT_SSH_COMMAND, GitConstants.GIT_SSH_COMMAND_VALUE)
         git.config(
             configKey = GitConstants.GIT_CREDENTIAL_AUTH_HELPER,
@@ -116,17 +99,7 @@ class SshGitAuthHelper(
                 git.remoteSetUrl(remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME, remoteUrl = sourceRepositoryUrl)
             }
         }
-        val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
-        if (sshAgentPidFile.exists()) {
-            val sshAgentPid = sshAgentPidFile.readText()
-            if (sshAgentPid.isBlank()) {
-                logger.warn("SSH_AGENT_PID not set, cannot kill agent")
-            } else {
-                logger.info("kill ssh-agent $sshAgentPid")
-                SSHAgentUtils().stop(repositoryPath = settings.repositoryPath, sshAgentPid = sshAgentPid)
-                sshAgentPidFile.delete()
-            }
-        }
+        stopSshAgent()
     }
 
     override fun insteadOf() {
@@ -172,5 +145,30 @@ class SshGitAuthHelper(
         val authUrl = "${uri.scheme}://${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}" +
             "@${uri.host}${uri.path}"
         git.remoteSetUrl(remoteName = remoteName, remoteUrl = authUrl)
+    }
+
+    private fun startSshAgent() {
+        SSHAgentUtils().addIdentity(privateKey = authInfo.privateKey!!, passPhrase = authInfo.passPhrase)
+        // 将ssh-agent启动产生的pid写入文件,方便post-action阶段时清理
+        val sshAgentPid = EnvHelper.getEnvVariable(AGENT_PID_VAR)
+        if (!sshAgentPid.isNullOrBlank()) {
+            val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
+            if (!sshAgentPidFile.exists()) {
+                sshAgentPidFile.createNewFile()
+            }
+            sshAgentPidFile.writeText(sshAgentPid)
+        }
+    }
+
+    private fun stopSshAgent() {
+        val sshAgentPidFile = File(settings.repositoryPath, SSH_AGENT_PID_PATH)
+        if (sshAgentPidFile.exists()) {
+            val sshAgentPid = sshAgentPidFile.readText()
+            if (sshAgentPid.isNotBlank()) {
+                logger.info("kill ssh-agent $sshAgentPid")
+                SSHAgentUtils().stop(repositoryPath = settings.repositoryPath, sshAgentPid = sshAgentPid)
+                sshAgentPidFile.delete()
+            }
+        }
     }
 }
