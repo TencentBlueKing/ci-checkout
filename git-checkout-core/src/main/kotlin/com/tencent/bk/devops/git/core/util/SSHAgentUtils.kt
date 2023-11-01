@@ -3,6 +3,7 @@ package com.tencent.bk.devops.git.core.util
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.plugin.script.CommandLineExecutor
+import com.tencent.bk.devops.plugin.script.ScriptUtils
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.ExecuteWatchdog
 import org.apache.commons.exec.LogOutputStream
@@ -77,20 +78,18 @@ class SSHAgentUtils {
         return mapOf()
     }
 
-    fun stop(sshAgentPid: String) {
-        var sshAgentFile: File? = null
-        try {
-            sshAgentFile = if (AgentEnv.getOS() == OSType.WINDOWS) {
-                createWindowsStop(sshAgentPid)
-            } else {
-                createUnixStop()
-            }
-            executeCommand(sshAgentFile.absolutePath, mapOf(AGENT_PID_VAR to sshAgentPid))
-        } catch (ignored: Throwable) {
-            logger.warn("Fail to stop ssh-agent ${ignored.message}")
-        } finally {
-            deleteTempFile(sshAgentFile)
+    fun stop(repositoryPath: String, sshAgentPid: String) {
+        val script = if (AgentEnv.getOS() == OSType.WINDOWS) {
+            "\"${getWindowsSshExecutable("ssh-agent.exe")}\" -k"
+        } else {
+            "ssh-agent -k"
         }
+        ScriptUtils.execute(
+            script = script,
+            dir = File(repositoryPath),
+            runtimeVariables = mapOf(AGENT_PID_VAR to sshAgentPid),
+            failExit = false
+        )
     }
 
     private fun createWindowsSshAgent(): File {
@@ -142,24 +141,6 @@ class SSHAgentUtils {
         askpass.writeText("#!/bin/sh\necho \"\$SSH_PASSPHRASE\"\nrm \"$0\"\n")
         executeCommand("chmod +x ${askpass.absolutePath}", null)
         return askpass
-    }
-
-    /**
-     * windows如果登录启动用户NT AUTHORITY\SYSTEM,如果ssh-agent进程已经退出,那么执行ssh-agent -k命令会卡住,原因未知.
-     * 所以通过kill命令终止ssh-agent程序
-     */
-    private fun createWindowsStop(sshAgentPid: String): File {
-        val sshAgentKillFile = File.createTempFile("ssh-agent-kill-", ".bat")
-        sshAgentKillFile.setExecutable(true, true)
-        sshAgentKillFile.writeText("@echo off\n\"${getWindowsSshExecutable("kill.exe")}\" $sshAgentPid")
-        return sshAgentKillFile
-    }
-
-    private fun createUnixStop(): File {
-        val sshAgentStopFile = File.createTempFile("ssh-agent-stop-", ".sh")
-        sshAgentStopFile.setExecutable(true, true)
-        sshAgentStopFile.writeText("#!/bin/sh\nssh-agent -k")
-        return sshAgentStopFile
     }
 
     private fun deleteTempFile(tempFile: File?) {

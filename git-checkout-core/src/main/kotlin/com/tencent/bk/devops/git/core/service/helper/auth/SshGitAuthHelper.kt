@@ -67,7 +67,7 @@ class SshGitAuthHelper(
             val sshAgentPid = sshAgentPidFile.readText()
             if (sshAgentPid.isNotBlank()) {
                 logger.info("Kill the previous build started ssh-agent $sshAgentPid")
-                SSHAgentUtils().stop(sshAgentPid)
+                SSHAgentUtils().stop(repositoryPath = settings.repositoryPath, sshAgentPid = sshAgentPid)
                 sshAgentPidFile.delete()
             }
         }
@@ -123,7 +123,7 @@ class SshGitAuthHelper(
                 logger.warn("SSH_AGENT_PID not set, cannot kill agent")
             } else {
                 logger.info("kill ssh-agent $sshAgentPid")
-                SSHAgentUtils().stop(sshAgentPid)
+                SSHAgentUtils().stop(repositoryPath = settings.repositoryPath, sshAgentPid = sshAgentPid)
                 sshAgentPidFile.delete()
             }
         }
