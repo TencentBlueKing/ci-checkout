@@ -81,9 +81,15 @@ class PlaintextGitAuthHelper(
 
     private fun replaceUrl(url: String, remoteName: String, authInfo: AuthInfo) {
         val uri = URI(url)
+        // 不存在端口号时，直接用域名
+        val targetHost = if (uri.port == -1) {
+            uri.host
+        } else {
+            "${uri.host}:${uri.port}"
+        }
         val authUrl = "${uri.scheme}://" +
-            "${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}@" +
-            "${uri.host}${uri.path}"
+                "${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}@" +
+                "$targetHost${uri.path}"
         git.remoteSetUrl(remoteName = remoteName, remoteUrl = authUrl)
     }
 

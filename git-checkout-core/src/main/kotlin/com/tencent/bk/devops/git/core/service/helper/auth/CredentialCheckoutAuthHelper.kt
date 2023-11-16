@@ -184,7 +184,11 @@ class CredentialCheckoutAuthHelper(
                 ),
                 inputStream = CredentialArguments(
                     protocol = scheme,
-                    host = host,
+                    host = if (port == -1) {
+                        host
+                    } else {
+                        "$host:$port"
+                    },
                     path = path.removePrefix("/"),
                     username = authInfo.username,
                     password = authInfo.password,
