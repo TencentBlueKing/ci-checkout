@@ -56,6 +56,7 @@ import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.URI
 
 class GitCodeCommandAtomParamInputAdapter(
     private val input: GitCodeCommandAtomParamInput
@@ -79,8 +80,9 @@ class GitCodeCommandAtomParamInputAdapter(
             val authInfo = authProvider.getAuthInfo()
             // fork库凭证信息
             var forkRepoAuthInfo: AuthInfo? = null
+            val repositoryUri = URI(GitUtil.getServerInfo(repositoryUrl).hostName)
             // 代码库ID
-            val gitProjectId = if (!RegexUtil.isIPAddress(repositoryUrl)) {
+            val gitProjectId = if (!RegexUtil.isIPAddress(repositoryUri.host)) {
                 GitScmService(
                     scmType = scmType,
                     repositoryUrl = repositoryUrl,
