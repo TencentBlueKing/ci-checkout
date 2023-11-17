@@ -254,7 +254,11 @@ class CredentialCheckoutAuthHelper(
                     ),
                     inputStream = CredentialArguments(
                         protocol = scheme,
-                        host = host,
+                        host = if (port == -1) {
+                            host
+                        } else {
+                            "$host:$port"
+                        },
                         path = path.removePrefix("/"),
                         forkProtocol = forkRepoURI?.scheme,
                         forkHost = forkRepoURI?.host
