@@ -80,9 +80,8 @@ class GitCodeCommandAtomParamInputAdapter(
             val authInfo = authProvider.getAuthInfo()
             // fork库凭证信息
             var forkRepoAuthInfo: AuthInfo? = null
-            val repositoryUri = URI(GitUtil.getServerInfo(repositoryUrl).origin)
             // 代码库ID
-            val gitProjectId = if (!RegexUtil.isIPAddress(repositoryUri.host)) {
+            val gitProjectId = if (!RegexUtil.isIPAddress(GitUtil.getServerInfo(repositoryUrl).hostName)) {
                 GitScmService(
                     scmType = scmType,
                     repositoryUrl = repositoryUrl,

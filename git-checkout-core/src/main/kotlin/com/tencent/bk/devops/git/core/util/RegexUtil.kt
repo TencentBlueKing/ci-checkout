@@ -86,7 +86,7 @@ object RegexUtil {
      * 是否为IP地址
      */
     fun isIPAddress(input: String): Boolean {
-        val pattern = Regex("^([0-9]{1,3}\\.){3}[0-9]{1,3}$")
+        val pattern = Regex("^(([0-9]{1,3}\\.){3}[0-9]{1,3})(:[0-9]{1,5})?$")
         return pattern.matches(input)
     }
 
