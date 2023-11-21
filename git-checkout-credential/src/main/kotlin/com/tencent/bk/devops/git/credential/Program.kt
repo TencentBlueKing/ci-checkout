@@ -48,7 +48,12 @@ class Program(
 
     private fun getTaskUri(targetUri: URI, taskId: String? = this.taskId): URI {
         return with(targetUri) {
-            URI(scheme, null, host, port, "/$taskId", null, null)
+            // 端口为-1，则为域名模式，保持原始逻辑，保证上次构建的残留凭证能正常清理
+            if (port != -1) {
+                URI("$scheme://$taskId.$host")
+            } else {
+                URI(scheme, null, host, port, "/$taskId", null, null)
+            }
         }
     }
 
