@@ -31,7 +31,6 @@ import com.microsoft.alm.secret.Credential
 import com.tencent.bk.devops.git.credential.Constants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.credential.helper.LockHelper
 import com.tencent.bk.devops.git.credential.storage.CredentialStore
-import com.tencent.bk.devops.git.credential.utils.HostNameUtil
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -49,14 +48,7 @@ class Program(
 
     private fun getTaskUri(targetUri: URI, taskId: String? = this.taskId): URI {
         return with(targetUri) {
-            // 当域名为IP地址格式时，不能与taskId直接拼接，否则会出现【Illegal character in hostname】
-            val targetHostName = if (HostNameUtil.isIPAddress(host)){
-                // 将IP地址转成域名格式
-                HostNameUtil.convertIpToHostName(host)
-            }else {
-                host
-            }
-            URI(scheme, "$taskId.$targetHostName", null, null)
+            URI(scheme, null, host, port, "/$taskId", null, null)
         }
     }
 
