@@ -50,7 +50,7 @@ class Program(
     private fun getTaskUri(targetUri: URI, taskId: String? = this.taskId): URI {
         return with(targetUri) {
             // 【端口为-1】且【非IP域名】，则为原始域名模式，保持原始逻辑，保证上次构建的残留凭证能正常清理
-            if (!HostNameUtil.isIPAddress(host) && port != -1) {
+            if (!HostNameUtil.isIPAddress(host)) {
                 URI("$scheme://$taskId.$host")
             } else {
                 URI(scheme, null, host, port, "/$taskId", null, null)
