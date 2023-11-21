@@ -68,8 +68,6 @@ class CacheSecureStore : ICredentialStore {
             builder.append("username=").append(credential.Username).append("\n")
             builder.append("password=").append(credential.Password).append("\n")
         }
-        // 调试日志
-        System.err.println("linux credential command input[${builder.toString()}]")
         return GitHelper.invokeHelper(
             args = args,
             inputStream = ByteArrayInputStream(builder.toString().toByteArray())
