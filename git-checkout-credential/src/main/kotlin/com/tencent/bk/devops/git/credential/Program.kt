@@ -31,7 +31,6 @@ import com.microsoft.alm.secret.Credential
 import com.tencent.bk.devops.git.credential.Constants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.credential.helper.LockHelper
 import com.tencent.bk.devops.git.credential.storage.CredentialStore
-import com.tencent.bk.devops.git.credential.utils.HostNameUtil
 import java.io.BufferedReader
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -49,14 +48,16 @@ class Program(
 
     private fun getTaskUri(targetUri: URI, taskId: String? = this.taskId): URI {
         return with(targetUri) {
-            // 【非IP域名】，则为原始域名模式，保持原始逻辑，保证上次构建的残留凭证能正常清理
-            if (!HostNameUtil.isIPAddress(host)) {
-                URI("$scheme://$taskId.$host")
-            } else {
-                URI(scheme, null, host, port, "/$taskId", null, null)
-            }
+            URI("$scheme://$host/$taskId")
         }
     }
+
+    private fun getOldTaskUri(targetUri: URI, taskId: String? = this.taskId): URI {
+        return with(targetUri) {
+            URI("$scheme://$taskId.$host")
+        }
+    }
+
 
     fun innerMain(args: Array<String>) {
         if (args.isEmpty() || args[0].contains("?")) {
@@ -160,8 +161,18 @@ class Program(
                 credentialStore.delete(compatibleUri)
             }
             if (!taskId.isNullOrBlank()) {
-                // 卸载主库凭证
-                credentialStore.delete(getTaskUri(targetUri))
+                try {
+                    // 卸载主库凭证
+                    credentialStore.delete(getTaskUri(targetUri))
+                } catch (ignored: Exception) {
+                    System.err.println("Unable to remove taskId credential,${ignored.message}")
+                }
+                try {
+                    // 卸载旧凭证
+                    credentialStore.delete(getOldTaskUri(targetUri))
+                } catch (ignored: Exception) {
+                    System.err.println("Unable to remove old credential,${ignored.message}")
+                }
                 // 存在fork库凭证，卸载fork库凭证
                 if (!forkProtocol.isNullOrBlank() && !forkHost.isNullOrBlank()) {
                     credentialStore.delete(getTaskUri(forkTargetUri, "$taskId-fork"))
