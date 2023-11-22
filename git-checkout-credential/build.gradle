@@ -38,7 +38,7 @@ mainClassName = "com.tencent.bk.devops.git.credential.MainKt"
 version '3.0.5'
 
 // 上一个版本，避免因发布导致post-action阶段凭证无法被清理，后续将移除
-lastVersion  = "3.0.4"
+def lastVersion  = "3.0.4"
 
 shadowJar {
     archiveBaseName.set("git-checkout-credential")
