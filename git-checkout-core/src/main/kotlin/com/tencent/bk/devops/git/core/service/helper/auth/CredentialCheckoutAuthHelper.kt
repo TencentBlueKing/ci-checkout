@@ -88,6 +88,8 @@ class CredentialCheckoutAuthHelper(
         val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
         EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         EnvHelper.addEnvVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
+        // 保存当前插件使用的凭证版本
+        EnvHelper.addEnvVariable("${CREDENTIAL_JAR_PATH}_${settings.pipelineTaskId}", credentialJarFileName)
 
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         git.setEnvironmentVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
@@ -236,7 +238,8 @@ class CredentialCheckoutAuthHelper(
         // fork库URI
         val forkRepoURI = getForkRepoURI()
         // 清理构建机上凭证
-        if (File(credentialJarPath).exists()) {
+        val credentialJar = getCredentialJar()
+        if (credentialJar != null) {
             with(URL(settings.repositoryUrl).toURI()) {
                 CommandUtil.execute(
                     executable = getJavaFilePath(),
@@ -244,7 +247,7 @@ class CredentialCheckoutAuthHelper(
                         "-Dfile.encoding=utf-8",
                         "-Ddebug=${settings.enableTrace}",
                         "-jar",
-                        credentialJarPath,
+                        credentialJar.absolutePath,
                         taskId,
                         "devopsErase"
                     ),
@@ -353,5 +356,30 @@ class CredentialCheckoutAuthHelper(
         URL(settings.sourceRepositoryUrl).toURI()
     } else {
         null
+    }
+
+    /**
+     * post-action 阶段获取credential jar
+     * 注：修改credential模块后，新插件上架时，若流水线正在执行，可能导致凭证Jar包无法获取，无法卸载凭证
+     * [git插件_1] -> [git插件_2] -> [新插件上架!!!] -> [git插件_2_post] -> [git插件_1_post]
+     *
+     *
+     * 1. 如果能获取到当前版本插件的对应的credential jar,则直接使用
+     * 2. 获取不到当前版本插件的对应的credential jar,则尝试获取环境变量里面的凭证Jar，后续
+     *    版本可使用[${CREDENTIAL_JAR_PATH}_${settings.pipelineTaskId}] 去获取
+     */
+    private fun getCredentialJar(): File? {
+        val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
+        val credentialJarName = System.getenv("${CREDENTIAL_JAR_PATH}_$jobId")
+        return when {
+            File(credentialJarPath).exists() -> File(credentialJarPath)
+
+            File(credentialHome, credentialJarName).exists() -> File(credentialHome, credentialJarName)
+
+            else -> {
+                logger.debug("Unable to retrieve the credential jar, may not be able to uninstall the credential.")
+                null
+            }
+        }
     }
 }
