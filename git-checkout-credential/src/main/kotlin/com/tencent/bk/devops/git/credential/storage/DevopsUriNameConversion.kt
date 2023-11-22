@@ -26,7 +26,7 @@ class DevopsUriNameConversion : Secret.IUriNameConversion {
      * 获取有效路径
      */
     private fun URI.getFinalPath() = if (!path.isNullOrBlank() && path != "/") {
-        path
+        path.removePrefix("/")
     } else {
         ""
     }
