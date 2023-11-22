@@ -16,7 +16,7 @@ class DevopsUriNameConversion : Secret.IUriNameConversion {
         if (!vmSeqId.isNullOrBlank()) {
             builder.append(":").append(vmSeqId)
         }
-        if (!finalPath.isNullOrBlank()) {
+        if (finalPath.isNotBlank()) {
             builder.append(":").append(finalPath)
         }
         return Secret.uriToName(targetUri, builder.toString())
