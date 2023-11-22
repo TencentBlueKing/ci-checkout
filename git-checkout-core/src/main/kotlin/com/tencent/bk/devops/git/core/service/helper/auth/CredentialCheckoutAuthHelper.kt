@@ -127,19 +127,7 @@ class CredentialCheckoutAuthHelper(
     }
 
     private fun install() {
-        val credentialJarParentFile = File(credentialHome)
-        if (!credentialJarParentFile.exists()) {
-            credentialJarParentFile.mkdirs()
-        }
-        copyCredentialFile(
-            sourceFilePath = "script/$credentialJarFileName",
-            targetFile = File(credentialJarPath)
-        )
-
-        replaceCredentialFile(
-            sourceFilePath = "script/$credentialShellFileName",
-            targetFile = File(credentialShellPath)
-        )
+        copyCredentialFile()
         // TODO 卸载历史的全局的git-checkout-credential凭证,后续需要删除
         git.tryConfigUnset(
             configKey = GIT_CREDENTIAL_HELPER,
@@ -235,36 +223,39 @@ class CredentialCheckoutAuthHelper(
         val taskId = git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_TASKID)
         // fork库URI
         val forkRepoURI = getForkRepoURI()
+        // post-action阶段若遇到插件升级，卸载凭证的时候，需要将jar包内的credentialJar取出
+        if (!File(credentialJarPath).exists()) {
+            logger.debug("Unable to retrieve the credential jar, attempt to retrieve again")
+            copyCredentialFile()
+        }
         // 清理构建机上凭证
-        if (File(credentialJarPath).exists()) {
-            with(URL(settings.repositoryUrl).toURI()) {
-                CommandUtil.execute(
-                    executable = getJavaFilePath(),
-                    args = listOf(
-                        "-Dfile.encoding=utf-8",
-                        "-Ddebug=${settings.enableTrace}",
-                        "-jar",
-                        credentialJarPath,
-                        taskId,
-                        "devopsErase"
-                    ),
-                    runtimeEnv = mapOf(
-                        GIT_REPO_PATH to settings.repositoryPath,
-                        CREDENTIAL_COMPATIBLE_HOST to (settings.compatibleHostList?.joinToString(",") ?: "")
-                    ),
-                    inputStream = CredentialArguments(
-                        protocol = scheme,
-                        host = if (port == -1) {
-                            host
-                        } else {
-                            "$host:$port"
-                        },
-                        path = path.removePrefix("/"),
-                        forkProtocol = forkRepoURI?.scheme,
-                        forkHost = forkRepoURI?.host
-                    ).convertInputStream()
-                )
-            }
+        with(URL(settings.repositoryUrl).toURI()) {
+            CommandUtil.execute(
+                executable = getJavaFilePath(),
+                args = listOf(
+                    "-Dfile.encoding=utf-8",
+                    "-Ddebug=${settings.enableTrace}",
+                    "-jar",
+                    credentialJarPath,
+                    taskId,
+                    "devopsErase"
+                ),
+                runtimeEnv = mapOf(
+                    GIT_REPO_PATH to settings.repositoryPath,
+                    CREDENTIAL_COMPATIBLE_HOST to (settings.compatibleHostList?.joinToString(",") ?: "")
+                ),
+                inputStream = CredentialArguments(
+                    protocol = scheme,
+                    host = if (port == -1) {
+                        host
+                    } else {
+                        "$host:$port"
+                    },
+                    path = path.removePrefix("/"),
+                    forkProtocol = forkRepoURI?.scheme,
+                    forkHost = forkRepoURI?.host
+                ).convertInputStream()
+            )
         }
         git.tryConfigUnset(configKey = GIT_CREDENTIAL_HELPER)
         git.tryConfigUnset(configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY)
@@ -353,5 +344,23 @@ class CredentialCheckoutAuthHelper(
         URL(settings.sourceRepositoryUrl).toURI()
     } else {
         null
+    }
+
+    /**
+     * 将jar包内的凭证相关文件解压出来
+     */
+    private fun copyCredentialFile() {
+        val credentialJarParentFile = File(credentialHome)
+        if (!credentialJarParentFile.exists()) {
+            credentialJarParentFile.mkdirs()
+        }
+        copyCredentialFile(
+            sourceFilePath = "script/$credentialJarFileName",
+            targetFile = File(credentialJarPath)
+        )
+        replaceCredentialFile(
+            sourceFilePath = "script/$credentialShellFileName",
+            targetFile = File(credentialShellPath)
+        )
     }
 }
