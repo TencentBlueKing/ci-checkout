@@ -4,6 +4,10 @@ import java.util.Properties
 
 @SuppressWarnings("MagicNumber")
 object VersionHelper {
+    // 当前版本
+    const val VERSION_KEY = "version"
+    // 上一个版本
+    const val LAST_VERSION_KEY = "lastVersion"
 
     fun getCheckoutBuildInfo(): String {
         val properties = Properties()
@@ -20,7 +24,13 @@ object VersionHelper {
     fun getCredentialVersion(): String {
         val properties = Properties()
         javaClass.classLoader.getResourceAsStream("credential-version.properties").use { properties.load(it) }
-        return properties["version"]?.toString() ?: ""
+        return properties[VERSION_KEY]?.toString() ?: ""
+    }
+
+    fun getCredentialLastVersion(): String {
+        val properties = Properties()
+        javaClass.classLoader.getResourceAsStream("credential-version.properties").use { properties.load(it) }
+        return properties[LAST_VERSION_KEY]?.toString() ?: ""
     }
 
     fun computeGitVersion(version: String): Long {

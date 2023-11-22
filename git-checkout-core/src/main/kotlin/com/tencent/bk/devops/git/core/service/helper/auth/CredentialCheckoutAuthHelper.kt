@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_COMPATIBL
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAR_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.CREDENTIAL_JAVA_PATH
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_JAR_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_REPO_PATH
 import com.tencent.bk.devops.git.core.enums.AuthHelperType
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
@@ -70,11 +71,7 @@ class CredentialCheckoutAuthHelper(
     }
 
     private val credentialVersion = VersionHelper.getCredentialVersion()
-    private val credentialJarFileName = if (credentialVersion.isNotBlank()) {
-        "git-checkout-credential-$credentialVersion.jar"
-    } else {
-        "git-checkout-credential.jar"
-    }
+    private val credentialJarFileName = getCredentialJarName(credentialVersion)
     private val credentialShellFileName = "git-checkout.sh"
     private val credentialHome = File(System.getProperty("user.home"), ".checkout").absolutePath
     private val credentialJarPath = File(credentialHome, credentialJarFileName).absolutePath
@@ -89,7 +86,7 @@ class CredentialCheckoutAuthHelper(
         EnvHelper.addEnvVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         EnvHelper.addEnvVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
         // 保存当前插件使用的凭证版本
-        EnvHelper.addEnvVariable("${CREDENTIAL_JAR_PATH}_${settings.pipelineTaskId}", credentialJarFileName)
+        saveCredentialInfo()
 
         git.setEnvironmentVariable("${CREDENTIAL_JAVA_PATH}_$jobId", getJavaFilePath())
         git.setEnvironmentVariable("${CREDENTIAL_JAR_PATH}_$jobId", credentialJarFileName)
@@ -365,21 +362,48 @@ class CredentialCheckoutAuthHelper(
      *
      *
      * 1. 如果能获取到当前版本插件的对应的credential jar,则直接使用
-     * 2. 获取不到当前版本插件的对应的credential jar,则尝试获取环境变量里面的凭证Jar，后续
-     *    版本可使用[${CREDENTIAL_JAR_PATH}_${settings.pipelineTaskId}] 去获取
+     * 2. 获取不到当前版本插件的对应的credential jar,则尝试获取[.git/config]里面的凭证Jar
+     * 3. 获取jar包内配置的lastVersion版本，此步骤临时用，后续可删除
+     * @see com.tencent.bk.devops.git.core.service.helper.auth.CredentialCheckoutAuthHelper.saveCredentialInfo
      */
     private fun getCredentialJar(): File? {
-        val jobId = System.getenv(BK_CI_BUILD_JOB_ID)
-        val credentialJarName = System.getenv("${CREDENTIAL_JAR_PATH}_$jobId")
+        // 获取当前仓库配置的credentialJar版本
+        val credentialVersion = git.tryConfigGet(GIT_CREDENTIAL_JAR_VERSION)
+        // 获取上个版本的配置，仅插件瞬时升级时启用
+        val lastVersion = VersionHelper.getCredentialLastVersion()
         return when {
             File(credentialJarPath).exists() -> File(credentialJarPath)
 
-            File(credentialHome, credentialJarName).exists() -> File(credentialHome, credentialJarName)
+            File(credentialHome, getCredentialJarName(credentialVersion)).exists() -> {
+                logger.debug("The plugin has been updated, attempting to use the old version|git config")
+                File(credentialHome, getCredentialJarName(lastVersion))
+            }
+
+            File(credentialHome, getCredentialJarName(lastVersion)).exists() -> {
+                logger.debug("The plugin has been updated, attempting to use the old version|jar config")
+                File(credentialHome, getCredentialJarName(lastVersion))
+            }
 
             else -> {
-                logger.debug("Unable to retrieve the credential jar, may not be able to uninstall the credential.")
+                logger.debug("Unable to retrieve the credential jar, may not be able to uninstall the credential!")
                 null
             }
         }
+    }
+
+    private fun getCredentialJarName(credentialVersion: String = "") = if (credentialVersion.isNotBlank()) {
+        "git-checkout-credential-$credentialVersion.jar"
+    } else {
+        "git-checkout-credential.jar"
+    }
+
+    /**
+     * 保存当前插件的credentialJar的版本
+     */
+    private fun saveCredentialInfo() {
+        if (git.configExists(GIT_CREDENTIAL_JAR_VERSION)) {
+            git.tryConfigUnset(GIT_CREDENTIAL_JAR_VERSION)
+        }
+        git.config(GIT_CREDENTIAL_JAR_VERSION, credentialVersion)
     }
 }
