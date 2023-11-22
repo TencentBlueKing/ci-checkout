@@ -37,9 +37,6 @@ dependencies {
 mainClassName = "com.tencent.bk.devops.git.credential.MainKt"
 version '3.0.5'
 
-// 上一个版本，避免因发布导致post-action阶段凭证无法被清理，后续将移除
-def lastVersion  = "3.0.4"
-
 shadowJar {
     archiveBaseName.set("git-checkout-credential")
     zip64 true
@@ -51,7 +48,6 @@ task versionInfo(type: WriteProperties) {
     outputFile new File("../git-checkout-core/src/main/resources/credential-version.properties")
     encoding = "UTF-8"
     property 'version', version
-    property 'lastVersion', lastVersion
 }
 
 processResources.dependsOn versionInfo
