@@ -56,7 +56,6 @@ import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.net.URI
 
 class GitCodeCommandAtomParamInputAdapter(
     private val input: GitCodeCommandAtomParamInput
