@@ -53,10 +53,8 @@ import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.service.repository.GitScmService
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
-import com.tencent.bk.devops.git.core.util.RegexUtil
 import org.slf4j.LoggerFactory
 import java.io.File
-import java.net.URI
 
 class GitCodeCommandAtomParamInputAdapter(
     private val input: GitCodeCommandAtomParamInput
@@ -81,15 +79,11 @@ class GitCodeCommandAtomParamInputAdapter(
             // fork库凭证信息
             var forkRepoAuthInfo: AuthInfo? = null
             // 代码库ID
-            val gitProjectId = if (!RegexUtil.isIPAddress(GitUtil.getServerInfo(repositoryUrl).hostName)) {
-                GitScmService(
-                    scmType = scmType,
-                    repositoryUrl = repositoryUrl,
-                    authInfo = authInfo
-                ).getGitProjectId()
-            } else {
-                null
-            } ?: ""
+            val gitProjectId = GitScmService(
+                scmType = scmType,
+                repositoryUrl = repositoryUrl,
+                authInfo = authInfo
+            ).getGitProjectId() ?: ""
             // 保存代码库相关信息
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
             var ref: String = refName

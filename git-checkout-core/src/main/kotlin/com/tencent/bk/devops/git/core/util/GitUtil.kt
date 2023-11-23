@@ -44,8 +44,6 @@ object GitUtil {
     private const val PRE_PUSH_BRANCH_NAME_PREFIX = "refs/for/"
     private val HTTP_URL_REGEX = Regex("(http[s]?://)(.*:.*@)?(([-.a-z0-9A-Z]+)(:[0-9]+)?)/(.*?)(\\.git)?$")
     private val GIT_URL_REGEX = Regex("(git@([-.a-z0-9A-Z]+)):(.*?)(\\.git)?$")
-    private val GIT_IP_SSH_URL_REGEX = Regex("ssh://git@(([0-9]{1,3}\\.){3}[0-9]{1,3})/(.*?)(\\.git)?$")
-    private val GIT_IP_PORT_SSH_URL_REGEX = Regex("ssh://git@(([0-9]{1,3}\\.){3}[0-9]{1,3}):([0-9]{1,9})/(.*?)(\\.git)?$")
     private val NOT_GIT_PROTOCOL_URL_REGEX = Regex("([-.a-z0-9A-Z]+):(.*?)(\\.git)?$")
 
     fun urlDecode(s: String) = URLDecoder.decode(s, "UTF-8")
@@ -75,26 +73,6 @@ object GitUtil {
                     origin = groups[1]!!.value,
                     hostName = groups[2]!!.value,
                     repositoryName = groups[3]!!.value,
-                    httpProtocol = false
-                )
-            }
-            GIT_IP_SSH_URL_REGEX.matches(url) -> {
-                val groups = GIT_IP_SSH_URL_REGEX.find(url)!!.groups
-                ServerInfo(
-                    scheme = "git@",
-                    origin = "git@${groups[1]!!.value}",
-                    hostName = groups[1]!!.value,
-                    repositoryName = groups[3]!!.value,
-                    httpProtocol = false
-                )
-            }
-            GIT_IP_PORT_SSH_URL_REGEX.matches(url) -> {
-                val groups = GIT_IP_PORT_SSH_URL_REGEX.find(url)!!.groups
-                ServerInfo(
-                    scheme = "git@",
-                    origin = "git@${groups[1]!!.value}:${groups[3]!!.value}",
-                    hostName = "${groups[1]!!.value}:${groups[3]!!.value}",
-                    repositoryName = groups[4]!!.value,
                     httpProtocol = false
                 )
             }

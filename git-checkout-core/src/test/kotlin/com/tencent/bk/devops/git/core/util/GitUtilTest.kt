@@ -94,46 +94,6 @@ class GitUtilTest {
             httpProtocol = false
         )
         Assert.assertEquals(expected, actual)
-
-        expected = GitUtil.getServerInfo("http://111.222.333.444:36000/my-group/my-repo.git")
-        actual = ServerInfo(
-            scheme = "http://",
-            origin = "http://111.222.333.444:36000",
-            hostName = "111.222.333.444:36000",
-            repositoryName = "my-group/my-repo",
-            httpProtocol = true
-        )
-        Assert.assertEquals(expected, actual)
-
-        expected = GitUtil.getServerInfo("http://111.222.333.444/my-group/my-repo.git")
-        actual = ServerInfo(
-            scheme = "http://",
-            origin = "http://111.222.333.444",
-            hostName = "111.222.333.444",
-            repositoryName = "my-group/my-repo",
-            httpProtocol = true
-        )
-        Assert.assertEquals(expected, actual)
-
-        expected = GitUtil.getServerInfo("ssh://git@111.222.333.444:36000/my-group/my-repo.git")
-        actual = ServerInfo(
-            scheme = "git@",
-            origin = "git@111.222.333.444:36000",
-            hostName = "111.222.333.444:36000",
-            repositoryName = "my-group/my-repo",
-            httpProtocol = false
-        )
-        Assert.assertEquals(expected, actual)
-
-        expected = GitUtil.getServerInfo("ssh://git@111.222.333.444/my-group/my-repo.git")
-        actual = ServerInfo(
-            scheme = "git@",
-            origin = "git@111.222.333.444",
-            hostName = "111.222.333.444",
-            repositoryName = "my-group/my-repo",
-            httpProtocol = false
-        )
-        Assert.assertEquals(expected, actual)
     }
 
     @Test
