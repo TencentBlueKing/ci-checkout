@@ -9,12 +9,25 @@ class DevopsUriNameConversion : Secret.IUriNameConversion {
         val builder = StringBuilder(namespace)
         val pipelineId = System.getenv(Constants.BK_CI_PIPELINE_ID)
         val vmSeqId = System.getenv(Constants.BK_CI_BUILD_JOB_ID)
+        val finalPath = targetUri.getFinalPath()
         if (!pipelineId.isNullOrBlank()) {
             builder.append(":").append(pipelineId)
         }
         if (!vmSeqId.isNullOrBlank()) {
             builder.append(":").append(vmSeqId)
         }
+        if (finalPath.isNotBlank()) {
+            builder.append(":").append(finalPath)
+        }
         return Secret.uriToName(targetUri, builder.toString())
+    }
+
+    /**
+     * 获取有效路径
+     */
+    private fun URI.getFinalPath() = if (!path.isNullOrBlank() && path != "/") {
+        path.removePrefix("/")
+    } else {
+        ""
     }
 }

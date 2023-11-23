@@ -55,7 +55,15 @@ class CacheSecureStore : ICredentialStore {
         args.add(action)
         val builder = StringBuilder()
         builder.append("protocol=").append(targetUri.scheme).append("\n")
-        builder.append("host=").append(targetUri.host).append("\n")
+        builder.append("host=").append(targetUri.host)
+        if (targetUri.port != -1) {
+            builder.append(":${targetUri.port}")
+        }
+        val finalPath = targetUri.getFinalPath()
+        if (!finalPath.isNullOrBlank()) {
+            builder.append(finalPath)
+        }
+        builder.append("\n")
         if (credential != null) {
             builder.append("username=").append(credential.Username).append("\n")
             builder.append("password=").append(credential.Password).append("\n")
@@ -79,5 +87,14 @@ class CacheSecureStore : ICredentialStore {
         }
         socketPath = File(socketPath, "credential/socket")
         return socketPath.absolutePath
+    }
+
+    /**
+     * 获取有效路径
+     */
+    private fun URI.getFinalPath() = if (!path.isNullOrBlank() && path != "/") {
+        path
+    } else {
+        ""
     }
 }
