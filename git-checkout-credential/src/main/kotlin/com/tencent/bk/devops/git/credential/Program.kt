@@ -30,6 +30,7 @@ package com.tencent.bk.devops.git.credential
 import com.microsoft.alm.secret.Credential
 import com.tencent.bk.devops.git.credential.Constants.CREDENTIAL_COMPATIBLE_HOST
 import com.tencent.bk.devops.git.credential.helper.LockHelper
+import com.tencent.bk.devops.git.credential.helper.Trace
 import com.tencent.bk.devops.git.credential.storage.CredentialStore
 import java.io.BufferedReader
 import java.io.InputStream
@@ -165,13 +166,13 @@ class Program(
                     // 卸载主库凭证
                     credentialStore.delete(getTaskUri(targetUri))
                 } catch (ignored: Exception) {
-                    System.err.println("Unable to remove taskId credential,${ignored.message}")
+                    Trace.writeLine("Unable to remove taskId credential,${ignored.message}")
                 }
                 try {
                     // 卸载旧凭证
                     credentialStore.delete(getOldTaskUri(targetUri))
                 } catch (ignored: Exception) {
-                    System.err.println("Unable to remove old credential,${ignored.message}")
+                    Trace.writeLine("Unable to remove old credential,${ignored.message}")
                 }
                 // 存在fork库凭证，卸载fork库凭证
                 if (!forkProtocol.isNullOrBlank() && !forkHost.isNullOrBlank()) {
