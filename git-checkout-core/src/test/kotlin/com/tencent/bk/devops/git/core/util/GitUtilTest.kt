@@ -33,6 +33,7 @@ import org.junit.Test
 
 class GitUtilTest {
 
+    @SuppressWarnings("LongMethod")
     @Test
     fun getServerUrl() {
         var expected = GitUtil.getServerInfo("https://git.exaple.com/my-proj/my-repo.git")
@@ -91,6 +92,46 @@ class GitUtilTest {
             origin = "git@git.exaple.com",
             hostName = "git.exaple.com",
             repositoryName = "my-proj/my-repo",
+            httpProtocol = false
+        )
+        Assert.assertEquals(expected, actual)
+
+        expected = GitUtil.getServerInfo("http://111.222.333.444:36000/my-group/my-repo.git")
+        actual = ServerInfo(
+            scheme = "http://",
+            origin = "http://111.222.333.444:36000",
+            hostName = "111.222.333.444:36000",
+            repositoryName = "my-group/my-repo",
+            httpProtocol = true
+        )
+        Assert.assertEquals(expected, actual)
+
+        expected = GitUtil.getServerInfo("http://111.222.333.444/my-group/my-repo.git")
+        actual = ServerInfo(
+            scheme = "http://",
+            origin = "http://111.222.333.444",
+            hostName = "111.222.333.444",
+            repositoryName = "my-group/my-repo",
+            httpProtocol = true
+        )
+        Assert.assertEquals(expected, actual)
+
+        expected = GitUtil.getServerInfo("ssh://git@111.222.333.444:36000/my-group/my-repo.git")
+        actual = ServerInfo(
+            scheme = "git@",
+            origin = "git@111.222.333.444:36000",
+            hostName = "111.222.333.444:36000",
+            repositoryName = "my-group/my-repo",
+            httpProtocol = false
+        )
+        Assert.assertEquals(expected, actual)
+
+        expected = GitUtil.getServerInfo("ssh://git@111.222.333.444/my-group/my-repo.git")
+        actual = ServerInfo(
+            scheme = "git@",
+            origin = "git@111.222.333.444",
+            hostName = "111.222.333.444",
+            repositoryName = "my-group/my-repo",
             httpProtocol = false
         )
         Assert.assertEquals(expected, actual)
