@@ -33,6 +33,7 @@ import org.junit.Test
 
 class GitUtilTest {
 
+    @SuppressWarnings("LongMethod")
     @Test
     fun getServerUrl() {
         var expected = GitUtil.getServerInfo("https://git.exaple.com/my-proj/my-repo.git")

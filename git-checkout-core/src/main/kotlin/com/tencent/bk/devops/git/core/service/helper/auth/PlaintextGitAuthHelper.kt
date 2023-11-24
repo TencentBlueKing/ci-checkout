@@ -88,8 +88,8 @@ class PlaintextGitAuthHelper(
             "${uri.host}:${uri.port}"
         }
         val authUrl = "${uri.scheme}://" +
-                "${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}@" +
-                "$targetHost${uri.path}"
+            "${authInfo.username}:${GitUtil.urlEncode(authInfo.password!!)}@" +
+            "$targetHost${uri.path}"
         git.remoteSetUrl(remoteName = remoteName, remoteUrl = authUrl)
     }
 
