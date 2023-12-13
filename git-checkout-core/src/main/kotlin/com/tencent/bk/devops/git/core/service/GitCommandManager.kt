@@ -546,7 +546,7 @@ class GitCommandManager(
                 args.add(startPoint)
             }
         }
-        doRetry(args = args)
+        doRetry(args = args, retryTime = 5)
         // git 1.7.3之前的版本，没有-B参数，需要先切换startPoint然后再切换分支
         if (startPoint.isNotBlank() && !isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
             branchDelete(ref)

@@ -34,6 +34,7 @@ import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.helper.DefaultGitTypeParseHelper
 import com.tencent.bk.devops.git.core.service.helper.IGitTypeParseHelper
+import org.slf4j.LoggerFactory
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.ServiceLoader
@@ -47,6 +48,7 @@ object GitUtil {
     private val GIT_IP_SSH_URL_REGEX = Regex("ssh://git@(([0-9]{1,3}\\.){3}[0-9]{1,3})/(.*?)(\\.git)?$")
     private val GIT_IP_PORT_SSH_URL_REGEX = Regex("ssh://git@(([0-9]{1,3}\\.){3}[0-9]{1,3}):([0-9]{1,9})/(.*?)(\\.git)?$")
     private val NOT_GIT_PROTOCOL_URL_REGEX = Regex("([-.a-z0-9A-Z]+):(.*?)(\\.git)?$")
+    private val logger = LoggerFactory.getLogger(GitUtil::class.java)
 
     fun urlDecode(s: String) = URLDecoder.decode(s, "UTF-8")
 
@@ -158,11 +160,17 @@ object GitUtil {
         compatibleHostList: List<String>?
     ): Boolean {
         val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
+        // 如果存在hookTargetUrl异常则直接返回false，不进行pre-merge
+        if (!checkUrl(hookTargetUrl)) {
+            logger.info("fail to parse repo url, can not merge|hookTargetUrl[$hookTargetUrl]|")
+            return false
+        }
         // 必须先验证事件类型，再判断仓库是否相同，不然验证仓库类型时解析url会异常
         return enableVirtualMergeBranch &&
             (
                 hookEventType == CodeEventType.PULL_REQUEST.name ||
-                    hookEventType == CodeEventType.MERGE_REQUEST.name
+                    hookEventType == CodeEventType.MERGE_REQUEST.name ||
+                        hookEventType == CodeEventType.PARENT_PIPELINE.name
                 ) &&
             gitHookEventType != CodeEventType.MERGE_REQUEST_ACCEPT.name &&
             isSameRepository(
@@ -184,5 +192,17 @@ object GitUtil {
         val gitTypeParseHelper = ServiceLoader.load(IGitTypeParseHelper::class.java).firstOrNull()
             ?: DefaultGitTypeParseHelper()
         return gitTypeParseHelper.getScmType(hostName)
+    }
+
+    private fun checkUrl(url: String?): Boolean {
+        if (url.isNullOrBlank()) {
+            return false
+        }
+        return try {
+            getServerInfo(url)
+            true
+        } catch (e: ParamInvalidException) {
+            false
+        }
     }
 }
