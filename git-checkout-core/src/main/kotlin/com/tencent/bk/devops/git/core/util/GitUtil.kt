@@ -161,7 +161,7 @@ object GitUtil {
     ): Boolean {
         val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
         // 如果存在hookTargetUrl异常则直接返回false，不进行pre-merge
-        if (!preParseUrl(hookTargetUrl)) {
+        if (!checkUrl(hookTargetUrl)) {
             logger.info("fail to parse repo url, can not merge|hookTargetUrl[$hookTargetUrl]|")
             return false
         }
@@ -194,7 +194,7 @@ object GitUtil {
         return gitTypeParseHelper.getScmType(hostName)
     }
 
-    private fun preParseUrl(url: String?): Boolean {
+    private fun checkUrl(url: String?): Boolean {
         if (url.isNullOrBlank()) {
             return false
         }
