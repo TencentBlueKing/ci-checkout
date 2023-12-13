@@ -162,7 +162,8 @@ object GitUtil {
         return enableVirtualMergeBranch &&
             (
                 hookEventType == CodeEventType.PULL_REQUEST.name ||
-                    hookEventType == CodeEventType.MERGE_REQUEST.name
+                    hookEventType == CodeEventType.MERGE_REQUEST.name ||
+                        hookEventType == CodeEventType.PARENT_PIPELINE.name
                 ) &&
             gitHookEventType != CodeEventType.MERGE_REQUEST_ACCEPT.name &&
             isSameRepository(
