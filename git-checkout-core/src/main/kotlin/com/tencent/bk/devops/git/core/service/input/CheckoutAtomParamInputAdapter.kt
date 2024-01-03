@@ -28,6 +28,13 @@
 package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_TARGET_BRANCH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_TAG_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_WEBHOOK_HASH_ID
+import com.tencent.bk.devops.git.core.enums.CodeEventType
+import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.CheckoutAtomParamInput
@@ -43,6 +50,35 @@ class CheckoutAtomParamInputAdapter(
     override fun getInputs(): GitSourceSettings {
         EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, input.repositoryType)
         return when (RepositoryType.valueOf(input.repositoryType)) {
+            RepositoryType.SELF -> {
+                input.repositoryHashId = System.getenv(BK_REPO_WEBHOOK_HASH_ID)
+                val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE) ?: ""
+                input.refName = when (gitHookEventType) {
+                    CodeEventType.PUSH.name -> {
+                        val hookVersion = System.getenv(BK_CI_HOOK_REVISION)
+                        if (hookVersion.isNullOrBlank()) {
+                            input.pullType = PullType.BRANCH.name
+                            System.getenv(BK_CI_HOOK_BRANCH) ?: "master"
+                        } else {
+                            input.pullType = PullType.COMMIT_ID.name
+                            hookVersion
+                        }
+                    }
+
+                    CodeEventType.MERGE_REQUEST.name, CodeEventType.MERGE_REQUEST_ACCEPT.name -> {
+                        input.pullType = PullType.BRANCH.name
+                        System.getenv(BK_CI_HOOK_TARGET_BRANCH) ?: "master"
+                    }
+
+                    CodeEventType.TAG_PUSH.name -> {
+                        System.getenv(BK_CI_REPO_GIT_WEBHOOK_TAG_NAME) ?: ""
+                    }
+
+                    else -> ""
+                }
+                input.repositoryHashId = System.getenv(BK_REPO_WEBHOOK_HASH_ID)
+                input.byRepositoryIdOrName()
+            }
             RepositoryType.ID, RepositoryType.NAME -> {
                 input.byRepositoryIdOrName()
             }

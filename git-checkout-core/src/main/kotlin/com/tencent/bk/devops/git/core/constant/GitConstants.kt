@@ -77,6 +77,9 @@ object GitConstants {
     const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
     const val GIT_REPO_PATH = "GIT_REPO_PATH"
     const val BK_CI_GIT_PROJECT_ID = "BK_CI_GIT_PROJECT_ID"
+    const val BK_REPO_WEBHOOK_HASH_ID = "BK_REPO_WEBHOOK_HASH_ID"
+    const val BK_CI_REPO_GIT_WEBHOOK_TAG_NAME = "BK_CI_REPO_GIT_WEBHOOK_TAG_NAME"
+    const val BK_CI_HOOK_TARGET_BRANCH = "BK_CI_HOOK_TARGET_BRANCH"
 
     // auth env
     const val AUTH_SOCKET_VAR = "SSH_AUTH_SOCK"
