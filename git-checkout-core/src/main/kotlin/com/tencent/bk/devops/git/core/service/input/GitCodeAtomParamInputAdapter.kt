@@ -87,7 +87,7 @@ class GitCodeAtomParamInputAdapter(
             // 1. 获取仓库信息
             val repositoryType = RepositoryType.valueOf(repositoryType)
             val repositoryId = when (repositoryType) {
-                RepositoryType.ID -> {
+                RepositoryType.ID, RepositoryType.SELF -> {
                     repositoryHashId ?: throw ParamInvalidException(errorMsg = "Repository ID cannot be empty")
                     EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_ID, repositoryHashId!!)
                     repositoryHashId

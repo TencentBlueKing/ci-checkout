@@ -48,10 +48,13 @@ object RepositoryUtils {
         val repositoryId = EnvHelper.getEnvVariable(BK_CI_GIT_REPO_ID)
         val repositoryName = EnvHelper.getEnvVariable(BK_CI_GIT_REPO_NAME)
         return when {
-            repositoryType == RepositoryType.ID.name && repositoryId != null ->
+            (repositoryType == RepositoryType.ID.name || repositoryType == RepositoryType.SELF.name) &&
+                    repositoryId != null ->
                 RepositoryConfig(repositoryId, null, RepositoryType.ID)
+
             repositoryId == RepositoryType.NAME.name && repositoryName != null ->
                 RepositoryConfig(null, repositoryName, RepositoryType.NAME)
+
             else ->
                 RepositoryConfig(
                     null,
@@ -62,7 +65,7 @@ object RepositoryUtils {
     }
 
     fun buildConfig(repositoryId: String, repositoryType: RepositoryType?) =
-        if (repositoryType == null || repositoryType == RepositoryType.ID) {
+        if (repositoryType == null || repositoryType == RepositoryType.ID || repositoryType == RepositoryType.SELF) {
             RepositoryConfig(repositoryId, null, RepositoryType.ID)
         } else {
             RepositoryConfig(null, repositoryId, RepositoryType.NAME)
