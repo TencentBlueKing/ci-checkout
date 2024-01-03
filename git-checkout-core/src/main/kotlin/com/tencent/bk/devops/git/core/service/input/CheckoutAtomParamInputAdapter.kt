@@ -73,6 +73,7 @@ class CheckoutAtomParamInputAdapter(
                     }
 
                     CodeEventType.TAG_PUSH.name -> {
+                        input.pullType = PullType.TAG.name
                         System.getenv(BK_CI_REPO_GIT_WEBHOOK_TAG_NAME) ?: ""
                     }
 
