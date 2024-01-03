@@ -32,7 +32,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_TARGET_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_TAG_NAME
-import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_WEBHOOK_HASH_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_WEB_HOOK_HASHID
 import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
@@ -52,7 +52,7 @@ class CheckoutAtomParamInputAdapter(
         EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, input.repositoryType)
         return when (RepositoryType.valueOf(input.repositoryType)) {
             RepositoryType.SELF -> {
-                input.repositoryHashId = System.getenv(BK_REPO_WEBHOOK_HASH_ID)
+                input.repositoryHashId = System.getenv(BK_CI_REPO_WEB_HOOK_HASHID)
                     ?: throw ParamInvalidException(errorMsg = "repository hash id is empty")
                 val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE) ?: ""
                 input.refName = when (gitHookEventType) {
