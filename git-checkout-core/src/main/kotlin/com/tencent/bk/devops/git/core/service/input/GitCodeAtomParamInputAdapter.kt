@@ -202,8 +202,8 @@ class GitCodeAtomParamInputAdapter(
 
             val devopsGitCodePaths = System.getenv(DEVOPS_GIT_CODE_PATHS)
             // 当第一个插件没有设置代码路径时，会导致后续插件的【DEVOPS_GIT_CODE_PATHS】和【DEVOPS_GIT_BRANCHES】出现错位的情况
-            val gitCodePaths = if (devopsGitCodePaths.isNullOrBlank()) {
-                localPath ?: PARAM_SEPARATOR
+            val gitCodePaths = if (devopsGitCodePaths == null) {
+                localPath ?: ""
             } else {
                 devopsGitCodePaths + PARAM_SEPARATOR + (localPath ?: "")
             }
