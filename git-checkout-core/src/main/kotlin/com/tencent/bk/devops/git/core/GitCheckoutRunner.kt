@@ -86,6 +86,7 @@ class GitCheckoutRunner {
         var settings: GitSourceSettings? = null
         try {
             settings = inputAdapter.getInputs()
+            logger.info("settings = $settings")
             val sourceProvider = GitSourceProvider(settings = settings, devopsApi = DevopsApi())
             if (settings.postEntryParam == "True") {
                 sourceProvider.cleanUp()
