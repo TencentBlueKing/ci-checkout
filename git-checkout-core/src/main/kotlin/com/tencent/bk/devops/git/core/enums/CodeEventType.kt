@@ -41,5 +41,8 @@ enum class CodeEventType {
     // svn event
     POST_COMMIT,
     LOCK_COMMIT,
-    PRE_COMMIT
+    PRE_COMMIT,
+
+    // 子流水线触发
+    PARENT_PIPELINE
 }
