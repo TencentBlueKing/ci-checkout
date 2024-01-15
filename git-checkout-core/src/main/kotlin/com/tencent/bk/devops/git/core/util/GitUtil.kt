@@ -123,11 +123,13 @@ object GitUtil {
      * @param hostNameList 当同一个仓库有多个域名时，传入多个域名
      */
     fun isSameRepository(repositoryUrl: String, otherRepositoryUrl: String?, hostNameList: List<String>?): Boolean {
-        if (otherRepositoryUrl.isNullOrBlank()) {
+        // 如果存在hookTargetUrl异常则直接返回false，不进行pre-merge
+        if (!checkUrl(otherRepositoryUrl)) {
+            logger.debug("fail to parse repo url, repositoryUrl[$otherRepositoryUrl]")
             return false
         }
         val serverUrl = getServerInfo(url = repositoryUrl)
-        val sourceServerUrl = getServerInfo(url = otherRepositoryUrl)
+        val sourceServerUrl = getServerInfo(url = otherRepositoryUrl!!)
         return isSameHostName(serverUrl.hostName, sourceServerUrl.hostName, hostNameList) &&
             serverUrl.repositoryName == sourceServerUrl.repositoryName
     }
@@ -160,11 +162,7 @@ object GitUtil {
         compatibleHostList: List<String>?
     ): Boolean {
         val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
-        // 如果存在hookTargetUrl异常则直接返回false，不进行pre-merge
-        if (!checkUrl(hookTargetUrl)) {
-            logger.info("fail to parse repo url, can not merge|hookTargetUrl[$hookTargetUrl]|")
-            return false
-        }
+
         // 必须先验证事件类型，再判断仓库是否相同，不然验证仓库类型时解析url会异常
         return enableVirtualMergeBranch &&
             (
