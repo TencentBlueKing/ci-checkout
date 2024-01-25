@@ -396,6 +396,17 @@ enum class GitErrors(
         solution = GitErrorsText.get().notFoundGitRemoteHttpsSolution,
         errorCode = 800026,
         wiki = GitErrorsText.get().notFoundGitRemoteHttpsWiki
+    ),
+    InvalidRefSpec(
+        regex = Regex(
+            "(fatal: 无效的引用规格)|" +
+                    "(fatal: invalid refspec)"
+        ),
+        title = GitErrorsText.get().invalidRefSpec,
+        cause = GitErrorsText.get().invalidRefSpecCause,
+        solution = GitErrorsText.get().invalidRefSpecSolution,
+        errorCode = 800027,
+        wiki = GitErrorsText.get().invalidRefSpecWiki
     )
     ;
 
