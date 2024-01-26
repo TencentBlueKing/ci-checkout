@@ -399,8 +399,8 @@ enum class GitErrors(
     ),
     InvalidRefSpec(
         regex = Regex(
-            "(fatal: 无效的引用规格)|" +
-                    "(fatal: invalid refspec)"
+            "(fatal: 无效的引用规格：'(.*)')|" +
+                    "(fatal: invalid refspec '(.*)')"
         ),
         title = GitErrorsText.get().invalidRefSpec,
         cause = GitErrorsText.get().invalidRefSpecCause,

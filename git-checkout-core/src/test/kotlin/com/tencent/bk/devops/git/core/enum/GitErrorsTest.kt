@@ -263,4 +263,13 @@ class GitErrorsTest {
         )
         Assert.assertEquals(gitError, GitErrors.GitNotInstall)
     }
+
+
+    @Test
+    fun invalidRefSpec() {
+        val gitError = GitErrors.matchError(
+            "fatal: 无效的引用规格：'+refs/heads/ master:refs/remotes/origin/ master'"
+        )
+        Assert.assertEquals(gitError, GitErrors.InvalidRefSpec)
+    }
 }
