@@ -31,6 +31,8 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_TARGET_BRANCH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_TYPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_TAG_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_WEB_HOOK_HASHID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_START_TYPE
@@ -191,7 +193,8 @@ class CheckoutAtomParamInputAdapter(
                     ?: throw ParamInvalidException(errorMsg = "repository hash id is empty")
                 val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE) ?: ""
                 input.refName = when (gitHookEventType) {
-                    CodeEventType.PUSH.name -> {
+                    CodeEventType.PUSH.name, CodeEventType.ISSUES.name,
+                    CodeEventType.NOTE.name, CodeEventType.REVIEW.name -> {
                         val hookVersion = System.getenv(BK_CI_HOOK_REVISION)
                         if (hookVersion.isNullOrBlank()) {
                             input.pullType = PullType.BRANCH.name
@@ -202,7 +205,8 @@ class CheckoutAtomParamInputAdapter(
                         }
                     }
 
-                    CodeEventType.MERGE_REQUEST.name, CodeEventType.MERGE_REQUEST_ACCEPT.name -> {
+                    CodeEventType.MERGE_REQUEST.name, CodeEventType.MERGE_REQUEST_ACCEPT.name,
+                    CodeEventType.PULL_REQUEST.name -> {
                         input.pullType = PullType.BRANCH.name
                         System.getenv(BK_CI_HOOK_TARGET_BRANCH) ?: "master"
                     }
@@ -210,6 +214,17 @@ class CheckoutAtomParamInputAdapter(
                     CodeEventType.TAG_PUSH.name -> {
                         input.pullType = PullType.TAG.name
                         System.getenv(BK_CI_REPO_GIT_WEBHOOK_TAG_NAME) ?: ""
+                    }
+
+                    CodeEventType.CREATE.name -> {
+                        // 创建要素类型，branch 或 tag
+                        val createRefType =
+                            System.getenv(BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_TYPE) ?: "branch"
+                        input.pullType = when (createRefType) {
+                            "tag" -> PullType.TAG.name
+                            else -> PullType.BRANCH.name
+                        }
+                        System.getenv(BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_NAME) ?: "master"
                     }
 
                     else -> ""
