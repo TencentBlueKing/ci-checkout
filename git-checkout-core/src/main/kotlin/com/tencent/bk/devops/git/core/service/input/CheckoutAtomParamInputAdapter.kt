@@ -195,14 +195,8 @@ class CheckoutAtomParamInputAdapter(
                 input.refName = when (gitHookEventType) {
                     CodeEventType.PUSH.name, CodeEventType.ISSUES.name,
                     CodeEventType.NOTE.name, CodeEventType.REVIEW.name -> {
-                        val hookVersion = System.getenv(BK_CI_HOOK_REVISION)
-                        if (hookVersion.isNullOrBlank()) {
-                            input.pullType = PullType.BRANCH.name
-                            System.getenv(BK_CI_HOOK_BRANCH) ?: "master"
-                        } else {
-                            input.pullType = PullType.COMMIT_ID.name
-                            hookVersion
-                        }
+                        input.pullType = PullType.BRANCH.name
+                        System.getenv(BK_CI_HOOK_BRANCH) ?: "master"
                     }
 
                     CodeEventType.MERGE_REQUEST.name, CodeEventType.MERGE_REQUEST_ACCEPT.name,
