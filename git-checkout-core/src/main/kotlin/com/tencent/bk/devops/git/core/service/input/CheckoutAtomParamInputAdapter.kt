@@ -193,8 +193,17 @@ class CheckoutAtomParamInputAdapter(
                     ?: throw ParamInvalidException(errorMsg = "repository hash id is empty")
                 val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE) ?: ""
                 input.refName = when (gitHookEventType) {
-                    CodeEventType.PUSH.name, CodeEventType.ISSUES.name,
-                    CodeEventType.NOTE.name, CodeEventType.REVIEW.name -> {
+                    CodeEventType.PUSH.name -> {
+                        // push事件触发时，拉取对应事件的代码版本，不能直接COMMIT_ID拉取，会使代码进入游离状态
+                        val hookVersion = System.getenv(BK_CI_HOOK_REVISION)
+                        if (!hookVersion.isNullOrBlank()) {
+                            input.retryStartPoint = hookVersion
+                        }
+                        input.pullType = PullType.BRANCH.name
+                        System.getenv(BK_CI_HOOK_BRANCH) ?: "master"
+                    }
+
+                    CodeEventType.ISSUES.name, CodeEventType.NOTE.name, CodeEventType.REVIEW.name -> {
                         input.pullType = PullType.BRANCH.name
                         System.getenv(BK_CI_HOOK_BRANCH) ?: "master"
                     }
