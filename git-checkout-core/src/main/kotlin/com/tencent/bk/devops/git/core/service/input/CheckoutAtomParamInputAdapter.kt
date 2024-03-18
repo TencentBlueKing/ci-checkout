@@ -191,6 +191,8 @@ class CheckoutAtomParamInputAdapter(
             StartType.WEB_HOOK.name -> {
                 input.repositoryHashId = System.getenv(BK_CI_REPO_WEB_HOOK_HASHID)
                     ?: throw ParamInvalidException(errorMsg = "repository hash id is empty")
+                // 兼容其他插件使用【BK_CI_GIT_REPO_TYPE】变量，统一设置为ID
+                EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, RepositoryType.ID.name)
                 val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE) ?: ""
                 input.refName = when (gitHookEventType) {
                     CodeEventType.PUSH.name -> {
