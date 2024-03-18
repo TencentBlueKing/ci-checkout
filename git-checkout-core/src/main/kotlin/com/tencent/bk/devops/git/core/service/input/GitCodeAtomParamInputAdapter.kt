@@ -162,7 +162,9 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable("bk_repo_taskId_${input.pipelineTaskId}", input.pipelineTaskId)
             EnvHelper.addEnvVariable("bk_repo_hashId_${input.pipelineTaskId}", input.repositoryHashId ?: "")
             EnvHelper.addEnvVariable("bk_repo_name_${input.pipelineTaskId}", input.repositoryName ?: "")
-            EnvHelper.addEnvVariable("bk_repo_config_type_${input.pipelineTaskId}", input.repositoryType)
+            EnvHelper.addEnvVariable("bk_repo_config_type_${input.pipelineTaskId}", input.repositoryType.let {
+                if (it == RepositoryType.SELF.name) RepositoryType.ID.name else it
+            })
             EnvHelper.addEnvVariable("bk_repo_type_${input.pipelineTaskId}", "GIT")
             EnvHelper.addEnvVariable("bk_repo_local_path_${input.pipelineTaskId}", input.localPath ?: "")
             EnvHelper.addEnvVariable("bk_repo_container_id_${input.pipelineTaskId}", System.getenv(BK_CI_BUILD_JOB_ID))
