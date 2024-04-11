@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_ALIAS_NAME
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_HASH_ID
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_TYPE
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_JOB_ID
@@ -105,6 +106,7 @@ class GitCodeAtomParamInputAdapter(
                 ?: throw ParamInvalidException(
                     errorMsg = "repository ${repositoryConfig.getRepositoryId()} is not found"
                 )
+            EnvHelper.putContext(CONTEXT_REPOSITORY_HASH_ID, repository.repoHashId ?: "")
             logger.info("get the repo:$repository")
             // 2. 确定分支和commit
             var ref: String = getRef()

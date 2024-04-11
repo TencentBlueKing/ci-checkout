@@ -162,7 +162,6 @@ object GitUtil {
         val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
         // 如果存在hookTargetUrl异常则直接返回false，不进行pre-merge
         if (!checkUrl(hookTargetUrl)) {
-            logger.info("fail to parse repo url, can not merge|hookTargetUrl[$hookTargetUrl]|")
             return false
         }
         // 必须先验证事件类型，再判断仓库是否相同，不然验证仓库类型时解析url会异常

@@ -31,6 +31,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bk.devops.atom.api.BaseApi
 import com.tencent.bk.devops.atom.api.Header.AUTH_HEADER_PROJECT_ID
 import com.tencent.bk.devops.atom.api.SdkEnv
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_HASH_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.HttpStatus
 import com.tencent.bk.devops.git.core.exception.ApiException
@@ -43,6 +44,7 @@ import com.tencent.bk.devops.git.core.pojo.api.GithubToken
 import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.HttpUtil
 import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 import com.tencent.bk.devops.plugin.pojo.ErrorType
@@ -128,7 +130,14 @@ class DevopsApi : IDevopsApi, BaseApi() {
                     defaultResolver.resolveByMap(it, mapOf("userId" to userId))
                 } ?: "",
                 solution = GitErrorsText.get().notPermissionGetOauthTokenSolution?.let {
-                    defaultResolver.resolveByMap(it, mapOf("userId" to userId))
+                    defaultResolver.resolveByMap(
+                        it,
+                        mapOf(
+                            "userId" to userId,
+                            "projectId" to projectId,
+                            "repository_hash_id" to EnvHelper.getContext(CONTEXT_REPOSITORY_HASH_ID)
+                        )
+                    )
                 } ?: "",
                 wiki = GitErrorsText.get().notPermissionGetOauthTokenWiki ?: ""
             )
