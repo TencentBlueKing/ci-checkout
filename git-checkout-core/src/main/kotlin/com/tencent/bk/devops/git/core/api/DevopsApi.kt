@@ -29,9 +29,13 @@ package com.tencent.bk.devops.git.core.api
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.tencent.bk.devops.atom.api.BaseApi
+import com.tencent.bk.devops.atom.api.Header.AUTH_HEADER_PROJECT_ID
+import com.tencent.bk.devops.atom.api.SdkEnv
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.HttpStatus
 import com.tencent.bk.devops.git.core.exception.ApiException
+import com.tencent.bk.devops.git.core.exception.PermissionForbiddenException
+import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
 import com.tencent.bk.devops.git.core.pojo.api.GitToken
@@ -39,7 +43,8 @@ import com.tencent.bk.devops.git.core.pojo.api.GithubToken
 import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
 import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
-import com.tencent.bk.devops.git.core.util.HttpUtil.retryRequest
+import com.tencent.bk.devops.git.core.util.HttpUtil
+import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.pojo.Result
 import com.tencent.bk.devops.plugin.utils.JsonUtil
@@ -50,7 +55,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun addCommit(commits: List<CommitData>): Result<Int> {
         val path = "/repository/api/build/commit/addCommit"
         val request = buildPost(path, getJsonRequest(commits), mutableMapOf())
-        val responseContent = retryRequest(
+        val responseContent = HttpUtil.retryRequest(
             request = request,
             errorMessage = "Failed to add repository commit information",
             maxAttempts = 1
@@ -66,7 +71,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val path = "/repository/api/build/commit/getLatestCommit?pipelineId=$pipelineId&elementId=$elementId" +
             "&repoId=${repositoryConfig.getRepositoryId()}&repositoryType=${repositoryConfig.repositoryType.name}"
         val request = buildGet(path)
-        val responseContent = retryRequest(
+        val responseContent = HttpUtil.retryRequest(
             request = request,
             errorMessage = "Failed to get the last code commit information"
         )
@@ -76,7 +81,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun saveBuildMaterial(materialList: List<PipelineBuildMaterial>): Result<Int> {
         val path = "/process/api/build/repository/saveBuildMaterial"
         val request = buildPost(path, getJsonRequest(materialList), mutableMapOf())
-        val responseContent = retryRequest(
+        val responseContent = HttpUtil.retryRequest(
             request = request,
             errorMessage = "Failed to add source material information",
             maxAttempts = 1
@@ -87,7 +92,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo> {
         val path = "/ticket/api/build/credentials/$credentialId?publicKey=${encode(publicKey)}"
         val request = buildGet(path)
-        val responseContent = retryRequest(
+        val responseContent = HttpUtil.retryRequest(
             request = request,
             errorMessage = "Failed to get credentials"
         )
@@ -97,25 +102,43 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun getOauthToken(userId: String): Result<GitToken> {
         val path = "/repository/api/build/oauth/git/$userId"
         val request = buildGet(path)
-        val responseContent = retryRequest(
-            request = request,
-            errorMessage = "Failed to get oauth token information"
-        )
-        val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
-        if (result.data == null) {
-            throw ApiException(
-                errorType = ErrorType.USER,
-                errorCode = GitConstants.CONFIG_ERROR,
-                errorMsg = "User [$userId] has no oauth authorization"
+        try {
+            val responseContent = HttpUtil.retryRequest(
+                request = request,
+                errorMessage = "Failed to get oauth token information"
+            )
+            val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
+            if (result.data == null) {
+                throw ApiException(
+                    errorType = ErrorType.USER,
+                    errorCode = GitConstants.CONFIG_ERROR,
+                    errorMsg = "User [$userId] has no oauth authorization"
+                )
+            }
+            return result
+        } catch (ignored: PermissionForbiddenException) {
+            val projectId = SdkEnv.getSdkHeader()[AUTH_HEADER_PROJECT_ID]
+            throw PermissionForbiddenException(
+                errorType = ignored.errorType,
+                errorCode = ignored.errorCode,
+                errorMsg = GitErrorsText.get().notPermissionGetOauthToken?.let {
+                    defaultResolver.resolveByMap(it, mapOf("userId" to userId, "projectId" to projectId))
+                } ?: ignored.errorMsg,
+                reason = GitErrorsText.get().notPermissionGetOauthTokenCause?.let {
+                    defaultResolver.resolveByMap(it, mapOf("userId" to userId))
+                } ?: "",
+                solution = GitErrorsText.get().notPermissionGetOauthTokenSolution?.let {
+                    defaultResolver.resolveByMap(it, mapOf("userId" to userId))
+                } ?: "",
+                wiki = GitErrorsText.get().notPermissionGetOauthTokenWiki ?: ""
             )
         }
-        return result
     }
 
     override fun getGithubOauthToken(userId: String): Result<GithubToken> {
         val path = "/repository/api/build/oauth/github/$userId"
         val request = buildGet(path)
-        val responseContent = retryRequest(request, "Failed to get oauth token information")
+        val responseContent = HttpUtil.retryRequest(request, "Failed to get oauth token information")
         val result = JsonUtil.to(responseContent, object : TypeReference<Result<GithubToken>>() {})
         if (result.data == null) {
             throw ApiException(
@@ -133,7 +156,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
                 "repositoryId=${repositoryConfig.getURLEncodeRepositoryId()}&" +
                 "repositoryType=${repositoryConfig.repositoryType.name}"
             val request = buildGet(path)
-            val responseContent = retryRequest(request, "Failed to get repository information")
+            val responseContent = HttpUtil.retryRequest(request, "Failed to get repository information")
             return JsonUtil.to(responseContent, object : TypeReference<Result<Repository>>() {})
         } catch (ignore: ApiException) {
             if (ignore.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
@@ -152,7 +175,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val path = "/monitoring/api/build/atom/metrics/report/$atomCode"
         val requestBody = RequestBody.create(JSON_CONTENT_TYPE, data)
         val request = buildPost(path, requestBody, mutableMapOf())
-        val responseContent = retryRequest(
+        val responseContent = HttpUtil.retryRequest(
             request = request,
             errorMessage = "Failed to report measurement information",
             maxAttempts = 1

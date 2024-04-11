@@ -77,7 +77,11 @@ object ExceptionTranslator {
                     JsonUtil.to(exception.responseContent, object : TypeReference<Result<Unit>>() {})
                 // 因权限中心bug，可能会出现调用权限中心失败，导致接口失败，增加重试
                 if (result.status == USER_NEED_PROJECT_X_PERMISSION) {
-                    RetryException(errorMsg = exception.message ?: "")
+                    PermissionForbiddenException(
+                        errorType = ErrorType.USER,
+                        errorCode = GitConstants.CONFIG_ERROR,
+                        errorMsg = exception.message ?: ""
+                    )
                 } else {
                     apiException
                 }
