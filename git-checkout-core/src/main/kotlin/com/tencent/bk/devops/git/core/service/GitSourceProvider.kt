@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service
 
 import com.tencent.bk.devops.git.core.api.GitClientApi
 import com.tencent.bk.devops.git.core.api.IDevopsApi
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_HTTP_URL
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_URL
@@ -69,6 +70,12 @@ class GitSourceProvider(
             val repositoryName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_NAME, repositoryName)
             EnvHelper.putContext(CONTEXT_REPOSITORY_URL, repositoryUrl)
+            val repositoryHttpUrl = if (repositoryUrl.startsWith("git@")) {
+                repositoryUrl.replace(":", "/").replace("git@", "https://")
+            } else {
+                repositoryUrl
+            }
+            EnvHelper.putContext(CONTEXT_REPOSITORY_HTTP_URL, repositoryHttpUrl)
 
             logger.info("Working directory is: $repositoryPath")
             if (ref.isBlank()) {
