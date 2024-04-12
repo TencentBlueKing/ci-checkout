@@ -70,10 +70,12 @@ class GitSourceProvider(
             val repositoryName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_NAME, repositoryName)
             EnvHelper.putContext(CONTEXT_REPOSITORY_URL, repositoryUrl)
-            EnvHelper.putContext(
-                CONTEXT_REPOSITORY_HTTP_URL,
+            val repositoryHttpUrl = if (repositoryUrl.startsWith("git@")) {
                 repositoryUrl.replace(":", "/").replace("git@", "https://")
-            )
+            } else {
+                repositoryUrl
+            }
+            EnvHelper.putContext(CONTEXT_REPOSITORY_HTTP_URL, repositoryHttpUrl)
 
             logger.info("Working directory is: $repositoryPath")
             if (ref.isBlank()) {
