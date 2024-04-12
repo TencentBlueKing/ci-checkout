@@ -275,7 +275,7 @@ class GitCodeAtomParamInputAdapter(
      * 获取代码库授权提供者
      */
 
-    private fun getAuthProvider(repository: Repository) = with(input){
+    private fun getAuthProvider(repository: Repository) = with(input) {
         if (postEntryParam == "True") {
             EmptyGitAuthProvider()
         } else {
@@ -313,10 +313,11 @@ class GitCodeAtomParamInputAdapter(
     /**
      * 获取引用，确定分支和commit
      */
-    private fun getRef() = with(input){
+    private fun getRef() = with(input) {
         when (pullType) {
             PullType.BRANCH.name ->
                 branchName
+
             PullType.TAG.name -> {
                 if (tagName.isNullOrBlank()) {
                     throw ParamInvalidException(

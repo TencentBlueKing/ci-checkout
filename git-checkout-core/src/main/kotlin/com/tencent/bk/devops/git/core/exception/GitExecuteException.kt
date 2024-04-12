@@ -37,7 +37,7 @@ class GitExecuteException constructor(
     override val reason: String = "",
     override val solution: String = "",
     override val wiki: String = ""
-): TaskExecuteException(
+) : TaskExecuteException(
     errorType = errorType,
     errorCode = errorCode,
     errorMsg = errorMsg,
