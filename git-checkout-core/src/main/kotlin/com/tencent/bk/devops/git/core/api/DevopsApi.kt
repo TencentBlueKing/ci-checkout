@@ -124,10 +124,10 @@ class DevopsApi : IDevopsApi, BaseApi() {
                 errorType = ignored.errorType,
                 errorCode = ignored.errorCode,
                 errorMsg = GitErrorsText.get().notPermissionGetOauthToken?.let {
-                    defaultResolver.resolveByMap(it, mapOf("userId" to userId, "projectId" to projectId))
+                    defaultResolver.resolveByMap(it, mapOf("userId" to userId))
                 } ?: ignored.errorMsg,
                 reason = GitErrorsText.get().notPermissionGetOauthTokenCause?.let {
-                    defaultResolver.resolveByMap(it, mapOf("userId" to userId))
+                    defaultResolver.resolveByMap(it, mapOf("userId" to userId, "projectId" to projectId))
                 } ?: "",
                 solution = GitErrorsText.get().notPermissionGetOauthTokenSolution?.let {
                     defaultResolver.resolveByMap(
