@@ -71,7 +71,8 @@ class GitSourceProvider(
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_NAME, repositoryName)
             EnvHelper.putContext(CONTEXT_REPOSITORY_URL, repositoryUrl)
             EnvHelper.putContext(
-                CONTEXT_REPOSITORY_HTTP_URL, repositoryUrl.replace("git@", "https://")
+                CONTEXT_REPOSITORY_HTTP_URL,
+                repositoryUrl.replace(":", "/").replace("git@", "https://")
             )
 
             logger.info("Working directory is: $repositoryPath")
