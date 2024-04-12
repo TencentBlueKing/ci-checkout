@@ -97,7 +97,7 @@ class Program(
                 )
             }
             // 保存fork库凭证
-            if (!forkUsername.isNullOrBlank() && !forkPassword.isNullOrBlank()){
+            if (!forkUsername.isNullOrBlank() && !forkPassword.isNullOrBlank()) {
                 credentialStore.add(
                     getTaskUri(forkTargetUri, "$taskId-fork"),
                     Credential(forkUsername, forkPassword)

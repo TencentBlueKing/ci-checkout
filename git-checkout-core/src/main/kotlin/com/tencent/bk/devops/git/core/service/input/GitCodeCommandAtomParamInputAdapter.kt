@@ -205,7 +205,7 @@ class GitCodeCommandAtomParamInputAdapter(
      * 获取代码库授权提供者
      */
 
-    private fun getAuthProvider() = with(input){
+    private fun getAuthProvider() = with(input) {
         if (postEntryParam == "True") {
             EmptyGitAuthProvider()
         } else {

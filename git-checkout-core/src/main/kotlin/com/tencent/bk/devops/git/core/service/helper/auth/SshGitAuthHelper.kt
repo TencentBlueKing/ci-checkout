@@ -82,7 +82,7 @@ class SshGitAuthHelper(
             configKey = GitConstants.GIT_CREDENTIAL_INSTEADOF_KEY,
             configValue = "url.git@${serverInfo.hostName}:.insteadof"
         )
-        if (settings.storeForkRepoCredential){
+        if (settings.storeForkRepoCredential) {
             replaceUrl(
                 url = settings.sourceRepositoryUrl,
                 remoteName = GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME,

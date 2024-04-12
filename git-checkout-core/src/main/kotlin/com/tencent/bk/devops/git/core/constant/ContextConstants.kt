@@ -12,6 +12,7 @@ object ContextConstants {
     const val CONTEXT_MERGE_TARGET_REF = "context_merge_target_ref"
     const val CONTEXT_REPOSITORY_TYPE = "context_repository_type"
     const val CONTEXT_REPOSITORY_ALIAS_NAME = "context_repository_alias_name"
+    const val CONTEXT_REPOSITORY_HASH_ID = "context_repository_hash_id"
 
     // 度量
     const val CONTEXT_PREPARE_COST_TIME = "context_prepare_cost_time"

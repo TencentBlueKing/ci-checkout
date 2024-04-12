@@ -56,7 +56,8 @@ enum class GitErrors(
                 "(fatal: could not read Password for '(.+)': No such device or address)|" +
                 "(error: The requested URL returned error: 401 Unauthorized while accessing .*)|" +
                 "(fatal: unable to access '(.+)': The requested URL returned error: 403)|" +
-                "(error: The requested URL returned error: 401 while accessing (.+))"
+                "(error: The requested URL returned error: 401 while accessing (.+))|" +
+                "(致命错误：could not read Username for '(.+)': terminal prompts disabled)"
         ),
         title = GitErrorsText.get().httpAuthenticationFailed,
         cause = GitErrorsText.get().httpAuthenticationFailedCause,
@@ -376,9 +377,10 @@ enum class GitErrors(
     GitNotInstall(
         regex = Regex(
             "(Cannot run program \"git\" \\(in directory (.*): CreateProcess error=2, " +
-                "The system cannot find the file specified\\))|" +
-                "('git' 不是内部或外部命令，也不是可运行的程序)|" +
-                "(Cannot run program \"git\" \\(in directory (.*)\\): CreateProcess error=2, 系统找不到指定的文件。)"
+                    "The system cannot find the file specified\\))|" +
+                    "('git' 不是内部或外部命令，也不是可运行的程序)|" +
+                    "(Cannot run program \"git\" \\(in directory (.*)\\): CreateProcess error=2, 系统找不到指定的文件。)|" +
+                    "(Cannot run program \"git\" \\(in directory (.*)\\): error=2, 没有那个文件或目录)"
         ),
         title = GitErrorsText.get().gitNotInstall,
         cause = GitErrorsText.get().gitNotInstallCause,

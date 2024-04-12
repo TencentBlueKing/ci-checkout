@@ -56,7 +56,7 @@ class TGitApi(
                 )
             )
             val responseContent = HttpUtil.retryRequest(request, "Failed to get session")
-            if (responseContent.isEmpty()){
+            if (responseContent.isEmpty()) {
                 return null
             }
             return JsonUtil.to(responseContent, object : TypeReference<GitSession>() {})
