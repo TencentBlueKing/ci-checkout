@@ -27,6 +27,10 @@ class GitErrorsTest {
             "error: The requested URL returned error: 401 while accessing http://example.com/demo.git/info/refs"
         )
         Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
+        gitError = GitErrors.matchError(
+            "致命错误：could not read Username for 'http://example.com': terminal prompts disabled"
+        )
+        Assert.assertEquals(gitError, GitErrors.AuthenticationFailed)
     }
 
     @Test
@@ -258,8 +262,12 @@ class GitErrorsTest {
 
     @Test
     fun gitNotInstall() {
-        val gitError = GitErrors.matchError(
+        var gitError = GitErrors.matchError(
             "Cannot run program \"git\" (in directory \"C:\\work\"): CreateProcess error=2, 系统找不到指定的文件。"
+        )
+        Assert.assertEquals(gitError, GitErrors.GitNotInstall)
+        gitError = GitErrors.matchError(
+            "Cannot run program \"git\" (in directory \"/data/landun/workspace\"): error=2, 没有那个文件或目录"
         )
         Assert.assertEquals(gitError, GitErrors.GitNotInstall)
     }

@@ -55,12 +55,12 @@ class GithubApi(
         try {
             val apiUrl =
                 "$GITHUB_API/repos/${serverInfo.repositoryName}"
-            val headers = if (authAccess == true){
+            val headers = if (authAccess == true) {
                 mapOf(
                     "Authorization" to "token  $token",
                     "Accept" to "application/vnd.github.v3+json"
                 )
-            }else {
+            } else {
                 mapOf()
             }
             val request = HttpUtil.buildGet(apiUrl, headers)

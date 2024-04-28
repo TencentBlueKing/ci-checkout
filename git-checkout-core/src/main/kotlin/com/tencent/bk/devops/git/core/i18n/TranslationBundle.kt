@@ -74,7 +74,8 @@ open class TranslationBundle {
         val resourceBundle = ResourceBundle.getBundle(bundleClass.simpleName, locale, bundleClass.classLoader)
         bundleClass.declaredFields.forEach { field ->
             if (field.type == String::class.java) {
-                val translatedText = resourceBundle.getString(field.name)
+                val translatedText =
+                    String(resourceBundle.getString(field.name).toByteArray(Charsets.ISO_8859_1), Charsets.UTF_8)
                 field.isAccessible = true
                 field.set(this, translatedText)
             }

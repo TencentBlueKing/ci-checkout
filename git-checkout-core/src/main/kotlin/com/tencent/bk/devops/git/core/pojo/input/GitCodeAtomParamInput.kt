@@ -54,7 +54,7 @@ data class GitCodeAtomParamInput(
     /**
      * submodule depth
      */
-    var submoduleDepth:Int? = null,
+    var submoduleDepth: Int? = null,
     /**
      * submodule并发拉取数量
      */

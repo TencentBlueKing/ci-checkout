@@ -134,6 +134,10 @@ class GitErrorsText : TranslationBundle() {
     var invalidRefSpecCause: String? = null
     var invalidRefSpecSolution: String? = null
     var invalidRefSpecWiki: String? = null
+    var notPermissionGetOauthToken: String? = null
+    var notPermissionGetOauthTokenCause: String? = null
+    var notPermissionGetOauthTokenSolution: String? = null
+    var notPermissionGetOauthTokenWiki: String? = null
     companion object {
         fun get(): GitErrorsText {
             return lookupBundle(Locale.SIMPLIFIED_CHINESE, GitErrorsText::class.java)
