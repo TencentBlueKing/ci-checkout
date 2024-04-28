@@ -88,7 +88,7 @@ class GitCodeAtomParamInputAdapter(
             // 1. 获取仓库信息
             val repositoryType = RepositoryType.valueOf(repositoryType)
             val repositoryId = when (repositoryType) {
-                RepositoryType.ID -> {
+                RepositoryType.ID, RepositoryType.SELF -> {
                     repositoryHashId ?: throw ParamInvalidException(errorMsg = "Repository ID cannot be empty")
                     EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_ID, repositoryHashId!!)
                     repositoryHashId
@@ -139,8 +139,13 @@ class GitCodeAtomParamInputAdapter(
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.putContext(CONTEXT_REPOSITORY_ALIAS_NAME, repository.aliasName)
-            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, repositoryType.name)
-            EnvHelper.putContext(CONTEXT_REPOSITORY_TYPE, repositoryType.name)
+            // 兼容其他插件使用【BK_CI_GIT_REPO_TYPE】变量，统一设置为ID
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, repositoryType.let {
+                if (it == RepositoryType.SELF) RepositoryType.ID else it
+            }.name)
+            EnvHelper.putContext(CONTEXT_REPOSITORY_TYPE, repositoryType.let {
+                if (it == RepositoryType.SELF) RepositoryType.ID else it
+            }.name)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_BRANCH, branchName)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_TAG, tagName ?: "")
@@ -164,7 +169,10 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable("bk_repo_taskId_${input.pipelineTaskId}", input.pipelineTaskId)
             EnvHelper.addEnvVariable("bk_repo_hashId_${input.pipelineTaskId}", input.repositoryHashId ?: "")
             EnvHelper.addEnvVariable("bk_repo_name_${input.pipelineTaskId}", input.repositoryName ?: "")
-            EnvHelper.addEnvVariable("bk_repo_config_type_${input.pipelineTaskId}", input.repositoryType)
+            // codecc没有SELF模式，此处做兼容
+            EnvHelper.addEnvVariable("bk_repo_config_type_${input.pipelineTaskId}", repositoryType.let {
+                if (it == RepositoryType.SELF) RepositoryType.ID else it
+            }.name)
             EnvHelper.addEnvVariable("bk_repo_type_${input.pipelineTaskId}", "GIT")
             EnvHelper.addEnvVariable("bk_repo_local_path_${input.pipelineTaskId}", input.localPath ?: "")
             EnvHelper.addEnvVariable("bk_repo_container_id_${input.pipelineTaskId}", System.getenv(BK_CI_BUILD_JOB_ID))

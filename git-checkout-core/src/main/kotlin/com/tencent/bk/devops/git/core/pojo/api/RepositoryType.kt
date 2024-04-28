@@ -30,5 +30,6 @@ package com.tencent.bk.devops.git.core.pojo.api
 enum class RepositoryType {
     ID,
     NAME,
-    URL
+    URL,
+    SELF
 }

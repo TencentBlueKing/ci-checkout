@@ -39,7 +39,7 @@ class RepositoryConfig(
     @JsonIgnore
     fun getRepositoryId(): String {
         return when (repositoryType) {
-            RepositoryType.ID -> if (repositoryHashId.isNullOrBlank()) {
+            RepositoryType.ID, RepositoryType.SELF -> if (repositoryHashId.isNullOrBlank()) {
                 throw ParamInvalidException(errorMsg = "repository hash id is empty")
             } else {
                 repositoryHashId

@@ -130,6 +130,10 @@ class GitErrorsText : TranslationBundle() {
     var notFoundGitRemoteHttpsCause: String? = null
     var notFoundGitRemoteHttpsSolution: String? = null
     var notFoundGitRemoteHttpsWiki: String? = null
+    var invalidRefSpec: String? = null
+    var invalidRefSpecCause: String? = null
+    var invalidRefSpecSolution: String? = null
+    var invalidRefSpecWiki: String? = null
     var notPermissionGetOauthToken: String? = null
     var notPermissionGetOauthTokenCause: String? = null
     var notPermissionGetOauthTokenSolution: String? = null

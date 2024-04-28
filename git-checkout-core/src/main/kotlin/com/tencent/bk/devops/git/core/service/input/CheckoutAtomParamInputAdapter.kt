@@ -28,6 +28,18 @@
 package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_TARGET_BRANCH
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_TYPE
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_TAG_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_WEB_HOOK_HASHID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_START_TYPE
+import com.tencent.bk.devops.git.core.enums.CodeEventType
+import com.tencent.bk.devops.git.core.enums.PullType
+import com.tencent.bk.devops.git.core.enums.StartType
+import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.CheckoutAtomParamInput
@@ -43,6 +55,10 @@ class CheckoutAtomParamInputAdapter(
     override fun getInputs(): GitSourceSettings {
         EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_TYPE, input.repositoryType)
         return when (RepositoryType.valueOf(input.repositoryType)) {
+            RepositoryType.SELF -> {
+                handleSelfParam()
+                input.byRepositoryIdOrName()
+            }
             RepositoryType.ID, RepositoryType.NAME -> {
                 input.byRepositoryIdOrName()
             }
@@ -168,4 +184,62 @@ class CheckoutAtomParamInputAdapter(
             useCustomCredential = true
         )
     ).getInputs()
+
+    private fun handleSelfParam() {
+        val startType = System.getenv(BK_CI_START_TYPE)
+        when (startType) {
+            StartType.WEB_HOOK.name -> {
+                input.repositoryHashId = System.getenv(BK_CI_REPO_WEB_HOOK_HASHID)
+                    ?: throw ParamInvalidException(errorMsg = "repository hash id is empty")
+                val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE) ?: ""
+                input.refName = when (gitHookEventType) {
+                    CodeEventType.PUSH.name -> {
+                        // push事件触发时，拉取对应事件的代码版本，不能直接COMMIT_ID拉取，会使代码进入游离状态
+                        val hookVersion = System.getenv(BK_CI_HOOK_REVISION)
+                        if (!hookVersion.isNullOrBlank()) {
+                            input.retryStartPoint = hookVersion
+                        }
+                        input.pullType = PullType.BRANCH.name
+                        System.getenv(BK_CI_HOOK_BRANCH) ?: "master"
+                    }
+
+                    CodeEventType.ISSUES.name, CodeEventType.NOTE.name, CodeEventType.REVIEW.name -> {
+                        input.pullType = PullType.BRANCH.name
+                        System.getenv(BK_CI_HOOK_BRANCH) ?: "master"
+                    }
+
+                    CodeEventType.MERGE_REQUEST.name, CodeEventType.MERGE_REQUEST_ACCEPT.name,
+                    CodeEventType.PULL_REQUEST.name -> {
+                        input.pullType = PullType.BRANCH.name
+                        System.getenv(BK_CI_HOOK_TARGET_BRANCH) ?: "master"
+                    }
+
+                    CodeEventType.TAG_PUSH.name -> {
+                        input.pullType = PullType.TAG.name
+                        System.getenv(BK_CI_REPO_GIT_WEBHOOK_TAG_NAME) ?: ""
+                    }
+
+                    CodeEventType.CREATE.name -> {
+                        // 创建要素类型，branch 或 tag
+                        val createRefType =
+                            System.getenv(BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_TYPE) ?: "branch"
+                        input.pullType = when (createRefType) {
+                            "tag" -> PullType.TAG.name
+                            else -> PullType.BRANCH.name
+                        }
+                        System.getenv(BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_NAME) ?: "master"
+                    }
+
+                    else -> ""
+                }
+            }
+            // 非webhook触发则拉取当前PAC流水线关联代码库的默认分支
+            else -> {
+                input.repositoryHashId = System.getenv(BK_CI_REPO_WEB_HOOK_HASHID)
+                    ?: throw ParamInvalidException(errorMsg = "repository hash id is empty")
+                input.pullType = PullType.BRANCH.name
+                input.refName = System.getenv(BK_CI_HOOK_BRANCH) ?: "master"
+            }
+        }
+    }
 }
