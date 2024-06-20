@@ -27,18 +27,28 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
-interface IBkRepoHelper {
+import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
+import com.tencent.bk.devops.git.core.service.GitCommandManager
+
+interface ICacheRepoHelper {
 
     /**
-     * 从制品库下载缓存的仓库.git文件
+     * 缓存策略是否支持
+     */
+    fun support(settings: GitSourceSettings): Boolean
+
+    /**
+     * 缓存名称
+     */
+    fun getName(): String
+
+    /**
+     * 从缓存仓库下载代码
      *
-     * @param cachePath 缓存的目录
-     * @param repositoryPath 下载后存储的目录
      * @return 返回下载是否成功
      */
     fun downloadCacheRepo(
-        cachePath: String,
-        repositoryPath: String,
-        repositoryUrl: String
+        settings: GitSourceSettings,
+        git: GitCommandManager
     ): Boolean
 }
