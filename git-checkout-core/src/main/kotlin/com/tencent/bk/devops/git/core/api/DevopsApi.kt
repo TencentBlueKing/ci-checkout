@@ -50,7 +50,7 @@ import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.default
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.pojo.Result
 import com.tencent.bk.devops.plugin.utils.JsonUtil
-import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class DevopsApi : IDevopsApi, BaseApi() {
 
@@ -182,7 +182,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
 
     override fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean> {
         val path = "/monitoring/api/build/atom/metrics/report/$atomCode"
-        val requestBody = RequestBody.create(JSON_CONTENT_TYPE, data)
+        val requestBody = data.toRequestBody(JSON_CONTENT_TYPE)
         val request = buildPost(path, requestBody, mutableMapOf())
         val responseContent = HttpUtil.retryRequest(
             request = request,

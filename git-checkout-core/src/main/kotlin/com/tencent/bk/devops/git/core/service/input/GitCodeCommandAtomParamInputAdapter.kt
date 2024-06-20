@@ -56,6 +56,7 @@ import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.util.Locale
 
 class GitCodeCommandAtomParamInputAdapter(
     private val input: GitCodeCommandAtomParamInput
@@ -195,7 +196,7 @@ class GitCodeCommandAtomParamInputAdapter(
         return when {
             authType == AuthType.ACCESS_TOKEN -> "OAUTH"
             authType == AuthType.USERNAME_PASSWORD -> "HTTP"
-            repositoryUrl.toUpperCase().startsWith("HTTP") -> "HTTP"
+            repositoryUrl.uppercase(Locale.getDefault()).startsWith("HTTP") -> "HTTP"
             else ->
                 "SSH"
         }

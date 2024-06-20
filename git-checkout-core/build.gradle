@@ -26,19 +26,19 @@
  */
 
 dependencies {
-    compile("com.tencent.devops.ci-plugins:java-plugin-sdk:1.1.9") {
+    implementation("com.tencent.devops.ci-plugins:java-plugin-sdk:1.1.9") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
         exclude group:'com.fasterxml.jackson.core', module:'jackson-databind'
     }
-    compile "com.squareup.okhttp3:okhttp:4.9.0"
-    compile "org.bouncycastle:bcprov-jdk15on:1.70"
-    compile "org.apache.commons:commons-exec:1.3"
-    compile "commons-codec:commons-codec:1.15"
-    compile "org.apache.commons:commons-lang3:3.12.0"
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2"
-    testCompile "org.mockito.kotlin:mockito-kotlin:4.0.0"
-    testCompile "org.mockito:mockito-inline:4.0.0"
-    testCompile "com.nhaarman:mockito-kotlin-kt1.1:1.6.0"
+    implementation "com.squareup.okhttp3:okhttp:4.9.0"
+    implementation "org.bouncycastle:bcprov-jdk15on:1.70"
+    implementation "org.apache.commons:commons-exec:1.3"
+    implementation "commons-codec:commons-codec:1.15"
+    implementation "org.apache.commons:commons-lang3:3.12.0"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
+    testImplementation "org.mockito:mockito-inline:4.0.0"
+    testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.6.0"
 }
 
 task versionInfo(type: WriteProperties) {
