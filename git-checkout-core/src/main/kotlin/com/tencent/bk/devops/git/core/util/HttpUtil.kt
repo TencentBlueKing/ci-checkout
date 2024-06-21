@@ -4,7 +4,6 @@ import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.exception.ExceptionTranslator
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.service.helper.RetryHelper
-import okhttp3.Headers
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.OkHttpClient
 import okhttp3.Protocol

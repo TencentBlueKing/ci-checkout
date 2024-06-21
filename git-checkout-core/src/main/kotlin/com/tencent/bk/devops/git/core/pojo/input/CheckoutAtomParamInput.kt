@@ -128,5 +128,9 @@ data class CheckoutAtomParamInput(
      *
      * 只要是http[s]，都是用自定义的checkout凭证,不管有没有配置全局的凭证
      */
-    val useCustomCredential: Boolean = true
+    val useCustomCredential: Boolean = true,
+    /**
+     * 是否使用工蜂边缘节点加速
+     */
+    val enableTGitCache: Boolean? = false
 )
