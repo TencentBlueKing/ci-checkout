@@ -5,8 +5,8 @@ enum class FetchStrategy {
     FULL,
     // 构建机缓存
     VM_CACHE,
-    // 制品库缓存
-    BKREPO_CACHE,
     // TGIT缓存
-    TGIT_CACHE
+    TGIT_CACHE,
+    // 制品库缓存
+    BKREPO_CACHE
 }
