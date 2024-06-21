@@ -6,5 +6,7 @@ enum class FetchStrategy {
     // 构建机缓存
     VM_CACHE,
     // 制品库缓存
-    BKREPO_CACHE
+    BKREPO_CACHE,
+    // TGIT缓存
+    TGIT_CACHE
 }

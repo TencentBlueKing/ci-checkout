@@ -34,7 +34,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_PREPARE_
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitDirectoryHelper
-import com.tencent.bk.devops.git.core.service.helper.ICacheRepoHelper
+import com.tencent.bk.devops.git.core.service.helper.IGitProxyHelper
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.FileUtils
 import org.slf4j.LoggerFactory
@@ -88,11 +88,11 @@ class PrepareWorkspaceHandler(
     private fun GitSourceSettings.downloadCacheRepo() {
         if (!File(repositoryPath, ".git").exists()) {
             val startEpoch = System.currentTimeMillis()
-            val cacheRepoHelpers = ServiceLoader.load(ICacheRepoHelper::class.java)
+            val cacheRepoHelpers = ServiceLoader.load(IGitProxyHelper::class.java)
             val cacheRepoHelper = cacheRepoHelpers.find { it.support(settings) } ?: return
             val name = cacheRepoHelper.getName()
             logger.groupStart("Fetching cache from $name")
-            val downloadResult = cacheRepoHelper.downloadCacheRepo(
+            val downloadResult = cacheRepoHelper.fetch(
                 settings = settings,
                 git = git
             )

@@ -30,24 +30,27 @@ package com.tencent.bk.devops.git.core.service.helper
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 
-interface ICacheRepoHelper {
+/**
+ * git代理,加速代码下载速度,优先从代理服务下载
+ */
+interface IGitProxyHelper {
 
     /**
-     * 缓存策略是否支持
+     * 是否支持代理类型
      */
     fun support(settings: GitSourceSettings): Boolean
 
     /**
-     * 缓存名称
+     * 代理名称
      */
     fun getName(): String
 
     /**
-     * 从缓存仓库下载代码
+     * 从代理服务拉取代理
      *
-     * @return 返回下载是否成功
+     * @return 拉取是否成功
      */
-    fun downloadCacheRepo(
+    fun fetch(
         settings: GitSourceSettings,
         git: GitCommandManager
     ): Boolean
