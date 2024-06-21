@@ -61,6 +61,10 @@ class PrepareWorkspaceHandler(
 
     private fun doHandlePrepare() {
         with(settings) {
+            val workingDirectory = File(repositoryPath)
+            if (!workingDirectory.exists()) {
+                workingDirectory.mkdirs()
+            }
             git.getGitVersion()
             // 如果缓存锁存在,说明上次构建下载缓存没有成功,需要先清理工作空间
             if (File(repositoryPath, ".git/cache.lock").exists()) {
@@ -70,14 +74,8 @@ class PrepareWorkspaceHandler(
             // 如果仓库不存在,并且配置了开启缓存加速,则先从缓存库下载
             downloadCacheRepo()
 
-            val workingDirectory = File(repositoryPath)
-            var isExisting = true
-            if (!workingDirectory.exists()) {
-                isExisting = false
-                workingDirectory.mkdirs()
-            }
             // Prepare existing directory, otherwise recreate
-            if (isExisting) {
+            if (File(repositoryPath, ".git").exists()) {
                 logger.groupStart("cleaning workspace")
                 GitDirectoryHelper(git = git, settings = settings).prepareExistingDirectory()
                 logger.groupEnd("")
