@@ -169,7 +169,7 @@ class GitSourceProvider(
                 authHelper.removeAuth()
                 logger.groupEnd("")
             }
-            if (settings.enableTGitCache == true) {
+            if (settings.enableTGitCache == true && GitUtil.isHttpProtocol(settings.repositoryUrl)) {
                 val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
                 val origin = serverInfo.origin
                 git.tryConfigUnset("http.$origin.proxy")
