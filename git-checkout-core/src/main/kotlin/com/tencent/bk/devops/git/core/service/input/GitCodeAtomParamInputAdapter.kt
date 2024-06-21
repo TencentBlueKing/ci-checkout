@@ -274,7 +274,8 @@ class GitCodeAtomParamInputAdapter(
                 cachePath = cachePath,
                 enableGlobalInsteadOf = enableGlobalInsteadOf,
                 useCustomCredential = useCustomCredential,
-                forkRepoAuthInfo = forkRepoAuthInfo
+                forkRepoAuthInfo = forkRepoAuthInfo,
+                enableTGitCache = enableTGitCache
             )
         }
     }
