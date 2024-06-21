@@ -41,6 +41,11 @@ interface IGitProxyHelper {
     fun support(settings: GitSourceSettings): Boolean
 
     /**
+     * 读取顺序
+     */
+    fun getOrder(): Int
+
+    /**
      * 代理名称
      */
     fun getName(): String

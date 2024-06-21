@@ -169,6 +169,12 @@ class GitSourceProvider(
                 authHelper.removeAuth()
                 logger.groupEnd("")
             }
+            if (settings.enableTGitCache == true) {
+                val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
+                val origin = serverInfo.origin
+                git.tryConfigUnset("http.$origin.proxy")
+                git.tryConfigUnset("http.$origin.sslverify")
+            }
         }
     }
 }
