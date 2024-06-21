@@ -108,18 +108,17 @@ class GithubApi(
         }
     }
 
-    override fun getProjectId(): Long {
-        val gitProjectId: Long
-        try {
-            gitProjectId = getProjectInfo().id
+    override fun getProjectId(): Long? {
+        if (token.isBlank()) return null
+        return try {
+            getProjectInfo().id
         } catch (ignore: ApiException) {
             if (ignore.httpStatus == HttpStatus.UNAUTHORIZED.statusCode) {
                 // 尝试直接访问GitHub API，不携带token，仅public仓库可用
                 logger.debug("can't to get github repository info,try non-authorization access repository ")
-                return getProjectInfo(false).id
+                getProjectInfo(false).id
             }
             throw ignore
         }
-        return gitProjectId
     }
 }

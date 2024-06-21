@@ -4,7 +4,7 @@ import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.exception.ExceptionTranslator
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.service.helper.RetryHelper
-import okhttp3.Headers
+import okhttp3.Headers.Companion.toHeaders
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import okhttp3.Request
@@ -63,7 +63,7 @@ object HttpUtil {
     fun build(url: String, headers: Map<String, String>? = null): Request.Builder {
         val builder = Request.Builder().url(url)
         if (headers != null) {
-            builder.headers(Headers.of(headers))
+            builder.headers(headers.toHeaders())
         }
         return builder
     }
@@ -72,13 +72,13 @@ object HttpUtil {
         return RetryHelper(maxAttempts = maxAttempts).execute {
             try {
                 okHttpClient.newCall(request).execute().use { response ->
-                    val responseContent = response.body()?.string() ?: ""
+                    val responseContent = response.body?.string() ?: ""
                     if (!response.isSuccessful) {
                         logger.error(
-                            "$errorMessage|Fail to request with code ${response.code()} " +
-                                "message ${response.message()} and response $responseContent"
+                            "$errorMessage|Fail to request with code ${response.code} " +
+                                "message ${response.message} and response $responseContent"
                         )
-                        throw RemoteServiceException(errorMessage, response.code(), responseContent)
+                        throw RemoteServiceException(errorMessage, response.code, responseContent)
                     }
                     responseContent
                 }

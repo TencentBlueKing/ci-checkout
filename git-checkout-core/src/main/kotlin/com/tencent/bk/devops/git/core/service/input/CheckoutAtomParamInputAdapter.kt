@@ -120,7 +120,8 @@ class CheckoutAtomParamInputAdapter(
             enablePartialClone = enablePartialClone,
             cachePath = cachePath,
             enableGlobalInsteadOf = true,
-            useCustomCredential = true
+            useCustomCredential = true,
+            enableTGitCache = enableTGitCache
         )
     ).getInputs()
 
@@ -181,7 +182,8 @@ class CheckoutAtomParamInputAdapter(
             enablePartialClone = enablePartialClone,
             cachePath = cachePath,
             enableGlobalInsteadOf = true,
-            useCustomCredential = true
+            useCustomCredential = true,
+            enableTGitCache = enableTGitCache
         )
     ).getInputs()
 

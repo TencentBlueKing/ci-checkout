@@ -40,7 +40,7 @@ object AgentEnv {
         if (os == null) {
             synchronized(this) {
                 if (os == null) {
-                    val OS = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH)
+                    val OS = System.getProperty("os.name", "generic").lowercase(Locale.ENGLISH)
                     os = if (OS.indexOf(string = "mac") >= 0 || OS.indexOf("darwin") >= 0) {
                         OSType.MAC_OS
                     } else if (OS.indexOf("win") >= 0) {

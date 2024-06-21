@@ -31,5 +31,5 @@ interface GitApi {
 
     fun canViewProject(username: String): Boolean
 
-    fun getProjectId(): Long
+    fun getProjectId(): Long?
 }

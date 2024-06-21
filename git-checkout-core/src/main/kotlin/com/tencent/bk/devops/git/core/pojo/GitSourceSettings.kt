@@ -209,7 +209,11 @@ data class GitSourceSettings(
      *
      * 当启用preMr，且为[fork库]向[main库]发MR时，以此凭证信息拉取fork库
      */
-    val forkRepoAuthInfo: AuthInfo? = null
+    val forkRepoAuthInfo: AuthInfo? = null,
+    /**
+     * 是否使用工蜂边缘节点加速
+     */
+    val enableTGitCache: Boolean? = false
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(

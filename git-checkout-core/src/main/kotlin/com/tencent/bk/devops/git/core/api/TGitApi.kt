@@ -12,8 +12,8 @@ import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.HttpUtil
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.utils.JsonUtil
-import okhttp3.MediaType
-import okhttp3.RequestBody
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
 import java.net.URLEncoder
 
@@ -45,15 +45,13 @@ class TGitApi(
                 "https://$hostName/$API_PATH/session"
             val request = HttpUtil.buildPost(
                 apiUrl,
-                RequestBody.create(
-                    MediaType.parse("application/json; charset=utf-8"),
-                    JsonUtil.toJson(
-                        mapOf(
-                            "login" to userId,
-                            "password" to password
-                        )
+                JsonUtil.toJson(
+                    mapOf(
+                        "login" to userId,
+                        "password" to password
                     )
                 )
+                    .toRequestBody("application/json; charset=utf-8".toMediaTypeOrNull())
             )
             val responseContent = HttpUtil.retryRequest(request, "Failed to get session")
             if (responseContent.isEmpty()) {
@@ -130,7 +128,8 @@ class TGitApi(
         } != null
     }
 
-    override fun getProjectId(): Long {
+    override fun getProjectId(): Long? {
+        if (token.isBlank()) return null
         return getProjectInfo().id
     }
 }

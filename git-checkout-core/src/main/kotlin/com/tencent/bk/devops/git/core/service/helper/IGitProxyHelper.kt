@@ -27,18 +27,36 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
-interface IBkRepoHelper {
+import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
+import com.tencent.bk.devops.git.core.service.GitCommandManager
+
+/**
+ * git代理,加速代码下载速度,优先从代理服务下载
+ */
+interface IGitProxyHelper {
 
     /**
-     * 从制品库下载缓存的仓库.git文件
-     *
-     * @param cachePath 缓存的目录
-     * @param repositoryPath 下载后存储的目录
-     * @return 返回下载是否成功
+     * 是否支持代理类型
      */
-    fun downloadCacheRepo(
-        cachePath: String,
-        repositoryPath: String,
-        repositoryUrl: String
+    fun support(settings: GitSourceSettings): Boolean
+
+    /**
+     * 读取顺序
+     */
+    fun getOrder(): Int
+
+    /**
+     * 代理名称
+     */
+    fun getName(): String
+
+    /**
+     * 从代理服务拉取代理
+     *
+     * @return 拉取是否成功
+     */
+    fun fetch(
+        settings: GitSourceSettings,
+        git: GitCommandManager
     ): Boolean
 }

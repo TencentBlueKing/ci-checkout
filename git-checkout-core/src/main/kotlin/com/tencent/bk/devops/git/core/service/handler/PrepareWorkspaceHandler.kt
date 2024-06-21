@@ -31,11 +31,10 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_BKREPO_DOWNLOAD_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_BKREPO_DOWNLOAD_RESULT
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_PREPARE_COST_TIME
-import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitDirectoryHelper
-import com.tencent.bk.devops.git.core.service.helper.IBkRepoHelper
+import com.tencent.bk.devops.git.core.service.helper.IGitProxyHelper
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.FileUtils
 import org.slf4j.LoggerFactory
@@ -63,9 +62,7 @@ class PrepareWorkspaceHandler(
     private fun doHandlePrepare() {
         with(settings) {
             val workingDirectory = File(repositoryPath)
-            var isExisting = true
             if (!workingDirectory.exists()) {
-                isExisting = false
                 workingDirectory.mkdirs()
             }
             git.getGitVersion()
@@ -74,40 +71,43 @@ class PrepareWorkspaceHandler(
                 logger.warn("previously build download from cache repository failed,cleaning workspace")
                 FileUtils.deleteRepositoryFile(repositoryPath)
             }
-            // 如果仓库不存在,并且配置了缓存路径,则先从缓存路径下载.git文件
-            if (!File(repositoryPath, ".git").exists() && !cachePath.isNullOrBlank()) {
-                val startEpoch = System.currentTimeMillis()
-                logger.groupStart("download from cache repository: $cachePath")
-                val bkRepoHelper = ServiceLoader.load(IBkRepoHelper::class.java).firstOrNull()
-                if (bkRepoHelper != null) {
-                    isExisting = bkRepoHelper.downloadCacheRepo(
-                        cachePath = cachePath,
-                        repositoryPath = repositoryPath,
-                        repositoryUrl = repositoryUrl
-                    )
-                }
-                val downloadResult = if (isExisting) {
-                    EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.BKREPO_CACHE.name)
-                    "success"
-                } else {
-                    logger.error("download from cache repository failed,cleaning workspace")
-                    FileUtils.deleteRepositoryFile(repositoryPath)
-                    "failed"
-                }
-                logger.info("download from cache repository $downloadResult")
-                EnvHelper.putContext(
-                    CONTEXT_BKREPO_DOWNLOAD_COST_TIME,
-                    (System.currentTimeMillis() - startEpoch).toString()
-                )
-                EnvHelper.putContext(CONTEXT_BKREPO_DOWNLOAD_RESULT, downloadResult)
-                logger.groupEnd("")
-            }
+            // 如果仓库不存在,并且配置了开启缓存加速,则先从缓存库下载
+            downloadCacheRepo()
+
             // Prepare existing directory, otherwise recreate
-            if (isExisting) {
+            if (File(repositoryPath, ".git").exists()) {
                 logger.groupStart("cleaning workspace")
                 GitDirectoryHelper(git = git, settings = settings).prepareExistingDirectory()
                 logger.groupEnd("")
             }
+        }
+    }
+
+    private fun GitSourceSettings.downloadCacheRepo() {
+        if (!File(repositoryPath, ".git").exists()) {
+            val startEpoch = System.currentTimeMillis()
+            val cacheRepoHelpers = ServiceLoader.load(IGitProxyHelper::class.java)
+            val cacheRepoHelper = cacheRepoHelpers.sortedBy { it.getOrder() }.find { it.support(settings) } ?: return
+            val name = cacheRepoHelper.getName()
+            logger.groupStart("Fetching cache from $name")
+            val downloadResult = cacheRepoHelper.fetch(
+                settings = settings,
+                git = git
+            )
+            if (downloadResult) {
+                EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, name)
+                logger.info("Success to download cache from $name")
+                EnvHelper.putContext(CONTEXT_BKREPO_DOWNLOAD_RESULT, "success")
+            } else {
+                logger.error("Failed to download cache repository from $name,cleaning workspace")
+                FileUtils.deleteRepositoryFile(repositoryPath)
+                EnvHelper.putContext(CONTEXT_BKREPO_DOWNLOAD_RESULT, "failed")
+            }
+            EnvHelper.putContext(
+                CONTEXT_BKREPO_DOWNLOAD_COST_TIME,
+                (System.currentTimeMillis() - startEpoch).toString()
+            )
+            logger.groupEnd("")
         }
     }
 }

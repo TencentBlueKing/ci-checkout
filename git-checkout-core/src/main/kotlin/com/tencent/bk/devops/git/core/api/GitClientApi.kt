@@ -83,12 +83,12 @@ class GitClientApi {
             for (url in candidates) {
                 val request = HttpUtil.buildGet(url = url, headers = headers)
                 var response = okHttpClient.newCall(request).execute()
-                if (response.code() == HttpStatus.HTTP_MOVED_PERM.statusCode ||
-                    response.code() == HttpStatus.HTTP_MOVED_TEMP.statusCode
+                if (response.code == HttpStatus.HTTP_MOVED_PERM.statusCode ||
+                    response.code == HttpStatus.HTTP_MOVED_TEMP.statusCode
                 ) {
                     response = redirect(response, headers)
                 }
-                if (response.code() == HttpStatus.OK.statusCode &&
+                if (response.code == HttpStatus.OK.statusCode &&
                     checkBody(response = response)
                 ) {
                     status = HttpStatus.OK.statusCode
@@ -119,7 +119,7 @@ class GitClientApi {
     ): Boolean {
         // 工蜂如果用户名密码是正确的,则状态返回的是200,但是内容是Git repository not found
         return response.use {
-            !response.body()!!.string().contains("Git repository not found")
+            !response.body!!.string().contains("Git repository not found")
         }
     }
 }
