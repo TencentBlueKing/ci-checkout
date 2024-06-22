@@ -126,5 +126,9 @@ data class GitCodeCommandAtomParamInput(
     /**
      * 是否使用工蜂边缘节点加速
      */
-    val enableTGitCache: Boolean? = false
+    val enableTGitCache: Boolean? = false,
+    /**
+     * 工蜂边缘节点url
+     */
+    val tGitCacheUrl: String? = null
 )
