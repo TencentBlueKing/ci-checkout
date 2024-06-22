@@ -174,6 +174,7 @@ class GitSourceProvider(
                 val origin = serverInfo.origin
                 git.tryConfigUnset("http.$origin.proxy")
                 git.tryConfigUnset("http.$origin.sslverify")
+                git.tryConfigUnset("protocol.version")
             }
         }
     }
