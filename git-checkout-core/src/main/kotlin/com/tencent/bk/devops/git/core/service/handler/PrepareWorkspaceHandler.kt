@@ -87,6 +87,7 @@ class PrepareWorkspaceHandler(
         if (!File(repositoryPath, ".git").exists()) {
             val startEpoch = System.currentTimeMillis()
             val cacheRepoHelpers = ServiceLoader.load(IGitProxyHelper::class.java)
+            cacheRepoHelpers.sortedBy { it.getOrder() }.forEach { logger.info(it.getName()) }
             val cacheRepoHelper = cacheRepoHelpers.sortedBy { it.getOrder() }.find { it.support(settings) } ?: return
             val name = cacheRepoHelper.getName()
             logger.groupStart("Fetching cache from $name")
