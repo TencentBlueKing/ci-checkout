@@ -10,6 +10,7 @@ import org.apache.commons.compress.archivers.ArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
 
+@Suppress("NestedBlockDepth")
 object CompressUtil {
 
     /**

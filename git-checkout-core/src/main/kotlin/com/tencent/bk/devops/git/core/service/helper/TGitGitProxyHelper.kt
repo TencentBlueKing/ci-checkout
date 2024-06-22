@@ -90,6 +90,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
         }
     }
 
+    @Suppress("MagicNumber")
     private fun downloadFileToLocal(
         proxyUrl: String,
         repositoryName: String,
