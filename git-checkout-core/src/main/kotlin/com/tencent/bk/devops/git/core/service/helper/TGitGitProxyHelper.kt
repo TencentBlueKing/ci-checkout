@@ -31,7 +31,6 @@ class TGitGitProxyHelper : IGitProxyHelper {
     }
 
     override fun support(settings: GitSourceSettings): Boolean {
-        logger.info("tgit cache:${settings.enableTGitCache}, ${settings.scmType}, ${settings.tGitCacheUrl}")
         // 开启工蜂边缘节点加速,并且是http协议，并且是工蜂域名
         return settings.enableTGitCache == true
                 && GitUtil.isHttpProtocol(settings.repositoryUrl)
