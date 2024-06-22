@@ -25,30 +25,13 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-dependencies {
-    implementation("com.tencent.devops.ci-plugins:java-plugin-sdk:1.1.9") {
-        exclude group:'com.squareup.okhttp3', module:'okhttp'
-        exclude group:'com.fasterxml.jackson.core', module:'jackson-databind'
-    }
-    implementation "com.squareup.okhttp3:okhttp:4.9.0"
-    implementation "org.bouncycastle:bcprov-jdk15on:1.70"
-    implementation "org.apache.commons:commons-exec:1.3"
-    implementation "commons-codec:commons-codec:1.15"
-    implementation "org.apache.commons:commons-lang3:3.12.0"
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.2"
-    implementation "org.apache.commons:commons-compress:1.21"
-    testImplementation "org.mockito.kotlin:mockito-kotlin:4.0.0"
-    testImplementation "org.mockito:mockito-inline:4.0.0"
-    testImplementation "com.nhaarman:mockito-kotlin-kt1.1:1.6.0"
-}
+package com.tencent.bk.devops.git.core.exception
 
-task versionInfo(type: WriteProperties) {
-    outputFile 'src/main/resources/core-version.properties'
-    encoding = "UTF-8"
-    property 'version', version
-    property 'buildNo', System.getenv("BK_CI_BUILD_NO") ?: ""
-    property 'date', new Date().format('yyyy-MM-dd HH:mm:ss')
-}
-processResources.dependsOn versionInfo
+import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.plugin.pojo.ErrorType
 
-apply from: "../task_deploy_to_maven.gradle"
+class CompressException constructor(
+    override val errorType: ErrorType = ErrorType.PLUGIN,
+    override val errorCode: Int = GitConstants.DEFAULT_ERROR,
+    override val errorMsg: String
+) : TaskExecuteException(errorType, errorCode, errorMsg)
