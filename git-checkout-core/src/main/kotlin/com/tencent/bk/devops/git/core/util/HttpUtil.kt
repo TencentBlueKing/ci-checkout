@@ -44,7 +44,7 @@ object HttpUtil {
 
     fun sslSocketFactory(): SSLSocketFactory {
         try {
-            val sslContext = SSLContext.getInstance("TLS")
+            val sslContext = SSLContext.getInstance("SSL")
             sslContext.init(null, trustAllCerts, java.security.SecureRandom())
             return sslContext.socketFactory
         } catch (ignore: Exception) {
