@@ -3,22 +3,18 @@ package com.tencent.bk.devops.git.core.service.helper
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.ScmType
-import com.tencent.bk.devops.git.core.exception.RetryException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.CompressUtil
 import com.tencent.bk.devops.git.core.util.GitUtil
-import org.apache.commons.io.IOUtils
+import com.tencent.bk.devops.git.core.util.HttpUtil
+import okhttp3.Credentials
+import okhttp3.Request
 import org.slf4j.LoggerFactory
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.Base64
 import kotlin.io.path.deleteIfExists
 
 /**
@@ -36,6 +32,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
                 && GitUtil.isHttpProtocol(settings.repositoryUrl)
                 && settings.scmType == ScmType.CODE_GIT
                 && !settings.tGitCacheUrl.isNullOrBlank()
+                && !settings.tGitCacheProxyUrl.isNullOrBlank()
 
     }
 
@@ -50,7 +47,8 @@ class TGitGitProxyHelper : IGitProxyHelper {
     override fun fetch(settings: GitSourceSettings, git: GitCommandManager): Boolean {
         val repositoryPath = settings.repositoryPath
         val repositoryUrl = settings.repositoryUrl
-        val proxyUrl = settings.tGitCacheUrl!!
+        val cacheUrl = settings.tGitCacheUrl!!
+        val cacheProxyUrl = settings.tGitCacheProxyUrl!!
 
         val tarFile = Files.createTempFile(".git_", ".tar")
         val cacheLockFile = Paths.get(repositoryPath, ".git", "cache.lock").toFile()
@@ -63,7 +61,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
             }
             git.init()
             downloadFileToLocal(
-                proxyUrl = proxyUrl,
+                proxyUrl = cacheUrl,
                 repositoryName = repositoryName,
                 authInfo = settings.authInfo,
                 saveFilePath = tarFile.toString()
@@ -76,7 +74,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
             val origin = serverInfo.origin
             // fetch需要使用git protocol v2协议
             git.config("protocol.version", "2")
-            git.config("http.$origin.proxy", proxyUrl)
+            git.config("http.$origin.proxy", cacheProxyUrl)
             git.config("http.$origin.sslverify", "false")
             return true
         } catch (ignore: Throwable) {
@@ -98,41 +96,17 @@ class TGitGitProxyHelper : IGitProxyHelper {
         saveFilePath: String
     ) {
         val startTime = System.currentTimeMillis()
-        return RetryHelper().execute {
-            try {
-                val saveDirFile = File(saveFilePath)
-                if (!saveDirFile.exists()) {
-                    saveDirFile.mkdirs()
-                }
-                val netUrl = URL("$proxyUrl/$repositoryName/git-upload-pack?service=archive")
-                logger.info("tgit cache url:$netUrl")
-                val conn = netUrl.openConnection() as HttpURLConnection
-                conn.requestMethod = "GET"
-                conn.connectTimeout = 5 * 1000
-                conn.readTimeout = 5 * 60 * 1000
-
-                if (!authInfo.username.isNullOrBlank() && !authInfo.password.isNullOrBlank()) {
-                    val username = authInfo.username
-                    val password = authInfo.password
-                    val auth = "$username:$password"
-                    val encodedAuth = Base64.getEncoder().encodeToString(auth.toByteArray())
-                    // 设置用户名和密码
-                    conn.setRequestProperty("Authorization", "Basic $encodedAuth")
-                }
-
-                var length = 0L
-                // 把文件下载到saveFilePath目录下面
-                conn.inputStream.use { inputStream ->
-                    BufferedOutputStream(FileOutputStream(saveFilePath), 8192).use { outputStream ->
-                        length += IOUtils.copy(inputStream, outputStream, 8192)
-                    }
-                }
-                val elapse = (System.currentTimeMillis() - startTime)
-                logger.info("fetch cache file,time:$elapse(ms), size:${length/1024}(KB)")
-            } catch (ignored: Exception) {
-                logger.warn("Failed to download from tgit cache: ${ignored.message}")
-                throw RetryException(errorMsg = ignored.message ?: "Failed to download from tgit cache")
-            }
+        val saveDirFile = File(saveFilePath)
+        val builder = Request.Builder().url("$proxyUrl/$repositoryName/git-upload-pack?service=archive")
+        if (!authInfo.username.isNullOrBlank() && !authInfo.password.isNullOrBlank()) {
+            // 设置用户名和密码
+            builder.header("Authorization", Credentials.basic(authInfo.username, authInfo.password))
         }
+        val request = builder.build()
+        logger.info("tgit cache url:${request.url}")
+        val length = HttpUtil.downloadFile(request, saveDirFile)
+
+        val elapse = (System.currentTimeMillis() - startTime)
+        logger.info("fetch cache file,time:$elapse(ms), size:${length / 1024}(KB)")
     }
 }
