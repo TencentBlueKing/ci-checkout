@@ -9,7 +9,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.RequestBody
+import org.apache.commons.io.IOUtils
 import org.slf4j.LoggerFactory
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.security.cert.CertificateException
 import java.util.concurrent.TimeUnit
 import javax.net.ssl.SSLContext
@@ -37,7 +41,7 @@ object HttpUtil {
 
     fun sslSocketFactory(): SSLSocketFactory {
         try {
-            val sslContext = SSLContext.getInstance("SSL")
+            val sslContext = SSLContext.getInstance("TLS")
             sslContext.init(null, trustAllCerts, java.security.SecureRandom())
             return sslContext.socketFactory
         } catch (ignore: Exception) {
@@ -50,6 +54,14 @@ object HttpUtil {
         .readTimeout(readTimeout, TimeUnit.SECONDS)
         .writeTimeout(writeTimeout, TimeUnit.SECONDS)
         .protocols(listOf(Protocol.HTTP_1_1))
+        .build()
+
+    private val longHttpClient = OkHttpClient.Builder()
+        .connectTimeout(5 * 1000, TimeUnit.SECONDS)
+        .readTimeout(5 * 60 * 1000, TimeUnit.SECONDS)
+        .writeTimeout(5 * 60 * 1000, TimeUnit.SECONDS)
+        .sslSocketFactory(sslSocketFactory(), trustAllCerts[0] as X509TrustManager)
+        .hostnameVerifier { _, _ -> true }
         .build()
 
     fun buildGet(url: String, headers: Map<String, String>? = null): Request {
@@ -66,6 +78,32 @@ object HttpUtil {
             builder.headers(headers.toHeaders())
         }
         return builder
+    }
+
+    @Suppress("MagicNumber")
+    fun downloadFile(request: Request, destPath: File, maxAttempts: Int = 3): Long {
+        return RetryHelper(maxAttempts = maxAttempts).execute {
+            try {
+                var length = 0L
+                longHttpClient.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        logger.warn(
+                            "FAIL|Download file from ${request.url}|message=${response.message}| code=${response.code}"
+                        )
+                        throw RemoteServiceException("Get file fail", response.code, response.message)
+                    }
+                    if (!destPath.parentFile.exists()) destPath.parentFile.mkdirs()
+                    response.body!!.byteStream().use { inputStream ->
+                        BufferedOutputStream(FileOutputStream(destPath), 8192).use { outputStream ->
+                            length += IOUtils.copy(inputStream, outputStream, 8192)
+                        }
+                    }
+                }
+                length
+            } catch (ignore: Exception) {
+                throw ExceptionTranslator.apiExceptionTranslator(ignore)
+            }
+        }
     }
 
     fun retryRequest(request: Request, errorMessage: String, maxAttempts: Int = 3): String {
