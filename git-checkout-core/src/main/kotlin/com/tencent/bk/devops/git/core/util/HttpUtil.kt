@@ -25,6 +25,9 @@ object HttpUtil {
     private const val connectTimeout = 5L
     private const val readTimeout = 30L
     private const val writeTimeout = 30L
+    private const val LONG_CONNECT_TIMEOUT = 5 * 1000L
+    private const val LONG_READ_TIMEOUT = 5 * 60 * 1000L
+    private const val LONG_WRITE_TIMEOUT = 5 * 60 * 1000L
     private val logger = LoggerFactory.getLogger(HttpUtil::class.java)
 
     val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -57,9 +60,9 @@ object HttpUtil {
         .build()
 
     private val longHttpClient = OkHttpClient.Builder()
-        .connectTimeout(5 * 1000, TimeUnit.SECONDS)
-        .readTimeout(5 * 60 * 1000, TimeUnit.SECONDS)
-        .writeTimeout(5 * 60 * 1000, TimeUnit.SECONDS)
+        .connectTimeout(LONG_CONNECT_TIMEOUT, TimeUnit.SECONDS)
+        .readTimeout(LONG_READ_TIMEOUT, TimeUnit.SECONDS)
+        .writeTimeout(LONG_WRITE_TIMEOUT, TimeUnit.SECONDS)
         .sslSocketFactory(sslSocketFactory(), trustAllCerts[0] as X509TrustManager)
         .hostnameVerifier { _, _ -> true }
         .build()
