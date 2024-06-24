@@ -22,9 +22,9 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 object HttpUtil {
-    private const val connectTimeout = 5L
-    private const val readTimeout = 30L
-    private const val writeTimeout = 30L
+    private const val CONNECT_TIMEOUT = 5L
+    private const val READ_TIMEOUT = 30L
+    private const val WRITE_TIMEOUT = 30L
     private const val LONG_CONNECT_TIMEOUT = 5 * 1000L
     private const val LONG_READ_TIMEOUT = 5 * 60 * 1000L
     private const val LONG_WRITE_TIMEOUT = 5 * 60 * 1000L
@@ -53,9 +53,9 @@ object HttpUtil {
     }
 
     private val okHttpClient = OkHttpClient.Builder()
-        .connectTimeout(connectTimeout, TimeUnit.SECONDS)
-        .readTimeout(readTimeout, TimeUnit.SECONDS)
-        .writeTimeout(writeTimeout, TimeUnit.SECONDS)
+        .connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS)
+        .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
+        .writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS)
         .protocols(listOf(Protocol.HTTP_1_1))
         .build()
 
