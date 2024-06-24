@@ -130,5 +130,9 @@ data class GitCodeCommandAtomParamInput(
     /**
      * 工蜂边缘节点url
      */
-    val tGitCacheUrl: String? = null
+    val tGitCacheUrl: String? = null,
+    /**
+     * 工蜂边缘节点 proxy url,给http.proxy使用
+     */
+    val tGitCacheProxyUrl: String? = null
 )

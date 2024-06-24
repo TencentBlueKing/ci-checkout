@@ -189,7 +189,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 useCustomCredential = useCustomCredential,
                 forkRepoAuthInfo = forkRepoAuthInfo,
                 enableTGitCache = enableTGitCache,
-                tGitCacheUrl = tGitCacheUrl
+                tGitCacheUrl = tGitCacheUrl,
+                tGitCacheProxyUrl = tGitCacheProxyUrl
             )
         }
     }

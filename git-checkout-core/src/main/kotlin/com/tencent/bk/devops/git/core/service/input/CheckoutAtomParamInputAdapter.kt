@@ -122,7 +122,8 @@ class CheckoutAtomParamInputAdapter(
             enableGlobalInsteadOf = true,
             useCustomCredential = true,
             enableTGitCache = enableTGitCache,
-            tGitCacheUrl = tGitCacheUrl
+            tGitCacheUrl = tGitCacheUrl,
+            tGitCacheProxyUrl = tGitCacheProxyUrl
         )
     ).getInputs()
 
@@ -185,7 +186,8 @@ class CheckoutAtomParamInputAdapter(
             enableGlobalInsteadOf = true,
             useCustomCredential = true,
             enableTGitCache = enableTGitCache,
-            tGitCacheUrl = tGitCacheUrl
+            tGitCacheUrl = tGitCacheUrl,
+            tGitCacheProxyUrl = tGitCacheProxyUrl
         )
     ).getInputs()
 

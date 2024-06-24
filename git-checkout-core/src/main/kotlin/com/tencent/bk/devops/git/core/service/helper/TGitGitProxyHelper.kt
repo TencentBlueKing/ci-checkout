@@ -32,6 +32,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
                 && GitUtil.isHttpProtocol(settings.repositoryUrl)
                 && settings.scmType == ScmType.CODE_GIT
                 && !settings.tGitCacheUrl.isNullOrBlank()
+                && !settings.tGitCacheProxyUrl.isNullOrBlank()
 
     }
 
@@ -46,7 +47,8 @@ class TGitGitProxyHelper : IGitProxyHelper {
     override fun fetch(settings: GitSourceSettings, git: GitCommandManager): Boolean {
         val repositoryPath = settings.repositoryPath
         val repositoryUrl = settings.repositoryUrl
-        val proxyUrl = settings.tGitCacheUrl!!
+        val cacheUrl = settings.tGitCacheUrl!!
+        val cacheProxyUrl = settings.tGitCacheProxyUrl!!
 
         val tarFile = Files.createTempFile(".git_", ".tar")
         val cacheLockFile = Paths.get(repositoryPath, ".git", "cache.lock").toFile()
@@ -59,7 +61,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
             }
             git.init()
             downloadFileToLocal(
-                proxyUrl = proxyUrl,
+                proxyUrl = cacheUrl,
                 repositoryName = repositoryName,
                 authInfo = settings.authInfo,
                 saveFilePath = tarFile.toString()
@@ -72,7 +74,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
             val origin = serverInfo.origin
             // fetch需要使用git protocol v2协议
             git.config("protocol.version", "2")
-            git.config("http.$origin.proxy", proxyUrl)
+            git.config("http.$origin.proxy", cacheProxyUrl)
             git.config("http.$origin.sslverify", "false")
             return true
         } catch (ignore: Throwable) {
