@@ -97,7 +97,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
     ) {
         val startTime = System.currentTimeMillis()
         val saveDirFile = File(saveFilePath)
-        val builder = Request.Builder().url("$proxyUrl/$repositoryName/git-upload-pack?service=archive")
+        val builder = Request.Builder().url("$proxyUrl/${repositoryName}.git/git-upload-pack?service=archive")
         if (!authInfo.username.isNullOrBlank() && !authInfo.password.isNullOrBlank()) {
             // 设置用户名和密码
             builder.header("Authorization", Credentials.basic(authInfo.username, authInfo.password))
