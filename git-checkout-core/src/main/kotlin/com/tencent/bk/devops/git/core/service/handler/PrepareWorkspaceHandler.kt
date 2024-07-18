@@ -71,9 +71,9 @@ class PrepareWorkspaceHandler(
                 FileUtils.deleteRepositoryFile(repositoryPath)
             }
             if (File(repositoryPath, ".git").exists()) {
-                EnvHelper.putContext(CONTEXT_VM_EXIST_REPO, "true")
+                EnvHelper.putContext(CONTEXT_VM_EXIST_REPO, "1")
             } else {
-                EnvHelper.putContext(CONTEXT_VM_EXIST_REPO, "false")
+                EnvHelper.putContext(CONTEXT_VM_EXIST_REPO, "0")
                 // 如果仓库不存在,并且配置了开启缓存加速,则先从缓存库下载
                 downloadCacheRepo()
             }

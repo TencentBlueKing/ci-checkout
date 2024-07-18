@@ -36,6 +36,6 @@ data class GitMetricsInfo(
     val jobType: String?,
     val channel: String,
     val invalidRef: Int = 0,
-    val vmExistRepo: String,
+    val vmExistRepo: Int = 0,
     val devcloudDataCached: String
 )
