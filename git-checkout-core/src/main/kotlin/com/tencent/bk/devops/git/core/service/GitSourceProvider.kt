@@ -48,6 +48,7 @@ import com.tencent.bk.devops.git.core.service.handler.GitSubmodulesPlaintextHand
 import com.tencent.bk.devops.git.core.service.handler.HandlerExecutionChain
 import com.tencent.bk.devops.git.core.service.handler.InitRepoHandler
 import com.tencent.bk.devops.git.core.service.handler.PrepareWorkspaceHandler
+import com.tencent.bk.devops.git.core.service.helper.GitCacheHelperFactory
 import com.tencent.bk.devops.git.core.service.helper.auth.GitAuthHelperFactory
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -169,6 +170,7 @@ class GitSourceProvider(
                 authHelper.removeAuth()
                 logger.groupEnd("")
             }
+            GitCacheHelperFactory.getCacheHelper(settings)?.unsetConfig(settings = settings, git = git)
         }
     }
 }

@@ -90,14 +90,18 @@ class TGitCacheHelper : IGitCacheHelper {
         val repositoryUrl = settings.repositoryUrl
         val serverInfo = GitUtil.getServerInfo(repositoryUrl)
         val origin = serverInfo.origin
-        // 不直接使用git config 命令,是为了防止卸载不干净,影响下次构建
-        logger.info("##[command]$ git config protocol.version 2")
-        logger.info("##[command]$ http.$origin.proxy $cacheProxyUrl")
-        logger.info("##[command]$ http.$origin.sslverify false")
         // fetch需要使用git protocol v2协议
-        git.setEnvironmentVariable("protocol.version", "2")
-        git.setEnvironmentVariable("http.$origin.proxy", cacheProxyUrl)
-        git.setEnvironmentVariable("http.$origin.sslverify", "false")
+        git.config("protocol.version", "2")
+        git.config("http.$origin.proxy", cacheProxyUrl)
+        git.config("http.$origin.sslverify", "false")
+    }
+
+    override fun unsetConfig(settings: GitSourceSettings, git: GitCommandManager) {
+        val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
+        val origin = serverInfo.origin
+        git.tryConfigUnset("http.$origin.proxy")
+        git.tryConfigUnset("http.$origin.sslverify")
+        git.tryConfigUnset("protocol.version")
     }
 
     @Suppress("MagicNumber")

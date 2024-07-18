@@ -67,5 +67,10 @@ interface IGitCacheHelper {
     fun config(
         settings: GitSourceSettings,
         git: GitCommandManager
-    )
+    )  = Unit
+
+    fun unsetConfig(
+        settings: GitSourceSettings,
+        git: GitCommandManager
+    ) = Unit
 }
