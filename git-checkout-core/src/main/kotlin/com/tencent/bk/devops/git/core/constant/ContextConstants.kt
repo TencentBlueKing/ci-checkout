@@ -26,6 +26,7 @@ object ContextConstants {
     const val CONTEXT_AUTH_COST_TIME = "context_auth_cost_time"
     const val CONTEXT_CACHE_DOWNLOAD_COST_TIME = "context_cache_download_cost_time"
     const val CONTEXT_CACHE_DOWNLOAD_RESULT = "context_cache_download_result"
+    const val CONTEXT_CACHE_SIZE = "context_cache_size"
     const val CONTEXT_TRANSFER_RATE = "context_transfer_rate"
     const val CONTEXT_TOTAL_SIZE = "context_total_size"
     const val CONTEXT_ERROR_INFO = "context_error_info"

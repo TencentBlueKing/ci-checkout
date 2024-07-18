@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_AUTH_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CACHE_DOWNLOAD_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CACHE_DOWNLOAD_RESULT
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CACHE_SIZE
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CHECKOUT_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_ERROR_INFO
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_FETCH_COST_TIME
@@ -167,6 +168,7 @@ class GitCheckoutRunner {
                     status = atomContext.result.status.name,
                     cacheDownloadCostTime = EnvHelper.getContext(CONTEXT_CACHE_DOWNLOAD_COST_TIME)?.toLong() ?: 0L,
                     cacheDownloadResult = EnvHelper.getContext(CONTEXT_CACHE_DOWNLOAD_RESULT) ?: "",
+                    cacheSize = EnvHelper.getContext(CONTEXT_CACHE_SIZE)?.toLong() ?: 0L,
                     transferRate = EnvHelper.getContext(CONTEXT_TRANSFER_RATE)?.toDouble() ?: 0.0,
                     totalSize = EnvHelper.getContext(CONTEXT_TOTAL_SIZE)?.toDouble() ?: 0.0,
                     errorInfo = EnvHelper.getContext(CONTEXT_ERROR_INFO) ?: "",

@@ -1,6 +1,7 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.constant.ContextConstants
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CACHE_SIZE
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.ScmType
@@ -123,6 +124,8 @@ class TGitCacheHelper : IGitCacheHelper {
         val length = HttpUtil.downloadFile(request, saveDirFile)
 
         val elapse = (System.currentTimeMillis() - startTime)
-        logger.info("fetch cache file,time:$elapse(ms), size:${length / 1024}(KB)")
+        val size = length / 1024
+        EnvHelper.putContext(CONTEXT_CACHE_SIZE, size.toString())
+        logger.info("fetch cache file,time:$elapse(ms), size:$size(KB)")
     }
 }

@@ -27,6 +27,7 @@ data class GitMetricsInfo(
     val status: String? = null,
     val cacheDownloadCostTime: Long,
     val cacheDownloadResult: String,
+    val cacheSize: Long,
     val errorInfo: String,
     val transferRate: Double,
     val totalSize: Double,
