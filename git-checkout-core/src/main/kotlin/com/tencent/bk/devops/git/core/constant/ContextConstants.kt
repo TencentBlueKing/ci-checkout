@@ -24,12 +24,15 @@ object ContextConstants {
     const val CONTEXT_CHECKOUT_COST_TIME = "context_checkout_cost_time"
     const val CONTEXT_LOG_COST_TIME = "context_log_cost_time"
     const val CONTEXT_AUTH_COST_TIME = "context_auth_cost_time"
-    const val CONTEXT_BKREPO_DOWNLOAD_COST_TIME = "context_bkrepo_download_cost_time"
-    const val CONTEXT_BKREPO_DOWNLOAD_RESULT = "context_bkrepo_download_result"
+    const val CONTEXT_CACHE_DOWNLOAD_COST_TIME = "context_cache_download_cost_time"
+    const val CONTEXT_CACHE_DOWNLOAD_RESULT = "context_cache_download_result"
+    const val CONTEXT_CACHE_SIZE = "context_cache_size"
     const val CONTEXT_TRANSFER_RATE = "context_transfer_rate"
     const val CONTEXT_TOTAL_SIZE = "context_total_size"
     const val CONTEXT_ERROR_INFO = "context_error_info"
     const val CONTEXT_GIT_VERSION = "context_git_version"
     const val CONTEXT_INVALID_REF = "context_invalid_ref"
     const val CONTEXT_BACKUP_INSTEADOF = "context_backup_insteadOf"
+    // 构建机是否有代码库
+    const val CONTEXT_VM_EXIST_REPO = "context_vm_exist_repo"
 }

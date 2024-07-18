@@ -35,10 +35,10 @@ class TGitGitProxyHelperTest {
         )
     )
     private val git = GitCommandManager(workspace)
-    private val cacheHelper = TGitGitProxyHelper()
+    private val cacheHelper = TGitCacheHelper()
 
     @Test
     fun fetch() {
-        cacheHelper.fetch(settings, git)
+        cacheHelper.download(settings, git)
     }
 }

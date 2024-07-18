@@ -33,7 +33,7 @@ import com.tencent.bk.devops.git.core.service.GitCommandManager
 /**
  * git代理,加速代码下载速度,优先从代理服务下载
  */
-interface IGitProxyHelper {
+interface IGitCacheHelper {
 
     /**
      * 是否支持代理类型
@@ -51,12 +51,26 @@ interface IGitProxyHelper {
     fun getName(): String
 
     /**
-     * 从代理服务拉取代理
+     * 从缓存服务下载代码
      *
      * @return 拉取是否成功
      */
-    fun fetch(
+    fun download(
         settings: GitSourceSettings,
         git: GitCommandManager
     ): Boolean
+
+    /**
+     * 添加缓存配置
+     *
+     */
+    fun config(
+        settings: GitSourceSettings,
+        git: GitCommandManager
+    )  = Unit
+
+    fun unsetConfig(
+        settings: GitSourceSettings,
+        git: GitCommandManager
+    ) = Unit
 }

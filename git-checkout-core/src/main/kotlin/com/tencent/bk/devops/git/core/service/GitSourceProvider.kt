@@ -48,6 +48,7 @@ import com.tencent.bk.devops.git.core.service.handler.GitSubmodulesPlaintextHand
 import com.tencent.bk.devops.git.core.service.handler.HandlerExecutionChain
 import com.tencent.bk.devops.git.core.service.handler.InitRepoHandler
 import com.tencent.bk.devops.git.core.service.handler.PrepareWorkspaceHandler
+import com.tencent.bk.devops.git.core.service.helper.GitCacheHelperFactory
 import com.tencent.bk.devops.git.core.service.helper.auth.GitAuthHelperFactory
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -169,13 +170,7 @@ class GitSourceProvider(
                 authHelper.removeAuth()
                 logger.groupEnd("")
             }
-            if (settings.enableTGitCache == true && GitUtil.isHttpProtocol(settings.repositoryUrl)) {
-                val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
-                val origin = serverInfo.origin
-                git.tryConfigUnset("http.$origin.proxy")
-                git.tryConfigUnset("http.$origin.sslverify")
-                git.tryConfigUnset("protocol.version")
-            }
+            GitCacheHelperFactory.getCacheHelper(settings)?.unsetConfig(settings = settings, git = git)
         }
     }
 }

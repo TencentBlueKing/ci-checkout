@@ -36,8 +36,9 @@ import com.tencent.bk.devops.atom.pojo.MonitorData
 import com.tencent.bk.devops.atom.pojo.StringData
 import com.tencent.bk.devops.git.core.api.DevopsApi
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_AUTH_COST_TIME
-import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_BKREPO_DOWNLOAD_COST_TIME
-import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_BKREPO_DOWNLOAD_RESULT
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CACHE_DOWNLOAD_COST_TIME
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CACHE_DOWNLOAD_RESULT
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CACHE_SIZE
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CHECKOUT_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_ERROR_INFO
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_FETCH_COST_TIME
@@ -53,8 +54,10 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_SUBMODUL
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TOTAL_SIZE
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_USER_ID
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_VM_EXIST_REPO
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
+import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.exception.TaskExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitMetricsInfo
@@ -158,13 +161,14 @@ class GitCheckoutRunner {
                     checkoutCostTime = EnvHelper.getContext(CONTEXT_CHECKOUT_COST_TIME)?.toLong() ?: 0L,
                     logCostTime = EnvHelper.getContext(CONTEXT_LOG_COST_TIME)?.toLong() ?: 0L,
                     authCostTime = EnvHelper.getContext(CONTEXT_AUTH_COST_TIME)?.toLong() ?: 0L,
-                    fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: "",
+                    fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: FetchStrategy.NO_CACHE.name,
                     errorType = atomContext.result.errorType,
                     errorCode = atomContext.result.errorCode,
                     errorMessage = atomContext.result.message,
                     status = atomContext.result.status.name,
-                    bkRepoDownloadCostTime = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_COST_TIME)?.toLong() ?: 0L,
-                    bkRepoDownloadResult = EnvHelper.getContext(CONTEXT_BKREPO_DOWNLOAD_RESULT) ?: "",
+                    cacheDownloadCostTime = EnvHelper.getContext(CONTEXT_CACHE_DOWNLOAD_COST_TIME)?.toLong() ?: 0L,
+                    cacheDownloadResult = EnvHelper.getContext(CONTEXT_CACHE_DOWNLOAD_RESULT) ?: "",
+                    cacheSize = EnvHelper.getContext(CONTEXT_CACHE_SIZE)?.toLong() ?: 0L,
                     transferRate = EnvHelper.getContext(CONTEXT_TRANSFER_RATE)?.toDouble() ?: 0.0,
                     totalSize = EnvHelper.getContext(CONTEXT_TOTAL_SIZE)?.toDouble() ?: 0.0,
                     errorInfo = EnvHelper.getContext(CONTEXT_ERROR_INFO) ?: "",
@@ -173,7 +177,9 @@ class GitCheckoutRunner {
                     osType = AgentEnv.getOS().name,
                     jobType = SdkEnv.getSdkHeader()[Header.AUTH_HEADER_DEVOPS_BUILD_TYPE] ?: "",
                     channel = System.getenv("BK_CI_START_CHANNEL") ?: "",
-                    invalidRef = EnvHelper.getContext(CONTEXT_INVALID_REF)?.toInt() ?: 0
+                    invalidRef = EnvHelper.getContext(CONTEXT_INVALID_REF)?.toInt() ?: 0,
+                    vmExistRepo = EnvHelper.getContext(CONTEXT_VM_EXIST_REPO)?.toInt() ?: 0,
+                    devcloudDataCached = System.getenv("DEVCLOUD_DATA_CACHED") ?: ""
                 )
             }
             ServiceLoader.load(IGitMetricsHelper::class.java).firstOrNull()
