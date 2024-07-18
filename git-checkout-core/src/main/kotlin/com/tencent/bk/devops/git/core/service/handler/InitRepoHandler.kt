@@ -32,13 +32,13 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
-import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.DefaultGitUserConfigHelper
+import com.tencent.bk.devops.git.core.service.helper.GitCacheHelperFactory
 import com.tencent.bk.devops.git.core.service.helper.IGitUserConfigHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -79,7 +79,6 @@ class InitRepoHandler(
 
     private fun GitSourceSettings.initRepository() {
         if (!File(repositoryPath, ".git").exists()) {
-            EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.FULL.name)
             git.init()
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
             // if source repository is fork repo, adding devops-virtual-origin
@@ -88,9 +87,6 @@ class InitRepoHandler(
                 git.remoteAdd(DEVOPS_VIRTUAL_REMOTE_NAME, sourceRepositoryUrl)
             }
         } else {
-            if (EnvHelper.getContext(ContextConstants.CONTEXT_FETCH_STRATEGY) == null) {
-                EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.VM_CACHE.name)
-            }
             git.remoteSetUrl(ORIGIN_REMOTE_NAME, repositoryUrl)
             if (preMerge && !sourceRepoUrlEqualsRepoUrl
             ) {
@@ -123,6 +119,7 @@ class InitRepoHandler(
         if (AgentEnv.getOS() == OSType.WINDOWS) {
             git.config(configKey = "core.longpaths", configValue = "true")
         }
+        GitCacheHelperFactory.getCacheHelper(settings)?.config(settings, git)
     }
 
     private fun GitSourceSettings.initPartialClone() {

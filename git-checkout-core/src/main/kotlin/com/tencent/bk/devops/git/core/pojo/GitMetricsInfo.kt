@@ -25,8 +25,8 @@ data class GitMetricsInfo(
     val errorCode: Int? = null,
     val errorMessage: String? = null,
     val status: String? = null,
-    val bkRepoDownloadCostTime: Long,
-    val bkRepoDownloadResult: String,
+    val cacheDownloadCostTime: Long,
+    val cacheDownloadResult: String,
     val errorInfo: String,
     val transferRate: Double,
     val totalSize: Double,
@@ -35,5 +35,7 @@ data class GitMetricsInfo(
     val osType: String,
     val jobType: String?,
     val channel: String,
-    val invalidRef: Int = 0
+    val invalidRef: Int = 0,
+    val vmExistRepo: String,
+    val devcloudDataCached: String
 )

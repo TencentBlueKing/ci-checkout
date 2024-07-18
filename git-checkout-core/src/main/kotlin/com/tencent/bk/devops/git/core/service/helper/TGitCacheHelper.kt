@@ -1,5 +1,6 @@
 package com.tencent.bk.devops.git.core.service.helper
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.ScmType
@@ -7,6 +8,7 @@ import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.CompressUtil
+import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.bk.devops.git.core.util.HttpUtil
 import okhttp3.Credentials
@@ -20,20 +22,19 @@ import kotlin.io.path.deleteIfExists
 /**
  * 工蜂缓存加速,提高代码拉取速度
  */
-class TGitGitProxyHelper : IGitProxyHelper {
+class TGitCacheHelper : IGitCacheHelper {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(TGitGitProxyHelper::class.java)
+        private val logger = LoggerFactory.getLogger(TGitCacheHelper::class.java)
     }
 
     override fun support(settings: GitSourceSettings): Boolean {
         // 开启工蜂边缘节点加速,并且是http协议，并且是工蜂域名
-        return settings.enableTGitCache == true
-                && GitUtil.isHttpProtocol(settings.repositoryUrl)
-                && settings.scmType == ScmType.CODE_GIT
-                && !settings.tGitCacheUrl.isNullOrBlank()
-                && !settings.tGitCacheProxyUrl.isNullOrBlank()
-
+        return settings.enableTGitCache == true &&
+                GitUtil.isHttpProtocol(settings.repositoryUrl) &&
+                settings.scmType == ScmType.CODE_GIT &&
+                !settings.tGitCacheUrl.isNullOrBlank() &&
+                !settings.tGitCacheProxyUrl.isNullOrBlank()
     }
 
     override fun getName(): String {
@@ -44,11 +45,10 @@ class TGitGitProxyHelper : IGitProxyHelper {
         return FetchStrategy.TGIT_CACHE.ordinal
     }
 
-    override fun fetch(settings: GitSourceSettings, git: GitCommandManager): Boolean {
+    override fun download(settings: GitSourceSettings, git: GitCommandManager): Boolean {
         val repositoryPath = settings.repositoryPath
         val repositoryUrl = settings.repositoryUrl
         val cacheUrl = settings.tGitCacheUrl!!
-        val cacheProxyUrl = settings.tGitCacheProxyUrl!!
 
         val tarFile = Files.createTempFile(".git_", ".tar")
         val cacheLockFile = Paths.get(repositoryPath, ".git", "cache.lock").toFile()
@@ -71,11 +71,7 @@ class TGitGitProxyHelper : IGitProxyHelper {
             logger.info("compress cache file, time:${System.currentTimeMillis() - startTime}(ms)")
 
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
-            val origin = serverInfo.origin
-            // fetch需要使用git protocol v2协议
-            git.config("protocol.version", "2")
-            git.config("http.$origin.proxy", cacheProxyUrl)
-            git.config("http.$origin.sslverify", "false")
+
             return true
         } catch (ignore: Throwable) {
             logger.error("Failed to download from tgit cache:${ignore.message}")
@@ -86,6 +82,22 @@ class TGitGitProxyHelper : IGitProxyHelper {
             }
             tarFile.deleteIfExists()
         }
+    }
+
+    override fun config(settings: GitSourceSettings, git: GitCommandManager) {
+        EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.TGIT_CACHE.name)
+        val cacheProxyUrl = settings.tGitCacheProxyUrl!!
+        val repositoryUrl = settings.repositoryUrl
+        val serverInfo = GitUtil.getServerInfo(repositoryUrl)
+        val origin = serverInfo.origin
+        // 不直接使用git config 命令,是为了防止卸载不干净,影响下次构建
+        logger.info("##[command]$ git config protocol.version 2")
+        logger.info("##[command]$ http.$origin.proxy $cacheProxyUrl")
+        logger.info("##[command]$ http.$origin.sslverify false")
+        // fetch需要使用git protocol v2协议
+        git.setEnvironmentVariable("protocol.version", "2")
+        git.setEnvironmentVariable("http.$origin.proxy", cacheProxyUrl)
+        git.setEnvironmentVariable("http.$origin.sslverify", "false")
     }
 
     @Suppress("MagicNumber")
