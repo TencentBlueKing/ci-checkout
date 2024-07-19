@@ -4,11 +4,14 @@ enum class FetchStrategy {
     // 全量拉取
     FULL,
 
-    // 直连git服务器
-    NO_CACHE,
+    // 构建机缓存
+    VM_CACHE,
 
-    // TGIT缓存
-    TGIT_CACHE,
+    // 全量 + TGIT缓存
+    FULL_TGIT_CACHE,
+
+    // 增量 + TGIT缓存
+    VM_TGIT_CACHE,
 
     // 制品库缓存
     BKREPO_CACHE
