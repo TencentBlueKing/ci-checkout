@@ -57,7 +57,6 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_USER_ID
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_VM_EXIST_REPO
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
-import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.GitProtocolEnum
 import com.tencent.bk.devops.git.core.exception.TaskExecuteException
 import com.tencent.bk.devops.git.core.pojo.GitMetricsInfo
@@ -161,7 +160,7 @@ class GitCheckoutRunner {
                     checkoutCostTime = EnvHelper.getContext(CONTEXT_CHECKOUT_COST_TIME)?.toLong() ?: 0L,
                     logCostTime = EnvHelper.getContext(CONTEXT_LOG_COST_TIME)?.toLong() ?: 0L,
                     authCostTime = EnvHelper.getContext(CONTEXT_AUTH_COST_TIME)?.toLong() ?: 0L,
-                    fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: FetchStrategy.NO_CACHE.name,
+                    fetchStrategy = EnvHelper.getContext(CONTEXT_FETCH_STRATEGY) ?: "",
                     errorType = atomContext.result.errorType,
                     errorCode = atomContext.result.errorCode,
                     errorMessage = atomContext.result.message,

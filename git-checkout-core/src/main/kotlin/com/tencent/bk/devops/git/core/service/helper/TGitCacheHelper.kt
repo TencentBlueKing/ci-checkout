@@ -39,11 +39,11 @@ class TGitCacheHelper : IGitCacheHelper {
     }
 
     override fun getName(): String {
-        return FetchStrategy.TGIT_CACHE.name
+        return "TGIT_CACHE"
     }
 
     override fun getOrder(): Int {
-        return FetchStrategy.TGIT_CACHE.ordinal
+        return 0
     }
 
     override fun download(settings: GitSourceSettings, git: GitCommandManager): Boolean {
@@ -73,6 +73,7 @@ class TGitCacheHelper : IGitCacheHelper {
 
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
 
+            EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.TGIT_CACHE.name)
             return true
         } catch (ignore: Throwable) {
             logger.error("Failed to download from tgit cache:${ignore.message}")
@@ -86,7 +87,6 @@ class TGitCacheHelper : IGitCacheHelper {
     }
 
     override fun config(settings: GitSourceSettings, git: GitCommandManager) {
-        EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.TGIT_CACHE.name)
         val cacheProxyUrl = settings.tGitCacheProxyUrl!!
         val repositoryUrl = settings.repositoryUrl
         val serverInfo = GitUtil.getServerInfo(repositoryUrl)
@@ -95,6 +95,10 @@ class TGitCacheHelper : IGitCacheHelper {
         git.config("protocol.version", "2")
         git.config("http.$origin.proxy", cacheProxyUrl)
         git.config("http.$origin.sslverify", "false")
+        // 如果有构建机缓存,开启了工蜂cache,需要重置VM_TGIT_CACHE
+        if (EnvHelper.getContext(ContextConstants.CONTEXT_FETCH_STRATEGY) == FetchStrategy.VM_CACHE.name) {
+            EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.VM_TGIT_CACHE.name)
+        }
     }
 
     override fun unsetConfig(settings: GitSourceSettings, git: GitCommandManager) {
