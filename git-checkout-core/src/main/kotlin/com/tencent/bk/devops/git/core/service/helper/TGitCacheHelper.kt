@@ -73,7 +73,7 @@ class TGitCacheHelper : IGitCacheHelper {
 
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
 
-            EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.FULL_TGIT_CACHE.name)
+            EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.TGIT_CACHE.name)
             return true
         } catch (ignore: Throwable) {
             logger.error("Failed to download from tgit cache:${ignore.message}")

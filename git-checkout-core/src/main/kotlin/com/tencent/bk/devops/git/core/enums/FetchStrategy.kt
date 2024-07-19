@@ -8,7 +8,7 @@ enum class FetchStrategy {
     VM_CACHE,
 
     // 全量 + TGIT缓存
-    FULL_TGIT_CACHE,
+    TGIT_CACHE,
 
     // 增量 + TGIT缓存
     VM_TGIT_CACHE,
