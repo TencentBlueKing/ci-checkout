@@ -217,7 +217,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
             if (ignored.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
                 val errorMsg = GitErrorsText.get().notExistRepository?.let {
                     defaultResolver.resolveByMap(it, mapOf("repositoryId" to repositoryConfig.getRepositoryId()))
-                } ?: "Repository does not exist or has been deleted"
+                } ?: "Repository does not exist or has been deleted."
                 val reason = GitErrorsText.get().notExistRepositoryCause?.let {
                     defaultResolver.resolveByMap(it, mapOf("repositoryId" to repositoryConfig.getRepositoryId()))
                 } ?: ""
