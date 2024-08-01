@@ -98,7 +98,40 @@ class DevopsApi : IDevopsApi, BaseApi() {
             request = request,
             errorMessage = "Failed to get credentials"
         )
-        return JsonUtil.to(responseContent, object : TypeReference<Result<CredentialInfo>>() {})
+        val result = JsonUtil.to(responseContent, object : TypeReference<Result<CredentialInfo>>() {})
+        if (result.data == null) {
+            val projectId = SdkEnv.getSdkHeader()[AUTH_HEADER_PROJECT_ID]
+            val errorMsg = GitErrorsText.get().notExistCredential?.let {
+                defaultResolver.resolveByMap(it, mapOf(
+                    "credentialId" to credentialId,
+                    "projectId" to projectId))
+            } ?: "Credential does not exist"
+            val reason = GitErrorsText.get().notExistCredentialCause?.let {
+                defaultResolver.resolveByMap(it, mapOf(
+                    "credentialId" to credentialId,
+                    "projectId" to projectId))
+            } ?: ""
+            val solution = GitErrorsText.get().notExistCredentialSolution?.let {
+                defaultResolver.resolveByMap(it, mapOf(
+                    "credentialId" to credentialId,
+                    "projectId" to projectId))
+            } ?: ""
+            val wiki = GitErrorsText.get().notExistCredentialWiki?.let {
+                defaultResolver.resolveByMap(it, mapOf(
+                    "credentialId" to credentialId,
+                    "projectId" to projectId))
+            } ?: ""
+            throw ApiException(
+                errorType = ErrorType.USER,
+                errorCode = GitConstants.CONFIG_ERROR,
+                errorMsg = errorMsg,
+                reason = reason,
+                solution = solution,
+                wiki = wiki,
+                httpStatus = HttpStatus.NOT_FOUND.statusCode
+            )
+        }
+        return result
     }
 
     override fun getOauthToken(userId: String): Result<GitToken> {
@@ -162,21 +195,49 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository> {
         try {
             val path = "/repository/api/build/repositories?" +
-                "repositoryId=${repositoryConfig.getURLEncodeRepositoryId()}&" +
-                "repositoryType=${repositoryConfig.repositoryType.name}"
+                    "repositoryId=${repositoryConfig.getURLEncodeRepositoryId()}&" +
+                    "repositoryType=${repositoryConfig.repositoryType.name}"
             val request = buildGet(path)
             val responseContent = HttpUtil.retryRequest(request, "Failed to get repository information")
-            return JsonUtil.to(responseContent, object : TypeReference<Result<Repository>>() {})
-        } catch (ignore: ApiException) {
-            if (ignore.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
+            val result = JsonUtil.to(responseContent, object : TypeReference<Result<Repository>>() {})
+            return result
+        } catch (ignored: ApiException) {
+            if (ignored.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
+                val projectId = SdkEnv.getSdkHeader()[AUTH_HEADER_PROJECT_ID]
+                val repositoryId = repositoryConfig.getRepositoryId()
+                val errorMsg = GitErrorsText.get().notExistRepository?.let {
+                    defaultResolver.resolveByMap(it, mapOf(
+                        "repositoryId" to repositoryId,
+                        "projectId" to projectId))
+                } ?: "Repository does not exist or has been deleted."
+                val reason = GitErrorsText.get().notExistRepositoryCause?.let {
+                    defaultResolver.resolveByMap(it, mapOf(
+                        "repositoryId" to repositoryId,
+                        "projectId" to projectId))
+                } ?: ""
+                val solution = GitErrorsText.get().notExistRepositorySolution?.let {
+                    defaultResolver.resolveByMap(it, mapOf(
+                        "repositoryId" to repositoryId,
+                        "projectId" to projectId))
+                } ?: ""
+                val wiki = GitErrorsText.get().notExistRepositoryWiki?.let {
+                    defaultResolver.resolveByMap(it, mapOf(
+                        "repositoryId" to repositoryId,
+                        "projectId" to projectId))
+                } ?: ""
+
                 throw ApiException(
-                    errorType = ErrorType.USER,
-                    errorCode = GitConstants.CONFIG_ERROR,
-                    httpStatus = ignore.httpStatus,
-                    errorMsg = "Repository does not exist or has been deleted"
+                    errorType = ignored.errorType,
+                    errorCode = ignored.errorCode,
+                    errorMsg = errorMsg,
+                    reason = reason,
+                    solution = solution,
+                    wiki = wiki,
+                    httpStatus = ignored.httpStatus
                 )
+            } else {
+                throw ignored
             }
-            throw ignore
         }
     }
 

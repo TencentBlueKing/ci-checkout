@@ -138,6 +138,15 @@ class GitErrorsText : TranslationBundle() {
     var notPermissionGetOauthTokenCause: String? = null
     var notPermissionGetOauthTokenSolution: String? = null
     var notPermissionGetOauthTokenWiki: String? = null
+    var notExistCredential: String? = null
+    var notExistCredentialCause: String? = null
+    var notExistCredentialSolution: String? = null
+    var notExistCredentialWiki: String? = null
+    var notExistRepository:String?=null
+    var notExistRepositoryCause: String? = null
+    var notExistRepositorySolution: String? = null
+    var notExistRepositoryWiki: String? = null
+
     companion object {
         fun get(): GitErrorsText {
             return lookupBundle(Locale.SIMPLIFIED_CHINESE, GitErrorsText::class.java)
