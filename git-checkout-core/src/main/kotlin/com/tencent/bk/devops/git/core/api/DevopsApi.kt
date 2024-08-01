@@ -200,14 +200,6 @@ class DevopsApi : IDevopsApi, BaseApi() {
             val request = buildGet(path)
             val responseContent = HttpUtil.retryRequest(request, "Failed to get repository information")
             val result = JsonUtil.to(responseContent, object : TypeReference<Result<Repository>>() {})
-            if (result.data == null) {
-                throw ApiException(
-                    httpStatus = HttpStatus.NOT_FOUND.statusCode,
-                    errorType = ErrorType.USER,
-                    errorCode = GitConstants.CONFIG_ERROR,
-                    errorMsg = "Repository does not exist or has been deleted"
-                )
-            }
             return result
         } catch (ignored: ApiException) {
             if (ignored.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
