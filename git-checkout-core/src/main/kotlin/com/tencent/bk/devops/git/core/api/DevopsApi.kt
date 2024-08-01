@@ -94,48 +94,44 @@ class DevopsApi : IDevopsApi, BaseApi() {
     override fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo> {
         val path = "/ticket/api/build/credentials/$credentialId?publicKey=${encode(publicKey)}"
         val request = buildGet(path)
-        try {
-            val responseContent = HttpUtil.retryRequest(
-                request = request,
-                errorMessage = "Failed to get credentials"
+        val responseContent = HttpUtil.retryRequest(
+            request = request,
+            errorMessage = "Failed to get credentials"
+        )
+        val result = JsonUtil.to(responseContent, object : TypeReference<Result<CredentialInfo>>() {})
+        if (result.data == null) {
+            val projectId = SdkEnv.getSdkHeader()[AUTH_HEADER_PROJECT_ID]
+            val errorMsg = GitErrorsText.get().notExistCredential?.let {
+                defaultResolver.resolveByMap(it, mapOf(
+                    "credentialId" to credentialId,
+                    "projectId" to projectId))
+            } ?: "Credential does not exist"
+            val reason = GitErrorsText.get().notExistCredentialCause?.let {
+                defaultResolver.resolveByMap(it, mapOf(
+                    "credentialId" to credentialId,
+                    "projectId" to projectId))
+            } ?: ""
+            val solution = GitErrorsText.get().notExistCredentialSolution?.let {
+                defaultResolver.resolveByMap(it, mapOf(
+                    "credentialId" to credentialId,
+                    "projectId" to projectId))
+            } ?: ""
+            val wiki = GitErrorsText.get().notExistCredentialWiki?.let {
+                defaultResolver.resolveByMap(it, mapOf(
+                    "credentialId" to credentialId,
+                    "projectId" to projectId))
+            } ?: ""
+            throw ApiException(
+                errorType = ErrorType.USER,
+                errorCode = GitConstants.CONFIG_ERROR,
+                errorMsg = errorMsg,
+                reason = reason,
+                solution = solution,
+                wiki = wiki,
+                httpStatus = HttpStatus.NOT_FOUND.statusCode
             )
-            val result = JsonUtil.to(responseContent, object : TypeReference<Result<CredentialInfo>>() {})
-            if (result.data == null) {
-                throw ApiException(
-                    httpStatus = HttpStatus.NOT_FOUND.statusCode,
-                    errorType = ErrorType.USER,
-                    errorCode = GitConstants.CONFIG_ERROR,
-                    errorMsg = "Credential does not exist"
-                )
-            }
-            return result
-        } catch (ignored: ApiException) {
-            if (ignored.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
-                val errorMsg = GitErrorsText.get().notExistCredential?.let {
-                    defaultResolver.resolveByMap(it, mapOf("credentialId" to credentialId))
-                } ?: "Credential does not exist"
-                val reason = GitErrorsText.get().notExistCredentialCause?.let {
-                    defaultResolver.resolveByMap(it, mapOf("credentialId" to credentialId))
-                } ?: ""
-                val solution = GitErrorsText.get().notExistCredentialSolution?.let {
-                    defaultResolver.resolveByMap(it, mapOf("credentialId" to credentialId))
-                } ?: ""
-                val wiki = GitErrorsText.get().notExistCredentialWiki?.let {
-                    defaultResolver.resolveByMap(it, mapOf("credentialId" to credentialId))
-                } ?: ""
-                throw ApiException(
-                    errorType = ignored.errorType,
-                    errorCode = ignored.errorCode,
-                    errorMsg = errorMsg,
-                    reason = reason,
-                    solution = solution,
-                    wiki = wiki,
-                    httpStatus = ignored.httpStatus
-                )
-            } else {
-                throw ignored
-            }
         }
+        return result
     }
 
     override fun getOauthToken(userId: String): Result<GitToken> {
@@ -215,17 +211,27 @@ class DevopsApi : IDevopsApi, BaseApi() {
             return result
         } catch (ignored: ApiException) {
             if (ignored.httpStatus == HttpStatus.NOT_FOUND.statusCode) {
+                val projectId = SdkEnv.getSdkHeader()[AUTH_HEADER_PROJECT_ID]
+                val repositoryId = repositoryConfig.getRepositoryId()
                 val errorMsg = GitErrorsText.get().notExistRepository?.let {
-                    defaultResolver.resolveByMap(it, mapOf("repositoryId" to repositoryConfig.getRepositoryId()))
+                    defaultResolver.resolveByMap(it, mapOf(
+                        "repositoryId" to repositoryId,
+                        "projectId" to projectId))
                 } ?: "Repository does not exist or has been deleted."
                 val reason = GitErrorsText.get().notExistRepositoryCause?.let {
-                    defaultResolver.resolveByMap(it, mapOf("repositoryId" to repositoryConfig.getRepositoryId()))
+                    defaultResolver.resolveByMap(it, mapOf(
+                        "repositoryId" to repositoryId,
+                        "projectId" to projectId))
                 } ?: ""
                 val solution = GitErrorsText.get().notExistRepositorySolution?.let {
-                    defaultResolver.resolveByMap(it, mapOf("repositoryId" to repositoryConfig.getRepositoryId()))
+                    defaultResolver.resolveByMap(it, mapOf(
+                        "repositoryId" to repositoryId,
+                        "projectId" to projectId))
                 } ?: ""
                 val wiki = GitErrorsText.get().notExistRepositoryWiki?.let {
-                    defaultResolver.resolveByMap(it, mapOf("repositoryId" to repositoryConfig.getRepositoryId()))
+                    defaultResolver.resolveByMap(it, mapOf(
+                        "repositoryId" to repositoryId,
+                        "projectId" to projectId))
                 } ?: ""
 
                 throw ApiException(
