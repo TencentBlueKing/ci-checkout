@@ -44,8 +44,10 @@ import com.tencent.bk.devops.git.core.service.helper.IGitUserConfigHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
+import org.apache.commons.io.FileUtils
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.File.separator
 import java.util.ServiceLoader
 
 class InitRepoHandler(
@@ -82,6 +84,8 @@ class InitRepoHandler(
         if (!File(repositoryPath, ".git").exists()) {
             EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.FULL.name)
             git.init()
+            // 设置安全目录
+            setSafeDir()
             git.remoteAdd(ORIGIN_REMOTE_NAME, repositoryUrl)
             // if source repository is fork repo, adding devops-virtual-origin
             if (preMerge && !sourceRepoUrlEqualsRepoUrl
@@ -144,6 +148,33 @@ class InitRepoHandler(
                 git.config(
                     configKey = "remote.$DEVOPS_VIRTUAL_REMOTE_NAME.partialclonefilter",
                     configValue = FilterValueEnum.TREELESS.value
+                )
+            }
+        }
+    }
+
+    private fun GitSourceSettings.setSafeDir() {
+        if (setSafeDirectory == true) {
+            val safeDirs = git.tryConfigGetAll(configKey = "safe.directory", configScope = GitConfigScope.GLOBAL)
+            // 补充斜杠
+            val repoDir = git.workingDirectory.canonicalPath.apply {
+                if (!this.endsWith(separator)) {
+                    "$this$separator"
+                }
+            }
+            val noExistsConfig = safeDirs.filter { it.isNotBlank() }.find {
+                val canonicalPath = FileUtils.getFile(it).canonicalPath.apply {
+                    if (!it.endsWith(separator)) {
+                        "$it$separator"
+                    }
+                }
+                it == repoDir || repoDir.startsWith(canonicalPath)
+            }.isNullOrBlank()
+            if (noExistsConfig) {
+                git.configAdd(
+                    "safe.directory",
+                    repoDir,
+                    GitConfigScope.GLOBAL
                 )
             }
         }

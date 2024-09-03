@@ -123,5 +123,9 @@ data class GitCodeAtomParamInput(
     /**
      * 工蜂边缘节点 proxy url,给http.proxy使用
      */
-    val tGitCacheProxyUrl: String? = null
+    val tGitCacheProxyUrl: String? = null,
+    /**
+     * 是否设置安全目录
+     */
+    val setSafeDirectory: Boolean? = true
 )

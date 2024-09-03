@@ -123,7 +123,8 @@ class CheckoutAtomParamInputAdapter(
             useCustomCredential = true,
             enableTGitCache = enableTGitCache,
             tGitCacheUrl = tGitCacheUrl,
-            tGitCacheProxyUrl = tGitCacheProxyUrl
+            tGitCacheProxyUrl = tGitCacheProxyUrl,
+            setSafeDirectory = setSafeDirectory
         )
     ).getInputs()
 
@@ -187,7 +188,8 @@ class CheckoutAtomParamInputAdapter(
             useCustomCredential = true,
             enableTGitCache = enableTGitCache,
             tGitCacheUrl = tGitCacheUrl,
-            tGitCacheProxyUrl = tGitCacheProxyUrl
+            tGitCacheProxyUrl = tGitCacheProxyUrl,
+            setSafeDirectory = setSafeDirectory
         )
     ).getInputs()
 
