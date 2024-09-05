@@ -40,6 +40,5 @@ data class PipelineBuildMaterial(
     val newCommitComment: String?,
     val commitTimes: Int?,
     val scmType: ScmType?,
-    val mainRepo: Boolean? = false,
-    val createTime: Long? = System.currentTimeMillis() / 1000
+    val mainRepo: Boolean? = false
 )
