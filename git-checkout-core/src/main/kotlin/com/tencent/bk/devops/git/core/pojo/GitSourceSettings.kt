@@ -221,7 +221,11 @@ data class GitSourceSettings(
     /**
      * 工蜂边缘节点 proxy url,给http.proxy使用,可以不需要schema
      */
-    val tGitCacheProxyUrl: String? = null
+    val tGitCacheProxyUrl: String? = null,
+    /**
+     * 是否为源材料主仓库
+     */
+    val mainRepo: Boolean? = false
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(
