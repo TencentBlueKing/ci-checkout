@@ -34,6 +34,7 @@ import com.tencent.bk.devops.atom.api.SdkEnv
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_HASH_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.HttpStatus
+import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.PermissionForbiddenException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
@@ -50,7 +51,9 @@ import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.default
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.pojo.Result
 import com.tencent.bk.devops.plugin.utils.JsonUtil
+import okhttp3.HttpUrl
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.slf4j.LoggerFactory
 
 class DevopsApi : IDevopsApi, BaseApi() {
 
@@ -251,5 +254,29 @@ class DevopsApi : IDevopsApi, BaseApi() {
             maxAttempts = 1
         )
         return JsonUtil.to(responseContent, object : TypeReference<Result<Boolean>>() {})
+    }
+
+    override fun getGitOauthUrl(userId: String): Result<String> {
+        return getOauthUrl("/repository/api/build/oauth/git/oauthUrl?userId=$userId")
+    }
+
+    override fun getGithubOauthUrl(userId: String): Result<String> {
+        return getOauthUrl("/repository/api/build/oauth/github/oauthUrl?userId=$userId")
+    }
+
+    private fun getOauthUrl(url: String): Result<String> {
+        val result = Result("")
+        val responseContent = try {
+            HttpUtil.retryRequest(buildGet(url), "Failed to get oauth url")
+        } catch (ignored: Exception) {
+            logger.debug("Failed to get oauth url")
+            return result
+        }
+        val oauthUrl = JsonUtil.to(responseContent, object : TypeReference<Result<String>>() {})
+        return if (!oauthUrl.data.isNullOrBlank()) oauthUrl else result
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(DevopsApi::class.java)
     }
 }
