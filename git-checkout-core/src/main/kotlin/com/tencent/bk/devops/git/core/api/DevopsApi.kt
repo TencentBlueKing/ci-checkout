@@ -34,7 +34,6 @@ import com.tencent.bk.devops.atom.api.SdkEnv
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_HASH_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.HttpStatus
-import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.PermissionForbiddenException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
@@ -51,10 +50,10 @@ import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.default
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.pojo.Result
 import com.tencent.bk.devops.plugin.utils.JsonUtil
-import okhttp3.HttpUrl
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
 
+@SuppressWarnings("TooManyFunctions")
 class DevopsApi : IDevopsApi, BaseApi() {
 
     override fun addCommit(commits: List<CommitData>): Result<Int> {
