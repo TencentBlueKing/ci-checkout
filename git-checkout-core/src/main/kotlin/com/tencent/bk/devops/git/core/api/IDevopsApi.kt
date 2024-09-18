@@ -27,7 +27,6 @@
 
 package com.tencent.bk.devops.git.core.api
 
-import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
 import com.tencent.bk.devops.git.core.pojo.api.GitToken
