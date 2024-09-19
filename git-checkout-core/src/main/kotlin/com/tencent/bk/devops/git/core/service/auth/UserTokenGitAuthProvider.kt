@@ -69,7 +69,7 @@ class UserTokenGitAuthProvider(
                     content = GitErrorsText.get().emptyAccessToken ?: "access token is empty",
                     valueMap = mapOf(
                         "userId" to userId,
-                        "oauthUrl" to oauthUrl
+                        "oauthUrl" to oauthUrl.data
                     )
                 )
             )
@@ -87,7 +87,7 @@ class UserTokenGitAuthProvider(
                     content = GitErrorsText.get().emptyAccessToken ?: "access token is empty",
                     valueMap = mapOf(
                         "userId" to userId,
-                        "oauthUrl" to oauthUrl
+                        "oauthUrl" to oauthUrl.data
                     )
                 )
             )
