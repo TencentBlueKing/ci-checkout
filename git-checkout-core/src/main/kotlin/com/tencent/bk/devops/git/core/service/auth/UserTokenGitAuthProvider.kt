@@ -94,10 +94,18 @@ class UserTokenGitAuthProvider(
                 defaultResolver.resolveByMap(
                     content = GitErrorsText.get().emptyAccessToken ?: "access token is empty",
                     valueMap = mapOf(
-                        "userId" to userId,
-                        "oauthUrl" to oauthUrl.data
+                        "userId" to userId
                     )
-                )
+                ),
+                solution = GitErrorsText.get().emptyAccessTokenSolution?.let {
+                    defaultResolver.resolveByMap(
+                        it,
+                        mapOf(
+                            "userId" to userId,
+                            "oauthUrl" to oauthUrl.data
+                        )
+                    )
+                } ?: ""
             )
         }
         return result.data!!.accessToken
