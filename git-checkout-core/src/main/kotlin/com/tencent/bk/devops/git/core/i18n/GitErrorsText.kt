@@ -118,6 +118,7 @@ class GitErrorsText : TranslationBundle() {
     var branchOrPathNameConflictsSolution: String? = null
     var branchOrPathNameConflictsWiki: String? = null
     var emptyAccessToken: String? = null
+    var emptyAccessTokenSolution: String? = null
     var libcurlNotSupportHttps: String? = null
     var libcurlNotSupportHttpsCause: String? = null
     var libcurlNotSupportHttpsSolution: String? = null
