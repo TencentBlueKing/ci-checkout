@@ -79,8 +79,8 @@ class UserTokenGitAuthProvider(
 
     private fun getGithubOauthToken(userId: String): String {
         val result = devopsApi.getGithubOauthToken(userId = userId)
-        val oauthUrl = devopsApi.getGithubOauthUrl(userId)
         if (result.isNotOk() || result.data == null) {
+            val oauthUrl = devopsApi.getGithubOauthUrl(userId)
             throw ApiException(
                 errorMsg =
                 defaultResolver.resolveByMap(

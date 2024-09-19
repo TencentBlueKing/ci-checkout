@@ -145,13 +145,6 @@ class DevopsApi : IDevopsApi, BaseApi() {
                 errorMessage = "Failed to get oauth token information"
             )
             val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
-            if (result.data == null) {
-                throw ApiException(
-                    errorType = ErrorType.USER,
-                    errorCode = GitConstants.CONFIG_ERROR,
-                    errorMsg = "User [$userId] has no oauth authorization"
-                )
-            }
             return result
         } catch (ignored: PermissionForbiddenException) {
             val projectId = SdkEnv.getSdkHeader()[AUTH_HEADER_PROJECT_ID]
@@ -184,13 +177,6 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val request = buildGet(path)
         val responseContent = HttpUtil.retryRequest(request, "Failed to get oauth token information")
         val result = JsonUtil.to(responseContent, object : TypeReference<Result<GithubToken>>() {})
-        if (result.data == null) {
-            throw ApiException(
-                errorType = ErrorType.USER,
-                errorCode = GitConstants.CONFIG_ERROR,
-                errorMsg = "User [$userId] has no oauth authorization"
-            )
-        }
         return result
     }
 
