@@ -257,10 +257,16 @@ class GitCodeCommandAtomParamInputAdapter(
      * 获取fork仓库授权信息
      * 1.post阶段不获取
      * 2.非git、github代码库不获取，后续支持tgit
+     * 3.不是fork仓库的，源仓库和目标仓库是同一个仓库
      */
     private fun getForkRepoAuthInfo() = with(input) {
         if (postEntryParam == "True" ||
-            !listOf(ScmType.CODE_GIT, ScmType.GITHUB).contains(scmType)
+            !listOf(ScmType.CODE_GIT, ScmType.GITHUB).contains(scmType) ||
+            GitUtil.isSameRepository(
+                repositoryUrl = repositoryUrl,
+                otherRepositoryUrl = hookTargetUrl,
+                hostNameList = hostNameList
+            )
         ) {
             null
         } else {
