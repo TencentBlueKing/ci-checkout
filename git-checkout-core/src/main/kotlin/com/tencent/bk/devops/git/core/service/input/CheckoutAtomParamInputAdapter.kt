@@ -192,7 +192,7 @@ class CheckoutAtomParamInputAdapter(
         )
     ).getInputs()
 
-    @Suppress("CyclomaticComplexMethod")
+    @Suppress("CyclomaticComplexMethod", "ComplexMethod")
     private fun handleSelfParam() {
         val startType = System.getenv(BK_CI_START_TYPE)
         when (startType) {
