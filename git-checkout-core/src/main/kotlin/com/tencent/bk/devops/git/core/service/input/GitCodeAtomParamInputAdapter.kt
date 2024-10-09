@@ -277,7 +277,8 @@ class GitCodeAtomParamInputAdapter(
                 forkRepoAuthInfo = forkRepoAuthInfo,
                 enableTGitCache = enableTGitCache,
                 tGitCacheUrl = tGitCacheUrl,
-                tGitCacheProxyUrl = tGitCacheProxyUrl
+                tGitCacheProxyUrl = tGitCacheProxyUrl,
+                setSafeDirectory = setSafeDirectory
             )
         }
     }
