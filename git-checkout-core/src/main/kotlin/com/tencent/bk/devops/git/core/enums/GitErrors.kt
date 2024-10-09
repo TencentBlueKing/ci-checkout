@@ -121,7 +121,8 @@ enum class GitErrors(
                 "(error: RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
                 "(fatal: 协议错误：坏的包头)|" +
                 "(fatal: protocol error: bad pack header)|" +
-                "(fatal: 远程错误：(.+) unavailable)"
+                "(fatal: 远程错误：(.+) unavailable)|" +
+                "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         cause = GitErrorsText.get().remoteServerFailedCause,
@@ -336,7 +337,8 @@ enum class GitErrors(
             "(Another git process seems to be running in this repository, e.g.)|" +
                 "(error: could not lock config file (.+): File exists)|" +
                 "(error: could not lock config file .+: 文件已存在)|" +
-                "(fatal: 无法创建 '(.+)'：文件已存在。)"
+                "(fatal: 无法创建 '(.+)'：文件已存在。)|" +
+                "(error: 无法创建 '(.+)'：文件已存在。)"
         ),
         title = GitErrorsText.get().lockFileAlreadyExists,
         cause = GitErrorsText.get().lockFileAlreadyExistsCause,

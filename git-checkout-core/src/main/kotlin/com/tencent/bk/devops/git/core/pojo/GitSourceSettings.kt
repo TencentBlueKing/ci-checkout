@@ -223,6 +223,10 @@ data class GitSourceSettings(
      */
     val tGitCacheProxyUrl: String? = null,
     /**
+     * 是否设置安全目录
+     */
+    val setSafeDirectory: Boolean? = true,
+    /**
      * 是否为源材料主仓库
      */
     val mainRepo: Boolean? = false

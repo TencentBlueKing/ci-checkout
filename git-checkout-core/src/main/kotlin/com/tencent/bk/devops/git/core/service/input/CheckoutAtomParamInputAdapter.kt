@@ -124,6 +124,7 @@ class CheckoutAtomParamInputAdapter(
             enableTGitCache = enableTGitCache,
             tGitCacheUrl = tGitCacheUrl,
             tGitCacheProxyUrl = tGitCacheProxyUrl,
+            setSafeDirectory = setSafeDirectory,
             mainRepo = mainRepo
         )
     ).getInputs()
@@ -189,6 +190,7 @@ class CheckoutAtomParamInputAdapter(
             enableTGitCache = enableTGitCache,
             tGitCacheUrl = tGitCacheUrl,
             tGitCacheProxyUrl = tGitCacheProxyUrl,
+            setSafeDirectory = setSafeDirectory,
             mainRepo = mainRepo
         )
     ).getInputs()
