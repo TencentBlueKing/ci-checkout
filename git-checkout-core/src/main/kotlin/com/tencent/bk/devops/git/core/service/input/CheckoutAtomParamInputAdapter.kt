@@ -30,6 +30,7 @@ package com.tencent.bk.devops.git.core.service.input
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_SOURCE_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_TARGET_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GITHUB_WEBHOOK_CREATE_REF_TYPE
@@ -193,6 +194,7 @@ class CheckoutAtomParamInputAdapter(
         )
     ).getInputs()
 
+    @Suppress("CyclomaticComplexMethod", "ComplexMethod")
     private fun handleSelfParam() {
         val startType = System.getenv(BK_CI_START_TYPE)
         when (startType) {
@@ -219,7 +221,11 @@ class CheckoutAtomParamInputAdapter(
                     CodeEventType.MERGE_REQUEST.name, CodeEventType.MERGE_REQUEST_ACCEPT.name,
                     CodeEventType.PULL_REQUEST.name -> {
                         input.pullType = PullType.BRANCH.name
-                        System.getenv(BK_CI_HOOK_TARGET_BRANCH) ?: "master"
+                        if (input.enableVirtualMergeBranch) {
+                            System.getenv(BK_CI_HOOK_TARGET_BRANCH) ?: "master"
+                        } else {
+                            System.getenv(BK_CI_HOOK_SOURCE_BRANCH)
+                        }
                     }
 
                     CodeEventType.TAG_PUSH.name -> {
