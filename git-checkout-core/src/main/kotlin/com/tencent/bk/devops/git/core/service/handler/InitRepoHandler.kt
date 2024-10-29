@@ -162,6 +162,10 @@ class InitRepoHandler(
                     "$this$separator"
                 }
             }
+            // 设置了全路径则直接跳过
+            if (safeDirs.contains("*") || safeDirs.contains("**")) {
+                return
+            }
             val noExistsConfig = safeDirs.filter { it.isNotBlank() }.find {
                 val canonicalPath = FileUtils.getFile(it).canonicalPath.apply {
                     if (!it.endsWith(separator)) {
