@@ -51,7 +51,9 @@ import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.pojo.Result
 import com.tencent.bk.devops.plugin.utils.JsonUtil
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.slf4j.LoggerFactory
 
+@SuppressWarnings("TooManyFunctions")
 class DevopsApi : IDevopsApi, BaseApi() {
 
     override fun addCommit(commits: List<CommitData>): Result<Int> {
@@ -143,13 +145,6 @@ class DevopsApi : IDevopsApi, BaseApi() {
                 errorMessage = "Failed to get oauth token information"
             )
             val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
-            if (result.data == null) {
-                throw ApiException(
-                    errorType = ErrorType.USER,
-                    errorCode = GitConstants.CONFIG_ERROR,
-                    errorMsg = "User [$userId] has no oauth authorization"
-                )
-            }
             return result
         } catch (ignored: PermissionForbiddenException) {
             val projectId = SdkEnv.getSdkHeader()[AUTH_HEADER_PROJECT_ID]
@@ -182,13 +177,6 @@ class DevopsApi : IDevopsApi, BaseApi() {
         val request = buildGet(path)
         val responseContent = HttpUtil.retryRequest(request, "Failed to get oauth token information")
         val result = JsonUtil.to(responseContent, object : TypeReference<Result<GithubToken>>() {})
-        if (result.data == null) {
-            throw ApiException(
-                errorType = ErrorType.USER,
-                errorCode = GitConstants.CONFIG_ERROR,
-                errorMsg = "User [$userId] has no oauth authorization"
-            )
-        }
         return result
     }
 
@@ -251,5 +239,29 @@ class DevopsApi : IDevopsApi, BaseApi() {
             maxAttempts = 1
         )
         return JsonUtil.to(responseContent, object : TypeReference<Result<Boolean>>() {})
+    }
+
+    override fun getGitOauthUrl(userId: String): Result<String> {
+        return getOauthUrl("/repository/api/build/oauth/git/oauthUrl?userId=$userId")
+    }
+
+    override fun getGithubOauthUrl(userId: String): Result<String> {
+        return getOauthUrl("/repository/api/build/oauth/github/oauthUrl?userId=$userId")
+    }
+
+    private fun getOauthUrl(url: String): Result<String> {
+        val result = Result("")
+        val responseContent = try {
+            HttpUtil.retryRequest(buildGet(url), "Failed to get oauth url")
+        } catch (ignored: Exception) {
+            logger.debug("Failed to get oauth url")
+            return result
+        }
+        val oauthUrl = JsonUtil.to(responseContent, object : TypeReference<Result<String>>() {})
+        return if (!oauthUrl.data.isNullOrBlank()) oauthUrl else result
+    }
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(DevopsApi::class.java)
     }
 }

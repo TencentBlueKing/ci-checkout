@@ -57,4 +57,8 @@ interface IDevopsApi {
     fun getRepository(repositoryConfig: RepositoryConfig): Result<Repository>
 
     fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean>
+
+    fun getGitOauthUrl(userId: String): Result<String>
+
+    fun getGithubOauthUrl(userId: String): Result<String>
 }
