@@ -89,7 +89,7 @@ class PrepareWorkspaceHandler(
 
     private fun GitSourceSettings.downloadCacheRepo() {
         val startEpoch = System.currentTimeMillis()
-        val cacheRepoHelper = GitCacheHelperFactory.getCacheHelper(settings) ?: return
+        val cacheRepoHelper = GitCacheHelperFactory.getCacheHelper(settings, git) ?: return
         val name = cacheRepoHelper.getName()
         logger.groupStart("download cache from $name")
         val downloadResult = cacheRepoHelper.download(

@@ -117,7 +117,8 @@ class GitDirectoryHelper(
             File(repositoryPath, ".git/index.lock"),
             File(repositoryPath, ".git/shallow.lock"),
             File(repositoryPath, ".git/config.lock"),
-            File(repositoryPath, ".git/packed-refs.lock")
+            File(repositoryPath, ".git/packed-refs.lock"),
+            File(repositoryPath, ".git/packed-refs.new")
         )
         lockFiles.addAll(findRefLockFile(File(repositoryPath, ".git/refs")))
         lockFiles.addAll(findRefLockFile(File(repositoryPath, ".git/modules")))

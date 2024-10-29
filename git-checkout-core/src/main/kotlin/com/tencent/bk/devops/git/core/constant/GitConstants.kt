@@ -182,6 +182,14 @@ object GitConstants {
         VersionHelper.computeVersionFromBits(2, 15, 0, 0)
     val SUPPORT_XDG_CONFIG_HOME_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 7, 12, 0)
     val SUPPORT_SET_UPSTREAM_TO_GIT_VERSION = VersionHelper.computeVersionFromBits(1, 8, 0, 0)
+    // 支持协议版本2.0
+    val SUPPORT_PROTOCOL_2_0_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 18, 0, 0)
 
     const val USER_NEED_PROJECT_X_PERMISSION = 2115025
+
+    const val TGIT_CACHE_GRAY_WHITE_PROJECT = "TGIT_CACHE_GRAY_WHITE_PROJECT"
+
+    const val TGIT_CACHE_GRAY_PROJECT = "TGIT_CACHE_GRAY_PROJECT"
+
+    const val TGIT_CACHE_GRAY_WEIGHT = "TGIT_CACHE_GRAY_WEIGHT"
 }
