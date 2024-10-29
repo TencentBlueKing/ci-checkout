@@ -212,11 +212,13 @@ object GitUtil {
     ): Boolean {
         val gitProjectName = getServerInfo(url = repositoryUrl).repositoryName
         val hash = (gitProjectName.hashCode() and Int.MAX_VALUE) % 100
-        return when {
+        val cacheStrategy = when {
             tGitCacheGrayWhiteProject?.split(",")?.contains(gitProjectName) ?: false -> false
             tGitCacheGrayProject?.split(",")?.contains(gitProjectName) ?: false -> true
             hash <= (tGitCacheGrayWeight?.toInt() ?: -1) -> true
             else -> false
         }
+        logger.debug("enable cache by strategy: $cacheStrategy")
+        return cacheStrategy
     }
 }
