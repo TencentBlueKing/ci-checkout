@@ -170,7 +170,7 @@ class GitSourceProvider(
                 authHelper.removeAuth()
                 logger.groupEnd("")
             }
-            GitCacheHelperFactory.getCacheHelper(settings)?.unsetConfig(settings = settings, git = git)
+            GitCacheHelperFactory.getCacheHelper(settings, git)?.unsetConfig(settings = settings, git = git)
         }
     }
 }

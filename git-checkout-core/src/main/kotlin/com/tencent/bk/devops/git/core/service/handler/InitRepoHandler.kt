@@ -128,7 +128,7 @@ class InitRepoHandler(
         if (AgentEnv.getOS() == OSType.WINDOWS) {
             git.config(configKey = "core.longpaths", configValue = "true")
         }
-        GitCacheHelperFactory.getCacheHelper(settings)?.config(settings, git)
+        GitCacheHelperFactory.getCacheHelper(settings, git)?.config(settings, git)
     }
 
     private fun GitSourceSettings.initPartialClone() {

@@ -31,12 +31,12 @@ class TGitCacheHelper : IGitCacheHelper {
         private val logger = LoggerFactory.getLogger(TGitCacheHelper::class.java)
     }
 
-    override fun support(settings: GitSourceSettings): Boolean {
-        // 支持协议2.0
-        val supportProtocol2 =
-            isAtLeastVersion(settings.gitVersion ?: 0L, GitConstants.SUPPORT_PROTOCOL_2_0_GIT_VERSION)
+    override fun support(
+        settings: GitSourceSettings,
+        git: GitCommandManager
+    ): Boolean {
         // 开启工蜂边缘节点加速,并且是http协议，并且是工蜂域名
-        return supportProtocol2 &&
+        return git.isAtLeastVersion(GitConstants.SUPPORT_PROTOCOL_2_0_GIT_VERSION) &&
                 settings.enableTGitCache == true &&
                 GitUtil.isHttpProtocol(settings.repositoryUrl) &&
                 settings.scmType == ScmType.CODE_GIT &&

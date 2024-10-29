@@ -38,7 +38,10 @@ interface IGitCacheHelper {
     /**
      * 是否支持代理类型
      */
-    fun support(settings: GitSourceSettings): Boolean
+    fun support(
+        settings: GitSourceSettings,
+        git: GitCommandManager
+    ): Boolean
 
     /**
      * 读取顺序
