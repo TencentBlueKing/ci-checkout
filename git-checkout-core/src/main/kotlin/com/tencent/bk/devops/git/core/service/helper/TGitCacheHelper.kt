@@ -2,12 +2,14 @@ package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CACHE_SIZE
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.service.helper.VersionHelper.isAtLeastVersion
 import com.tencent.bk.devops.git.core.util.CompressUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -30,8 +32,12 @@ class TGitCacheHelper : IGitCacheHelper {
     }
 
     override fun support(settings: GitSourceSettings): Boolean {
+        // 支持协议2.0
+        val supportProtocol2 =
+            isAtLeastVersion(settings.gitVersion ?: 0L, GitConstants.SUPPORT_PROTOCOL_2_0_GIT_VERSION)
         // 开启工蜂边缘节点加速,并且是http协议，并且是工蜂域名
-        return settings.enableTGitCache == true &&
+        return supportProtocol2 &&
+                settings.enableTGitCache == true &&
                 GitUtil.isHttpProtocol(settings.repositoryUrl) &&
                 settings.scmType == ScmType.CODE_GIT &&
                 !settings.tGitCacheUrl.isNullOrBlank() &&

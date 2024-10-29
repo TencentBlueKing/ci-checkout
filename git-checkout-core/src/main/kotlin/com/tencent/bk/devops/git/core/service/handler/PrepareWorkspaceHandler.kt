@@ -35,6 +35,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitCacheHelperFactory
 import com.tencent.bk.devops.git.core.service.helper.GitDirectoryHelper
+import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.FileUtils
 import org.slf4j.LoggerFactory
@@ -64,7 +65,8 @@ class PrepareWorkspaceHandler(
             if (!workingDirectory.exists()) {
                 workingDirectory.mkdirs()
             }
-            git.getGitVersion()
+            val gitVersion = git.getGitVersion()
+            settings.gitVersion = VersionHelper.computeGitVersion(gitVersion)
             // 如果缓存锁存在,说明上次构建下载缓存没有成功,需要先清理工作空间
             if (File(repositoryPath, ".git/cache.lock").exists()) {
                 logger.warn("previously build download from cache repository failed,cleaning workspace")

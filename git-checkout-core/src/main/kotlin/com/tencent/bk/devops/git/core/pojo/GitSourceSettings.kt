@@ -41,6 +41,7 @@ data class GitSourceSettings(
     val pipelineBuildId: String,
     val pipelineStartUserName: String,
     val postEntryParam: String? = "false",
+    var gitVersion: Long? = 0L,
 
     val scmType: ScmType,
     /***
