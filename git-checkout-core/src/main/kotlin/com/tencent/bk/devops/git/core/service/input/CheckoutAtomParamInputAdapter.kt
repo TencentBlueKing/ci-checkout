@@ -69,6 +69,7 @@ class CheckoutAtomParamInputAdapter(
         }
     }
 
+    @Suppress("ALL")
     private fun CheckoutAtomParamInput.byRepositoryIdOrName() = GitCodeAtomParamInputAdapter(
         GitCodeAtomParamInput(
             bkWorkspace = bkWorkspace,
@@ -126,7 +127,10 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheUrl = tGitCacheUrl,
             tGitCacheProxyUrl = tGitCacheProxyUrl,
             setSafeDirectory = setSafeDirectory,
-            mainRepo = mainRepo
+            mainRepo = mainRepo,
+            tGitCacheGrayWeight = tGitCacheGrayWeight,
+            tGitCacheGrayProject = tGitCacheGrayProject,
+            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
         )
     ).getInputs()
 
@@ -192,7 +196,10 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheUrl = tGitCacheUrl,
             tGitCacheProxyUrl = tGitCacheProxyUrl,
             setSafeDirectory = setSafeDirectory,
-            mainRepo = mainRepo
+            mainRepo = mainRepo,
+            tGitCacheGrayWeight = tGitCacheGrayWeight,
+            tGitCacheGrayProject = tGitCacheGrayProject,
+            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
         )
     ).getInputs()
 
