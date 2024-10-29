@@ -203,4 +203,20 @@ object GitUtil {
             false
         }
     }
+
+    fun enableCacheByStrategy(
+        repositoryUrl: String,
+        tGitCacheGrayWhiteProject: String?,
+        tGitCacheGrayProject: String?,
+        tGitCacheGrayWeight: String?
+    ): Boolean {
+        val gitProjectName = getServerInfo(url = repositoryUrl).repositoryName
+        val hash = (gitProjectName.hashCode() and Int.MAX_VALUE) % 100
+        return when {
+            tGitCacheGrayWhiteProject?.split(",")?.contains(gitProjectName) ?: false -> false
+            tGitCacheGrayProject?.split(",")?.contains(gitProjectName) ?: false -> true
+            hash <= (tGitCacheGrayWeight?.toInt() ?: -1) -> true
+            else -> false
+        }
+    }
 }

@@ -125,7 +125,10 @@ class CheckoutAtomParamInputAdapter(
             enableTGitCache = enableTGitCache,
             tGitCacheUrl = tGitCacheUrl,
             tGitCacheProxyUrl = tGitCacheProxyUrl,
-            setSafeDirectory = setSafeDirectory
+            setSafeDirectory = setSafeDirectory,
+            tGitCacheGrayWeight = tGitCacheGrayWeight,
+            tGitCacheGrayProject = tGitCacheGrayProject,
+            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
         )
     ).getInputs()
 
@@ -190,7 +193,10 @@ class CheckoutAtomParamInputAdapter(
             enableTGitCache = enableTGitCache,
             tGitCacheUrl = tGitCacheUrl,
             tGitCacheProxyUrl = tGitCacheProxyUrl,
-            setSafeDirectory = setSafeDirectory
+            setSafeDirectory = setSafeDirectory,
+            tGitCacheGrayWeight = tGitCacheGrayWeight,
+            tGitCacheGrayProject = tGitCacheGrayProject,
+            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
         )
     ).getInputs()
 

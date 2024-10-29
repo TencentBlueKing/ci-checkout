@@ -127,5 +127,21 @@ data class GitCodeAtomParamInput(
     /**
      * 是否设置安全目录
      */
-    val setSafeDirectory: Boolean? = true
+    val setSafeDirectory: Boolean? = true,
+    /**
+     * 是否为源材料主仓库
+     */
+    val mainRepo: Boolean? = false,
+    /**
+     * 工蜂cache灰度项目
+     */
+    val tGitCacheGrayProject: String?,
+    /**
+     * 工蜂cache灰度白名单项目
+     */
+    val tGitCacheGrayWhiteProject: String?,
+    /**
+     * 工蜂cache灰度权重
+     */
+    val tGitCacheGrayWeight: String?
 )
