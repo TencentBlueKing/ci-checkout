@@ -245,7 +245,8 @@ class GitLogHelper(
                     newCommitId = commitMaterial.newCommitId ?: commitMaterial.lastCommitId,
                     newCommitComment = commitMaterial.newCommitComment,
                     commitTimes = commitMaterial.commitTimes,
-                    scmType = commitMaterial.scmType
+                    scmType = commitMaterial.scmType,
+                    mainRepo = settings.mainRepo
                 )
             )
         )
