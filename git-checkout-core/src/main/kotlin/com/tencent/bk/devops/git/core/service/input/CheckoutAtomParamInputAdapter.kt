@@ -69,6 +69,7 @@ class CheckoutAtomParamInputAdapter(
         }
     }
 
+    @Suppress("ALL")
     private fun CheckoutAtomParamInput.byRepositoryIdOrName() = GitCodeAtomParamInputAdapter(
         GitCodeAtomParamInput(
             bkWorkspace = bkWorkspace,
