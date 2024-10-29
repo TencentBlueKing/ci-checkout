@@ -126,6 +126,7 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheUrl = tGitCacheUrl,
             tGitCacheProxyUrl = tGitCacheProxyUrl,
             setSafeDirectory = setSafeDirectory,
+            mainRepo = mainRepo,
             tGitCacheGrayWeight = tGitCacheGrayWeight,
             tGitCacheGrayProject = tGitCacheGrayProject,
             tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
@@ -194,6 +195,7 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheUrl = tGitCacheUrl,
             tGitCacheProxyUrl = tGitCacheProxyUrl,
             setSafeDirectory = setSafeDirectory,
+            mainRepo = mainRepo,
             tGitCacheGrayWeight = tGitCacheGrayWeight,
             tGitCacheGrayProject = tGitCacheGrayProject,
             tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject

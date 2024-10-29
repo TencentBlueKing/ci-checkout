@@ -146,6 +146,10 @@ data class CheckoutAtomParamInput(
      */
     val setSafeDirectory: Boolean? = true,
     /**
+     * 是否为源材料主仓库
+     */
+    val mainRepo: Boolean? = false,
+    /**
      * 工蜂cache灰度项目
      */
     val tGitCacheGrayProject: String?,

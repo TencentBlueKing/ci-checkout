@@ -62,12 +62,24 @@ class UserTokenGitAuthProvider(
     private fun getGitOauthToken(userId: String): String {
         val result = devopsApi.getOauthToken(userId = userId)
         if (result.isNotOk() || result.data == null) {
+            val oauthUrl = devopsApi.getGitOauthUrl(userId)
             throw ApiException(
                 errorMsg =
                 defaultResolver.resolveByMap(
                     content = GitErrorsText.get().emptyAccessToken ?: "access token is empty",
-                    valueMap = EnvHelper.getContextMap()
-                )
+                    valueMap = mapOf(
+                        "userId" to userId
+                    )
+                ),
+                solution = GitErrorsText.get().emptyAccessTokenSolution?.let {
+                    defaultResolver.resolveByMap(
+                        it,
+                        mapOf(
+                            "userId" to userId,
+                            "oauthUrl" to oauthUrl.data
+                        )
+                    )
+                } ?: ""
             )
         }
         return result.data!!.accessToken
@@ -76,12 +88,24 @@ class UserTokenGitAuthProvider(
     private fun getGithubOauthToken(userId: String): String {
         val result = devopsApi.getGithubOauthToken(userId = userId)
         if (result.isNotOk() || result.data == null) {
+            val oauthUrl = devopsApi.getGithubOauthUrl(userId)
             throw ApiException(
                 errorMsg =
                 defaultResolver.resolveByMap(
                     content = GitErrorsText.get().emptyAccessToken ?: "access token is empty",
-                    valueMap = EnvHelper.getContextMap()
-                )
+                    valueMap = mapOf(
+                        "userId" to userId
+                    )
+                ),
+                solution = GitErrorsText.get().emptyAccessTokenSolution?.let {
+                    defaultResolver.resolveByMap(
+                        it,
+                        mapOf(
+                            "userId" to userId,
+                            "oauthUrl" to oauthUrl.data
+                        )
+                    )
+                } ?: ""
             )
         }
         return result.data!!.accessToken

@@ -225,7 +225,11 @@ data class GitSourceSettings(
     /**
      * 是否设置安全目录
      */
-    val setSafeDirectory: Boolean? = true
+    val setSafeDirectory: Boolean? = true,
+    /**
+     * 是否为源材料主仓库
+     */
+    val mainRepo: Boolean? = false
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(
