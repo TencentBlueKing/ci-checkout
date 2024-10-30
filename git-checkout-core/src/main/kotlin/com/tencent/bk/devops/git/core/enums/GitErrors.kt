@@ -338,7 +338,8 @@ enum class GitErrors(
                 "(error: could not lock config file (.+): File exists)|" +
                 "(error: could not lock config file .+: 文件已存在)|" +
                 "(fatal: 无法创建 '(.+)'：文件已存在。)|" +
-                "(error: 无法创建 '(.+)'：文件已存在。)"
+                "(error: 无法创建 '(.+)'：文件已存在。)|" +
+                "(错误：无法创建 '(.+)'：文件已存在。)|"
         ),
         title = GitErrorsText.get().lockFileAlreadyExists,
         cause = GitErrorsText.get().lockFileAlreadyExistsCause,
