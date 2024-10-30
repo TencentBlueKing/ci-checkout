@@ -53,7 +53,6 @@ import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.service.repository.GitScmService
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
-import com.tencent.bk.devops.git.core.util.GitUtil.enableCacheByStrategy
 import com.tencent.bk.devops.git.core.util.RegexUtil
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -189,16 +188,14 @@ class GitCodeCommandAtomParamInputAdapter(
                 enableGlobalInsteadOf = enableGlobalInsteadOf,
                 useCustomCredential = useCustomCredential,
                 forkRepoAuthInfo = forkRepoAuthInfo,
-                enableTGitCache = (enableTGitCache ?: false) || enableCacheByStrategy(
-                    repositoryUrl = repositoryUrl,
-                    tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
-                    tGitCacheGrayProject = tGitCacheGrayProject,
-                    tGitCacheGrayWeight = tGitCacheGrayWeight
-                ),
+                enableTGitCache = (enableTGitCache ?: false),
                 tGitCacheUrl = tGitCacheUrl,
                 tGitCacheProxyUrl = tGitCacheProxyUrl,
                 setSafeDirectory = setSafeDirectory,
-                mainRepo = mainRepo
+                mainRepo = mainRepo,
+                tGitCacheGrayProject = tGitCacheGrayProject,
+                tGitCacheGrayWeight = tGitCacheGrayWeight,
+                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
             )
         }
     }
