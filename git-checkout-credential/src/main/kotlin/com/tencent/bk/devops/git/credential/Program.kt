@@ -160,7 +160,9 @@ class Program(
             }
             if (!taskId.isNullOrBlank()) {
                 // 卸载主库凭证
-                credentialStore.delete(getTaskUri(targetUri))
+                compatibleHttpTaskUri(getTaskUri(targetUri)) {
+                    credentialStore.delete(it)
+                }
                 // 存在fork库凭证，卸载fork库凭证
                 if (!forkProtocol.isNullOrBlank() && !forkHost.isNullOrBlank()) {
                     credentialStore.delete(getTaskUri(forkTargetUri, "$taskId-fork"))
@@ -225,9 +227,7 @@ class Program(
     private fun compatibleHttpTaskUri(uri: URI, action: (URI) -> Unit) {
         action.invoke(uri)
         val otherScheme = if (uri.scheme == "https") "http" else "https"
-        if (uri.scheme == "http") {
-            val httpUri = URI(otherScheme, uri.userInfo, uri.host, uri.port, uri.path, uri.query, uri.fragment)
-            action.invoke(httpUri)
-        }
+        val httpUri = URI(otherScheme, uri.userInfo, uri.host, uri.port, uri.path, uri.query, uri.fragment)
+        action.invoke(httpUri)
     }
 }
