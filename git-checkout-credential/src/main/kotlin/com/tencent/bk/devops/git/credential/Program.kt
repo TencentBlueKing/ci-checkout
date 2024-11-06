@@ -92,9 +92,7 @@ class Program(
             // 如果拉仓库2的身份没有仓库1的权限，那么bash就会报错,因为凭证会被拉代码2插件给覆盖
             if (!taskId.isNullOrBlank()) {
                 // 同时保存http/https两种凭证
-                compatibleHttpTaskUri(
-                    uri = getTaskUri(targetUri)
-                ) {
+                compatibleTask(getTaskUri(targetUri)) {
                     credentialStore.add(
                         it,
                         Credential(username, password)
@@ -160,7 +158,7 @@ class Program(
             }
             if (!taskId.isNullOrBlank()) {
                 // 卸载主库凭证
-                compatibleHttpTaskUri(getTaskUri(targetUri)) {
+                compatibleTask(getTaskUri(targetUri)) {
                     credentialStore.delete(it)
                 }
                 // 存在fork库凭证，卸载fork库凭证
@@ -224,10 +222,11 @@ class Program(
         )
     }
 
-    private fun compatibleHttpTaskUri(uri: URI, action: (URI) -> Unit) {
-        action.invoke(uri)
-        val otherScheme = if (uri.scheme == "https") "http" else "https"
-        val httpUri = URI(otherScheme, uri.userInfo, uri.host, uri.port, uri.path, uri.query, uri.fragment)
-        action.invoke(httpUri)
+    //  服务端可能会有302跳转，将http转换成https，所以task也应该兼容https和http
+    private fun compatibleTask(taskUri: URI, action: (URI) -> Unit) {
+        listOf("https", "http")
+            .forEach protocol@{ cProtocol ->
+                action.invoke(URI("$cProtocol://${taskUri.host}/"))
+            }
     }
 }
