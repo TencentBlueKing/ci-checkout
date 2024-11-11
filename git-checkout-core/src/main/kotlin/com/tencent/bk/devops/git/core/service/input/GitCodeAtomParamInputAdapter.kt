@@ -51,9 +51,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_URLS
 import com.tencent.bk.devops.git.core.constant.GitConstants.PARAM_SEPARATOR
-import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_ALIASNAME
-import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_BRANCHNAME
-import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_URL
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
@@ -156,13 +153,6 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_CODE_PATH, localPath ?: "")
             EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_BRANCH, branchName)
-
-            EnvHelper.addEnvVariable("$PIPELINE_MATERIAL_URL.${repositoryConfig.getRepositoryId()}", repository.url)
-            EnvHelper.addEnvVariable("$PIPELINE_MATERIAL_BRANCHNAME.${repositoryConfig.getRepositoryId()}", ref)
-            EnvHelper.addEnvVariable(
-                key = "$PIPELINE_MATERIAL_ALIASNAME.${repositoryConfig.getRepositoryId()}",
-                value = repository.aliasName
-            )
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_INCLUDE_PATH, input.includePath ?: "")
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_EXCLUDE_PATH, input.excludePath ?: "")
 

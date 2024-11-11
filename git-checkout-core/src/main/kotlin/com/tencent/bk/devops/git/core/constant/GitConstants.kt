@@ -41,6 +41,7 @@ object GitConstants {
 
     // system
     const val BK_CI_BUILD_ID = "BK_CI_BUILD_ID"
+    const val BK_CI_PROJECT_ID = "BK_CI_PROJECT_ID"
     const val BK_CI_BUILD_JOB_ID = "BK_CI_BUILD_JOB_ID"
     const val BK_CI_PIPELINE_ID = "BK_CI_PIPELINE_ID"
     const val BK_CI_ATOM_CODE = "BK_CI_ATOM_CODE"
@@ -153,13 +154,6 @@ object GitConstants {
     const val BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT = "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT"
     const val BK_REPO_GIT_WEBHOOK_PUSH_BEFORE_COMMIT = "BK_REPO_GIT_WEBHOOK_PUSH_BEFORE_COMMIT"
     const val BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT = "BK_REPO_GIT_WEBHOOK_PUSH_AFTER_COMMIT"
-
-    const val PIPELINE_MATERIAL_URL = "pipeline.material.url"
-    const val PIPELINE_MATERIAL_BRANCHNAME = "pipeline.material.branchName"
-    const val PIPELINE_MATERIAL_ALIASNAME = "pipeline.material.aliasName"
-    const val PIPELINE_MATERIAL_NEW_COMMIT_ID = "pipeline.material.new.commit.id"
-    const val PIPELINE_MATERIAL_NEW_COMMIT_COMMENT = "pipeline.material.new.commit.comment"
-    const val PIPELINE_MATERIAL_NEW_COMMIT_TIMES = "pipeline.material.new.commit.times"
 
     const val GIT_LOG_FORMAT = "%H|%cn|%ct|%cd|%an|%s"
     const val GIT_LOG_MAX_COUNT = 50

@@ -92,7 +92,6 @@ class GitLogHelper(
         saveBuildMaterial(commitMaterial = commitMaterial)
         EnvHelper.addLogEnv(
             projectName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName,
-            repositoryConfig = repositoryConfig,
             commitMaterial = commitMaterial
         )
     }
