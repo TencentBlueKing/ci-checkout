@@ -123,7 +123,8 @@ enum class GitErrors(
                 "(fatal: protocol error: bad pack header)|" +
                 "(fatal: 远程错误：(.+) unavailable)|" +
                 "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)|" +
-                "(fatal: remote error: too many request, your request was forbidden)"
+                "(fatal: remote error: (.*)too many request, your request was forbidden(.*))|" +
+                "(fatal: 远程错误: (.*)too many request, your request was forbidden(.*))"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         cause = GitErrorsText.get().remoteServerFailedCause,

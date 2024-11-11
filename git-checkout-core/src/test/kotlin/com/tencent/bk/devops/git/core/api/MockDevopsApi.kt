@@ -73,4 +73,12 @@ class MockDevopsApi : IDevopsApi {
     override fun reportAtomMetrics(atomCode: String, data: String): Result<Boolean> {
         return Result(true)
     }
+
+    override fun getGitOauthUrl(userId: String): Result<String> {
+        return Result("true")
+    }
+
+    override fun getGithubOauthUrl(userId: String): Result<String> {
+        return Result("true")
+    }
 }

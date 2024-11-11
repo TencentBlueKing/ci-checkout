@@ -80,6 +80,22 @@ class GitErrorsTest {
             "fatal: early EOF"
         )
         Assert.assertEquals(gitError, GitErrors.RemoteServerFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: remote error: too many request, your request was forbidden, strategy id is: [666]"
+        )
+        Assert.assertEquals(gitError, GitErrors.RemoteServerFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: 远程错误: too many request, your request was forbidden, strategy id is: [6644]"
+        )
+        Assert.assertEquals(gitError, GitErrors.RemoteServerFailed)
+
+        gitError = GitErrors.matchError(
+            "fatal: 远程错误: https://github/repo_group/repo_name.git: too many request, " +
+                    "your request was forbidden, strategy id is: [6644]"
+        )
+        Assert.assertEquals(gitError, GitErrors.RemoteServerFailed)
     }
 
     @Test
