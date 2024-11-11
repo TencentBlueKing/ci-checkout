@@ -37,7 +37,7 @@ class TGitCacheHelper : IGitCacheHelper {
     ): Boolean {
         // 开启工蜂边缘节点加速,并且是http协议，并且是工蜂域名
         return git.isAtLeastVersion(GitConstants.SUPPORT_PROTOCOL_2_0_GIT_VERSION) &&
-                settings.enableTGitCache == true &&
+                (settings.enableTGitCache == true || settings.enableCacheByStrategy) &&
                 GitUtil.isHttpProtocol(settings.repositoryUrl) &&
                 settings.scmType == ScmType.CODE_GIT &&
                 !settings.tGitCacheUrl.isNullOrBlank() &&
