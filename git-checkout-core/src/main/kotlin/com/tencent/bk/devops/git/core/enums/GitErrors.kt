@@ -124,7 +124,9 @@ enum class GitErrors(
                 "(fatal: 远程错误：(.+) unavailable)|" +
                 "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)|" +
                 "(fatal: remote error: (.*)too many request, your request was forbidden(.*))|" +
-                "(fatal: 远程错误: (.*)too many request, your request was forbidden(.*))"
+                "(fatal: 远程错误：(.*)too many request, your request was forbidden(.*))|" +
+                "(致命错误: remote error: (.*)too many request, your request was forbidden(.*))|"+
+                "(致命错误：远程错误：(.*)too many request, your request was forbidden(.*))"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         cause = GitErrorsText.get().remoteServerFailedCause,
