@@ -240,9 +240,12 @@ class RefHelper(
             return null
         }
         // PAC 版本发布后，MR_ACC事件改为MR事件，动作为merge
+        // -- MR_ACC 事件拉取合并提交点
+        // -- PR 和 MR 事件，当动作为merge时拉取提交点
         return when {
             gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name ||
-                    (gitHookEventType == CodeEventType.MERGE_REQUEST.name &&
+                    ((gitHookEventType == CodeEventType.MERGE_REQUEST.name ||
+                            gitHookEventType == CodeEventType.PULL_REQUEST.name) &&
                             TGitMrAction.parse(mergeAction) == TGitMrAction.MERGE) -> mrMergeCommitSha
 
             gitHookEventType == CodeEventType.PUSH.name -> hookRevision
