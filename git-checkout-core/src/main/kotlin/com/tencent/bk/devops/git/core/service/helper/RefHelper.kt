@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_MR_ACTION
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_WEBHOOK_REPO_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_BRANCH
@@ -40,6 +41,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CI_MR_ACTION
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullType
+import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.enums.TGitMrAction
 import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -215,7 +217,11 @@ class RefHelper(
         val hookRepoUrl = System.getenv(BK_CI_REPO_WEBHOOK_REPO_URL)
         val hookRevision = System.getenv(BK_CI_HOOK_REVISION)
         val mrMergeCommitSha = System.getenv(BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA)
-        val mergeAction = System.getenv(GIT_CI_MR_ACTION)
+        // 兼容stream数据，github pr动作类型存的[BK_CI_REPO_GIT_WEBHOOK_MR_ACTION]变量
+        val mergeAction = when (settings.scmType) {
+            ScmType.GITHUB -> System.getenv(BK_CI_REPO_GIT_WEBHOOK_MR_ACTION)
+            else -> System.getenv(GIT_CI_MR_ACTION)
+        }
         /*
          切换到提交点，需要满足
          1. 是git事件触发
