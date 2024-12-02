@@ -42,6 +42,7 @@ object GitConstants {
     // system
     const val BK_CI_BUILD_ID = "BK_CI_BUILD_ID"
     const val BK_CI_PROJECT_ID = "BK_CI_PROJECT_ID"
+    const val BK_CI_PROJECT_NAME = "BK_CI_PROJECT_NAME"
     const val BK_CI_BUILD_JOB_ID = "BK_CI_BUILD_JOB_ID"
     const val BK_CI_PIPELINE_ID = "BK_CI_PIPELINE_ID"
     const val BK_CI_ATOM_CODE = "BK_CI_ATOM_CODE"
@@ -50,6 +51,7 @@ object GitConstants {
     const val BK_CI_HOOK_REVISION = "BK_CI_HOOK_REVISION"
     const val BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE = "BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE"
     const val BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA = "BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA"
+    const val GIT_CI_MR_ACTION = "GIT_CI_MR_ACTION"
     const val JOB_POOL = "JOB_POOL"
     const val BUILD_TYPE = "build.type"
 

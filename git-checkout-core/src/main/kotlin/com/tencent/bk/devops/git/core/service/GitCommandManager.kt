@@ -32,7 +32,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITO
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
-import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PROJECT_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PROJECT_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.GCM_INTERACTIVE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRESS
@@ -93,7 +93,7 @@ class GitCommandManager(
     fun getGitVersion(): String {
         val version = execGit(args = listOf("--version")).stdOut
         gitVersion = VersionHelper.computeGitVersion(version)
-        val projectId = System.getenv(BK_CI_PROJECT_ID)
+        val projectId = System.getenv(BK_CI_PROJECT_NAME)
         val pipelineId = System.getenv(BK_CI_PIPELINE_ID)
         val buildId = System.getenv(BK_CI_BUILD_ID)
         setEnvironmentVariable(
