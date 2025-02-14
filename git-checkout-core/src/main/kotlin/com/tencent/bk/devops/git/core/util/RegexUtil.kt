@@ -27,12 +27,9 @@
 
 package com.tencent.bk.devops.git.core.util
 
-import com.tencent.bk.devops.git.core.enums.GitRemoteRef
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.GitLsRemoteInfo
 import com.tencent.bk.devops.git.core.pojo.GitPackingPhase
-import com.tencent.bk.devops.git.core.service.GitCommandManager
-import java.io.File
 import java.util.regex.Pattern
 
 object RegexUtil {
