@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOT
 import com.tencent.bk.devops.git.core.constant.GitConstants.FETCH_HEAD
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.enums.CodeEventType
+import com.tencent.bk.devops.git.core.enums.GitRemoteRef
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -183,7 +184,21 @@ class RefHelper(
                     if (!RegexUtil.checkSha(ref)) {
                         EnvHelper.putContext(ContextConstants.CONTEXT_INVALID_REF, "1")
                     }
-                    CheckoutInfo(ref = ref, startPoint = "")
+                    val refBranchName = git.lsRemote(
+                        refType = GitRemoteRef.BRANCH,
+                        remoteName = ORIGIN_REMOTE_NAME,
+                        ref = ref.replaceFirst("$ORIGIN_REMOTE_NAME/", "")
+                    )?.refName?.replaceFirst("refs/heads/", "")
+                    if (!refBranchName.isNullOrBlank()) {
+                        // ref参数为分支
+                        CheckoutInfo(
+                            ref = ref,
+                            startPoint = "refs/remotes/$ORIGIN_REMOTE_NAME/$refBranchName",
+                            upstream = ""
+                        )
+                    } else {
+                        CheckoutInfo(ref = ref, startPoint = "")
+                    }
                 }
             }
         }

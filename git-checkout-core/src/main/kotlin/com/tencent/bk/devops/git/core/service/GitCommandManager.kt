@@ -45,10 +45,12 @@ import com.tencent.bk.devops.git.core.enums.CredentialActionEnum
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitErrors
+import com.tencent.bk.devops.git.core.enums.GitRemoteRef
 import com.tencent.bk.devops.git.core.enums.OSType
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.CredentialArguments
+import com.tencent.bk.devops.git.core.pojo.GitLsRemoteInfo
 import com.tencent.bk.devops.git.core.pojo.GitOutput
 import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
@@ -764,5 +766,30 @@ class GitCommandManager(
      */
     fun lfsVersion() {
         execGit(args = listOf("lfs", "version"))
+    }
+
+    /**
+     * 远端是否存在ref
+     */
+    fun lsRemote(
+        refType: GitRemoteRef,
+        remoteName: String,
+        ref: String
+    ): GitLsRemoteInfo? {
+        val output = execGit(
+            args = listOf(
+                "ls-remote",
+                if (refType == GitRemoteRef.BRANCH) {
+                    "--heads"
+                } else {
+                    "--tags"
+                },
+                remoteName,
+                ref
+            )
+        )
+        return output.stdOuts.mapNotNull { refStr ->
+            RegexUtil.parseLsRemote(refStr)
+        }.firstOrNull()
     }
 }
