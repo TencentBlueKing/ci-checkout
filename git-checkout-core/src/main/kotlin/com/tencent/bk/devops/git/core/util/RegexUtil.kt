@@ -28,7 +28,6 @@
 package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
-import com.tencent.bk.devops.git.core.pojo.GitLsRemoteInfo
 import com.tencent.bk.devops.git.core.pojo.GitPackingPhase
 import java.util.regex.Pattern
 
@@ -53,11 +52,6 @@ object RegexUtil {
     )
 
     private val SHA_PATTERN = Pattern.compile("([0-9a-f]{40})|([0-9a-f]{6,8})")
-
-    private val LS_REMOTE_PATTERN = Pattern.compile(
-        "(?<commitId>[0-9a-f]{40})\\s+" +
-                "(?<refName>(?:HEAD|refs/(?:heads|tags)/[\\w.-]+))"
-    )
 
     fun parseLog(log: String): CommitLogInfo? {
         val matcher = LOG_PATTERN.matcher(log)
@@ -97,15 +91,4 @@ object RegexUtil {
     }
 
     fun checkSha(commitId: String): Boolean = SHA_PATTERN.matcher(commitId).matches()
-
-    fun parseLsRemote(line: String): GitLsRemoteInfo? {
-        val matcher = LS_REMOTE_PATTERN.matcher(line)
-        if (matcher.find()) {
-            return GitLsRemoteInfo(
-                commitId = matcher.group("commitId"),
-                refName = matcher.group("refName")
-            )
-        }
-        return null
-    }
 }
