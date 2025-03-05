@@ -30,6 +30,7 @@ package com.tencent.bk.devops.git.core.util
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.enums.TGitMrAction
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.helper.DefaultGitTypeParseHelper
@@ -159,10 +160,9 @@ object GitUtil {
         repositoryUrl: String,
         hookEventType: String?,
         hookTargetUrl: String?,
-        compatibleHostList: List<String>?
+        compatibleHostList: List<String>?,
+        scmType: ScmType
     ): Boolean {
-        val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
-
         // 必须先验证事件类型，再判断仓库是否相同，不然验证仓库类型时解析url会异常
         return enableVirtualMergeBranch &&
             (
@@ -170,12 +170,28 @@ object GitUtil {
                     hookEventType == CodeEventType.MERGE_REQUEST.name ||
                         hookEventType == CodeEventType.PARENT_PIPELINE.name
                 ) &&
-            gitHookEventType != CodeEventType.MERGE_REQUEST_ACCEPT.name &&
+            !isMergeRequestEvent(scmType, hookEventType) &&
             isSameRepository(
                 repositoryUrl = repositoryUrl,
                 otherRepositoryUrl = hookTargetUrl,
                 hostNameList = compatibleHostList
             )
+    }
+
+    /**
+     * 是否为merge request 的merge事件
+     */
+    fun isMergeRequestEvent(scmType: ScmType, hookEventType: String?): Boolean {
+        val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
+        // 兼容stream数据，github pr动作类型存的[BK_CI_REPO_GIT_WEBHOOK_MR_ACTION]变量
+        val mergeAction = when (scmType) {
+            ScmType.GITHUB -> System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_MR_ACTION)
+            else -> System.getenv(GitConstants.GIT_CI_MR_ACTION)
+        }
+
+        return gitHookEventType != CodeEventType.MERGE_REQUEST_ACCEPT.name &&
+                (hookEventType in setOf(CodeEventType.MERGE_REQUEST.name, CodeEventType.PULL_REQUEST.name) &&
+                        TGitMrAction.parse(mergeAction) == TGitMrAction.MERGE)
     }
 
     fun isGitEvent(gitHookEventType: String?): Boolean {

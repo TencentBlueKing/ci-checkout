@@ -109,17 +109,18 @@ class GitCodeAtomParamInputAdapter(
             var ref: String = getRef()
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_REF, ref)
 
+            val scmType = RepositoryUtils.getScmType(repository)
             // 3. 确定是否开启pre-merge功能
             val preMerge = GitUtil.isEnablePreMerge(
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
                 repositoryUrl = repository.url,
                 hookEventType = hookEventType,
                 hookTargetUrl = hookTargetUrl,
-                compatibleHostList = compatibleHostList
+                compatibleHostList = compatibleHostList,
+                scmType = scmType
             )
             // fork库凭证信息
             var forkRepoAuthInfo: AuthInfo? = null
-            val scmType = RepositoryUtils.getScmType(repository)
             if (preMerge) {
                 ref = hookTargetBranch!!
                 pullType = PullType.BRANCH.name

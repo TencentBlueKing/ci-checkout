@@ -98,7 +98,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 repositoryUrl = repositoryUrl,
                 hookEventType = hookEventType,
                 hookTargetUrl = hookTargetUrl,
-                compatibleHostList = hostNameList
+                compatibleHostList = hostNameList,
+                scmType = scmType
             )
             if (preMerge) {
                 ref = hookTargetBranch!!
