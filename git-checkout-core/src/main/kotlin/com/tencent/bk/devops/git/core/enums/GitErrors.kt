@@ -122,7 +122,11 @@ enum class GitErrors(
                 "(fatal: 协议错误：坏的包头)|" +
                 "(fatal: protocol error: bad pack header)|" +
                 "(fatal: 远程错误：(.+) unavailable)|" +
-                "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)"
+                "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)|" +
+                "(fatal: remote error: (.*)too many request, your request was forbidden(.*))|" +
+                "(fatal: 远程错误：(.*)too many request, your request was forbidden(.*))|" +
+                "(致命错误: remote error: (.*)too many request, your request was forbidden(.*))|"+
+                "(致命错误：远程错误：(.*)too many request, your request was forbidden(.*))"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         cause = GitErrorsText.get().remoteServerFailedCause,
@@ -339,7 +343,7 @@ enum class GitErrors(
                 "(error: could not lock config file .+: 文件已存在)|" +
                 "(fatal: 无法创建 '(.+)'：文件已存在。)|" +
                 "(error: 无法创建 '(.+)'：文件已存在。)|" +
-                "(错误：无法创建 '(.+)'：文件已存在。)|"
+                "(错误：无法创建 '(.+)'：文件已存在。)"
         ),
         title = GitErrorsText.get().lockFileAlreadyExists,
         cause = GitErrorsText.get().lockFileAlreadyExistsCause,
@@ -412,6 +416,17 @@ enum class GitErrors(
         solution = GitErrorsText.get().invalidRefSpecSolution,
         errorCode = 800027,
         wiki = GitErrorsText.get().invalidRefSpecWiki
+    ),
+    MergeStashFail(
+        regex = Regex(
+            "(fatal: stash failed)|" +
+                    "(fatal: 贮藏失败)"
+        ),
+        title = null,
+        cause = null,
+        solution = null,
+        errorCode = 800028,
+        wiki = null
     )
     ;
 

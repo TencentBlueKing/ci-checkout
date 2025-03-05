@@ -51,9 +51,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_URLS
 import com.tencent.bk.devops.git.core.constant.GitConstants.PARAM_SEPARATOR
-import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_ALIASNAME
-import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_BRANCHNAME
-import com.tencent.bk.devops.git.core.constant.GitConstants.PIPELINE_MATERIAL_URL
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
@@ -69,7 +66,6 @@ import com.tencent.bk.devops.git.core.service.auth.UserTokenGitAuthProvider
 import com.tencent.bk.devops.git.core.service.helper.IInputAdapter
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
-import com.tencent.bk.devops.git.core.util.GitUtil.enableCacheByStrategy
 import com.tencent.bk.devops.git.core.util.RepositoryUtils
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -156,13 +152,6 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_CODE_PATH, localPath ?: "")
             EnvHelper.addEnvVariable(DEVOPS_GIT_REPO_BRANCH, branchName)
-
-            EnvHelper.addEnvVariable("$PIPELINE_MATERIAL_URL.${repositoryConfig.getRepositoryId()}", repository.url)
-            EnvHelper.addEnvVariable("$PIPELINE_MATERIAL_BRANCHNAME.${repositoryConfig.getRepositoryId()}", ref)
-            EnvHelper.addEnvVariable(
-                key = "$PIPELINE_MATERIAL_ALIASNAME.${repositoryConfig.getRepositoryId()}",
-                value = repository.aliasName
-            )
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_INCLUDE_PATH, input.includePath ?: "")
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_EXCLUDE_PATH, input.excludePath ?: "")
 
@@ -276,16 +265,14 @@ class GitCodeAtomParamInputAdapter(
                 enableGlobalInsteadOf = enableGlobalInsteadOf,
                 useCustomCredential = useCustomCredential,
                 forkRepoAuthInfo = forkRepoAuthInfo,
-                enableTGitCache = (enableTGitCache ?: false) || enableCacheByStrategy(
-                    repositoryUrl = repository.url,
-                    tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
-                    tGitCacheGrayProject = tGitCacheGrayProject,
-                    tGitCacheGrayWeight = tGitCacheGrayWeight
-                ),
+                enableTGitCache = (enableTGitCache ?: false),
                 tGitCacheUrl = tGitCacheUrl,
                 tGitCacheProxyUrl = tGitCacheProxyUrl,
                 setSafeDirectory = setSafeDirectory,
-                mainRepo = mainRepo
+                mainRepo = mainRepo,
+                tGitCacheGrayProject = tGitCacheGrayProject,
+                tGitCacheGrayWeight = tGitCacheGrayWeight,
+                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
             )
         }
     }

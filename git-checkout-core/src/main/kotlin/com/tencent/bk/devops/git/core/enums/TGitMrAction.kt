@@ -24,30 +24,24 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
+package com.tencent.bk.devops.git.core.enums
 
-apply plugin: "com.github.johnrengelman.shadow"
+/**
+ * mr动作
+ */
+enum class TGitMrAction(val value: String) {
+    OPEN("open"),
+    CLOSE("close"),
+    REOPEN("reopen"),
+    PUSH_UPDATE("push-update"),
+    MERGE("merge"),
+    EDIT("edit");
 
-dependencies {
-    compile "org.apache.commons:commons-exec:$commonExecVersion"
-    implementation group: 'com.microsoft.alm', name: 'auth-secure-storage', version: '0.6.4'
-    implementation 'org.slf4j:slf4j-simple:1.7.21'
+    companion object {
+        fun parse(value: String?): TGitMrAction? {
+            return value?.let {
+                values().find { it.value == value }
+            }
+        }
+    }
 }
-
-// 固定入口类 不要改
-mainClassName = "com.tencent.bk.devops.git.credential.MainKt"
-version '3.0.5'
-
-shadowJar {
-    archiveBaseName.set("git-checkout-credential")
-    zip64 true
-    archiveClassifier.set("")
-    destinationDirectory.set(new File("../git-checkout-core/src/main/resources/script/"))
-}
-
-task versionInfo(type: WriteProperties) {
-    outputFile new File("../git-checkout-core/src/main/resources/credential-version.properties")
-    encoding = "UTF-8"
-    property 'version', version
-}
-
-processResources.dependsOn versionInfo

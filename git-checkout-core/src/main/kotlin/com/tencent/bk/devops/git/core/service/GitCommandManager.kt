@@ -30,6 +30,9 @@ package com.tencent.bk.devops.git.core.service
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PROJECT_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.GCM_INTERACTIVE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPER
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRESS
@@ -90,8 +93,13 @@ class GitCommandManager(
     fun getGitVersion(): String {
         val version = execGit(args = listOf("--version")).stdOut
         gitVersion = VersionHelper.computeGitVersion(version)
-        val buildId = System.getenv("BK_CI_BUILD_ID")
-        setEnvironmentVariable(GitConstants.GIT_HTTP_USER_AGENT, "git/$gitVersion (devops-$buildId)")
+        val projectId = System.getenv(BK_CI_PROJECT_NAME)
+        val pipelineId = System.getenv(BK_CI_PIPELINE_ID)
+        val buildId = System.getenv(BK_CI_BUILD_ID)
+        setEnvironmentVariable(
+            GitConstants.GIT_HTTP_USER_AGENT,
+            "git/$gitVersion (devops-$projectId-$pipelineId-$buildId)"
+        )
         EnvHelper.putContext(CONTEXT_GIT_VERSION, "$gitVersion")
         return version
     }
@@ -458,7 +466,11 @@ class GitCommandManager(
         doRetry(args = args)
     }
 
-    private fun doRetry(repoDir: File? = null, args: List<String>, retryTime: Int = 3) {
+    private fun doRetry(
+        repoDir: File? = null,
+        args: List<String>,
+        retryTime: Int = 3
+    ) {
         try {
             execGit(repoDir = repoDir, args = args, logType = LogType.PROGRESS)
         } catch (e: GitExecuteException) {
@@ -475,6 +487,7 @@ class GitCommandManager(
                     // 服务端故障,睡眠后再重试
                     Thread.sleep(LONG_RETRY_PERIOD_MILLS)
                 }
+                // 后续根据缓存使用情况，在这里补充重试逻辑，先卸载相关代理配置，再做重试
                 doRetry(args = args, retryTime = retryTime - 1)
             } else {
                 throw e
@@ -487,7 +500,8 @@ class GitCommandManager(
             GitErrors.RemoteServerFailed.errorCode,
             GitErrors.AuthenticationFailed.errorCode,
             GitErrors.RepositoryNotFoundFailed.errorCode,
-            GitErrors.LockFileAlreadyExists.errorCode
+            GitErrors.LockFileAlreadyExists.errorCode,
+            GitErrors.MergeStashFail.errorCode
         ).contains(errorCode)
     }
 
@@ -570,7 +584,7 @@ class GitCommandManager(
             args.add("--no-verify")
         }
         args.add(ref)
-        execGit(args = args)
+        doRetry(args = args)
     }
 
     /**

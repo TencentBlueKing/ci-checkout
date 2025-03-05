@@ -229,7 +229,19 @@ data class GitSourceSettings(
     /**
      * 是否为源材料主仓库
      */
-    val mainRepo: Boolean? = false
+    val mainRepo: Boolean? = false,
+    /**
+     * 工蜂cache灰度项目
+     */
+    val tGitCacheGrayProject: String?,
+    /**
+     * 工蜂cache灰度白名单项目
+     */
+    val tGitCacheGrayWhiteProject: String?,
+    /**
+     * 工蜂cache灰度权重
+     */
+    val tGitCacheGrayWeight: String?
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(
@@ -246,4 +258,15 @@ data class GitSourceSettings(
      */
     val storeForkRepoCredential: Boolean
         get() = preMerge && !sourceRepoUrlEqualsRepoUrl && forkRepoAuthInfo != null
+
+    /**
+     * 是否启用灰度缓存
+     */
+    val enableCacheByStrategy: Boolean
+        get() = GitUtil.enableCacheByStrategy(
+            repositoryUrl = repositoryUrl,
+            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
+            tGitCacheGrayProject = tGitCacheGrayProject,
+            tGitCacheGrayWeight = tGitCacheGrayWeight
+        )
 }

@@ -31,14 +31,18 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_HOOK_REVISION
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_GIT_WEBHOOK_MR_ACTION
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_REPO_WEBHOOK_REPO_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_BRANCH
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.FETCH_HEAD
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CI_MR_ACTION
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.enums.CodeEventType
 import com.tencent.bk.devops.git.core.enums.PullType
+import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.enums.TGitMrAction
 import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -220,6 +224,11 @@ class RefHelper(
         val hookRepoUrl = System.getenv(BK_CI_REPO_WEBHOOK_REPO_URL)
         val hookRevision = System.getenv(BK_CI_HOOK_REVISION)
         val mrMergeCommitSha = System.getenv(BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA)
+        // 兼容stream数据，github pr动作类型存的[BK_CI_REPO_GIT_WEBHOOK_MR_ACTION]变量
+        val mergeAction = when (settings.scmType) {
+            ScmType.GITHUB -> System.getenv(BK_CI_REPO_GIT_WEBHOOK_MR_ACTION)
+            else -> System.getenv(GIT_CI_MR_ACTION)
+        }
         /*
          切换到提交点，需要满足
          1. 是git事件触发
@@ -237,9 +246,16 @@ class RefHelper(
         ) {
             return null
         }
-        return when (gitHookEventType) {
-            CodeEventType.MERGE_REQUEST_ACCEPT.name -> mrMergeCommitSha
-            CodeEventType.PUSH.name -> hookRevision
+        // PAC 版本发布后，MR_ACC事件改为MR事件，动作为merge
+        // -- MR_ACC 事件拉取合并提交点
+        // -- PR 和 MR 事件，当动作为merge时拉取提交点
+        return when {
+            gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name ||
+                    ((gitHookEventType == CodeEventType.MERGE_REQUEST.name ||
+                            gitHookEventType == CodeEventType.PULL_REQUEST.name) &&
+                            TGitMrAction.parse(mergeAction) == TGitMrAction.MERGE) -> mrMergeCommitSha
+
+            gitHookEventType == CodeEventType.PUSH.name -> hookRevision
             else -> null
         }
     }
