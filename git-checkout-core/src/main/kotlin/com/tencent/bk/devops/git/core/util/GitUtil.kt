@@ -189,7 +189,7 @@ object GitUtil {
             else -> System.getenv(GitConstants.GIT_CI_MR_ACTION)
         }
 
-        return gitHookEventType != CodeEventType.MERGE_REQUEST_ACCEPT.name &&
+        return gitHookEventType == CodeEventType.MERGE_REQUEST_ACCEPT.name ||
                 (hookEventType in setOf(CodeEventType.MERGE_REQUEST.name, CodeEventType.PULL_REQUEST.name) &&
                         TGitMrAction.parse(mergeAction) == TGitMrAction.MERGE)
     }
