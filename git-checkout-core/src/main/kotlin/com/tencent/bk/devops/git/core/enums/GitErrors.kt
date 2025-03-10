@@ -105,28 +105,29 @@ enum class GitErrors(
     RemoteServerFailed(
         regex = Regex(
             "(fatal: (the|The) remote end hung up unexpectedly)|" +
-                "(fatal: unable to access '(.+)': The requested URL returned error: 502)|" +
-                "(fatal: 无法访问 '(.+)'：The requested URL returned error: 502)|" +
-                "(fatal: 远程错误：Internal server error)|" +
-                "(fatal: 远端意外挂断了)|" +
-                "(Git:Server is busy, please try again later)|" +
-                "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)|" +
-                "(error: RPC failed; curl 56 Recv failure: Connection reset by peer)|" +
-                "(fatal: 过早的文件结束符（EOF）)|" +
-                "(fatal: index-pack 失败)|" +
-                "(fatal: early EOF)|" +
-                "(fatal: index-pack failed)|" +
-                "(fatal: unable to access '(.+)': The requested URL returned error: 429)|" +
-                "(error: RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
-                "(error: RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
-                "(fatal: 协议错误：坏的包头)|" +
-                "(fatal: protocol error: bad pack header)|" +
-                "(fatal: 远程错误：(.+) unavailable)|" +
-                "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)|" +
-                "(fatal: remote error: (.*)too many request, your request was forbidden(.*))|" +
-                "(fatal: 远程错误：(.*)too many request, your request was forbidden(.*))|" +
-                "(致命错误: remote error: (.*)too many request, your request was forbidden(.*))|"+
-                "(致命错误：远程错误：(.*)too many request, your request was forbidden(.*))"
+                    "(fatal: unable to access '(.+)': The requested URL returned error: 502)|" +
+                    "(fatal: 无法访问 '(.+)'：The requested URL returned error: 502)|" +
+                    "(fatal: 远程错误：Internal server error)|" +
+                    "(fatal: 远端意外挂断了)|" +
+                    "(Git:Server is busy, please try again later)|" +
+                    "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)|" +
+                    "(error: RPC failed; curl 56 Recv failure: Connection reset by peer)|" +
+                    "(fatal: 过早的文件结束符（EOF）)|" +
+                    "(fatal: index-pack 失败)|" +
+                    "(fatal: early EOF)|" +
+                    "(fatal: index-pack failed)|" +
+                    "(fatal: unable to access '(.+)': The requested URL returned error: 429)|" +
+                    "(error: RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
+                    "(error: RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
+                    "(fatal: 协议错误：坏的包头)|" +
+                    "(fatal: protocol error: bad pack header)|" +
+                    "(fatal: 远程错误：(.+) unavailable)|" +
+                    "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)|" +
+                    "(error: RPC failed; HTTP 500 curl 22 The requested URL returned error: 500)|" +
+                    "(fatal: remote error: (.*)too many request, your request was forbidden(.*))|" +
+                    "(fatal: 远程错误：(.*)too many request, your request was forbidden(.*))|" +
+                    "(致命错误: remote error: (.*)too many request, your request was forbidden(.*))|" +
+                    "(致命错误：远程错误：(.*)too many request, your request was forbidden(.*))"
         ),
         title = GitErrorsText.get().remoteServerFailed,
         cause = GitErrorsText.get().remoteServerFailedCause,
