@@ -270,7 +270,7 @@ class GitCodeCommandAtomParamInputAdapter(
             !listOf(ScmType.CODE_GIT, ScmType.GITHUB).contains(scmType) ||
             GitUtil.isSameRepository(
                 repositoryUrl = repositoryUrl,
-                otherRepositoryUrl = hookTargetUrl,
+                otherRepositoryUrl = hookSourceUrl,
                 hostNameList = hostNameList
             )
         ) {
