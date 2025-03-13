@@ -182,10 +182,12 @@ class RefHelper(
                 PullType.COMMIT_ID -> {
                     if (!RegexUtil.checkSha(ref)) {
                         EnvHelper.putContext(ContextConstants.CONTEXT_INVALID_REF, "1")
+                        // origin/master -> master
+                        val targetRef = ref.removePrefix("$ORIGIN_REMOTE_NAME/")
                         // ref参数为分支
                         CheckoutInfo(
                             ref = ref,
-                            startPoint = "refs/remotes/$ORIGIN_REMOTE_NAME/$ref",
+                            startPoint = "refs/remotes/$ORIGIN_REMOTE_NAME/$targetRef",
                             upstream = ""
                         )
                     } else {
