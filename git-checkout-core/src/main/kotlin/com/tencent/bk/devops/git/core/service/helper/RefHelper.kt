@@ -186,7 +186,7 @@ class RefHelper(
                         val targetRef = ref.removePrefix("$ORIGIN_REMOTE_NAME/")
                         // ref参数为分支
                         CheckoutInfo(
-                            ref = ref,
+                            ref = targetRef,
                             startPoint = "refs/remotes/$ORIGIN_REMOTE_NAME/$targetRef",
                             upstream = ""
                         )
