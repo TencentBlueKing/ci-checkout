@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.pojo.api
 
 import com.tencent.bk.devops.git.core.enums.RepoAuthType
+import com.tencent.bk.devops.git.core.enums.ScmType
 
 data class CodeGitlabRepository(
     override val aliasName: String,
@@ -38,7 +39,8 @@ data class CodeGitlabRepository(
     override val projectId: String?,
     override val repoHashId: String?,
     val authType: RepoAuthType? = RepoAuthType.HTTP,
-    val gitProjectId: Long?
+    val gitProjectId: Long?,
+    override val scmCode: String = ScmType.CODE_GITLAB.name
 ) : Repository {
     companion object {
         const val classType = "codeGitLab"

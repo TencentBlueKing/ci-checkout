@@ -249,6 +249,21 @@ class DevopsApi : IDevopsApi, BaseApi() {
         return getOauthUrl("/repository/api/build/oauth/github/oauthUrl?userId=$userId")
     }
 
+    override fun getScmGitOauthToken(userId: String, scmCode: String): Result<GitToken> {
+        val path = "/repository/api/build/oauth/$scmCode/token/$userId"
+        val request = buildGet(path)
+        val responseContent = HttpUtil.retryRequest(
+            request = request,
+            errorMessage = "Failed to get $scmCode oauth token information"
+        )
+        val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
+        return result
+    }
+
+    override fun getScmGitOauthUrl(userId: String, scmCode: String): Result<String> {
+        return getOauthUrl("/repository/api/build/oauth/$scmCode/oauthUrl?userId=$userId")
+    }
+
     private fun getOauthUrl(url: String): Result<String> {
         val result = Result("")
         val responseContent = try {

@@ -81,4 +81,12 @@ class MockDevopsApi : IDevopsApi {
     override fun getGithubOauthUrl(userId: String): Result<String> {
         return Result("true")
     }
+
+    override fun getScmGitOauthToken(userId: String, scmCode: String): Result<GitToken> {
+        return Result(GitToken())
+    }
+
+    override fun getScmGitOauthUrl(userId: String, scmCode: String): Result<String> {
+        return Result("true")
+    }
 }
