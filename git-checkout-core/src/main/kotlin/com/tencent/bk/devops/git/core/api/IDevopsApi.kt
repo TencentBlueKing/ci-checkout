@@ -36,6 +36,7 @@ import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
 import com.tencent.bk.devops.plugin.pojo.Result
 
+@SuppressWarnings("TooManyFunctions")
 interface IDevopsApi {
 
     fun addCommit(commits: List<CommitData>): Result<Int>
