@@ -109,6 +109,7 @@ enum class GitErrors(
                     "(fatal: 无法访问 '(.+)'：The requested URL returned error: 502)|" +
                     "(fatal: 远程错误：Internal server error)|" +
                     "(fatal: 远端意外挂断了)|" +
+                    "(fatal: the remote end hung up unexpectedly)|" +
                     "(Git:Server is busy, please try again later)|" +
                     "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)|" +
                     "(error: RPC failed; curl 56 Recv failure: Connection reset by peer)|" +
@@ -119,8 +120,12 @@ enum class GitErrors(
                     "(fatal: unable to access '(.+)': The requested URL returned error: 429)|" +
                     "(error: RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
                     "(error: RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
+                    "(错误：RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
+                    "(错误：RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
                     "(fatal: 协议错误：坏的包头)|" +
                     "(fatal: protocol error: bad pack header)|" +
+                    "(致命错误：协议错误：坏的包头)|" +
+                    "(致命错误：protocol error: bad pack header)|" +
                     "(fatal: 远程错误：(.+) unavailable)|" +
                     "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)|" +
                     "(error: RPC failed; HTTP 500 curl 22 The requested URL returned error: 500)|" +
