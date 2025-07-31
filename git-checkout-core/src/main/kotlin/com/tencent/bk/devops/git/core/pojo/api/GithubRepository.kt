@@ -27,13 +27,16 @@
 
 package com.tencent.bk.devops.git.core.pojo.api
 
+import com.tencent.bk.devops.git.core.enums.ScmType
+
 data class GithubRepository(
     override val aliasName: String,
     override val url: String,
     override var userName: String = "",
     override val projectName: String,
     override val projectId: String = "",
-    override val repoHashId: String?
+    override val repoHashId: String?,
+    override val scmCode: String = ScmType.GITHUB.name
 ) : Repository {
     companion object {
         const val classType = "github"

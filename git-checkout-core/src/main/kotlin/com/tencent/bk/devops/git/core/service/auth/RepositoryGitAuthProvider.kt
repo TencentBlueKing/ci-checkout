@@ -36,6 +36,7 @@ import com.tencent.bk.devops.git.core.pojo.api.CodeGitlabRepository
 import com.tencent.bk.devops.git.core.pojo.api.CodeTGitRepository
 import com.tencent.bk.devops.git.core.pojo.api.GithubRepository
 import com.tencent.bk.devops.git.core.pojo.api.Repository
+import com.tencent.bk.devops.git.core.pojo.api.ScmGitRepository
 import org.slf4j.LoggerFactory
 
 class RepositoryGitAuthProvider(
@@ -82,6 +83,15 @@ class RepositoryGitAuthProvider(
                     scmType = ScmType.GITHUB
                 )
             }
+            is ScmGitRepository -> {
+                getGitAuthProvider(
+                    repoAuthType = repository.authType,
+                    userId = repository.userName,
+                    credentialId = repository.credentialId,
+                    scmType = ScmType.SCM_GIT,
+                    scmCode = repository.scmCode
+                )
+            }
             else ->
                 EmptyGitAuthProvider()
         }
@@ -92,11 +102,17 @@ class RepositoryGitAuthProvider(
         repoAuthType: RepoAuthType?,
         userId: String,
         credentialId: String,
-        scmType: ScmType
+        scmType: ScmType,
+        scmCode: String = ""
     ): IGitAuthProvider {
         return when (repoAuthType) {
             RepoAuthType.OAUTH -> {
-                UserTokenGitAuthProvider(userId = userId, devopsApi = devopsApi, scmType = scmType)
+                UserTokenGitAuthProvider(
+                    userId = userId,
+                    devopsApi = devopsApi,
+                    scmType = scmType,
+                    scmCode = scmCode.ifBlank { scmType.name }
+                )
             }
             else ->
                 CredentialGitAuthProvider(credentialId = credentialId, devopsApi = devopsApi)

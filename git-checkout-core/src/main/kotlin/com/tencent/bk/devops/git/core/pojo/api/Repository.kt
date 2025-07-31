@@ -35,7 +35,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     JsonSubTypes.Type(value = CodeGitRepository::class, name = CodeGitRepository.classType),
     JsonSubTypes.Type(value = CodeGitlabRepository::class, name = CodeGitlabRepository.classType),
     JsonSubTypes.Type(value = GithubRepository::class, name = GithubRepository.classType),
-    JsonSubTypes.Type(value = CodeTGitRepository::class, name = CodeTGitRepository.classType)
+    JsonSubTypes.Type(value = CodeTGitRepository::class, name = CodeTGitRepository.classType),
+    JsonSubTypes.Type(value = ScmGitRepository::class, name = ScmGitRepository.classType)
 )
 interface Repository {
     val aliasName: String
@@ -45,4 +46,5 @@ interface Repository {
     val userName: String
     val projectId: String?
     val repoHashId: String?
+    val scmCode: String
 }

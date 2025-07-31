@@ -36,6 +36,7 @@ import com.tencent.bk.devops.git.core.pojo.api.Repository
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryConfig
 import com.tencent.bk.devops.plugin.pojo.Result
 
+@SuppressWarnings("TooManyFunctions")
 interface IDevopsApi {
 
     fun addCommit(commits: List<CommitData>): Result<Int>
@@ -61,4 +62,8 @@ interface IDevopsApi {
     fun getGitOauthUrl(userId: String): Result<String>
 
     fun getGithubOauthUrl(userId: String): Result<String>
+
+    fun getScmGitOauthToken(userId: String, scmCode: String): Result<GitToken>
+
+    fun getScmGitOauthUrl(userId: String, scmCode: String): Result<String>
 }

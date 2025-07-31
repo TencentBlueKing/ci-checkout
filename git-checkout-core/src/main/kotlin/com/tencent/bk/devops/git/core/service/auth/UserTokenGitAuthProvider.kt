@@ -43,17 +43,18 @@ import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.default
 class UserTokenGitAuthProvider(
     private val userId: String?,
     private val devopsApi: IDevopsApi,
-    private val scmType: ScmType
+    private val scmType: ScmType,
+    private val scmCode: String = ""
 ) : IGitAuthProvider {
 
     override fun getAuthInfo(): AuthInfo {
         if (userId.isNullOrBlank()) {
             throw ParamInvalidException(errorMsg = "Authorized user ID cannot be empty")
         }
-        val token = if (scmType == ScmType.GITHUB) {
-            getGithubOauthToken(userId)
-        } else {
-            getGitOauthToken(userId)
+        val token = when(scmType) {
+            ScmType.GITHUB -> getGithubOauthToken(userId)
+            ScmType.SCM_GIT -> getScmRepoOauthToken(userId = userId, scmCode = scmCode)
+            else -> getGitOauthToken(userId)
         }
         EnvHelper.putContext(ContextConstants.CONTEXT_USER_ID, userId)
         return OauthGitAuthProvider(token = token, userId = userId).getAuthInfo()
@@ -89,6 +90,32 @@ class UserTokenGitAuthProvider(
         val result = devopsApi.getGithubOauthToken(userId = userId)
         if (result.isNotOk() || result.data == null) {
             val oauthUrl = devopsApi.getGithubOauthUrl(userId)
+            throw ApiException(
+                errorMsg =
+                defaultResolver.resolveByMap(
+                    content = GitErrorsText.get().emptyAccessToken ?: "access token is empty",
+                    valueMap = mapOf(
+                        "userId" to userId
+                    )
+                ),
+                solution = GitErrorsText.get().emptyAccessTokenSolution?.let {
+                    defaultResolver.resolveByMap(
+                        it,
+                        mapOf(
+                            "userId" to userId,
+                            "oauthUrl" to oauthUrl.data
+                        )
+                    )
+                } ?: ""
+            )
+        }
+        return result.data!!.accessToken
+    }
+
+    private fun getScmRepoOauthToken(scmCode: String, userId: String): String {
+        val result = devopsApi.getScmGitOauthToken(userId = userId, scmCode = scmCode)
+        if (result.isNotOk() || result.data == null) {
+            val oauthUrl = devopsApi.getScmGitOauthUrl(userId, scmCode = scmCode)
             throw ApiException(
                 errorMsg =
                 defaultResolver.resolveByMap(
