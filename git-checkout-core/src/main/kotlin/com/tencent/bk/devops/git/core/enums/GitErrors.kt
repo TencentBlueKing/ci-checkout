@@ -114,9 +114,11 @@ enum class GitErrors(
                     "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)|" +
                     "(error: RPC failed; curl 56 Recv failure: Connection reset by peer)|" +
                     "(fatal: 过早的文件结束符（EOF）)|" +
+                    "(致命错误：过早的文件结束符（EOF）)|" +
                     "(fatal: index-pack 失败)|" +
                     "(fatal: early EOF)|" +
                     "(fatal: index-pack failed)|" +
+                    "(致命错误：fetch-pack：无效的 index-pack 输出)|" +
                     "(fatal: unable to access '(.+)': The requested URL returned error: 429)|" +
                     "(error: RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
                     "(error: RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +

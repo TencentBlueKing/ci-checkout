@@ -89,7 +89,8 @@ class RepositoryGitAuthProvider(
                     userId = repository.userName,
                     credentialId = repository.credentialId,
                     scmType = ScmType.SCM_GIT,
-                    scmCode = repository.scmCode
+                    scmCode = repository.scmCode,
+                    repoHashId = repository.repoHashId!!
                 )
             }
             else ->
@@ -98,12 +99,14 @@ class RepositoryGitAuthProvider(
         return gitAuthProvider.getAuthInfo()
     }
 
+    @SuppressWarnings("LongParameterList")
     private fun getGitAuthProvider(
         repoAuthType: RepoAuthType?,
         userId: String,
         credentialId: String,
         scmType: ScmType,
-        scmCode: String = ""
+        scmCode: String = "",
+        repoHashId: String = ""
     ): IGitAuthProvider {
         return when (repoAuthType) {
             RepoAuthType.OAUTH -> {
@@ -111,7 +114,8 @@ class RepositoryGitAuthProvider(
                     userId = userId,
                     devopsApi = devopsApi,
                     scmType = scmType,
-                    scmCode = scmCode.ifBlank { scmType.name }
+                    scmCode = scmCode.ifBlank { scmType.name },
+                    repoHashId = repoHashId
                 )
             }
             else ->

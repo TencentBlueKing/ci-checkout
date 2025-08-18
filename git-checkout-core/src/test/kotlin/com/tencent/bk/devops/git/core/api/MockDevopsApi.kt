@@ -82,7 +82,7 @@ class MockDevopsApi : IDevopsApi {
         return Result("true")
     }
 
-    override fun getScmGitOauthToken(userId: String, scmCode: String): Result<GitToken> {
+    override fun getScmGitOauthToken(repoHashId: String): Result<GitToken> {
         return Result(GitToken())
     }
 

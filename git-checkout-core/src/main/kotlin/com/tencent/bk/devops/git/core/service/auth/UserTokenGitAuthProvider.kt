@@ -44,7 +44,8 @@ class UserTokenGitAuthProvider(
     private val userId: String?,
     private val devopsApi: IDevopsApi,
     private val scmType: ScmType,
-    private val scmCode: String = ""
+    private val scmCode: String = "",
+    private val repoHashId: String = ""
 ) : IGitAuthProvider {
 
     override fun getAuthInfo(): AuthInfo {
@@ -53,7 +54,7 @@ class UserTokenGitAuthProvider(
         }
         val token = when(scmType) {
             ScmType.GITHUB -> getGithubOauthToken(userId)
-            ScmType.SCM_GIT -> getScmRepoOauthToken(userId = userId, scmCode = scmCode)
+            ScmType.SCM_GIT -> getScmRepoOauthToken(userId = userId, scmCode = scmCode, repoHashId = repoHashId)
             else -> getGitOauthToken(userId)
         }
         EnvHelper.putContext(ContextConstants.CONTEXT_USER_ID, userId)
@@ -112,8 +113,8 @@ class UserTokenGitAuthProvider(
         return result.data!!.accessToken
     }
 
-    private fun getScmRepoOauthToken(scmCode: String, userId: String): String {
-        val result = devopsApi.getScmGitOauthToken(userId = userId, scmCode = scmCode)
+    private fun getScmRepoOauthToken(scmCode: String, userId: String, repoHashId: String): String {
+        val result = devopsApi.getScmGitOauthToken(repoHashId = repoHashId)
         if (result.isNotOk() || result.data == null) {
             val oauthUrl = devopsApi.getScmGitOauthUrl(userId, scmCode = scmCode)
             throw ApiException(
