@@ -12,4 +12,9 @@ object GitCacheHelperFactory {
         val cacheRepoHelpers = ServiceLoader.load(IGitCacheHelper::class.java)
         return cacheRepoHelpers.sortedBy { it.getOrder() }.find { it.support(settings, git) }
     }
+
+    fun getCacheHelper(proxyName: String): IGitCacheHelper? {
+        val cacheRepoHelpers = ServiceLoader.load(IGitCacheHelper::class.java)
+        return cacheRepoHelpers.find { it.getName() == proxyName }
+    }
 }

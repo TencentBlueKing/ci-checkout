@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service.helper
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
@@ -108,6 +109,11 @@ class GitDirectoryHelper(
         }
         if (settings.enableGitClean) {
             git.tryClean(settings.enableGitCleanIgnore, settings.enableGitCleanNested)
+        }
+        // 清理上一次的http代理,当上一次构建被突然终止时,如用户取消,会导致代理没有清理,然后用户关闭代理,会导致新的构建还是使用了代理
+        val proxyName = git.tryConfigGet(GitConstants.GIT_HTTP_PROXY_NAME)
+        if (proxyName.isNotEmpty()) {
+            GitCacheHelperFactory.getCacheHelper(proxyName = proxyName)?.unsetConfig(settings, git)
         }
         git.removeEnvironmentVariable(GIT_LFS_SKIP_SMUDGE)
     }

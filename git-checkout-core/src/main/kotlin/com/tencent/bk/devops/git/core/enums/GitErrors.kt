@@ -85,11 +85,13 @@ enum class GitErrors(
     RepositoryNotFoundFailed(
         regex = Regex(
             "(fatal: repository '(.+)' not found)|" +
-                "(fatal: .* Git repository not found)|" +
-                "(fatal: 远程错误：Git repository not found)|" +
-                "(ERROR: Repository not found)|" +
-                "(fatal: remote error: Git:Project not found.)|" +
-                "(fatal: 远程错误：Git:Project not found.)"
+                    "(fatal: .* Git repository not found)|" +
+                    "(fatal: 远程错误：Git repository not found)|" +
+                    "(ERROR: Repository not found)|" +
+                    "(remote: Repository not found.)|" +
+                    "(fatal: remote error: Git:Project not found.)|" +
+                    "(fatal: 远程错误：Git:Project not found.)|" +
+                    "(致命错误：远程错误：Git repository not found)"
         ),
         title = GitErrorsText.get().repositoryNotFoundFailed,
         cause = GitErrorsText.get().httpAuthenticationFailedCause,
@@ -158,21 +160,25 @@ enum class GitErrors(
     NoMatchingBranch(
         regex = Regex(
             pattern = "(fatal: couldn't find remote ref .+)|" +
-                "(fatal: 无法找到远程引用 .+)|" +
-                "(Your configuration specifies to merge with the ref '(.+)')|" +
-                "(您的配置中指定要合并远程的引用 '(.+)')|" +
-                "(fatal: '(.+)' is not a commit and a branch '(.+)' cannot be created from it)|" +
-                "(fatal: '.+' 不是一个提交，不能基于它创建分支 '.+')|" +
-                "(error: pathspec '(.+)' did not match any file\\(s\\) known to git\\.)|" +
-                "(error: 路径规格 '(.+)' 未匹配任何 git 已知文件)|" +
-                "(fatal: path '(.+)' does not exist .+)|" +
-                "(fatal: 路径 '(.+)' 不存在)|" +
-                "(fatal: 引用不是一个树：(.+))|" +
-                "(fatal: reference is not a tree: (.+))|" +
-                "(error: 请求的上游分支 '(.+)' 不存在)|" +
-                "(fatal: 不能同时更新路径并切换到分支'(.+)'。)|" +
-                "(fatal: 不能同时更新路径并切换到分支'(.+)'。\\s+您是想要检出 '(.+)' 但其未能解析为提交么？)|" +
-                "(fatal: Cannot update paths and switch to branch '(.+)' at the same time.)",
+                    "(fatal: 无法找到远程引用 .+)|" +
+                    "(Your configuration specifies to merge with the ref '(.+)')|" +
+                    "(您的配置中指定要合并远程的引用 '(.+)')|" +
+                    "(fatal: '(.+)' is not a commit and a branch '(.+)' cannot be created from it)|" +
+                    "(fatal: '.+' 不是一个提交，不能基于它创建分支 '.+')|" +
+                    "(致命错误：'.+' 不是一个提交，不能基于它创建分支 '.+')|" +
+                    "(error: pathspec '(.+)' did not match any file\\(s\\) known to git\\.)|" +
+                    "(error: 路径规格 '(.+)' 未匹配任何 git 已知文件)|" +
+                    "(fatal: path '(.+)' does not exist .+)|" +
+                    "(fatal: 路径 '(.+)' 不存在)|" +
+                    "(fatal: 引用不是一个树：(.+))|" +
+                    "(致命错误：引用不是一个树：(.+))|" +
+                    "(致命错误：无法读取树（(.+)）)|" +
+                    "(fatal: reference is not a tree: (.+))|" +
+                    "(error: 请求的上游分支 '(.+)' 不存在)|" +
+                    "(致命错误：请求的上游分支 '(.+)' 不存在)|" +
+                    "(fatal: 不能同时更新路径并切换到分支'(.+)'。)|" +
+                    "(fatal: 不能同时更新路径并切换到分支'(.+)'。\\s+您是想要检出 '(.+)' 但其未能解析为提交么？)|" +
+                    "(fatal: Cannot update paths and switch to branch '(.+)' at the same time.)",
             options = setOf(RegexOption.IGNORE_CASE)
         ),
         title = GitErrorsText.get().noMatchingBranch,
@@ -232,8 +238,10 @@ enum class GitErrors(
     InvalidMerge(
         regex = Regex(
             "(merge: (.+) - not something we can merge)|" +
-                "(merge：.+ - 不能合并)|" +
-                "(fatal: .+ - not something we can merge)"
+                    "(merge：.+ - 不能合并)|" +
+                    "(merge：.+ - 不是可以合并的东西)|" +
+                    "(fatal: .+ - not something we can merge)|" +
+                    "(fatal: .+ - 不能被合并)"
         ),
         title = GitErrorsText.get().invalidMerge,
         cause = GitErrorsText.get().invalidMergeCause,
@@ -296,11 +304,12 @@ enum class GitErrors(
     InvalidSubmoduleSHA(
         regex = Regex(
             "(Fetched in submodule path '(.+)', but it did not contain (.+). " +
-                "Direct fetching of that commit failed.)|" +
-                "(获取了子模组路径 '(.+)'，但是它没有包含 (.+)。直接获取该提交失败。)|" +
-                "(无法在子模组路径 '(.+)' 中找到当前版本)|" +
-                "(fatal: Needed a single revision)|" +
-                "(fatal: Unable to find current revision in submodule path '.+')"
+                    "Direct fetching of that commit failed.)|" +
+                    "(获取了子模组路径 '(.+)'，但是它没有包含 (.+)。直接获取该提交失败。)|" +
+                    "(无法在子模组路径 '(.+)' 中找到当前版本)|" +
+                    "(fatal: Needed a single revision)|" +
+                    "(fatal: 需要一个单独的版本)" +
+                    "(fatal: Unable to find current revision in submodule path '.+')"
         ),
         title = GitErrorsText.get().invalidSubmoduleSHA,
         cause = GitErrorsText.get().invalidSubmoduleSHACause,
@@ -347,11 +356,11 @@ enum class GitErrors(
     LockFileAlreadyExists(
         regex = Regex(
             "(Another git process seems to be running in this repository, e.g.)|" +
-                "(error: could not lock config file (.+): File exists)|" +
-                "(error: could not lock config file .+: 文件已存在)|" +
-                "(fatal: 无法创建 '(.+)'：文件已存在。)|" +
-                "(error: 无法创建 '(.+)'：文件已存在。)|" +
-                "(错误：无法创建 '(.+)'：文件已存在。)"
+                    "(error: could not lock config file (.+): File exists)|" +
+                    "(error: could not lock config file .+: 文件已存在)|" +
+                    "(fatal: 无法创建 '(.+)'：文件已存在。)|" +
+                    "(error: 无法创建 '(.+)'：文件已存在。)|" +
+                    "(错误：无法创建 '(.+)'：文件已存在。)"
         ),
         title = GitErrorsText.get().lockFileAlreadyExists,
         cause = GitErrorsText.get().lockFileAlreadyExistsCause,
@@ -361,7 +370,8 @@ enum class GitErrors(
     ),
     BadRevision(
         regex = Regex(
-            "fatal: bad revision '(.*)'"
+            "(fatal: bad revision '(.*)')|" +
+                    "(错误：坏的签名 (.*))"
         ),
         title = GitErrorsText.get().badRevision,
         cause = GitErrorsText.get().badRevisionCause,
@@ -371,7 +381,8 @@ enum class GitErrors(
     ),
     NotAGitRepository(
         regex = Regex(
-            "fatal: [Nn]ot a git repository \\(or any of the parent directories\\): .git"
+            "(fatal: [Nn]ot a git repository \\(or any of the parent directories\\): .git)|" +
+                    "(致命错误：不是 git 仓库（或者直至挂载点 (.*)）)"
         ),
         title = GitErrorsText.get().notAGitRepository,
         cause = GitErrorsText.get().notAGitRepositoryCause,

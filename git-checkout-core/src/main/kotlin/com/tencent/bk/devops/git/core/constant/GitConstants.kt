@@ -78,6 +78,8 @@ object GitConstants {
     const val GIT_CREDENTIAL_COMPATIBLEHOST = "credential.compatibleHost"
     const val GIT_CREDENTIAL_AUTH_HELPER = "credential.authHelper"
     const val GIT_CREDENTIAL_USEHTTPPATH = "credential.useHttpPath"
+    const val GIT_HTTP_PROXY_NAME = "http.proxyName"
+
     const val GIT_REPO_PATH = "GIT_REPO_PATH"
     const val BK_CI_GIT_PROJECT_ID = "BK_CI_GIT_PROJECT_ID"
     const val BK_CI_REPO_WEB_HOOK_HASHID = "BK_CI_REPO_WEB_HOOK_HASHID"
@@ -85,6 +87,8 @@ object GitConstants {
     const val BK_CI_HOOK_TARGET_BRANCH = "BK_CI_HOOK_TARGET_BRANCH"
     const val BK_CI_HOOK_SOURCE_BRANCH = "BK_CI_HOOK_SOURCE_BRANCH"
     const val BK_CI_START_TYPE = "BK_CI_START_TYPE"
+    // devcloud网络区域
+    const val DEVCLOUD_NETWORK_AREA = "DEVCLOUD_NETWORK_AREA"
 
     // auth env
     const val AUTH_SOCKET_VAR = "SSH_AUTH_SOCK"
