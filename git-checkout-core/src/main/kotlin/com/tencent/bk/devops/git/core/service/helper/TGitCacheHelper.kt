@@ -41,11 +41,13 @@ class TGitCacheHelper : IGitCacheHelper {
                 GitUtil.isHttpProtocol(settings.repositoryUrl) &&
                 settings.scmType == ScmType.CODE_GIT &&
                 !settings.tGitCacheUrl.isNullOrBlank() &&
-                !settings.tGitCacheProxyUrl.isNullOrBlank()
+                !settings.tGitCacheProxyUrl.isNullOrBlank() &&
+                // 办公区域不走代理
+                System.getenv(GitConstants.DEVCLOUD_NETWORK_AREA) != "offlice"
     }
 
     override fun getName(): String {
-        return "TGIT_CACHE"
+        return FetchStrategy.TGIT_CACHE.name
     }
 
     override fun getOrder(): Int {
@@ -101,6 +103,7 @@ class TGitCacheHelper : IGitCacheHelper {
         git.config("protocol.version", "2")
         git.config("http.$origin.proxy", cacheProxyUrl)
         git.config("http.$origin.sslverify", "false")
+        git.config(GitConstants.GIT_HTTP_PROXY_NAME, FetchStrategy.TGIT_CACHE.name)
         // 如果有构建机缓存,开启了工蜂cache,需要重置VM_TGIT_CACHE
         if (EnvHelper.getContext(ContextConstants.CONTEXT_FETCH_STRATEGY) == FetchStrategy.VM_CACHE.name) {
             EnvHelper.putContext(ContextConstants.CONTEXT_FETCH_STRATEGY, FetchStrategy.VM_TGIT_CACHE.name)
@@ -113,6 +116,7 @@ class TGitCacheHelper : IGitCacheHelper {
         git.tryConfigUnset("http.$origin.proxy")
         git.tryConfigUnset("http.$origin.sslverify")
         git.tryConfigUnset("protocol.version")
+        git.tryConfigUnset(GitConstants.GIT_HTTP_PROXY_NAME)
     }
 
     @Suppress("MagicNumber")
