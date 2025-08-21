@@ -114,11 +114,12 @@ class GitDirectoryHelper(
         val proxyName = git.tryConfigGet(GitConstants.GIT_HTTP_PROXY_NAME)
         if (proxyName.isNotEmpty()) {
             GitCacheHelperFactory.getCacheHelper(proxyName = proxyName)?.unsetConfig(settings, git)
-        }
-        // TODO 清理没有设置GIT_HTTP_PROXY_NAME之前的数据,后续可以删除
-        val httpProxyConfig = git.tryConfigGetRegexp("http.*.proxy")
-        if (httpProxyConfig.isNotEmpty()) {
-            TGitCacheHelper().unsetConfig(settings, git)
+        } else {
+            // TODO 清理没有设置GIT_HTTP_PROXY_NAME之前的数据,后续可以删除
+            val httpProxyConfig = git.tryConfigGetRegexp("http.*.proxy")
+            if (httpProxyConfig.isNotEmpty()) {
+                TGitCacheHelper().unsetConfig(settings, git)
+            }
         }
         git.removeEnvironmentVariable(GIT_LFS_SKIP_SMUDGE)
     }
