@@ -20,8 +20,9 @@ dependencies {
 
 
 task buildZip(type: Zip, dependsOn: shadowJar) {
+    archiveFileName = "checkout.zip"
     from "build/libs", "./task.json"
-    into "${project.name}"
+    into "checkout"
 
     from("../docs/images/checkout.png") {
         into("file")
