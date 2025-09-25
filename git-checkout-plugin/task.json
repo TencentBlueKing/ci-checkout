@@ -1,0 +1,865 @@
+{
+  "atomCode": "checkout",
+  "defaultLocaleLanguage": "zh_CN",
+  "execution": {
+    "packagePath": "checkout.jar",
+    "language": "java",
+    "minimumVersion": "1.8",
+    "demands": [],
+    "target": "$bk_java_path -Dfile.encoding=utf8 -jar checkout.jar",
+    "post": {
+      "postEntryParam": "True",
+      "postCondition": "always()"
+    }
+  },
+  "releaseInfo": {
+    "projectId": "demo",
+    "name": "Checkout",
+    "language": "java",
+    "logoUrl": "${{indexFile(\"checkout.png\")}}",
+    "category": "TASK",
+    "classifyCode": "scm",
+    "jobType": "AGENT",
+    "os": [
+      "LINUX",
+      "MACOS",
+      "WINDOWS"
+    ],
+    "labelCodes": [],
+    "summary": "checkout插件为蓝盾平台提供基本的git拉取操作，可以拉取所有的git仓库",
+    "description": "${{indexFile(\"README.md\")}}",
+    "configInfo": {
+      "frontendType": "NORMAL"
+    },
+    "versionInfo": {
+      "publisher": "BlueKing",
+      "releaseType": "NEW",
+      "version": "1.0.0",
+      "versionContent": "init"
+    }
+  },
+  "inputGroups": [
+    {
+      "name": "fetch",
+      "label": "Fetch",
+      "isExpanded": true
+    },
+    {
+      "name": "submodule",
+      "label": "子模块",
+      "isExpanded": true
+    },
+    {
+      "name": "lfs",
+      "label": "Lfs",
+      "isExpanded": true
+    },
+    {
+      "name": "merge",
+      "label": "Merge",
+      "isExpanded": true
+    },
+    {
+      "name": "config",
+      "label": "配置",
+      "isExpanded": true
+    }
+  ],
+  "input": {
+    "repositoryType": {
+      "label": "代码库",
+      "default": "ID",
+      "desc": "值为ID/NAME/URL",
+      "type": "enum-input",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "list": [
+        {
+          "label": "按代码库选择",
+          "value": "ID"
+        },
+        {
+          "label": "按代码库别名输入",
+          "value": "NAME"
+        },
+        {
+          "label": "按仓库URL输入",
+          "value": "URL"
+        }
+      ]
+    },
+    "repositoryHashId": {
+      "label": "",
+      "default": "",
+      "placeholder": "请选择代码库名称",
+      "type": "selector",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "optionsConf": {
+        "searchable": true,
+        "multiple": false,
+        "url": "/repository/api/user/repositories/{projectId}/hasPermissionList?permission=USE&page=1&pageSize=5000",
+        "paramId": "repositoryHashId",
+        "paramName": "aliasName",
+        "itemTargetUrl": "/codelib/{projectId}/",
+        "itemText": "关联代码库",
+        "hasAddItem": true
+      },
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "ID"
+          }
+        ]
+      }
+    },
+    "repositoryName": {
+      "label": "",
+      "default": "",
+      "placeholder": "请输入代码库别名",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "NAME"
+          }
+        ]
+      }
+    },
+    "repositoryUrl": {
+      "label": "",
+      "default": "",
+      "placeholder": "请输入代码库URL",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "URL"
+          }
+        ]
+      }
+    },
+    "authType": {
+      "label": "授权类型",
+      "default": "TICKET",
+      "type": "selector",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "options": [
+        {
+          "name": "空",
+          "id": "EMPTY"
+        },
+        {
+          "name": "凭证",
+          "id": "TICKET"
+        },
+        {
+          "name": "access token",
+          "id": "ACCESS_TOKEN"
+        },
+        {
+          "name": "username/password",
+          "id": "USERNAME_PASSWORD"
+        },
+        {
+          "name": "流水线启动人token",
+          "id": "START_USER_TOKEN"
+        },
+        {
+          "name": "工蜂personal_access_token",
+          "id": "PERSONAL_ACCESS_TOKEN"
+        }
+      ],
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "URL"
+          }
+        ]
+      }
+    },
+    "ticketId": {
+      "label": "代码库凭证",
+      "placeholder": "请选中对应凭证",
+      "type": "select-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "URL"
+          },
+          {
+            "key": "authType",
+            "value": "TICKET"
+          }
+        ]
+      },
+      "optionsConf": {
+        "searchable": true,
+        "multiple": false,
+        "url": "/ticket/api/user/credentials/{projectId}/hasPermissionList?permission=USE&page=1&pageSize=10000",
+        "paramId": "credentialId",
+        "paramName": "credentialId",
+        "itemTargetUrl": "/ticket/{projectId}/",
+        "itemText": "添加新的凭证",
+        "hasAddItem": true
+      }
+    },
+    "accessToken": {
+      "label": "access token",
+      "placeholder": "请输入对应access token",
+      "type": "vuex-input",
+      "inputType": "password",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": true,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "URL"
+          },
+          {
+            "key": "authType",
+            "value": "ACCESS_TOKEN"
+          }
+        ]
+      }
+    },
+    "personalAccessToken": {
+      "label": "工蜂personal_access_token",
+      "placeholder": "请输入对应personal_access_token",
+      "type": "vuex-input",
+      "inputType": "password",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": true,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "URL"
+          },
+          {
+            "key": "authType",
+            "value": "PERSONAL_ACCESS_TOKEN"
+          }
+        ]
+      }
+    },
+    "username": {
+      "label": "username",
+      "placeholder": "请输入用户名",
+      "type": "vuex-input",
+      "inputType": "password",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "URL"
+          },
+          {
+            "key": "authType",
+            "value": "USERNAME_PASSWORD"
+          }
+        ]
+      }
+    },
+    "password": {
+      "label": "password",
+      "placeholder": "请输入密码",
+      "type": "vuex-input",
+      "inputType": "password",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": true,
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "URL"
+          },
+          {
+            "key": "authType",
+            "value": "USERNAME_PASSWORD"
+          }
+        ]
+      }
+    },
+    "persistCredentials": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否持久化凭证",
+      "desc": "如果当前 Job 的后续步骤需要使用 Git 凭证，则持久化。凭证仅对当前仓库有效。",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false
+    },
+    "pullType": {
+      "label": "指定拉取方式",
+      "default": "BRANCH",
+      "type": "select-input",
+      "required": false,
+      "optionsConf": {
+        "searchable": true
+      },
+      "options": [
+        {
+          "id": "BRANCH",
+          "name": "BRANCH"
+        },
+        {
+          "id": "TAG",
+          "name": "TAG"
+        },
+        {
+          "id": "COMMIT_ID",
+          "name": "COMMIT_ID"
+        }
+      ]
+    },
+    "refName": {
+      "label": "分支/TAG/COMMIT",
+      "default": "master",
+      "placeholder": "请输入",
+      "type": "vuex-input",
+      "desc": "",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false
+    },
+    "localPath": {
+      "label": "代码保存路径",
+      "default": "",
+      "placeholder": "请填写工作空间相对目录，不填则默认为工作空间目录",
+      "type": "vuex-input",
+      "desc": "若当前 Job 有多个代码拉取步骤，请设置此字段以解决代码存储路径冲突问题",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false
+    },
+    "strategy": {
+      "label": "拉取策略",
+      "default": "REVERT_UPDATE",
+      "type": "enum-input",
+      "desc": "Revert Update: 增量，每次先\"git reset --hard HEAD\"，再\"git pull\"\n\n Fresh Checkout: 全量，每次都会全新clone代码，之前会delete整个工作空间\n\n Increment Update: 增量，只使用\"git pull\"，并不清除冲突及历史缓存文件  ",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "list": [
+        {
+          "label": "Revert Update",
+          "value": "REVERT_UPDATE"
+        },
+        {
+          "label": "Fresh Checkout",
+          "value": "FRESH_CHECKOUT"
+        },
+        {
+          "label": "Increment Update",
+          "value": "INCREMENT_UPDATE"
+        }
+      ]
+    },
+    "fetchDepth": {
+      "label": "git fetch的depth参数值",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "fetch"
+    },
+    "fetchOnlyCurrentRef": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "仅fetch当前配置的分支",
+      "desc": "默认从远端获取所有的分支，配置后只fetch当前分支，如果后续有插件需要切换分支，插件需要先fetch分支再切换",
+      "required": false,
+      "disabled": false,
+      "hidden": true,
+      "isSensitive": false,
+      "groupName": "fetch"
+    },
+    "enableFetchRefSpec": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "启用拉取指定分支",
+      "desc": "默认会拉取所有分支，启用后只会拉取指定的分支，配置分支总是都会拉取",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "fetch"
+    },
+    "fetchRefSpec": {
+      "label": "",
+      "default": "",
+      "placeholder": "请填写分支名，多个以,分割，支持通配符，不填默认拉取插件配置的分支",
+      "type": "vuex-input",
+      "desc": "插件配置的分支不需要设置，默认会设置。配置的分支必须存在，否则会报错",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "fetch",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableFetchRefSpec",
+            "value": true
+          }
+        ]
+      }
+    },
+    "enablePartialClone": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "启动部分克隆",
+      "desc": "部分克隆git版本必须高于2.22.0版本，使用部分克隆时，建议指定检出的目录，性能更好。部分克隆和depth不能同时用，开启部分克隆会把depth关闭",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "fetch"
+    },
+    "includePath": {
+      "label": "拉取代码库以下路径",
+      "default": "",
+      "placeholder": "请填写代码库相对目录，多个用逗号分隔",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "fetch"
+    },
+    "excludePath": {
+      "label": "排除代码库以下路径",
+      "default": "",
+      "placeholder": "请填写代码库相对目录，多个用逗号分隔",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "fetch"
+    },
+    "cachePath": {
+      "label": "归档的缓存路径",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "输入归档的缓存路径，全量拉取时先拉取归档的文件，再增量拉取。文件必须是tar.gz格式",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "fetch"
+    },
+    "enableGitLfs": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否开启Git Lfs",
+      "desc": "选中则执行git lfs pull",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "lfs"
+    },
+    "enableGitLfsClean": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否开启Git Lfs清理",
+      "desc": "选中则执行git lfs prune，会影响代码拉取效率",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "lfs"
+    },
+    "lfsConcurrentTransfers": {
+      "label": "lfs并发拉取数",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "默认值：8",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "lfs"
+    },
+    "enableSubmodule": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "启用Submodule",
+      "desc": "勾选则启用外链，不勾选则不启用",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule"
+    },
+    "submodulePath": {
+      "label": "",
+      "default": "",
+      "placeholder": "请填写需拉取的Submodule path，多个用逗号分隔，不填默认拉所有Submodule",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
+    "enableSubmoduleRemote": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "执行git submodule update后面是否带上--remote参数",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
+    "enableSubmoduleRecursive": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "执行git submodule update后面是否带上--recursive参数",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
+    "submoduleJobs": {
+      "label": "submodule并发拉取数",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "默认不启用并发拉取",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
+    "submoduleDepth": {
+      "label": "submodule depth参数值",
+      "default": "",
+      "placeholder": "",
+      "type": "vuex-input",
+      "desc": "",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
+    "enableVirtualMergeBranch": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "MR事件触发时执行Pre-Merge",
+      "desc": "我们会在MR事件触发时尝试Merge源分支到目标分支，冲突将直接判定为失败",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "merge"
+    },
+    "enableGitClean": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否开启Git Clean",
+      "desc": "选中删除未进行版本管理的文件，排除.gitignore中配置的文件和目录(git clean -df)",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "config",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "strategy",
+            "value": "REVERT_UPDATE"
+          }
+        ]
+      }
+    },
+    "enableGitCleanIgnore": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "清理没有版本跟踪的ignored文件",
+      "desc": "在git clean命令增加-x参数(git clean -x)",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "config",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "strategy",
+            "value": "REVERT_UPDATE"
+          },
+          {
+            "key": "enableGitClean",
+            "value": true
+          }
+        ]
+      }
+    },
+    "enableGitCleanNested": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "清理没有版本跟踪的嵌套仓库",
+      "desc": "git clean使用两个f(git clean -ff)，当删除子模块时，工作空间子模块目录默认不会删除，启用后才会删除",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "config",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "strategy",
+            "value": "REVERT_UPDATE"
+          },
+          {
+            "key": "enableGitClean",
+            "value": true
+          }
+        ]
+      }
+    },
+    "autoCrlf": {
+      "label": "AutoCrlf配置值",
+      "default": "false",
+      "type": "select-input",
+      "optionsConf": {
+        "searchable": true
+      },
+      "groupName": "config",
+      "options": [
+        {
+          "id": "false",
+          "name": "false"
+        },
+        {
+          "id": "true",
+          "name": "true"
+        },
+        {
+          "id": "input",
+          "name": "input"
+        }
+      ]
+    },
+    "enableTrace": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否开启调试",
+      "desc": "开启后，会输出调试日志，插件运行正常建议关闭",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "config"
+    }
+  },
+  "output": {
+    "BK_CI_GIT_REPO_URL": {
+      "type": "string",
+      "description": "代码库的URL"
+    },
+    "BK_CI_GIT_REPO_ALIAS_NAME": {
+      "type": "string",
+      "description": "代码库别名，只有选择`按代码库选择`或`按代码库别名输入`才有值"
+    },
+    "BK_CI_GIT_REPO_NAME": {
+      "type": "string",
+      "description": "代码库的工程名称"
+    },
+    "BK_CI_GIT_REPO_REF": {
+      "type": "string",
+      "description": "当前代码库REF，分支/TAG/COMMIT的值"
+    },
+    "BK_CI_GIT_REPO_CODE_PATH": {
+      "type": "string",
+      "description": "当前代码库本地存放路径"
+    },
+    "BK_CI_GIT_REPO_LAST_COMMIT_ID": {
+      "type": "string",
+      "description": "拉取代码时，上次构建最后的commit id"
+    },
+    "BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID": {
+      "type": "string",
+      "description": "拉取代码时，目标分支的commitId，只有mr事件触发并启用pre-merge功能才有值"
+    },
+    "BK_CI_GIT_REPO_HEAD_COMMIT_ID": {
+      "type": "string",
+      "description": "拉取代码时，本次构建最后的commit id，如果启用pre-merge，则是合并完后的commitId"
+    },
+    "BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT": {
+      "type": "string",
+      "description": "拉取代码时，本次构建最后的commit注释"
+    },
+    "BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR": {
+      "type": "string",
+      "description": "本次产生的新的author"
+    },
+    "BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER": {
+      "type": "string",
+      "description": "本次产生的新的committer"
+    },
+    "BK_CI_GIT_REPO_COMMITS": {
+      "type": "string",
+      "description": "本次产生的新的commit id"
+    },
+    "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID": {
+      "type": "string",
+      "description": "MR合并之前源分支的commitId"
+    },
+    "BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT": {
+      "type": "string",
+      "description": "MR合并之前源分支的提交信息"
+    }
+  }
+}

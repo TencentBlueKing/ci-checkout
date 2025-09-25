@@ -26,11 +26,11 @@
 
 先检查拉取代码使用的是谁的身份，查看插件代码库的配置
 
-![img](../resource/img/repositoryType.png)
+![img](images/repositoryType.png)
 
 1. 如果使用的是“按代码库选择”或“按代码库别名输入”，则拉取代码使用的是代码库配置的授权人，在"蓝盾代码"库搜索选择的代码库，查看授权身份
 
-![img](../resource/img/repositoryInfo.png)
+![img](images/repositoryInfo.png)
 
 - 如果代码库授权身份是oauth类型，则检查授权的用户是否有拉取仓库的权限，如果不是，请让是仓库成员的同学重新编辑代码库，那么授权身份就会变成最后编辑的同学
 - 如果代码库授权身份是凭证类型，那么检查凭证中配置的用户名密码或者公私钥是否正确
@@ -38,7 +38,7 @@
 
 2. 如果使用的是“按仓库URL输入”，则检查凭证类型是否正确
 
-   ![img](../resource/img/authType.png)
+   ![img](images/authType.png)
 
 - 凭证：使用选择的凭证拉取代码
 - access token：工蜂服务器选择这种少，gitlab使用的多
@@ -77,7 +77,7 @@
 
 以上报错是在执行checkout命令时报错，出现这个错的原因是因为分支或者commitId配置错误导致的，需要检查插件的分支配置
 
-![img](../resource/img/branchConfig.png)
+![img](images/branchConfig.png)
 
 常见原因有：
 
@@ -101,7 +101,7 @@
 1. 如果是变量没有设置，设置变量重新执行
 2. 如果配置的是事件触发的变量，需要兼容手动触发的情况，需要把事件触发的变量设置成流水线启动变量，这样手动触发直接指定变量就可以。
 
-![img](../resource/img/pipelineVariable.png)
+![img](images/pipelineVariable.png)
 
 ## 五、部分检出错误,请检查部分检出的文件是否存在
 
@@ -111,7 +111,7 @@
 
 这个错误是因为配置了“拉取相对子路径"或”排除代码库以下路径“导致
 
-![img](../resource/img/sparseCheckoutConfig.png)
+![img](images/sparseCheckoutConfig.png)
 
 报错原因是配置的路径在仓库中不存在，如果有时能 运行成功，有时运行不成功，则需要看路径是不是在有的分支存在，有的分支不存在
 
@@ -252,4 +252,4 @@ git lfs命令没有安装导致的，
 1. 如果仓库使用到大文件，则需要在构建机或者镜像中安装git lfs程序
 2. 如果仓库没有使用大文件，关闭插件的lfs功能。 
 
-![img](../resource/img/lfsConfig.png)
+![img](images/lfsConfig.png)

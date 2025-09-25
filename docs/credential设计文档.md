@@ -11,7 +11,7 @@ git为了解决用户需要输入多次输入账号密码的问题，在1.7版�
 3. 如果匹配上，则将获取的用户名密码去git服务器验证账号密码是否正确，如果正确，则将把账号密码再存储到所有的凭证管理中
 4. 如果没匹配到，则会调用GIT_ASKPASS、core.askPass、SSH_ASKPASS程序获取密码，如果这几个没有配置，会提示让用户输入账号密码。
 
-![git-credentials架构图](../resource/img/git-credentials.png)
+![git-credentials架构图](images/git-credentials.png)
 
 常见的git凭证实现有
 
@@ -49,7 +49,7 @@ git为了解决用户需要输入多次输入账号密码的问题，在1.7版�
 
 最终git-checkout-credential的设计图如下:
 
-![git-checkout-credential架构图](../resource/img/git-checkout-credential.png)
+![git-checkout-credential架构图](images/git-checkout-credential.png)
 
 1. git插件调用git-checkout-credential存储凭证，git-checkout-credential再调用系统级的凭证管理真正存储凭证
 2. git-checkout-credential在配置的时候，会禁用其他的凭证管理，然后再配置自己

@@ -25,6 +25,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-rootProject.name = 'git-checkout'
+rootProject.name = 'ci-checkout'
 include ":git-checkout-core"
 include ":git-checkout-credential"
+include ":git-checkout-plugin"

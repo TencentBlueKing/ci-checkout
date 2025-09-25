@@ -49,6 +49,8 @@ task versionInfo(type: WriteProperties) {
     property 'buildNo', System.getenv("BK_CI_BUILD_NO") ?: ""
     property 'date', new Date().format('yyyy-MM-dd HH:mm:ss')
 }
+
+processResources.dependsOn(":git-checkout-credential:shadowJar")
 processResources.dependsOn versionInfo
 
 apply from: "../task_deploy_to_maven.gradle"
