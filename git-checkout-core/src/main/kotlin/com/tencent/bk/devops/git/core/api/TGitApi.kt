@@ -5,6 +5,7 @@ import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.HttpStatus
 import com.tencent.bk.devops.git.core.exception.ApiException
+import com.tencent.bk.devops.git.core.pojo.PreMergeCommit
 import com.tencent.bk.devops.git.core.pojo.api.GitSession
 import com.tencent.bk.devops.git.core.pojo.api.TGitProjectInfo
 import com.tencent.bk.devops.git.core.pojo.api.TGitProjectMember
@@ -126,6 +127,20 @@ class TGitApi(
                 it.state == "active" &&
                 it.accessLevel >= REPORTER_ACCESS_LEVEL
         } != null
+    }
+
+    override fun preMerge(mrIid: Int): PreMergeCommit? {
+        var apiUrl = "https://${serverInfo.hostName}/$API_PATH/" +
+                    "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}/" +
+                    "merge_request/iid/$mrIid/create_pre_merge_commit"
+        if (isOauth == true) {
+            apiUrl += "&access_token=$token"
+        } else {
+            apiUrl += "&private_token=$token"
+        }
+        val request = HttpUtil.buildGet(apiUrl)
+        val responseContent = HttpUtil.retryRequest(request, "Failed to get tgit repository members info")
+        return JsonUtil.to(responseContent, object : TypeReference<PreMergeCommit>() {})
     }
 
     override fun getProjectId(): Long? {

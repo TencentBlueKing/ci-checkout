@@ -4,7 +4,8 @@ import com.tencent.bk.devops.git.core.enums.GitErrors
 import org.junit.Assert
 import org.junit.Test
 
-class GitErrorsTest {
+class
+GitErrorsTest {
 
     @Test
     fun authenticationFailed() {

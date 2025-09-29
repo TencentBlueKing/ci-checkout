@@ -206,6 +206,8 @@ abstract class AbGitAuthHelper(
         commands: MutableList<String>
     )
 
+    open fun woaInsteadOf() = Unit
+
     /**
      * 子类添加全局配置 expand
      */

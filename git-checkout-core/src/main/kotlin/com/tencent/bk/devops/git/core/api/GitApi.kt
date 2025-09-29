@@ -27,9 +27,13 @@
 
 package com.tencent.bk.devops.git.core.api
 
+import com.tencent.bk.devops.git.core.pojo.PreMergeCommit
+
 interface GitApi {
 
     fun canViewProject(username: String): Boolean
 
     fun getProjectId(): Long?
+
+    fun preMerge(mrIid: Int): PreMergeCommit? = null
 }

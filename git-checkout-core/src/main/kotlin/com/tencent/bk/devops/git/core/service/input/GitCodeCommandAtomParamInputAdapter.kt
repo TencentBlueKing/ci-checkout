@@ -75,7 +75,7 @@ class GitCodeCommandAtomParamInputAdapter(
             }
 
             // 获取鉴权信息,post action阶段不需要查询凭证
-            val authProvider = getAuthProvider()
+            val authProvider = getAuthProvider(repositoryUrl)
             // 主库凭证信息
             val authInfo = authProvider.getAuthInfo()
             // fork库凭证信息
@@ -215,7 +215,8 @@ class GitCodeCommandAtomParamInputAdapter(
      * 获取代码库授权提供者
      */
 
-    private fun getAuthProvider() = with(input) {
+    private fun getAuthProvider(newRepositoryUrl: String) = with(input) {
+        // 获取鉴权信息,post action阶段不需要查询凭证
         if (postEntryParam == "True") {
             EmptyGitAuthProvider()
         } else {
