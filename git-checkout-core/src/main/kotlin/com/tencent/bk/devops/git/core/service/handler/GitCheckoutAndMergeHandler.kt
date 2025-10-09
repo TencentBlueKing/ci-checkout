@@ -29,18 +29,16 @@ package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CHECKOUT_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CHECKOUT_REF
-import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MERGE_SOURCE_REF
-import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MERGE_TARGET_REF
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.PreMergeStrategy
 import com.tencent.bk.devops.git.core.enums.PullStrategy
-import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
-import com.tencent.bk.devops.git.core.pojo.CommitLogInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.service.helper.GitMergeHelper
+import com.tencent.bk.devops.git.core.service.helper.GitSparseCheckoutHelper
 import com.tencent.bk.devops.git.core.service.helper.RefHelper
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
-import java.io.File
 
 class GitCheckoutAndMergeHandler(
     private val settings: GitSourceSettings,
@@ -48,6 +46,8 @@ class GitCheckoutAndMergeHandler(
 ) : IGitHandler {
 
     private val refHelper = RefHelper(settings = settings, git = git)
+    private val mergeHelper = GitMergeHelper(settings = settings, git = git)
+    private val sparseCheckoutHelper = GitSparseCheckoutHelper(settings = settings, git = git)
     companion object {
         private val logger = LoggerFactory.getLogger(GitCheckoutAndMergeHandler::class.java)
     }
@@ -57,7 +57,7 @@ class GitCheckoutAndMergeHandler(
         try {
             logger.groupStart("Checking out")
             val checkoutInfo = refHelper.getCheckInfo()
-            settings.initSparseCheckout(checkoutInfo)
+            sparseCheckoutHelper.initSparseCheckout(checkoutInfo)
             EnvHelper.putContext(CONTEXT_CHECKOUT_REF, checkoutInfo.ref)
             git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
             if (checkoutInfo.upstream.isNotBlank()) {
@@ -70,26 +70,9 @@ class GitCheckoutAndMergeHandler(
                 value = afterCheckoutLog?.commitId ?: ""
             )
             logger.groupEnd("")
-            if (settings.preMerge) {
-                val mergeRef = refHelper.getMergeInfo()
-                logger.groupStart("merge $mergeRef into ${checkoutInfo.ref}")
-                EnvHelper.addEnvVariable(
-                    key = GitConstants.BK_CI_GIT_REPO_MR_TARGET_HEAD_COMMIT_ID,
-                    value = afterCheckoutLog?.commitId ?: ""
-                )
-                val sourceBranchLog = getBranchHeadLog(mergeRef)
-                EnvHelper.addEnvVariable(
-                    key = GitConstants.BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_ID,
-                    value = sourceBranchLog?.commitId ?: ""
-                )
-                EnvHelper.addEnvVariable(
-                    key = GitConstants.BK_CI_GIT_REPO_MR_SOURCE_HEAD_COMMIT_COMMENT,
-                    value = sourceBranchLog?.commitMessage ?: ""
-                )
-                EnvHelper.putContext(CONTEXT_MERGE_SOURCE_REF, mergeRef)
-                EnvHelper.putContext(CONTEXT_MERGE_TARGET_REF, settings.ref)
-                git.merge(mergeRef)
-                logger.groupEnd("")
+            // 默认合并逻辑
+            if (settings.preMergeInfo?.first == PreMergeStrategy.DEFAULT) {
+                mergeHelper.doMerge(afterCheckoutLog, checkoutInfo)
             }
             if (settings.pullStrategy == PullStrategy.REVERT_UPDATE && settings.enableGitClean) {
                 // checkout完成后再执行git clean命令,避免当子模块删除,但是构建机上子模块目录不会被清理的问题,影响下一次构建
@@ -107,63 +90,7 @@ class GitCheckoutAndMergeHandler(
     }
 
     /**
-     * sparse checkout
-     */
-    private fun GitSourceSettings.initSparseCheckout(checkoutInfo: CheckoutInfo) {
-        val sparseFile = File(repositoryPath, ".git/info/sparse-checkout")
-        val content = StringBuilder()
-        if (!excludeSubPath.isNullOrBlank()) {
-            content.append("/*").append(System.lineSeparator())
-            excludeSubPath!!.split(",").forEach {
-                content.append("!").append(it.trim()).append(System.lineSeparator())
-            }
-        }
-        if (!includeSubPath.isNullOrBlank()) {
-            includeSubPath!!.split(",").forEach {
-                content.append("/").append(it.trim().removePrefix("/")).append(System.lineSeparator())
-            }
-        }
-        logger.debug(".git/info/sparse-checkout content: $content")
-
-        if (content.toString().isBlank()) {
-            /*
-                #24 如果由sparse checkout改成正常拉取,需要把内容设置为*, 不然执行`git checkout`文件内容不会发生改变.
-                参考: https://ftp.mcs.anl.gov/pub/pdetools/nightlylogs/xsdk/xsdk-configuration
-                -tester/packages/trilinos/sparse_checkout.sh
-             */
-            if (sparseFile.exists()) {
-                sparseFile.writeText("*")
-                git.config(configKey = "core.sparsecheckout", configValue = "true")
-                if (checkoutInfo.startPoint.isBlank()) {
-                    git.readTree(options = listOf("--reset", "-u", checkoutInfo.ref))
-                } else {
-                    git.readTree(options = listOf("--reset", "-u", checkoutInfo.startPoint))
-                }
-
-                sparseFile.delete()
-            }
-            git.config(configKey = "core.sparsecheckout", configValue = "false")
-        } else {
-            if (!sparseFile.parentFile.exists()) sparseFile.parentFile.mkdirs()
-            if (!sparseFile.exists()) sparseFile.createNewFile()
-            sparseFile.writeText(content.toString())
-            git.config(configKey = "core.sparsecheckout", configValue = "true")
-            if (checkoutInfo.startPoint.isBlank()) {
-                git.readTree(options = listOf("-m", "-u", checkoutInfo.ref))
-            } else {
-                git.readTree(options = listOf("-m", "-u", checkoutInfo.startPoint))
-            }
-        }
-    }
-
-    /**
      * 获取当前工作空间head日志
      */
-    private fun getHeadLog(): CommitLogInfo? {
-        return git.log().firstOrNull()
-    }
-
-    private fun getBranchHeadLog(branchName: String): CommitLogInfo? {
-        return git.log(branchName = branchName).firstOrNull()
-    }
+    private fun getHeadLog() = git.log().firstOrNull()
 }

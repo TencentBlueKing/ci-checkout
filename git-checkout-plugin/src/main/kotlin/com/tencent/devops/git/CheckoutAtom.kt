@@ -5,19 +5,26 @@ import com.tencent.bk.devops.atom.spi.AtomService
 import com.tencent.bk.devops.atom.spi.TaskAtom
 import com.tencent.bk.devops.git.core.GitCheckoutRunner
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.pojo.input.CheckoutAtomParamInput
 import com.tencent.bk.devops.git.core.service.input.CheckoutAtomParamInputAdapter
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.GitUtil
 import com.tencent.devops.git.pojo.CheckoutAtomParam
 
 @AtomService(paramClass = CheckoutAtomParam::class)
 class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
-    @Suppress("LongMethod")
     override fun execute(context: AtomContext<CheckoutAtomParam>) {
-        val inputAdapter = CheckoutAtomParamInputAdapter(input = with(context.param) {
+        val inputAdapter = getInputAdapter(context)
+        GitCheckoutRunner().run(inputAdapter = inputAdapter, atomContext = context)
+    }
+
+    @SuppressWarnings("LongMethod")
+    private fun getInputAdapter(context: AtomContext<CheckoutAtomParam>) =
+        CheckoutAtomParamInputAdapter(input = with(context.param) {
             // 配置环境变量
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_REF, refName)
-
             CheckoutAtomParamInput(
                 bkWorkspace = bkWorkspace,
                 pipelineId = pipelineId,
@@ -25,8 +32,8 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 pipelineBuildId = pipelineBuildId,
                 pipelineStartUserName = pipelineStartUserName,
                 postEntryParam = postEntryParam,
-
                 repositoryType = repositoryType,
+                scmType = getScmTypeByRepoUrl(repositoryUrl, repositoryType),
                 repositoryHashId = repositoryHashId,
                 repositoryName = repositoryName,
                 repositoryUrl = repositoryUrl,
@@ -45,8 +52,9 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 enableFetchRefSpec = enableFetchRefSpec,
                 fetchRefSpec = fetchRefSpec,
                 enableGitLfs = enableGitLfs,
-                enableGitLfsClean = enableGitLfsClean,
+                lfsConcurrentTransfers = lfsConcurrentTransfers,
                 enableSubmodule = enableSubmodule,
+                enableGitLfsClean = enableGitLfsClean,
                 submodulePath = submodulePath,
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
                 enableSubmoduleRemote = enableSubmoduleRemote,
@@ -65,9 +73,6 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 hookTargetBranch = hookTargetBranch,
                 hookSourceUrl = hookSourceUrl,
                 hookTargetUrl = hookTargetUrl,
-
-                retryStartPoint = context.allParameters[
-                    GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_ID + "_" + pipelineTaskId]?.toString(),
                 persistCredentials = persistCredentials ?: true,
                 compatibleHostList = null,
                 enableTrace = enableTrace,
@@ -89,9 +94,19 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 tGitCacheUrl = null,
                 tGitCacheProxyUrl = null,
                 setSafeDirectory = setSafeDirectory,
-                mainRepo = mainRepo
+                mainRepo = mainRepo,
+                tGitCacheGrayProject = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_PROJECT],
+                tGitCacheGrayWhiteProject = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_WHITE_PROJECT],
+                tGitCacheGrayWeight = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_WEIGHT],
+                enableServerPreMerge = enableServerPreMerge
             )
         })
-        GitCheckoutRunner().run(inputAdapter = inputAdapter, atomContext = context)
+
+    private fun getScmTypeByRepoUrl(repositoryUrl: String, repositoryType: String): ScmType {
+        return if (repositoryUrl.isNotEmpty() && RepositoryType.valueOf(repositoryType) == RepositoryType.URL) {
+            GitUtil.getScmType(GitUtil.getServerInfo(repositoryUrl).hostName)
+        } else {
+            ScmType.CODE_TGIT
+        }
     }
 }

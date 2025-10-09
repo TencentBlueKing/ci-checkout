@@ -43,7 +43,7 @@ data class AuthInfo(
     val usernameConfig: String? = null,
 
     // token 信息用于获取代码库信息
-    val token: String? = "",
+    var token: String? = "",
 
     // 是否为Oauth授权
     val isOauth: Boolean? = false

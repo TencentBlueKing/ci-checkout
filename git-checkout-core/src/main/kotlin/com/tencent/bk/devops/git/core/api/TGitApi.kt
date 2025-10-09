@@ -14,6 +14,7 @@ import com.tencent.bk.devops.git.core.util.HttpUtil
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.utils.JsonUtil
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
 import java.net.URLEncoder
@@ -129,17 +130,22 @@ class TGitApi(
         } != null
     }
 
-    override fun preMerge(mrIid: Int): PreMergeCommit? {
+    override fun createPreMerge(mrIid: Int): PreMergeCommit? {
         var apiUrl = "https://${serverInfo.hostName}/$API_PATH/" +
-                    "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}/" +
-                    "merge_request/iid/$mrIid/create_pre_merge_commit"
+                "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}/" +
+                "merge_request/iid/$mrIid/create_pre_merge_commit?"
         if (isOauth == true) {
             apiUrl += "&access_token=$token"
         } else {
             apiUrl += "&private_token=$token"
         }
-        val request = HttpUtil.buildGet(apiUrl)
-        val responseContent = HttpUtil.retryRequest(request, "Failed to get tgit repository members info")
+        val responseContent = HttpUtil.retryRequest(
+            request = HttpUtil.buildPut(
+                apiUrl,
+                RequestBody.create("application/json; charset=utf-8".toMediaTypeOrNull(),"")
+            ),
+            errorMessage = "Failed to create pre merge"
+        )
         return JsonUtil.to(responseContent, object : TypeReference<PreMergeCommit>() {})
     }
 

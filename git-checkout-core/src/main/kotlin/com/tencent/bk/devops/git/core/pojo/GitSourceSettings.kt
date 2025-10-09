@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.pojo
 
+import com.tencent.bk.devops.git.core.enums.PreMergeStrategy
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
@@ -241,7 +242,15 @@ data class GitSourceSettings(
     /**
      * 工蜂cache灰度权重
      */
-    val tGitCacheGrayWeight: String? = null
+    val tGitCacheGrayWeight: String? = null,
+    /**
+     * 使用服务端预合并
+     */
+    val enableServerPreMerge: Boolean? = null,
+    /**
+     * 服务端预合并提交点
+     */
+    var preMergeInfo: Pair<PreMergeStrategy, String?>? = null
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(

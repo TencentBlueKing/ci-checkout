@@ -35,5 +35,5 @@ interface GitApi {
 
     fun getProjectId(): Long?
 
-    fun preMerge(mrIid: Int): PreMergeCommit? = null
+    fun createPreMerge(mrIid: Int): PreMergeCommit? = null
 }

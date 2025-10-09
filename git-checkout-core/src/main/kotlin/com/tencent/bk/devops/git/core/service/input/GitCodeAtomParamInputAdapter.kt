@@ -273,7 +273,8 @@ class GitCodeAtomParamInputAdapter(
                 mainRepo = mainRepo,
                 tGitCacheGrayProject = tGitCacheGrayProject,
                 tGitCacheGrayWeight = tGitCacheGrayWeight,
-                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
+                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
+                enableServerPreMerge = enableServerPreMerge
             )
         }
     }

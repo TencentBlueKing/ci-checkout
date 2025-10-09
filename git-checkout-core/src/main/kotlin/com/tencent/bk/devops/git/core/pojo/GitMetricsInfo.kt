@@ -37,7 +37,7 @@ data class GitMetricsInfo(
     val jobType: String?,
     val channel: String,
     val invalidRef: Int = 0,
-    // woaÊÇ·ñÓĞ´úÀí,0-Ã»ÓĞ´úÀí,1-ÓĞ´úÀí
+    // woaæ˜¯å¦æœ‰ä»£ç†,0-æ²¡æœ‰ä»£ç†,1-æœ‰ä»£ç†
     val woaProxy: Int = 0,
     val vmExistRepo: Int = 0,
     val devcloudDataCached: String
