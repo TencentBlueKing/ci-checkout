@@ -147,6 +147,7 @@ class RefHelper(
         }
     }
 
+    @SuppressWarnings("LongMethod", "CyclomaticComplexMethod")
     fun getCheckInfo(): CheckoutInfo {
         with(settings) {
             return when (pullType) {
