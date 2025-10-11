@@ -27,7 +27,7 @@ class GitFetchHelper constructor(
             settings.preMergeInfo = preMergeInfo
             when (preMergeInfo.first) {
                 PreMergeStrategy.SERVER -> {
-                    fetchBaseCommit(preMergeInfo.second!!)
+                    fetchPreMergeCommit(preMergeInfo.second!!)
                 }
 
                 else -> {
@@ -200,7 +200,10 @@ class GitFetchHelper constructor(
         }
     }
 
-    private fun GitSourceSettings.fetchBaseCommit(commitId: String) {
+    /**
+     * 如果开启服务端合并直接fetch提交点commit
+     */
+    private fun GitSourceSettings.fetchPreMergeCommit(commitId: String) {
         git.fetch(
             refSpec = listOf(commitId),
             fetchDepth = fetchDepth,

@@ -158,7 +158,7 @@ class RefHelper(
                             Pair("FETCH_HEAD", "")
                         preMergeInfo?.first == PreMergeStrategy.SERVER -> {
                             // 服务端预合并CommitId, 上游分支指定为MR的目标分支
-                            Pair(preMergeInfo?.second!!, ref)
+                            Pair(preMergeInfo?.second!!, "$ORIGIN_REMOTE_NAME/$ref")
                         }
                         hookCommitId != null -> {
                             Pair(hookCommitId, "$ORIGIN_REMOTE_NAME/$ref")
