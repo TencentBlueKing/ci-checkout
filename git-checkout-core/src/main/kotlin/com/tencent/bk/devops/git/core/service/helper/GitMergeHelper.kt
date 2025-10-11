@@ -57,13 +57,13 @@ class GitMergeHelper constructor(
      */
     @SuppressWarnings("NestedBlockDepth", "CyclomaticComplexMethod")
     fun getPreMergeInfo() = with(settings) {
-        val preMergeInfo = when {
-            preMerge && enableServerPreMerge == true-> {
+        when {
+            preMerge && enableServerPreMerge == true -> {
                 // 明文拉取时，preMergeInfo已存在直接使用
                 // 预合并commit为游离态，服务端可能会清理掉，使用前需校验commit是否存在，不存在则创建
                 val tryCreatePreMerge = preMergeInfo?.second
-                            ?.takeIf { it.isNotBlank() }
-                            ?.let { !git.shaExists(it) } ?: true
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let { !git.shaExists(it) } ?: true
                 if (tryCreatePreMerge) {
                     System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull()?.let {
                         logger.info("Creating pre-merge commit for MR#$it")
@@ -103,7 +103,6 @@ class GitMergeHelper constructor(
 
             else -> PreMergeStrategy.DEFAULT to null
         }
-        preMergeInfo
     }
 
     companion object {
