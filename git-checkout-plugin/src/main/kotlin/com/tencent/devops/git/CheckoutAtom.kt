@@ -82,7 +82,14 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                     userEmailConfig
                 },
                 enablePartialClone = enablePartialClone,
-                cachePath = cachePath
+                cachePath = cachePath,
+                enableGlobalInsteadOf = true,
+                useCustomCredential = true,
+                enableTGitCache = enableTGitCache,
+                tGitCacheUrl = null,
+                tGitCacheProxyUrl = null,
+                setSafeDirectory = setSafeDirectory,
+                mainRepo = mainRepo
             )
         })
         GitCheckoutRunner().run(inputAdapter = inputAdapter, atomContext = context)

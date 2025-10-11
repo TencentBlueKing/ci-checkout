@@ -79,4 +79,16 @@ class CheckoutAtomParam : AtomBaseParam() {
     val cachePath: String = ""
     val usernameConfig: String? = null
     val userEmailConfig: String? = null
+    /**
+     * 启用工蜂缓存加速
+     */
+    val enableTGitCache: Boolean = false
+    /**
+     * 是否设置安全目录
+     */
+    val setSafeDirectory: Boolean? = false
+    /**
+     * 是否为源材料主仓库
+     */
+    val mainRepo: Boolean? = false
 }

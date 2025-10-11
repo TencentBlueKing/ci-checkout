@@ -152,13 +152,13 @@ data class CheckoutAtomParamInput(
     /**
      * 工蜂cache灰度项目
      */
-    val tGitCacheGrayProject: String?,
+    val tGitCacheGrayProject: String? = null,
     /**
      * 工蜂cache灰度白名单项目
      */
-    val tGitCacheGrayWhiteProject: String?,
+    val tGitCacheGrayWhiteProject: String? = null,
     /**
      * 工蜂cache灰度权重
      */
-    val tGitCacheGrayWeight: String?
+    val tGitCacheGrayWeight: String? = null
 )

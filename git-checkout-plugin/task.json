@@ -802,6 +802,32 @@
       "hidden": false,
       "isSensitive": false,
       "groupName": "config"
+    },
+    "setSafeDirectory": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否设置安全目录",
+      "desc": "选中则执行`git config --global --add safe.directory <path>`，在全局配置中将代码保存路径设置为安全目录",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "config"
+    },
+    "mainRepo": {
+      "label": "",
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "是否为源材料主仓库",
+      "desc": "设置后，在源材料展示时，优先展示源材料主仓库",
+      "required": true,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "config"
     }
   },
   "output": {
