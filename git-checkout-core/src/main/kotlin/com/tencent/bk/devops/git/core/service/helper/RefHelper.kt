@@ -38,7 +38,6 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOT
 import com.tencent.bk.devops.git.core.constant.GitConstants.FETCH_HEAD
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.enums.CodeEventType
-import com.tencent.bk.devops.git.core.enums.PreMergeStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
@@ -156,9 +155,9 @@ class RefHelper(
                     val (startPoint, upstream) = when {
                         GitUtil.isPrePushBranch(ref) ->
                             Pair("FETCH_HEAD", "")
-                        preMergeInfo?.first == PreMergeStrategy.SERVER -> {
+                        serverPreMerge?.first == true -> {
                             // 服务端预合并CommitId, 上游分支指定为MR的目标分支
-                            Pair(preMergeInfo?.second!!, "$ORIGIN_REMOTE_NAME/$ref")
+                            Pair(serverPreMerge?.second!!, "$ORIGIN_REMOTE_NAME/$ref")
                         }
                         hookCommitId != null -> {
                             Pair(hookCommitId, "$ORIGIN_REMOTE_NAME/$ref")
@@ -174,7 +173,7 @@ class RefHelper(
                             CheckoutInfo(
                                 ref = DEVOPS_VIRTUAL_BRANCH,
                                 startPoint = startPoint,
-                                upstream = if (preMergeInfo?.first == PreMergeStrategy.DEFAULT) {
+                                upstream = if (serverPreMerge?.first == true) {
                                     ""
                                 } else {
                                     // 服务端合并需指定上游分支

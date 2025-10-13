@@ -699,7 +699,7 @@
       "placeholder": "",
       "type": "atom-checkbox",
       "text": "启用服务端预合并",
-      "desc": "由服务端执行预合并，直接拉取合并后的内容",
+      "desc": "由服务端执行预合并，直接拉取服务端合并后的内容，不影响原有MR状态。使用场景：\n当需要读取预合并后的代码片段时,建议开启\n使用限制:\n目前只支持内网工蜂代码库",
       "required": true,
       "disabled": false,
       "hidden": false,

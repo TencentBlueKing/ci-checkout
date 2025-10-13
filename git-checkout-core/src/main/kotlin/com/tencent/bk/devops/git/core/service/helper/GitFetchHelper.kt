@@ -1,7 +1,6 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
-import com.tencent.bk.devops.git.core.enums.PreMergeStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.util.DateUtil
@@ -14,7 +13,6 @@ class GitFetchHelper constructor(
 ) {
 
     private val refHelper = RefHelper(settings = settings, git = git)
-    private val mergeHelper = GitMergeHelper(settings = settings, git = git)
 
     fun doPrune() {
         // 清理本地已经删除的分支,git fetch --prune也能清理,但是如果git fetch指定分支,就只能清理指定的分支,无法清理所有的
@@ -23,21 +21,12 @@ class GitFetchHelper constructor(
 
     fun doFetch() {
         with(settings) {
-            val preMergeInfo = mergeHelper.getPreMergeInfo()
-            settings.preMergeInfo = preMergeInfo
-            when (preMergeInfo.first) {
-                PreMergeStrategy.SERVER -> {
-                    fetchPreMergeCommit(preMergeInfo.second!!)
-                }
-
-                else -> {
-                    val shallowSince = calculateShallowSince()
-                    fetchTargetRepository(shallowSince = shallowSince)
-                    fetchSourceRepository(shallowSince = shallowSince)
-                    fetchPrePushBranch(shallowSince = shallowSince)
-                    testMerge()
-                }
-            }
+            val shallowSince = calculateShallowSince()
+            fetchTargetRepository(shallowSince = shallowSince)
+            fetchSourceRepository(shallowSince = shallowSince)
+            fetchPrePushBranch(shallowSince = shallowSince)
+            fetchPreMergeCommit()
+            testMerge()
         }
     }
 
@@ -92,6 +81,11 @@ class GitFetchHelper constructor(
      * 3. 再次通过depth拉取源分支就能得到d1节点
      */
     private fun GitSourceSettings.testMerge() {
+        // 如果开启了server pre-merge,则跳过merge测试
+        if (serverPreMerge?.first == true) {
+            logger.debug("skip testMerge, use server pre-merge info")
+            return
+        }
         // preMerge和fetchDepth同时启用,并且不能merge
         if (preMerge && fetchDepth > 0) {
             val remoteName = if (sourceRepoUrlEqualsRepoUrl) {
@@ -203,13 +197,15 @@ class GitFetchHelper constructor(
     /**
      * 如果开启服务端合并直接fetch提交点commit
      */
-    private fun GitSourceSettings.fetchPreMergeCommit(commitId: String) {
-        git.fetch(
-            refSpec = listOf(commitId),
-            fetchDepth = fetchDepth,
-            remoteName = GitConstants.ORIGIN_REMOTE_NAME,
-            enablePartialClone = enablePartialClone
-        )
+    private fun GitSourceSettings.fetchPreMergeCommit() {
+        if (serverPreMerge?.first == true && !serverPreMerge?.second.isNullOrBlank()) {
+            git.fetch(
+                refSpec = listOf(serverPreMerge?.second!!),
+                fetchDepth = fetchDepth,
+                remoteName = GitConstants.ORIGIN_REMOTE_NAME,
+                enablePartialClone = enablePartialClone
+            )
+        }
     }
 
     companion object {

@@ -106,6 +106,15 @@ class GitCodeCommandAtomParamInputAdapter(
                 pullType = PullType.BRANCH.name
                 forkRepoAuthInfo = getForkRepoAuthInfo()
             }
+            // 服务端预合并信息
+            val serverPreMerge = GitUtil.getServerPreMerge(
+                scmType = scmType,
+                repositoryUrl = repositoryUrl,
+                authInfo = authInfo,
+                preMerge = preMerge,
+                mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
+                enableServerPreMerge = enableServerPreMerge
+            )
 
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
             EnvHelper.addEnvVariable(
@@ -197,7 +206,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 tGitCacheGrayProject = tGitCacheGrayProject,
                 tGitCacheGrayWeight = tGitCacheGrayWeight,
                 tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
-                enableServerPreMerge = enableServerPreMerge
+                serverPreMerge = serverPreMerge
             )
         }
     }

@@ -1,10 +1,12 @@
 package com.tencent.bk.devops.git.core.service.repository
 
+import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.api.GitApi
 import com.tencent.bk.devops.git.core.api.GithubApi
 import com.tencent.bk.devops.git.core.api.GitlabApi
 import com.tencent.bk.devops.git.core.api.TGitApi
 import com.tencent.bk.devops.git.core.enums.ScmType
+import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.PreMergeCommit
 import com.tencent.bk.devops.git.core.util.GitUtil
@@ -30,6 +32,8 @@ class GitScmService(
     fun createPreMerge(mrIid: Int): PreMergeCommit? {
         return try {
             getGitApi()?.createPreMerge(mrIid)
+        } catch (ignored: ApiException) {
+            throw ignored
         } catch (ignored: Exception) {
             logger.debug("can't to create pre merge", ignored)
             null
@@ -80,11 +84,7 @@ class GitScmService(
                 userId = username,
                 token = token
             )
-            else -> TGitApi(
-                repositoryUrl = repositoryUrl,
-                userId = username,
-                token = token
-            )
+            else -> null
         }
     }
 

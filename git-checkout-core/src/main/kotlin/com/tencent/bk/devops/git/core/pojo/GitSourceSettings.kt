@@ -244,13 +244,9 @@ data class GitSourceSettings(
      */
     val tGitCacheGrayWeight: String? = null,
     /**
-     * 使用服务端预合并
+     * 使用服务端预合并 to 服务端预合并提交点
      */
-    val enableServerPreMerge: Boolean? = null,
-    /**
-     * 服务端预合并提交点
-     */
-    var preMergeInfo: Pair<PreMergeStrategy, String?>? = null
+    var serverPreMerge: Pair<Boolean, String?>? = null
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(

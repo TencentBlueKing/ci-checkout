@@ -70,10 +70,7 @@ class GitCheckoutAndMergeHandler(
                 value = afterCheckoutLog?.commitId ?: ""
             )
             logger.groupEnd("")
-            // 默认合并逻辑
-            if (settings.preMergeInfo?.first == PreMergeStrategy.DEFAULT) {
-                mergeHelper.doMerge(afterCheckoutLog, checkoutInfo)
-            }
+            mergeHelper.doMerge(afterCheckoutLog, checkoutInfo)
             if (settings.pullStrategy == PullStrategy.REVERT_UPDATE && settings.enableGitClean) {
                 // checkout完成后再执行git clean命令,避免当子模块删除,但是构建机上子模块目录不会被清理的问题,影响下一次构建
                 git.tryClean(
