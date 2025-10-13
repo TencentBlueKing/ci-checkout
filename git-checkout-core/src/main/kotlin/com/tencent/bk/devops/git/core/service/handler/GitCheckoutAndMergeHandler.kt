@@ -30,7 +30,6 @@ package com.tencent.bk.devops.git.core.service.handler
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CHECKOUT_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_CHECKOUT_REF
 import com.tencent.bk.devops.git.core.constant.GitConstants
-import com.tencent.bk.devops.git.core.enums.PreMergeStrategy
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager

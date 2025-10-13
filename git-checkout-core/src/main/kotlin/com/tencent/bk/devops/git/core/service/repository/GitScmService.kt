@@ -1,6 +1,5 @@
 package com.tencent.bk.devops.git.core.service.repository
 
-import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.api.GitApi
 import com.tencent.bk.devops.git.core.api.GithubApi
 import com.tencent.bk.devops.git.core.api.GitlabApi

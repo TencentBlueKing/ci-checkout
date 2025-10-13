@@ -27,7 +27,6 @@
 
 package com.tencent.bk.devops.git.core.pojo
 
-import com.tencent.bk.devops.git.core.enums.PreMergeStrategy
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
