@@ -173,7 +173,7 @@ class RefHelper(
                             CheckoutInfo(
                                 ref = DEVOPS_VIRTUAL_BRANCH,
                                 startPoint = startPoint,
-                                upstream = if (serverPreMerge?.first == true) {
+                                upstream = if (serverPreMerge?.first != true) {
                                     ""
                                 } else {
                                     // 服务端合并需指定上游分支
