@@ -138,7 +138,7 @@ class GitCodeAtomParamInputAdapter(
                 EnvHelper.putContext(ContextConstants.CONTEXT_MERGE_TARGET_REF, ref)
             }
             // 服务端预合并信息
-            val serverPreMerge = GitUtil.getServerPreMerge(
+            val (serverPreMerge, serverPreMergeCommit) = GitUtil.getServerPreMerge(
                 scmType = scmType,
                 repositoryUrl = repository.url,
                 authInfo = authInfo,
@@ -286,7 +286,8 @@ class GitCodeAtomParamInputAdapter(
                 tGitCacheGrayProject = tGitCacheGrayProject,
                 tGitCacheGrayWeight = tGitCacheGrayWeight,
                 tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
-                serverPreMerge = serverPreMerge
+                serverPreMerge = serverPreMerge,
+                serverPreMergeCommit = serverPreMergeCommit
             )
         }
     }

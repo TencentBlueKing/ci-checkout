@@ -107,7 +107,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 forkRepoAuthInfo = getForkRepoAuthInfo()
             }
             // 服务端预合并信息
-            val serverPreMerge = GitUtil.getServerPreMerge(
+            val (serverPreMerge, serverPreMergeCommit) = GitUtil.getServerPreMerge(
                 scmType = scmType,
                 repositoryUrl = repositoryUrl,
                 authInfo = authInfo,
@@ -206,7 +206,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 tGitCacheGrayProject = tGitCacheGrayProject,
                 tGitCacheGrayWeight = tGitCacheGrayWeight,
                 tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
-                serverPreMerge = serverPreMerge
+                serverPreMerge = serverPreMerge,
+                serverPreMergeCommit = serverPreMergeCommit
             )
         }
     }

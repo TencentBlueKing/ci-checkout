@@ -37,7 +37,7 @@ class GitMergeHelper constructor(
             EnvHelper.putContext(ContextConstants.CONTEXT_MERGE_SOURCE_REF, mergeRef)
             EnvHelper.putContext(ContextConstants.CONTEXT_MERGE_TARGET_REF, settings.ref)
             // 如果服务端预合并开关关闭，则执行merge操作
-            if (settings.serverPreMerge?.first != true) {
+            if (settings.serverPreMerge != true) {
                 git.merge(mergeRef)
             }
             logger.groupEnd("")

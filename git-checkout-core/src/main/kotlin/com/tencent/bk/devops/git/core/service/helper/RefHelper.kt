@@ -155,9 +155,9 @@ class RefHelper(
                     val (startPoint, upstream) = when {
                         GitUtil.isPrePushBranch(ref) ->
                             Pair("FETCH_HEAD", "")
-                        serverPreMerge?.first == true -> {
+                        serverPreMerge == true -> {
                             // 服务端预合并CommitId, 上游分支指定为MR的目标分支
-                            Pair(serverPreMerge?.second!!, "$ORIGIN_REMOTE_NAME/$ref")
+                            Pair(serverPreMergeCommit!!, "$ORIGIN_REMOTE_NAME/$ref")
                         }
                         hookCommitId != null -> {
                             Pair(hookCommitId, "$ORIGIN_REMOTE_NAME/$ref")
@@ -173,7 +173,7 @@ class RefHelper(
                             CheckoutInfo(
                                 ref = DEVOPS_VIRTUAL_BRANCH,
                                 startPoint = startPoint,
-                                upstream = if (serverPreMerge?.first != true) {
+                                upstream = if (serverPreMerge != true) {
                                     ""
                                 } else {
                                     // 服务端合并需指定上游分支

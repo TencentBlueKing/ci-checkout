@@ -82,7 +82,7 @@ class GitFetchHelper constructor(
      */
     private fun GitSourceSettings.testMerge() {
         // 如果开启了server pre-merge,则跳过merge测试
-        if (serverPreMerge?.first == true) {
+        if (serverPreMerge == true) {
             logger.debug("skip testMerge, use server pre-merge info")
             return
         }
@@ -198,9 +198,9 @@ class GitFetchHelper constructor(
      * 如果开启服务端合并直接fetch提交点commit
      */
     private fun GitSourceSettings.fetchPreMergeCommit() {
-        if (serverPreMerge?.first == true && !serverPreMerge?.second.isNullOrBlank()) {
+        if (serverPreMerge == true && !serverPreMergeCommit.isNullOrBlank()) {
             git.fetch(
-                refSpec = listOf(serverPreMerge?.second!!),
+                refSpec = listOf(serverPreMergeCommit),
                 fetchDepth = fetchDepth,
                 remoteName = GitConstants.ORIGIN_REMOTE_NAME,
                 enablePartialClone = enablePartialClone
