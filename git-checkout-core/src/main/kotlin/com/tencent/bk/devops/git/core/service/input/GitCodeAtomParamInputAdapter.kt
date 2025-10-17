@@ -144,8 +144,7 @@ class GitCodeAtomParamInputAdapter(
                 authInfo = authInfo,
                 preMerge = preMerge,
                 mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
-                enableServerPreMerge = enableServerPreMerge,
-                enableSparseCone = enableSparseCone
+                enableServerPreMerge = enableServerPreMerge
             )
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
@@ -288,7 +287,8 @@ class GitCodeAtomParamInputAdapter(
                 tGitCacheGrayWeight = tGitCacheGrayWeight,
                 tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
                 serverPreMerge = serverPreMerge,
-                serverPreMergeCommit = serverPreMergeCommit
+                serverPreMergeCommit = serverPreMergeCommit,
+                enableSparseCone = enableSparseCone
             )
         }
     }
