@@ -100,7 +100,14 @@ class GitSparseCheckoutHelper constructor(
                 it.isNotBlank()
             }
         }
-        git.sparseCheckoutSet(true, conePaths)
+        git.sparseCheckoutInit(true)
+        if (conePaths.isNotEmpty()) {
+            git.sparseCheckoutAdd(conePaths)
+        } else {
+            // 置空规则，拉根目录文件
+            git.sparseCheckoutSet()
+        }
+        git.sparseCheckoutReapply()
     }
 
     /**

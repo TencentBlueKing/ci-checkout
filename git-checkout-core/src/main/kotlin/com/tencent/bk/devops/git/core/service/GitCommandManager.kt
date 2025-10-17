@@ -782,19 +782,42 @@ class GitCommandManager(
     }
 
     /**
-     * 设置sparse checkout路径
+     * sparse checkout 初始化
      */
-    fun sparseCheckoutSet(
-        cone: Boolean,
-        paths: List<String>
+    fun sparseCheckoutInit(
+        cone: Boolean
     ) {
-        val args = mutableListOf("sparse-checkout", "set")
+        val args = mutableListOf("sparse-checkout", "init")
         if (cone) {
             args.add("--cone")
         } else {
             args.add("--no-cone")
         }
-        args.addAll(paths)
         execGit(args = args)
+    }
+
+    /**
+     * sparse checkout 添加拉取路径
+     */
+    fun sparseCheckoutAdd(
+        paths: List<String>
+    ) {
+        execGit(args = listOf("sparse-checkout", "add").plus(paths))
+    }
+
+    /**
+     * sparse checkout 添加拉取路径
+     */
+    fun sparseCheckoutSet(
+        paths: List<String> = listOf()
+    ) {
+        execGit(args = listOf("sparse-checkout", "set").plus(paths))
+    }
+
+    /**
+     * sparse checkout 应用
+     */
+    fun sparseCheckoutReapply() {
+        execGit(args = listOf("sparse-checkout", "reapply"))
     }
 }
