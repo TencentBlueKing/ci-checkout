@@ -780,4 +780,21 @@ class GitCommandManager(
     fun lfsVersion() {
         execGit(args = listOf("lfs", "version"))
     }
+
+    /**
+     * 设置sparse checkout路径
+     */
+    fun sparseCheckoutSet(
+        cone: Boolean,
+        paths: List<String>
+    ) {
+        val args = mutableListOf("sparse-checkout", "set")
+        if (cone) {
+            args.add("--cone")
+        } else {
+            args.add("--no-cone")
+        }
+        args.addAll(paths)
+        execGit(args = args)
+    }
 }

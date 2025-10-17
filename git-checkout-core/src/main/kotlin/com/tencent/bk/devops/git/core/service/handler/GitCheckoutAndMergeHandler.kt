@@ -56,7 +56,7 @@ class GitCheckoutAndMergeHandler(
         try {
             logger.groupStart("Checking out")
             val checkoutInfo = refHelper.getCheckInfo()
-            sparseCheckoutHelper.initSparseCheckout(checkoutInfo)
+            sparseCheckoutHelper.init(checkoutInfo)
             EnvHelper.putContext(CONTEXT_CHECKOUT_REF, checkoutInfo.ref)
             git.checkout(checkoutInfo.ref, checkoutInfo.startPoint)
             if (checkoutInfo.upstream.isNotBlank()) {

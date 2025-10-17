@@ -113,7 +113,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 authInfo = authInfo,
                 preMerge = preMerge,
                 mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
-                enableServerPreMerge = enableServerPreMerge
+                enableServerPreMerge = enableServerPreMerge,
+                enableSparseCone = enableSparseCone
             )
 
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
