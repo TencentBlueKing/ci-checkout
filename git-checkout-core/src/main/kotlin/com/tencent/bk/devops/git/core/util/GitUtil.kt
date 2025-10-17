@@ -253,7 +253,7 @@ object GitUtil {
         mrIid: Int?,
         enableServerPreMerge: Boolean?
     ): Pair<Boolean, String> {
-        return if (preMerge && enableServerPreMerge == true && mrIid != null) {
+        return if (preMerge && enableServerPreMerge == true && scmType == ScmType.CODE_GIT && mrIid != null ) {
             logger.info("Creating pre-merge commit for MR#$mrIid")
             GitScmService(
                 scmType = scmType,
