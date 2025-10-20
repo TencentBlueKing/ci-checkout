@@ -101,13 +101,7 @@ class GitSparseCheckoutHelper constructor(
             }
         }
         git.sparseCheckoutInit(true)
-        if (conePaths.isNotEmpty()) {
-            git.sparseCheckoutAdd(conePaths)
-        } else {
-            // 置空规则，拉根目录文件
-            git.sparseCheckoutSet()
-        }
-        git.sparseCheckoutReapply()
+        git.sparseCheckoutSet(conePaths)
     }
 
     /**
@@ -160,7 +154,7 @@ class GitSparseCheckoutHelper constructor(
         } else ""
     }
 
-    private fun useConeMode() = settings.enableSparseCone == true &&
+    fun useConeMode() = settings.enableSparseCone == true &&
             git.isAtLeastVersion(GitConstants.SUPPORT_SPARSE_CHECKOUT_GIT_VERSION)
 
     companion object {

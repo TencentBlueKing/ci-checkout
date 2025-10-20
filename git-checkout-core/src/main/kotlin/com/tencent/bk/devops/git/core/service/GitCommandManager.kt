@@ -799,25 +799,9 @@ class GitCommandManager(
     /**
      * sparse checkout 添加拉取路径
      */
-    fun sparseCheckoutAdd(
+    fun sparseCheckoutSet(
         paths: List<String>
     ) {
-        execGit(args = listOf("sparse-checkout", "add").plus(paths))
-    }
-
-    /**
-     * sparse checkout 添加拉取路径
-     */
-    fun sparseCheckoutSet(
-        paths: List<String> = listOf()
-    ) {
         execGit(args = listOf("sparse-checkout", "set").plus(paths))
-    }
-
-    /**
-     * sparse checkout 应用
-     */
-    fun sparseCheckoutReapply() {
-        execGit(args = listOf("sparse-checkout", "reapply"))
     }
 }
