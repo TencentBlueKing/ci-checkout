@@ -17,6 +17,7 @@ class GitLfsHandler(
         private val logger = LoggerFactory.getLogger(GitLfsHandler::class.java)
     }
 
+    @SuppressWarnings("NestedBlockDepth")
     override fun doHandle() {
         val startEpoch = System.currentTimeMillis()
         try {
