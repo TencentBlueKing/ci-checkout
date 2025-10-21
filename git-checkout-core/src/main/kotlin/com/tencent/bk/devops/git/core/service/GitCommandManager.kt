@@ -804,4 +804,11 @@ class GitCommandManager(
     ) {
         execGit(args = listOf("sparse-checkout", "set").plus(paths))
     }
+
+    /**
+     * sparse checkout 配置列表
+     */
+    fun sparseCheckoutList() {
+        execGit(args = listOf("sparse-checkout", "list"))
+    }
 }

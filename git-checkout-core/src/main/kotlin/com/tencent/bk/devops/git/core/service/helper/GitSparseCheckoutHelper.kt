@@ -102,6 +102,7 @@ class GitSparseCheckoutHelper constructor(
         }
         git.sparseCheckoutInit(true)
         git.sparseCheckoutSet(conePaths)
+        git.sparseCheckoutList()
     }
 
     /**
