@@ -131,7 +131,8 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheGrayWeight = tGitCacheGrayWeight,
             tGitCacheGrayProject = tGitCacheGrayProject,
             tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
-            enableServerPreMerge = enableServerPreMerge
+            enableServerPreMerge = enableServerPreMerge,
+            enableSparseCone = enableSparseCone
         )
     ).getInputs()
 
@@ -201,7 +202,8 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheGrayWeight = tGitCacheGrayWeight,
             tGitCacheGrayProject = tGitCacheGrayProject,
             tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
-            enableServerPreMerge = enableServerPreMerge
+            enableServerPreMerge = enableServerPreMerge,
+            enableSparseCone = enableSparseCone
         )
     ).getInputs()
 

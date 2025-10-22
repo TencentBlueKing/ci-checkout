@@ -39,10 +39,10 @@ import org.mockito.Mockito
 import java.io.File
 import java.nio.file.Files
 
-class GitSourceProviderTest {
+open class GitSourceProviderTest {
 
-    private var workspace: File = Files.createTempDirectory("git-checkout").toFile()
-    private val settings = GitSourceSettings(
+    var workspace: File = Files.createTempDirectory("git-checkout").toFile()
+    val settings = GitSourceSettings(
         bkWorkspace = workspace.absolutePath,
         pipelineId = "p-0dedf8a92a3147bcb5bed58dd10a667e",
         pipelineBuildId = "b-3bee3e2d0a1941fa9dc1845aa6c55dbc",

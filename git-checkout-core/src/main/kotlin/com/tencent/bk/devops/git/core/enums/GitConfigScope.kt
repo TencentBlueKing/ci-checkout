@@ -31,5 +31,6 @@ enum class GitConfigScope(val arg: String) {
     GLOBAL("--global"),
     SYSTEM("--system"),
     LOCAL("--local"),
-    FILE("--file")
+    FILE("--file"),
+    WORKTREE("--worktree")
 }

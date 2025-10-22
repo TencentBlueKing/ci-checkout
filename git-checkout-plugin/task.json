@@ -486,6 +486,18 @@
       "isSensitive": false,
       "groupName": "fetch"
     },
+    "enableSparseCone": {
+      "default": false,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "启用sparse cone模式",
+      "desc": "sparse cone模式git版本必须高于2.25.0，默认仅拉取根目录文件，启用后\"拉取代码库以下路径\"不支持输入通配符，仅支持目录层级拉取",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "fetch"
+    },
     "includePath": {
       "label": "拉取代码库以下路径",
       "default": "",

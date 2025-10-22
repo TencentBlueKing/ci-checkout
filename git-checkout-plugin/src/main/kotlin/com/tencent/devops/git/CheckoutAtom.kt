@@ -98,7 +98,8 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 tGitCacheGrayProject = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_PROJECT],
                 tGitCacheGrayWhiteProject = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_WHITE_PROJECT],
                 tGitCacheGrayWeight = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_WEIGHT],
-                enableServerPreMerge = enableServerPreMerge
+                enableServerPreMerge = enableServerPreMerge,
+                enableSparseCone = enableSparseCone
             )
         })
 

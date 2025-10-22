@@ -249,7 +249,11 @@ data class GitSourceSettings(
     /**
      * 服务端预合并提交点
      */
-    val serverPreMergeCommit: String? = null
+    val serverPreMergeCommit: String? = null,
+    /**
+     * 启用sparse cone模式
+     */
+    val enableSparseCone: Boolean? = null
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(

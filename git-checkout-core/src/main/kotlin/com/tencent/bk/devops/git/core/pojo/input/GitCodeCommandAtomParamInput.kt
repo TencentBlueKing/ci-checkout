@@ -158,5 +158,9 @@ data class GitCodeCommandAtomParamInput(
     /**
      * 是否开启服务器预合并, 默认: false
      */
-    val enableServerPreMerge: Boolean? = false
+    val enableServerPreMerge: Boolean? = false,
+    /**
+     * 启用sparse cone模式
+     */
+    val enableSparseCone: Boolean? = null
 )

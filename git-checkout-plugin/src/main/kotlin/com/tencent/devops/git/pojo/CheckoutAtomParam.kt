@@ -242,4 +242,8 @@ class CheckoutAtomParam : AtomBaseParam() {
      * 启用服务器预合并
      */
     val enableServerPreMerge: Boolean? = false
+    /**
+     * 启用sparse cone模式
+     */
+    val enableSparseCone: Boolean? = false
 }

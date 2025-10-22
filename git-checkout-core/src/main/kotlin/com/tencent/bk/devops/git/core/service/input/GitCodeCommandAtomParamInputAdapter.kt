@@ -207,7 +207,8 @@ class GitCodeCommandAtomParamInputAdapter(
                 tGitCacheGrayWeight = tGitCacheGrayWeight,
                 tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
                 serverPreMerge = serverPreMerge,
-                serverPreMergeCommit = serverPreMergeCommit
+                serverPreMergeCommit = serverPreMergeCommit,
+                enableSparseCone = enableSparseCone
             )
         }
     }
