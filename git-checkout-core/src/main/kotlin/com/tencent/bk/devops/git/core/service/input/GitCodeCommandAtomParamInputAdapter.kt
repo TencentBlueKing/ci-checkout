@@ -75,7 +75,7 @@ class GitCodeCommandAtomParamInputAdapter(
             }
 
             // 获取鉴权信息,post action阶段不需要查询凭证
-            val authProvider = getAuthProvider()
+            val authProvider = getAuthProvider(repositoryUrl)
             // 主库凭证信息
             val authInfo = authProvider.getAuthInfo()
             // fork库凭证信息
@@ -106,6 +106,15 @@ class GitCodeCommandAtomParamInputAdapter(
                 pullType = PullType.BRANCH.name
                 forkRepoAuthInfo = getForkRepoAuthInfo()
             }
+            // 服务端预合并信息
+            val (serverPreMerge, serverPreMergeCommit) = GitUtil.getServerPreMerge(
+                scmType = scmType,
+                repositoryUrl = repositoryUrl,
+                authInfo = authInfo,
+                preMerge = preMerge,
+                mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
+                enableServerPreMerge = enableServerPreMerge
+            )
 
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
             EnvHelper.addEnvVariable(
@@ -196,7 +205,9 @@ class GitCodeCommandAtomParamInputAdapter(
                 mainRepo = mainRepo,
                 tGitCacheGrayProject = tGitCacheGrayProject,
                 tGitCacheGrayWeight = tGitCacheGrayWeight,
-                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
+                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
+                serverPreMerge = serverPreMerge,
+                serverPreMergeCommit = serverPreMergeCommit
             )
         }
     }
@@ -215,7 +226,8 @@ class GitCodeCommandAtomParamInputAdapter(
      * 获取代码库授权提供者
      */
 
-    private fun getAuthProvider() = with(input) {
+    private fun getAuthProvider(newRepositoryUrl: String) = with(input) {
+        // 获取鉴权信息,post action阶段不需要查询凭证
         if (postEntryParam == "True") {
             EmptyGitAuthProvider()
         } else {

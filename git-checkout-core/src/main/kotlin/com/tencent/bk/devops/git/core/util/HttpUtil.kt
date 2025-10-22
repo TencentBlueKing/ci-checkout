@@ -75,6 +75,10 @@ object HttpUtil {
         return build(url, headers).post(requestBody).build()
     }
 
+    fun buildPut(url: String, requestBody: RequestBody, headers: Map<String, String>? = null): Request {
+        return build(url, headers).put(requestBody).build()
+    }
+
     fun build(url: String, headers: Map<String, String>? = null): Request.Builder {
         val builder = Request.Builder().url(url)
         if (headers != null) {

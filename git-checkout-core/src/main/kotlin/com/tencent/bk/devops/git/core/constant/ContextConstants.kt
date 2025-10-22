@@ -32,6 +32,7 @@ object ContextConstants {
     const val CONTEXT_ERROR_INFO = "context_error_info"
     const val CONTEXT_GIT_VERSION = "context_git_version"
     const val CONTEXT_INVALID_REF = "context_invalid_ref"
+    const val CONTEXT_WOA_PROXY = "context_woa_proxy"
     const val CONTEXT_BACKUP_INSTEADOF = "context_backup_insteadOf"
     // 构建机是否有代码库
     const val CONTEXT_VM_EXIST_REPO = "context_vm_exist_repo"

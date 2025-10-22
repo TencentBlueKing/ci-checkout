@@ -29,12 +29,17 @@ package com.tencent.bk.devops.git.core.util
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.CodeEventType
+import com.tencent.bk.devops.git.core.enums.GitErrors
 import com.tencent.bk.devops.git.core.enums.ScmType
 import com.tencent.bk.devops.git.core.enums.TGitMrAction
+import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
+import com.tencent.bk.devops.git.core.pojo.AuthInfo
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.helper.DefaultGitTypeParseHelper
 import com.tencent.bk.devops.git.core.service.helper.IGitTypeParseHelper
+import com.tencent.bk.devops.git.core.service.repository.GitScmService
+import com.tencent.bk.devops.plugin.pojo.ErrorType
 import org.slf4j.LoggerFactory
 import java.net.URLDecoder
 import java.net.URLEncoder
@@ -236,5 +241,43 @@ object GitUtil {
         }
         logger.debug("enable cache by strategy: $cacheStrategy")
         return cacheStrategy
+    }
+
+
+    @SuppressWarnings("LongParameterList")
+    fun getServerPreMerge(
+        scmType: ScmType,
+        repositoryUrl: String,
+        authInfo: AuthInfo,
+        preMerge: Boolean,
+        mrIid: Int?,
+        enableServerPreMerge: Boolean?
+    ): Pair<Boolean, String> {
+        return if (preMerge && enableServerPreMerge == true && scmType == ScmType.CODE_GIT && mrIid != null ) {
+            logger.info("Creating pre-merge commit for MR#$mrIid")
+            GitScmService(
+                scmType = scmType,
+                repositoryUrl = repositoryUrl,
+                authInfo = authInfo
+            ).createPreMerge(mrIid)?.let {
+                // 合并冲突
+                if (it.conflict) {
+                    throw GitExecuteException(
+                        errorType = ErrorType.USER,
+                        errorCode = GitErrors.MergeConflicts.errorCode,
+                        errorMsg = GitErrors.MergeConflicts.title ?: "",
+                        reason = GitErrors.MergeConflicts.cause?.let {
+                            PlaceholderResolver.defaultResolver.resolveByMap(it, EnvHelper.getContextMap())
+                        } ?: "",
+                        solution = GitErrors.MergeConflicts.solution ?: "",
+                        wiki = GitErrors.MergeConflicts.wiki ?: ""
+                    )
+                }
+                logger.debug("created pre-merge commit point [${it.id}]")
+                true to it.id
+            } ?: (false to "")
+        } else {
+            false to ""
+        }
     }
 }

@@ -48,6 +48,7 @@ import com.tencent.bk.devops.git.core.service.handler.GitSubmodulesPlaintextHand
 import com.tencent.bk.devops.git.core.service.handler.HandlerExecutionChain
 import com.tencent.bk.devops.git.core.service.handler.InitRepoHandler
 import com.tencent.bk.devops.git.core.service.handler.PrepareWorkspaceHandler
+import com.tencent.bk.devops.git.core.service.handler.WoaProxyHandler
 import com.tencent.bk.devops.git.core.service.helper.GitCacheHelperFactory
 import com.tencent.bk.devops.git.core.service.helper.auth.GitAuthHelperFactory
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -93,6 +94,7 @@ class GitSourceProvider(
             val git = GitCommandManager(workingDirectory = workingDirectory, lfs = lfs)
             val handlerChain = HandlerExecutionChain(
                 listOf(
+                    WoaProxyHandler(settings, git),
                     PrepareWorkspaceHandler(settings, git),
                     InitRepoHandler(settings, git),
                     GitAuthHandler(settings, git),

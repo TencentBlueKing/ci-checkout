@@ -156,4 +156,6 @@ class UsernamePwdGitAuthHelper(
         val uri = URI(settings.repositoryUrl)
         return "url.${uri.scheme}://${authInfo.username}:${urlEncode(authInfo.password!!)}@${uri.host}/.insteadOf"
     }
+
+    override fun woaInsteadOf() = Unit
 }

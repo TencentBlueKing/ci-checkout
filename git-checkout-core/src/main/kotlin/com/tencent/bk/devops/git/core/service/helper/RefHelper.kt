@@ -146,6 +146,7 @@ class RefHelper(
         }
     }
 
+    @SuppressWarnings("LongMethod", "CyclomaticComplexMethod")
     fun getCheckInfo(): CheckoutInfo {
         with(settings) {
             return when (pullType) {
@@ -154,6 +155,10 @@ class RefHelper(
                     val (startPoint, upstream) = when {
                         GitUtil.isPrePushBranch(ref) ->
                             Pair("FETCH_HEAD", "")
+                        serverPreMerge == true -> {
+                            // 服务端预合并CommitId, 上游分支指定为MR的目标分支
+                            Pair(serverPreMergeCommit!!, "$ORIGIN_REMOTE_NAME/$ref")
+                        }
                         hookCommitId != null -> {
                             Pair(hookCommitId, "$ORIGIN_REMOTE_NAME/$ref")
                         }
@@ -162,13 +167,24 @@ class RefHelper(
                         else ->
                             Pair(commit, "$ORIGIN_REMOTE_NAME/$ref")
                     }
-                    if (preMerge) {
-                        CheckoutInfo(
-                            ref = DEVOPS_VIRTUAL_BRANCH,
-                            startPoint = startPoint
-                        )
-                    } else {
-                        CheckoutInfo(ref = ref, startPoint = startPoint, upstream = upstream)
+                    when {
+                        // 默认预合并
+                        preMerge -> {
+                            CheckoutInfo(
+                                ref = DEVOPS_VIRTUAL_BRANCH,
+                                startPoint = startPoint,
+                                upstream = if (serverPreMerge != true) {
+                                    ""
+                                } else {
+                                    // 服务端合并需指定上游分支
+                                    upstream
+                                }
+                            )
+                        }
+
+                        else -> {
+                            CheckoutInfo(ref = ref, startPoint = startPoint, upstream = upstream)
+                        }
                     }
                 }
                 PullType.TAG -> {

@@ -5,6 +5,7 @@ import com.tencent.bk.devops.atom.exception.RemoteServiceException
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.HttpStatus
 import com.tencent.bk.devops.git.core.exception.ApiException
+import com.tencent.bk.devops.git.core.pojo.PreMergeCommit
 import com.tencent.bk.devops.git.core.pojo.api.GitSession
 import com.tencent.bk.devops.git.core.pojo.api.TGitProjectInfo
 import com.tencent.bk.devops.git.core.pojo.api.TGitProjectMember
@@ -13,6 +14,7 @@ import com.tencent.bk.devops.git.core.util.HttpUtil
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import com.tencent.bk.devops.plugin.utils.JsonUtil
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.slf4j.LoggerFactory
 import java.net.URLEncoder
@@ -126,6 +128,25 @@ class TGitApi(
                 it.state == "active" &&
                 it.accessLevel >= REPORTER_ACCESS_LEVEL
         } != null
+    }
+
+    override fun createPreMerge(mrIid: Int): PreMergeCommit? {
+        var apiUrl = "https://${serverInfo.hostName}/$API_PATH/" +
+                "projects/${URLEncoder.encode(serverInfo.repositoryName, "UTF-8")}/" +
+                "merge_request/iid/$mrIid/create_pre_merge_commit?"
+        if (isOauth == true) {
+            apiUrl += "&access_token=$token"
+        } else {
+            apiUrl += "&private_token=$token"
+        }
+        val responseContent = HttpUtil.retryRequest(
+            request = HttpUtil.buildPut(
+                apiUrl,
+                RequestBody.create("application/json; charset=utf-8".toMediaTypeOrNull(),"")
+            ),
+            errorMessage = "Failed to create pre merge"
+        )
+        return JsonUtil.to(responseContent, object : TypeReference<PreMergeCommit>() {})
     }
 
     override fun getProjectId(): Long? {

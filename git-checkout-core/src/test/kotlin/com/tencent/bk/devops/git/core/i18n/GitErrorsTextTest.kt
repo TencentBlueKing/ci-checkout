@@ -37,6 +37,6 @@ class GitErrorsTextTest {
     fun get() {
         Locale.setDefault(Locale.SIMPLIFIED_CHINESE)
         Assert.assertEquals(GitErrorsText.get().httpAuthenticationFailed,
-            "授权失败,【\${context_user_id}】没有仓库【\${context_repository_url}】拉取权限。")
+            "http授权失败")
     }
 }

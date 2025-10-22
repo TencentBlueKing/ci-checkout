@@ -37,6 +37,8 @@ data class GitMetricsInfo(
     val jobType: String?,
     val channel: String,
     val invalidRef: Int = 0,
+    // woa是否有代理,0-没有代理,1-有代理
+    val woaProxy: Int = 0,
     val vmExistRepo: Int = 0,
     val devcloudDataCached: String
 )

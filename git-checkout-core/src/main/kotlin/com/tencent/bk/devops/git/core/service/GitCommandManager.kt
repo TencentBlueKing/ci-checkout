@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRESS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_MERGE_NO_VERIFY_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_RECURSE_SUBMODULES_VERSION
@@ -554,7 +555,7 @@ class GitCommandManager(
         if (startPoint.isBlank()) {
             args.add(ref)
         } else {
-            if (isAtLeastVersion(GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION)) {
+            if (isAtLeastVersion(SUPPORT_CHECKOUT_B_GIT_VERSION)) {
                 args.addAll(listOf("-B", ref, startPoint))
             } else {
                 args.add(startPoint)

@@ -130,7 +130,8 @@ class CheckoutAtomParamInputAdapter(
             mainRepo = mainRepo,
             tGitCacheGrayWeight = tGitCacheGrayWeight,
             tGitCacheGrayProject = tGitCacheGrayProject,
-            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
+            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
+            enableServerPreMerge = enableServerPreMerge
         )
     ).getInputs()
 
@@ -199,7 +200,8 @@ class CheckoutAtomParamInputAdapter(
             mainRepo = mainRepo,
             tGitCacheGrayWeight = tGitCacheGrayWeight,
             tGitCacheGrayProject = tGitCacheGrayProject,
-            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
+            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
+            enableServerPreMerge = enableServerPreMerge
         )
     ).getInputs()
 

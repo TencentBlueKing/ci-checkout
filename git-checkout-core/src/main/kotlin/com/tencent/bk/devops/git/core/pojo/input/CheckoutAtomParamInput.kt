@@ -160,5 +160,9 @@ data class CheckoutAtomParamInput(
     /**
      * 工蜂cache灰度权重
      */
-    val tGitCacheGrayWeight: String? = null
+    val tGitCacheGrayWeight: String? = null,
+    /**
+     * 是否开启服务器预合并, 默认: false
+     */
+    val enableServerPreMerge: Boolean? = false
 )

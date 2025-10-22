@@ -54,6 +54,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_SUBMODUL
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TOTAL_SIZE
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TRANSFER_RATE
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_USER_ID
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_WOA_PROXY
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_VM_EXIST_REPO
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_ATOM_CODE
@@ -177,6 +178,7 @@ class GitCheckoutRunner {
                     jobType = SdkEnv.getSdkHeader()[Header.AUTH_HEADER_DEVOPS_BUILD_TYPE] ?: "",
                     channel = System.getenv("BK_CI_START_CHANNEL") ?: "",
                     invalidRef = EnvHelper.getContext(CONTEXT_INVALID_REF)?.toInt() ?: 0,
+                    woaProxy = EnvHelper.getContext(CONTEXT_WOA_PROXY)?.toInt() ?: 0,
                     vmExistRepo = EnvHelper.getContext(CONTEXT_VM_EXIST_REPO)?.toInt() ?: 0,
                     devcloudDataCached = System.getenv("DEVCLOUD_DATA_CACHED") ?: ""
                 )

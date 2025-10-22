@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.input
 
 import com.tencent.bk.devops.git.core.api.DevopsApi
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_ALIAS_NAME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_HASH_ID
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_TYPE
@@ -110,7 +111,15 @@ class GitCodeAtomParamInputAdapter(
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_REF, ref)
 
             val scmType = RepositoryUtils.getScmType(repository)
-            // 3. 确定是否开启pre-merge功能
+
+            // 3. 得到授权信息,post action阶段不需要查询凭证
+            val authProvider = getAuthProvider(repository)
+            // 主库凭证信息
+            val authInfo = authProvider.getAuthInfo()
+            // 保存代码库相关信息
+            val gitProjectId = RepositoryUtils.getGitProjectId(repository, authInfo)
+            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
+            // 4. 确定是否开启pre-merge功能
             val preMerge = GitUtil.isEnablePreMerge(
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
                 repositoryUrl = repository.url,
@@ -125,15 +134,18 @@ class GitCodeAtomParamInputAdapter(
                 ref = hookTargetBranch!!
                 pullType = PullType.BRANCH.name
                 forkRepoAuthInfo = getForkRepoAuthInfo(scmType = scmType, repositoryUrl = repository.url)
+                EnvHelper.putContext(ContextConstants.CONTEXT_MERGE_SOURCE_REF, hookSourceBranch ?: "")
+                EnvHelper.putContext(ContextConstants.CONTEXT_MERGE_TARGET_REF, ref)
             }
-
-            // 4. 得到授权信息,post action阶段不需要查询凭证
-            val authProvider = getAuthProvider(repository)
-            // 主库凭证信息
-            val authInfo = authProvider.getAuthInfo()
-            // 保存代码库相关信息
-            val gitProjectId = RepositoryUtils.getGitProjectId(repository, authInfo)
-            EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_PROJECT_ID, "$gitProjectId")
+            // 服务端预合并信息
+            val (serverPreMerge, serverPreMergeCommit) = GitUtil.getServerPreMerge(
+                scmType = scmType,
+                repositoryUrl = repository.url,
+                authInfo = authInfo,
+                preMerge = preMerge,
+                mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
+                enableServerPreMerge = enableServerPreMerge
+            )
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.putContext(CONTEXT_REPOSITORY_ALIAS_NAME, repository.aliasName)
@@ -273,7 +285,9 @@ class GitCodeAtomParamInputAdapter(
                 mainRepo = mainRepo,
                 tGitCacheGrayProject = tGitCacheGrayProject,
                 tGitCacheGrayWeight = tGitCacheGrayWeight,
-                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject
+                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
+                serverPreMerge = serverPreMerge,
+                serverPreMergeCommit = serverPreMergeCommit
             )
         }
     }
