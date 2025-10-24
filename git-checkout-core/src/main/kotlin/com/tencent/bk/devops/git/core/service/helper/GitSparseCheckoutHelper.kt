@@ -38,11 +38,8 @@ class GitSparseCheckoutHelper constructor(
             }
         }
         logger.debug("$SPARSE_CHECKOUT_CONFIG_FILE_PATH content: $content")
-        git.config(
-            configKey = SPARSE_CHECKOUT_CONE_CONFIG_KEY,
-            configValue = "false",
-            configScope = GitConfigScope.WORKTREE
-        )
+        // 卸载cone模式配置
+        removeSparseCheckoutCone()
         if (content.toString().isBlank()) {
             /*
                 #24 如果由sparse checkout改成正常拉取,需要把内容设置为*, 不然执行`git checkout`文件内容不会发生改变.
@@ -158,11 +155,32 @@ class GitSparseCheckoutHelper constructor(
     fun useConeMode() = settings.enableSparseCone == true &&
             git.isAtLeastVersion(GitConstants.SUPPORT_SPARSE_CHECKOUT_GIT_VERSION)
 
+    /**
+     * 卸载sparse checkout cone配置
+     */
+    private fun removeSparseCheckoutCone() {
+        // 关闭cone模式，直接修改特定文件，避免配置残留
+        val workTreeConfig = File(settings.repositoryPath, SPARSE_CHECKOUT_WORKTREE_CONFIG_FILE_PATH)
+        if (workTreeConfig.exists()) {
+            git.tryConfigUnset(
+                configKey = SPARSE_CHECKOUT_CONE_CONFIG_KEY,
+                configScope = GitConfigScope.FILE,
+                configFile = SPARSE_CHECKOUT_WORKTREE_CONFIG_FILE_PATH
+            )
+            git.tryConfigUnset(
+                configKey = SPARSE_CHECKOUT_CONFIG_KEY,
+                configScope = GitConfigScope.FILE,
+                configFile = SPARSE_CHECKOUT_WORKTREE_CONFIG_FILE_PATH
+            )
+        }
+    }
+
     companion object {
         private val logger = LoggerFactory.getLogger(GitSparseCheckoutHelper::class.java)
         private const val SPARSE_CHECKOUT_CONFIG_KEY = "core.sparsecheckout"
         private const val SPARSE_CHECKOUT_CONE_CONFIG_KEY = "core.sparseCheckoutCone"
         private const val SPARSE_CHECKOUT_CONFIG_FILE_PATH = ".git/info/sparse-checkout"
+        private const val SPARSE_CHECKOUT_WORKTREE_CONFIG_FILE_PATH = ".git/config.worktree"
         private val SPARSE_CHECKOUT_WILDCARDS = listOf('*', '?', '[')
     }
 }
