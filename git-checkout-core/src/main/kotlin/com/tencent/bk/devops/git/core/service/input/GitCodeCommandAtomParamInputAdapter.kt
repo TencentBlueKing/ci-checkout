@@ -67,6 +67,10 @@ class GitCodeCommandAtomParamInputAdapter(
         private val logger = LoggerFactory.getLogger(GitCodeCommandAtomParamInputAdapter::class.java)
     }
 
+    /**
+     * 获取入参配置
+     * 注：此处调用外部API时，需考虑post action阶段能否调用
+     */
     @Suppress("ALL")
     override fun getInputs(): GitSourceSettings {
         with(input) {
@@ -81,7 +85,9 @@ class GitCodeCommandAtomParamInputAdapter(
             // fork库凭证信息
             var forkRepoAuthInfo: AuthInfo? = null
             // 代码库ID
-            val gitProjectId = if (!RegexUtil.isIPAddress(GitUtil.getServerInfo(repositoryUrl).hostName)) {
+            val gitProjectId = if (!postAction() &&
+                    !RegexUtil.isIPAddress(GitUtil.getServerInfo(repositoryUrl).hostName)
+            ) {
                 GitScmService(
                     scmType = scmType,
                     repositoryUrl = repositoryUrl,
@@ -106,15 +112,19 @@ class GitCodeCommandAtomParamInputAdapter(
                 pullType = PullType.BRANCH.name
                 forkRepoAuthInfo = getForkRepoAuthInfo()
             }
-            // 服务端预合并信息
-            val (serverPreMerge, serverPreMergeCommit) = GitUtil.getServerPreMerge(
-                scmType = scmType,
-                repositoryUrl = repositoryUrl,
-                authInfo = authInfo,
-                preMerge = preMerge,
-                mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
-                enableServerPreMerge = enableServerPreMerge
-            )
+            // 服务端预合并信息(post action阶段不需要调接口)
+            val (serverPreMerge, serverPreMergeCommit) = if (postAction()) {
+                false to null
+            } else {
+                GitUtil.getServerPreMerge(
+                    scmType = scmType,
+                    repositoryUrl = repositoryUrl,
+                    authInfo = authInfo,
+                    preMerge = preMerge,
+                    mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
+                    enableServerPreMerge = enableServerPreMerge
+                )
+            }
 
             EnvHelper.addEnvVariable(GitConstants.BK_CI_GIT_REPO_CODE_PATH, localPath ?: "")
             EnvHelper.addEnvVariable(
@@ -229,7 +239,7 @@ class GitCodeCommandAtomParamInputAdapter(
 
     private fun getAuthProvider(newRepositoryUrl: String) = with(input) {
         // 获取鉴权信息,post action阶段不需要查询凭证
-        if (postEntryParam == "True") {
+        if (postAction()) {
             EmptyGitAuthProvider()
         } else {
             when (authType) {
@@ -279,8 +289,7 @@ class GitCodeCommandAtomParamInputAdapter(
      * 3.不是fork仓库的，源仓库和目标仓库是同一个仓库
      */
     private fun getForkRepoAuthInfo() = with(input) {
-        if (postEntryParam == "True" ||
-            !listOf(ScmType.CODE_GIT, ScmType.GITHUB).contains(scmType) ||
+        if (postAction() || !listOf(ScmType.CODE_GIT, ScmType.GITHUB).contains(scmType) ||
             GitUtil.isSameRepository(
                 repositoryUrl = repositoryUrl,
                 otherRepositoryUrl = hookSourceUrl,

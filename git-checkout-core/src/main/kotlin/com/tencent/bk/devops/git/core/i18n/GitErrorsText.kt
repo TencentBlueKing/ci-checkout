@@ -147,6 +147,9 @@ class GitErrorsText : TranslationBundle() {
     var notExistRepositoryCause: String? = null
     var notExistRepositorySolution: String? = null
     var notExistRepositoryWiki: String? = null
+    var notSupportSparseCheckCone: String? = null
+    var notSupportSparseCheckConeCause: String? = null
+    var notSupportSparseCheckConeSolution: String? = null
 
     companion object {
         fun get(): GitErrorsText {

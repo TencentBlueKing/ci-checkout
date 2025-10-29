@@ -163,4 +163,10 @@ data class GitCodeCommandAtomParamInput(
      * 启用sparse cone模式
      */
     val enableSparseCone: Boolean? = null
-)
+) {
+    /**
+     * 是否为post action
+     * 参考插件task.json 内 execution.post.postEntryParam
+     */
+    fun postAction() = postEntryParam == "True"
+}

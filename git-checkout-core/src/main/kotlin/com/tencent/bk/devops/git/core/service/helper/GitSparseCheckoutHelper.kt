@@ -2,9 +2,12 @@ package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
+import com.tencent.bk.devops.git.core.exception.GitExecuteException
+import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.CheckoutInfo
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.plugin.pojo.ErrorType
 import org.slf4j.LoggerFactory
 import java.io.File
 
@@ -152,8 +155,32 @@ class GitSparseCheckoutHelper constructor(
         } else ""
     }
 
-    fun useConeMode() = settings.enableSparseCone == true &&
-            git.isAtLeastVersion(GitConstants.SUPPORT_SPARSE_CHECKOUT_GIT_VERSION)
+    fun useConeMode() = if (settings.enableSparseCone == true) {
+        if (git.isAtLeastVersion(GitConstants.SUPPORT_SPARSE_CHECKOUT_GIT_VERSION)) {
+            true
+        } else {
+            logger.error(
+                "Sparse-checkout cone mode not supported, " +
+                        "The `sparse-checkout cone` mode requires Git version 2.25.0 or higher"
+            )
+            val errorMsg = GitErrorsText.get().notSupportSparseCheckCone
+                ?: "Sparse-checkout cone mode not supported"
+            val reason = GitErrorsText.get().notSupportSparseCheckConeCause
+                ?: "The `sparse-checkout cone` mode requires Git version 2.25.0 or higher"
+            val solution = GitErrorsText.get().notSupportSparseCheckConeSolution
+                ?: "Install Git with a version higher than 2.25.0"
+            throw GitExecuteException(
+                errorType = ErrorType.USER,
+                errorCode = GitConstants.CONFIG_ERROR,
+                errorMsg = errorMsg,
+                reason = reason,
+                solution = solution,
+                wiki = ""
+            )
+        }
+    } else {
+        false
+    }
 
     /**
      * 卸载sparse checkout cone配置
