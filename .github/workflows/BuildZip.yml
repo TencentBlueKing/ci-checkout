@@ -29,8 +29,10 @@ jobs:
           ${{ runner.os }}-gradle-
     - name: Gradle Build
       run: |
+        version=${{ github.ref_name }}
+        version=$(echo ${version:1})
         chmod +x ./gradlew
-        ./gradlew :git-checkout-plugin:clean buildZip
+        ./gradlew :git-checkout-plugin:clean -Dcore_version=$version buildZip
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
