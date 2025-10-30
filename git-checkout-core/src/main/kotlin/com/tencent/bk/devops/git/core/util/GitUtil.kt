@@ -273,7 +273,7 @@ object GitUtil {
                         wiki = GitErrors.MergeConflicts.wiki ?: ""
                     )
                 }
-                logger.debug("created pre-merge commit point [${it.id}]")
+                logger.info("Created pre-merge commit point [${it.id}]")
                 true to it.id
             } ?: (false to "")
         } else {

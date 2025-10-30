@@ -80,6 +80,10 @@ class GitCodeAtomParamInputAdapter(
         private val logger = LoggerFactory.getLogger(GitCodeAtomParamInputAdapter::class.java)
     }
 
+    /**
+     * 获取入参配置
+     * 注：此处调用外部API时，需考虑post action阶段能否调用
+     */
     @Suppress("ALL")
     override fun getInputs(): GitSourceSettings {
         with(input) {
@@ -137,15 +141,19 @@ class GitCodeAtomParamInputAdapter(
                 EnvHelper.putContext(ContextConstants.CONTEXT_MERGE_SOURCE_REF, hookSourceBranch ?: "")
                 EnvHelper.putContext(ContextConstants.CONTEXT_MERGE_TARGET_REF, ref)
             }
-            // 服务端预合并信息
-            val (serverPreMerge, serverPreMergeCommit) = GitUtil.getServerPreMerge(
-                scmType = scmType,
-                repositoryUrl = repository.url,
-                authInfo = authInfo,
-                preMerge = preMerge,
-                mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
-                enableServerPreMerge = enableServerPreMerge
-            )
+            // 服务端预合并信息(post action阶段不需要调接口)
+            val (serverPreMerge, serverPreMergeCommit) = if (postAction()) {
+                false to null
+            } else {
+                GitUtil.getServerPreMerge(
+                    scmType = scmType,
+                    repositoryUrl = repository.url,
+                    authInfo = authInfo,
+                    preMerge = preMerge,
+                    mrIid = System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_NUMBER)?.toIntOrNull(),
+                    enableServerPreMerge = enableServerPreMerge
+                )
+            }
             // 5. 导入输入的参数到环境变量
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_ALIAS_NAME, repository.aliasName)
             EnvHelper.putContext(CONTEXT_REPOSITORY_ALIAS_NAME, repository.aliasName)
@@ -298,7 +306,7 @@ class GitCodeAtomParamInputAdapter(
      */
 
     private fun getAuthProvider(repository: Repository) = with(input) {
-        if (postEntryParam == "True") {
+        if (postAction()) {
             EmptyGitAuthProvider()
         } else {
             RepositoryGitAuthProvider(
@@ -318,7 +326,7 @@ class GitCodeAtomParamInputAdapter(
         scmType: ScmType,
         repositoryUrl: String
     ) = with(input) {
-        if (postEntryParam == "True" ||
+        if (postAction() ||
             !listOf(ScmType.CODE_GIT, ScmType.GITHUB).contains(scmType) ||
             GitUtil.isSameRepository(
                 repositoryUrl = repositoryUrl,
