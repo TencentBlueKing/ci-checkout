@@ -181,7 +181,7 @@ class GitLogHelper(
                     )
                 }
             }
-            isHook && gitHookEventType == CodeEventType.MERGE_REQUEST.name -> {
+            isHook && GitUtil.isMergeRequestEvent(gitHookEventType) -> {
                 val source = System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
                 val target = System.getenv(BK_REPO_GIT_WEBHOOK_MR_TARGET_COMMIT)
                 if (source.isNullOrBlank() || target.isNullOrBlank()) {
