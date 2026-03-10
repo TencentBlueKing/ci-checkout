@@ -333,7 +333,7 @@ enum class GitErrors(
         regex = Regex(
             "(Error downloading object: .*)|" +
                 "(LFS: Repository or object not found: .+)|" +
-                    "(* batch response: Fatal error: We couldn't respond to your request in time. " +
+                    "(.* batch response: Fatal error: We couldn't respond to your request in time. " +
                     "Sorry about that. Please try resubmitting your request and contact us if the problem persists.)"
         ),
         title = GitErrorsText.get().errorDownloadingObject,
