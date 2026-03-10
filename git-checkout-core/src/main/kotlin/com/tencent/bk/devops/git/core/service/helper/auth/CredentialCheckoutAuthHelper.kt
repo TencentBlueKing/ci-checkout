@@ -43,6 +43,7 @@ import com.tencent.bk.devops.git.core.pojo.CredentialArguments
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.pojo.ServerInfo
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.util.LockHelper
 import com.tencent.bk.devops.git.core.service.helper.VersionHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.CommandUtil
@@ -124,6 +125,8 @@ class CredentialCheckoutAuthHelper(
         if (settings.storeForkRepoCredential) {
             forkInstall()
         }
+        // 凭证写入成功后,把buildId写入到锁文件，防止在第三方构建机同一条流水线同时运行时,前面执行的构建把后面执行的构建凭证删除
+        LockHelper.lock()
     }
 
     private fun install() {
@@ -226,6 +229,10 @@ class CredentialCheckoutAuthHelper(
 
     override fun removeAuth() {
         if (!serverInfo.httpProtocol) {
+            return
+        }
+        // 如果当前凭证不是此构建Id写入的,就不删除
+        if (!LockHelper.unlock()) {
             return
         }
         val taskId = git.tryConfigGet(configKey = GitConstants.GIT_CREDENTIAL_TASKID)
