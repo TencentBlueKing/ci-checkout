@@ -259,7 +259,7 @@ class RefHelper(
         // -- MR_ACC 事件拉取合并提交点
         // -- PR 和 MR 事件，当动作为merge时拉取提交点
         return when {
-            GitUtil.isMergeRequestEvent(scmType = settings.scmType, gitHookEventType) -> mrMergeCommitSha
+            GitUtil.isMergeRequestAcceptEvent(scmType = settings.scmType, gitHookEventType) -> mrMergeCommitSha
 
             gitHookEventType == CodeEventType.PUSH.name -> hookRevision
             else -> null

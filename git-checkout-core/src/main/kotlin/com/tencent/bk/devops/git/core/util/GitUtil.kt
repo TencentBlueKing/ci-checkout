@@ -175,7 +175,7 @@ object GitUtil {
                     hookEventType == CodeEventType.MERGE_REQUEST.name ||
                         hookEventType == CodeEventType.PARENT_PIPELINE.name
                 ) &&
-            !isMergeRequestEvent(scmType, hookEventType) &&
+            !isMergeRequestAcceptEvent(scmType, hookEventType) &&
             isSameRepository(
                 repositoryUrl = repositoryUrl,
                 otherRepositoryUrl = hookTargetUrl,
@@ -186,7 +186,7 @@ object GitUtil {
     /**
      * 是否为merge request 的merge事件
      */
-    fun isMergeRequestEvent(scmType: ScmType, hookEventType: String?): Boolean {
+    fun isMergeRequestAcceptEvent(scmType: ScmType, hookEventType: String?): Boolean {
         val gitHookEventType = System.getenv(GitConstants.BK_CI_REPO_GIT_WEBHOOK_EVENT_TYPE)
         // 兼容stream数据，github pr动作类型存的[BK_CI_REPO_GIT_WEBHOOK_MR_ACTION]变量
         val mergeAction = when (scmType) {
@@ -198,6 +198,12 @@ object GitUtil {
                 (hookEventType in setOf(CodeEventType.MERGE_REQUEST.name, CodeEventType.PULL_REQUEST.name) &&
                         TGitMrAction.parse(mergeAction) == TGitMrAction.MERGE)
     }
+
+    fun isMergeRequestEvent(hookEventType: String?) = listOf(
+        CodeEventType.MERGE_REQUEST_ACCEPT.name,
+        CodeEventType.MERGE_REQUEST.name,
+        CodeEventType.PULL_REQUEST.name
+    ).contains(hookEventType)
 
     fun isGitEvent(gitHookEventType: String?): Boolean {
         return gitHookEventType == CodeEventType.PUSH.name ||
