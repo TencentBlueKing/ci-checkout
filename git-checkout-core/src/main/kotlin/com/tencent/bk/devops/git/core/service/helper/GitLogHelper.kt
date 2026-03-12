@@ -184,6 +184,8 @@ class GitLogHelper(
             isHook && GitUtil.isMergeRequestEvent(gitHookEventType) -> {
                 val source = if (GitUtil.isMergeRequestAcceptEvent(settings.scmType, gitHookEventType)) {
                     System.getenv(GitConstants.BK_REPO_GIT_WEBHOOK_MR_MERGE_COMMIT_SHA)
+                        ?.takeIf { it.isNotBlank() }
+                        ?: System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
                 } else {
                     System.getenv(BK_REPO_GIT_WEBHOOK_MR_SOURCE_COMMIT)
                 }
