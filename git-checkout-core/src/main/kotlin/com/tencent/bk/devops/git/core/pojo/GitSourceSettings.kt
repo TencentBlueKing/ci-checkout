@@ -253,7 +253,15 @@ data class GitSourceSettings(
     /**
      * 启用sparse cone模式
      */
-    val enableSparseCone: Boolean? = null
+    val enableSparseCone: Boolean? = null,
+    /**
+     * 镜像源灰度白名单项目
+     */
+    val mirrorGrayWhiteProject: String? = null,
+    /**
+     * 镜像源token
+     * */
+    val mirrorToken: String? = null
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(

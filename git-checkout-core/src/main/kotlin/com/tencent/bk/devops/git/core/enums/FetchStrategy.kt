@@ -13,6 +13,8 @@ enum class FetchStrategy {
     // 增量 + TGIT缓存
     VM_TGIT_CACHE,
 
+    // 镜像缓存
+    MIRROR_CACHE ,
     // 制品库缓存
-    BKREPO_CACHE
+    BKREPO_CACHE ,
 }

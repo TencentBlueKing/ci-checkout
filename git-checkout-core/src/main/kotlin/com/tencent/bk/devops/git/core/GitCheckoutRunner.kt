@@ -49,6 +49,7 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_INIT_COS
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_INVALID_REF
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_LFS_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_LOG_COST_TIME
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_MIRROR_RESULT
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_PREPARE_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_SUBMODULE_COST_TIME
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_TOTAL_SIZE
@@ -75,6 +76,7 @@ import com.tencent.bk.devops.git.core.util.StringUtils
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 import org.slf4j.LoggerFactory
 import java.util.ServiceLoader
+import kotlin.jvm.java
 
 class GitCheckoutRunner {
 
@@ -180,7 +182,8 @@ class GitCheckoutRunner {
                     invalidRef = EnvHelper.getContext(CONTEXT_INVALID_REF)?.toInt() ?: 0,
                     woaProxy = EnvHelper.getContext(CONTEXT_WOA_PROXY)?.toInt() ?: 0,
                     vmExistRepo = EnvHelper.getContext(CONTEXT_VM_EXIST_REPO)?.toInt() ?: 0,
-                    devcloudDataCached = System.getenv("DEVCLOUD_DATA_CACHED") ?: ""
+                    devcloudDataCached = System.getenv("DEVCLOUD_DATA_CACHED") ?: "",
+                    mirrorResult = EnvHelper.getContext(CONTEXT_MIRROR_RESULT) ?: "",
                 )
             }
             ServiceLoader.load(IGitMetricsHelper::class.java).firstOrNull()

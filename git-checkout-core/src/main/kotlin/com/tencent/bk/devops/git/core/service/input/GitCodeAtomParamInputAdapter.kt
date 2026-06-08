@@ -296,7 +296,9 @@ class GitCodeAtomParamInputAdapter(
                 tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
                 serverPreMerge = serverPreMerge,
                 serverPreMergeCommit = serverPreMergeCommit,
-                enableSparseCone = enableSparseCone
+                enableSparseCone = enableSparseCone,
+                mirrorGrayWhiteProject = mirrorGrayWhiteProject,
+                mirrorToken = mirrorToken
             )
         }
     }

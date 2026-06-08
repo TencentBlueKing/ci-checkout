@@ -168,5 +168,13 @@ data class CheckoutAtomParamInput(
     /**
      * 启用sparse cone模式
      */
-    val enableSparseCone: Boolean? = null
+    val enableSparseCone: Boolean? = null,
+    /**
+     * 镜像缓存灰度白名单项目
+     */
+    val mirrorGrayWhiteProject: String? = null,
+    /**
+     * 镜像源token
+     * */
+    val mirrorToken: String? = null
 )

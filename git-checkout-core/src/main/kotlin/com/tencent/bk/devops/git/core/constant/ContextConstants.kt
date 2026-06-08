@@ -34,6 +34,7 @@ object ContextConstants {
     const val CONTEXT_INVALID_REF = "context_invalid_ref"
     const val CONTEXT_WOA_PROXY = "context_woa_proxy"
     const val CONTEXT_BACKUP_INSTEADOF = "context_backup_insteadOf"
+    const val CONTEXT_MIRROR_RESULT = "context_mirror_result"
     // 构建机是否有代码库
     const val CONTEXT_VM_EXIST_REPO = "context_vm_exist_repo"
 }

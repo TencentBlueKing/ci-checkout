@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.service
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITORY_URL
 import com.tencent.bk.devops.git.core.constant.GitConstants
@@ -38,6 +39,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_CREDENTIAL_HELPE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_FORCE_PROGRESS
 import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
+import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_MERGE_NO_VERIFY_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
@@ -46,6 +48,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SET_UPSTREAM
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_SYNC_RECURSIVE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_SUBMODULE_UPDATE_FORCE_GIT_VERSION
 import com.tencent.bk.devops.git.core.enums.CredentialActionEnum
+import com.tencent.bk.devops.git.core.enums.FetchStrategy
 import com.tencent.bk.devops.git.core.enums.FilterValueEnum
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.enums.GitErrors
@@ -478,9 +481,18 @@ class GitCommandManager(
             if (retryTime - 1 < 0) {
                 throw e
             }
-            // 第一次重试先卸载oauth2凭证,然后再重试
-            if (retryTime == 3 && e.errorCode == GitErrors.RepositoryNotFoundFailed.errorCode) {
-                eraseOauth2Credential()
+            // 第一次重试
+            if (retryTime == 3) {
+                // 卸载oauth2凭证
+                if (e.errorCode == GitErrors.RepositoryNotFoundFailed.errorCode) {
+                    eraseOauth2Credential()
+                }
+                // 如果使用镜像缓存，则回源
+                if (EnvHelper.getContext(ContextConstants.CONTEXT_FETCH_STRATEGY) == FetchStrategy.MIRROR_CACHE.name) {
+                    val repositoryUrl = EnvHelper.getContext(CONTEXT_REPOSITORY_URL).orEmpty()
+                    remoteSetUrl(ORIGIN_REMOTE_NAME, repositoryUrl)
+                    EnvHelper.putContext(ContextConstants.CONTEXT_MIRROR_RESULT, "failure")
+                }
             }
             if (needRetry(errorCode = e.errorCode)) {
                 gitEnv[GitConstants.GIT_TRACE] = "1"

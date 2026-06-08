@@ -132,7 +132,9 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheGrayProject = tGitCacheGrayProject,
             tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
             enableServerPreMerge = enableServerPreMerge,
-            enableSparseCone = enableSparseCone
+            enableSparseCone = enableSparseCone,
+            mirrorGrayWhiteProject = mirrorGrayWhiteProject,
+            mirrorToken = mirrorToken
         )
     ).getInputs()
 
@@ -203,7 +205,9 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheGrayProject = tGitCacheGrayProject,
             tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
             enableServerPreMerge = enableServerPreMerge,
-            enableSparseCone = enableSparseCone
+            enableSparseCone = enableSparseCone,
+            mirrorGrayWhiteProject = mirrorGrayWhiteProject,
+            mirrorToken = mirrorToken
         )
     ).getInputs()
 
