@@ -1,6 +1,7 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_LFS_SKIP_SMUDGE
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.exception.GitExecuteException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
@@ -43,6 +44,8 @@ class GitSparseCheckoutHelper constructor(
         logger.debug("$SPARSE_CHECKOUT_CONFIG_FILE_PATH content: $content")
         // 卸载cone模式配置
         removeSparseCheckoutCone()
+        // readTree 会刷新索引,会去拉取lfs文件,导致命令卡住,先禁用,在checkout拉取lfs
+        git.setEnvironmentVariable(GIT_LFS_SKIP_SMUDGE, "1")
         if (content.toString().isBlank()) {
             /*
                 #24 如果由sparse checkout改成正常拉取,需要把内容设置为*, 不然执行`git checkout`文件内容不会发生改变.
@@ -72,6 +75,7 @@ class GitSparseCheckoutHelper constructor(
                 git.readTree(options = listOf("-m", "-u", checkoutInfo.startPoint))
             }
         }
+        git.removeEnvironmentVariable(GIT_LFS_SKIP_SMUDGE)
     }
 
 
