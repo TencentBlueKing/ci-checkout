@@ -187,6 +187,8 @@ object GitConstants {
     val SUPPORT_PROTOCOL_2_0_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 18, 0, 0)
     // 支持sparse-checkout
     val SUPPORT_SPARSE_CHECKOUT_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 25, 0, 0)
+    // 支持checkout progress
+    val SUPPORT_CHECKOUT_PROGRESS_GIT_VERSION = VersionHelper.computeVersionFromBits(2, 10, 0, 0)
 
     const val USER_NEED_PROJECT_X_PERMISSION = 2115025
 

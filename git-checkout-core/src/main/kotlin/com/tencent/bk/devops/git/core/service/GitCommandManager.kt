@@ -41,6 +41,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_TERMINAL_PROMPT
 import com.tencent.bk.devops.git.core.constant.GitConstants.HOME
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_CHECKOUT_B_GIT_VERSION
+import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_CHECKOUT_PROGRESS_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_MERGE_NO_VERIFY_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_RECURSE_SUBMODULES_VERSION
@@ -564,6 +565,9 @@ class GitCommandManager(
 
     fun checkout(ref: String, startPoint: String) {
         val args = mutableListOf("checkout", "--force")
+        if (isAtLeastVersion(SUPPORT_CHECKOUT_PROGRESS_GIT_VERSION)) {
+            args.add("--progress")
+        }
         if (startPoint.isBlank()) {
             args.add(ref)
         } else {
