@@ -44,23 +44,8 @@ class GitSparseCheckoutHelper constructor(
         logger.debug("$SPARSE_CHECKOUT_CONFIG_FILE_PATH content: $content")
         // 卸载cone模式配置
         removeSparseCheckoutCone()
-        // readTree 会刷新索引,会去拉取lfs文件,导致命令卡住,先禁用,在checkout拉取lfs
-        git.setEnvironmentVariable(GIT_LFS_SKIP_SMUDGE, "1")
         if (content.toString().isBlank()) {
-            /*
-                #24 如果由sparse checkout改成正常拉取,需要把内容设置为*, 不然执行`git checkout`文件内容不会发生改变.
-                参考: https://ftp.mcs.anl.gov/pub/pdetools/nightlylogs/xsdk/xsdk-configuration
-                -tester/packages/trilinos/sparse_checkout.sh
-             */
             if (sparseFile.exists()) {
-                sparseFile.writeText("*")
-                git.config(configKey = SPARSE_CHECKOUT_CONFIG_KEY, configValue = "true")
-                if (checkoutInfo.startPoint.isBlank()) {
-                    git.readTree(options = listOf("--reset", "-u", checkoutInfo.ref))
-                } else {
-                    git.readTree(options = listOf("--reset", "-u", checkoutInfo.startPoint))
-                }
-
                 sparseFile.delete()
             }
             git.config(configKey = SPARSE_CHECKOUT_CONFIG_KEY, configValue = "false")
@@ -69,13 +54,7 @@ class GitSparseCheckoutHelper constructor(
             if (!sparseFile.exists()) sparseFile.createNewFile()
             sparseFile.writeText(content.toString())
             git.config(configKey = SPARSE_CHECKOUT_CONFIG_KEY, configValue = "true")
-            if (checkoutInfo.startPoint.isBlank()) {
-                git.readTree(options = listOf("-m", "-u", checkoutInfo.ref))
-            } else {
-                git.readTree(options = listOf("-m", "-u", checkoutInfo.startPoint))
-            }
         }
-        git.removeEnvironmentVariable(GIT_LFS_SKIP_SMUDGE)
     }
 
 
