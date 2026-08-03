@@ -143,7 +143,11 @@ class InitRepoHandler(
     }
 
     private fun GitSourceSettings.initPartialClone() {
-        if (enablePartialClone == true && git.isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
+        // git版本不支持部分克隆时,既不会写入也不会残留相关配置,直接跳过
+        if (!git.isAtLeastVersion(SUPPORT_PARTIAL_CLONE_GIT_VERSION)) {
+            return
+        }
+        if (enablePartialClone == true) {
             git.config(configKey = "remote.$ORIGIN_REMOTE_NAME.promisor", configValue = "true")
             git.config(
                 configKey = "remote.$ORIGIN_REMOTE_NAME.partialclonefilter",
@@ -161,6 +165,20 @@ class InitRepoHandler(
                     configValue = FilterValueEnum.TREELESS.value
                 )
             }
+        } else {
+            // 用户主动关闭部分克隆时,清理构建机上可能残留的部分克隆配置,
+            // 避免上次构建开启部分克隆后,本次关闭仍复用残留配置继续走部分克隆
+            cleanupPartialCloneConfig()
+        }
+    }
+
+    /**
+     * 清理remote上残留的部分克隆配置(promisor、partialclonefilter)
+     */
+    private fun cleanupPartialCloneConfig() {
+        listOf(ORIGIN_REMOTE_NAME, DEVOPS_VIRTUAL_REMOTE_NAME).forEach { remoteName ->
+            git.tryConfigUnset(configKey = "remote.$remoteName.promisor")
+            git.tryConfigUnset(configKey = "remote.$remoteName.partialclonefilter")
         }
     }
 
