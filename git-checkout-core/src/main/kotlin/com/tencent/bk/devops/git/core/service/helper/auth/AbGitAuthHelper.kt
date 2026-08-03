@@ -42,6 +42,7 @@ import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.FileUtils
 import com.tencent.bk.devops.git.core.util.GitUtil
+import com.tencent.bk.devops.git.core.util.LockHelper
 import com.tencent.bk.devops.git.core.util.SubmoduleUtil
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -92,6 +93,18 @@ abstract class AbGitAuthHelper(
     }
 
     override fun removeGlobalAuth() {
+        /*
+         * 通过加锁来避免并发场景下误删其他构建正在使用的凭证。
+         *
+         * 原因:在 Linux 构建机上,cache 存储的凭证同样位于 $HOME/.checkout/$pipelineId/$jobId 目录下
+         * (参见 com.tencent.bk.devops.git.credential.storage.CacheSecureStore#cacheSocketPath)。
+         * 若并发构建间直接删除该目录,可能删除掉其他构建仍在使用的凭证,导致凭证失效。
+         *
+         * 因此仅当成功释放锁(即当前凭证由本次构建写入)时才继续执行删除逻辑。
+         */
+        if (!LockHelper.unlock()) {
+            return
+        }
         val gitXdgConfigHome = git.removeEnvironmentVariable(GitConstants.XDG_CONFIG_HOME)
         if (!gitXdgConfigHome.isNullOrBlank()) {
             val gitXdgConfigFile = Paths.get(gitXdgConfigHome, "git", "config")
