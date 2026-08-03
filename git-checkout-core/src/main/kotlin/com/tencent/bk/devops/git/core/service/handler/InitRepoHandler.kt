@@ -30,6 +30,9 @@ package com.tencent.bk.devops.git.core.service.handler
 import com.tencent.bk.devops.git.core.constant.ContextConstants
 import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_FETCH_STRATEGY
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_BUILD_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PIPELINE_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PROJECT_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_VIRTUAL_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.ORIGIN_REMOTE_NAME
 import com.tencent.bk.devops.git.core.constant.GitConstants.SUPPORT_PARTIAL_CLONE_GIT_VERSION
@@ -135,6 +138,7 @@ class InitRepoHandler(
         if (AgentEnv.getOS() == OSType.WINDOWS) {
             git.config(configKey = "core.longpaths", configValue = "true")
         }
+        initClientAgent()
         GitCacheHelperFactory.getCacheHelper(settings, git)?.config(settings, git)
     }
 
@@ -186,6 +190,41 @@ class InitRepoHandler(
                     "safe.directory",
                     repoDir,
                     GitConfigScope.GLOBAL
+                )
+            }
+        }
+    }
+
+    private fun initClientAgent() {
+        val projectId = System.getenv(BK_CI_PROJECT_NAME)
+        val pipelineId = System.getenv(BK_CI_PIPELINE_ID)
+        val buildId = System.getenv(BK_CI_BUILD_ID)
+        if (projectId.isNullOrBlank() || pipelineId.isNullOrBlank() || buildId.isNullOrBlank()) {
+            return
+        }
+        val targetValue = "Client-Agent: devops-$projectId-$pipelineId-$buildId"
+        val extraHeaders = git.tryConfigGetAll(configKey = "http.extraheader")
+        val existingClientAgents = extraHeaders.filter { it.startsWith("Client-Agent:") }
+        when {
+            // 已存在且仅有一条 Client-Agent，值与目标一致，跳过
+            existingClientAgents.size == 1 && existingClientAgents.first() == targetValue -> {
+            }
+            // 不存在 Client-Agent 配置，追加(不影响其他 http.extraheader，如 Authorization)
+            existingClientAgents.isEmpty() -> {
+                git.configAdd(
+                    configKey = "http.extraheader",
+                    configValue = targetValue
+                )
+            }
+            // 已存在 Client-Agent 但值不一致或有多条，先按值正则清除旧的再追加新的
+            else -> {
+                git.tryConfigUnset(
+                    configKey = "http.extraheader",
+                    configValueRegex = "^Client-Agent:.*"
+                )
+                git.configAdd(
+                    configKey = "http.extraheader",
+                    configValue = targetValue
                 )
             }
         }
