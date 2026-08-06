@@ -72,8 +72,6 @@ abstract class AbGitAuthHelper(
         val tempHomePath = Files.createTempDirectory("checkout")
         val newGitConfigPath = Paths.get(tempHomePath.toString(), ".gitconfig")
         Files.createFile(newGitConfigPath)
-        // 把真实全局的http.*配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
-        copyGlobalHttpConfigs(globalHttpConfigs, newGitConfigPath.toString())
         // 如果开启全局insteadOf,则insteadOf需要配置到全局配置中,否则应该只在插件中生效
         if (settings.enableGlobalInsteadOf && AgentEnv.isDocker()) {
             unsetInsteadOf()
@@ -95,6 +93,8 @@ abstract class AbGitAuthHelper(
             git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
             insteadOf()
         }
+        // 把真实全局的http.*配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
+        copyGlobalHttpConfigs(globalHttpConfigs)
         configXdgAuthCommand()
         configureXDGConfig()
     }
@@ -305,9 +305,8 @@ abstract class AbGitAuthHelper(
      * 若用户在全局配置了http代理,不复制会导致submodule拉取无代理而网络超时。
      *
      * @param entries git config --get-regexp的输出,每项形如 "http.https://xxx.proxy value"
-     * @param targetGitConfig 临时.gitconfig的绝对路径
      */
-    private fun copyGlobalHttpConfigs(entries: List<String>, targetGitConfig: String) {
+    private fun copyGlobalHttpConfigs(entries: List<String>) {
         entries.forEach { entry ->
             val idx = entry.indexOf(' ')
             if (idx <= 0) {
@@ -322,8 +321,7 @@ abstract class AbGitAuthHelper(
                 git.configAdd(
                     configKey = key,
                     configValue = value,
-                    configScope = GitConfigScope.FILE,
-                    configFile = targetGitConfig
+                    configScope = GitConfigScope.GLOBAL
                 )
             } catch (ignore: Exception) {
                 logger.warn("Failed to copy global http config: $key")
