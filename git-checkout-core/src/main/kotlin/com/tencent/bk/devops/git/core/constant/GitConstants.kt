@@ -58,6 +58,14 @@ object GitConstants {
     const val ORIGIN_REMOTE_NAME = "origin"
     const val DEVOPS_VIRTUAL_REMOTE_NAME = "devops-virtual-origin"
     const val DEVOPS_VIRTUAL_BRANCH = "devops-virtual-branch"
+
+    // 部分克隆残留配置(promisor、partialclonefilter)的匹配正则,用于清理
+    const val PARTIAL_CLONE_CONFIG_KEY_REGEX = "^remote\\..*\\.(promisor|partialclonefilter)$"
+
+    // devops注入的client-agent请求头配置(http.extraheader),用于清理
+    const val CLIENT_AGENT_CONFIG_KEY = "http.extraheader"
+    const val CLIENT_AGENT_VALUE_PREFIX = "Client-Agent: devops-"
+    const val CLIENT_AGENT_VALUE_REGEX = "^Client-Agent: devops-.*"
     const val FETCH_HEAD = "FETCH_HEAD"
     const val CI_EVENT = "ci.event"
     const val HOME = "HOME"

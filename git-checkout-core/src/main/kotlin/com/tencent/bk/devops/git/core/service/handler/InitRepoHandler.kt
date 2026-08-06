@@ -44,6 +44,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.DefaultGitUserConfigHelper
 import com.tencent.bk.devops.git.core.service.helper.GitCacheHelperFactory
+import com.tencent.bk.devops.git.core.service.helper.GitCleanUpHelper
 import com.tencent.bk.devops.git.core.service.helper.IGitUserConfigHelper
 import com.tencent.bk.devops.git.core.util.AgentEnv
 import com.tencent.bk.devops.git.core.util.EnvHelper
@@ -176,10 +177,7 @@ class InitRepoHandler(
      * 清理remote上残留的部分克隆配置(promisor、partialclonefilter)
      */
     private fun cleanupPartialCloneConfig() {
-        listOf(ORIGIN_REMOTE_NAME, DEVOPS_VIRTUAL_REMOTE_NAME).forEach { remoteName ->
-            git.tryConfigUnset(configKey = "remote.$remoteName.promisor")
-            git.tryConfigUnset(configKey = "remote.$remoteName.partialclonefilter")
-        }
+        GitCleanUpHelper(settings, git).cleanupPartialCloneConfig()
     }
 
     private fun GitSourceSettings.setSafeDir() {
@@ -220,28 +218,28 @@ class InitRepoHandler(
         if (projectId.isNullOrBlank() || pipelineId.isNullOrBlank() || buildId.isNullOrBlank()) {
             return
         }
-        val targetValue = "Client-Agent: devops-$projectId-$pipelineId-$buildId"
-        val extraHeaders = git.tryConfigGetAll(configKey = "http.extraheader")
-        val existingClientAgents = extraHeaders.filter { it.startsWith("Client-Agent:") }
+        val targetValue = "${GitConstants.CLIENT_AGENT_VALUE_PREFIX}$projectId-$pipelineId-$buildId"
+        val extraHeaders = git.tryConfigGetAll(configKey = GitConstants.CLIENT_AGENT_CONFIG_KEY)
+        val existingClientAgents = extraHeaders.filter { it.startsWith(GitConstants.CLIENT_AGENT_VALUE_PREFIX) }
         when {
-            // 已存在且仅有一条 Client-Agent，值与目标一致，跳过
+            // 已存在且仅有一条 devops Client-Agent，值与目标一致，跳过
             existingClientAgents.size == 1 && existingClientAgents.first() == targetValue -> {
             }
-            // 不存在 Client-Agent 配置，追加(不影响其他 http.extraheader，如 Authorization)
+            // 不存在 devops Client-Agent 配置，追加(不影响其他 http.extraheader，如 Authorization)
             existingClientAgents.isEmpty() -> {
                 git.configAdd(
-                    configKey = "http.extraheader",
+                    configKey = GitConstants.CLIENT_AGENT_CONFIG_KEY,
                     configValue = targetValue
                 )
             }
-            // 已存在 Client-Agent 但值不一致或有多条，先按值正则清除旧的再追加新的
+            // 已存在 devops Client-Agent 但值不一致或有多条，先按值正则清除旧的再追加新的(仅清理 devops 自身产生的)
             else -> {
                 git.tryConfigUnset(
-                    configKey = "http.extraheader",
-                    configValueRegex = "^Client-Agent:.*"
+                    configKey = GitConstants.CLIENT_AGENT_CONFIG_KEY,
+                    configValueRegex = GitConstants.CLIENT_AGENT_VALUE_REGEX
                 )
                 git.configAdd(
-                    configKey = "http.extraheader",
+                    configKey = GitConstants.CLIENT_AGENT_CONFIG_KEY,
                     configValue = targetValue
                 )
             }
