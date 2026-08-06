@@ -52,14 +52,14 @@ object SubmoduleUtil {
         }
         // 环检测:子模块可能出现循环引用(自引用、../回指祖先、符号链接成环等),
         // 一旦重复进入同一个规范路径,直接返回,避免无限递归导致死循环
-        if (!visited.add(canonicalPath)) {
+        val cycled = !visited.add(canonicalPath)
+        if (cycled) {
             logger.warn("Detected submodule cycle at $canonicalPath, skip to avoid infinite loop.")
+        }
+        if (cycled || !File(repositoryDir, ".gitmodules").exists()) {
             return emptyList()
         }
         logger.debug("enter submodule path:${repositoryDir.absolutePath}")
-        if (!File(repositoryDir, ".gitmodules").exists()) {
-            return emptyList()
-        }
         val submoduleCfg = try {
             CommandUtil.execute(
                 workingDirectory = repositoryDir,
