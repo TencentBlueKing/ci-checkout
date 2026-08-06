@@ -93,7 +93,7 @@ abstract class AbGitAuthHelper(
             git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
             insteadOf()
         }
-        // 把真实全局的http.*配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
+        // 把真实全局的http代理配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
         copyGlobalHttpConfigs(globalHttpConfigs)
         configXdgAuthCommand()
         configureXDGConfig()
@@ -299,7 +299,7 @@ abstract class AbGitAuthHelper(
     }
 
     /**
-     * 将真实全局配置中的http.*配置(代理等)复制到临时.gitconfig
+     * 将真实全局配置中的http代理配置复制到临时.gitconfig
      *
      * 拉取submodule时会用临时全局配置隔离用户的真实全局配置,
      * 若用户在全局配置了http代理,不复制会导致submodule拉取无代理而网络超时。
