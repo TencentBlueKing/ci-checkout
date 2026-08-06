@@ -63,10 +63,17 @@ abstract class AbGitAuthHelper(
     protected val authInfo = settings.authInfo
 
     override fun configGlobalAuth() {
+        // 在改写HOME之前,先抓真实全局的http代理配置
+        val globalHttpConfigs = git.tryConfigGetRegexp(
+            configKeyRegex = "^http\\.(.*\\.)?proxy$",
+            configScope = GitConfigScope.GLOBAL
+        )
         // 创建临时的.gitconfig文件
         val tempHomePath = Files.createTempDirectory("checkout")
         val newGitConfigPath = Paths.get(tempHomePath.toString(), ".gitconfig")
         Files.createFile(newGitConfigPath)
+        // 把真实全局的http.*配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
+        copyGlobalHttpConfigs(globalHttpConfigs, newGitConfigPath.toString())
         // 如果开启全局insteadOf,则insteadOf需要配置到全局配置中,否则应该只在插件中生效
         if (settings.enableGlobalInsteadOf && AgentEnv.isDocker()) {
             unsetInsteadOf()
@@ -288,6 +295,38 @@ abstract class AbGitAuthHelper(
                 configValue = "$protocol://$host/",
                 configScope = GitConfigScope.GLOBAL
             )
+        }
+    }
+
+    /**
+     * 将真实全局配置中的http.*配置(代理等)复制到临时.gitconfig
+     *
+     * 拉取submodule时会用临时全局配置隔离用户的真实全局配置,
+     * 若用户在全局配置了http代理,不复制会导致submodule拉取无代理而网络超时。
+     *
+     * @param entries git config --get-regexp的输出,每项形如 "http.https://xxx.proxy value"
+     * @param targetGitConfig 临时.gitconfig的绝对路径
+     */
+    private fun copyGlobalHttpConfigs(entries: List<String>, targetGitConfig: String) {
+        entries.forEach { entry ->
+            val idx = entry.indexOf(' ')
+            if (idx <= 0) {
+                return@forEach
+            }
+            val key = entry.substring(0, idx)
+            val value = entry.substring(idx + 1).trim()
+            if (value.isEmpty()) {
+                return@forEach
+            }
+            try {
+                git.configAdd(
+                    configKey = key,
+                    configValue = value,
+                    configFile = targetGitConfig
+                )
+            } catch (ignore: Exception) {
+                logger.warn("Failed to copy global http config: $key")
+            }
         }
     }
 
