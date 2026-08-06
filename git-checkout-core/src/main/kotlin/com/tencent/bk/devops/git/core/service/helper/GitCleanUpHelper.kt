@@ -77,14 +77,6 @@ class GitCleanUpHelper(
      * 按值正则清除,不影响其他http.extraheader(如Authorization)
      */
     fun cleanupClientAgentConfig() {
-        val existing = git.tryConfigGetAll(
-            configKey = GitConstants.CLIENT_AGENT_CONFIG_KEY,
-            configValueRegex = GitConstants.CLIENT_AGENT_VALUE_REGEX
-        )
-        if (existing.isEmpty()) {
-            return
-        }
-        logger.info("cleanup residual client-agent config: ${GitConstants.CLIENT_AGENT_CONFIG_KEY}")
         git.tryConfigUnset(
             configKey = GitConstants.CLIENT_AGENT_CONFIG_KEY,
             configValueRegex = GitConstants.CLIENT_AGENT_VALUE_REGEX
