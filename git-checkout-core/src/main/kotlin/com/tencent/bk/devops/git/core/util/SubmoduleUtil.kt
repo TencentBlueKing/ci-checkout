@@ -40,7 +40,22 @@ object SubmoduleUtil {
     private val submodulePattern = Pattern.compile(SUBMODULE_REMOTE_PATTERN_STRING)
     private val logger = LoggerFactory.getLogger(SubmoduleUtil::class.java)
 
-    fun getSubmodules(repositoryDir: File, recursive: Boolean): List<GitSubmodule> {
+    fun getSubmodules(
+        repositoryDir: File,
+        recursive: Boolean,
+        visited: MutableSet<String> = mutableSetOf()
+    ): List<GitSubmodule> {
+        val canonicalPath = try {
+            repositoryDir.canonicalPath
+        } catch (ignore: Throwable) {
+            repositoryDir.absolutePath
+        }
+        // 环检测:子模块可能出现循环引用(自引用、../回指祖先、符号链接成环等),
+        // 一旦重复进入同一个规范路径,直接返回,避免无限递归导致死循环
+        if (!visited.add(canonicalPath)) {
+            logger.warn("Detected submodule cycle at $canonicalPath, skip to avoid infinite loop.")
+            return emptyList()
+        }
         logger.debug("enter submodule path:${repositoryDir.absolutePath}")
         if (!File(repositoryDir, ".gitmodules").exists()) {
             return emptyList()
@@ -74,7 +89,7 @@ object SubmoduleUtil {
                     )
                 )
                 if (recursive) {
-                    submodules.addAll(getSubmodules(File(repositoryDir, path), recursive))
+                    submodules.addAll(getSubmodules(File(repositoryDir, path), recursive, visited))
                 }
             }
         }
