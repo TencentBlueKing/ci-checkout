@@ -66,7 +66,6 @@ class GitCleanUpHelper(
             configKeyRegex = GitConstants.PARTIAL_CLONE_CONFIG_KEY_REGEX
         ).mapNotNull { it.substringBefore(' ', "").ifBlank { null } }.distinct()
         residualKeys.forEach { key ->
-            logger.info("cleanup residual partial clone config: $key")
             git.tryConfigUnset(configKey = key)
         }
     }

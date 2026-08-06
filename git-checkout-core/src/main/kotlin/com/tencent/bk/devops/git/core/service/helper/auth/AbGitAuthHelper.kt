@@ -322,6 +322,7 @@ abstract class AbGitAuthHelper(
                 git.configAdd(
                     configKey = key,
                     configValue = value,
+                    configScope = GitConfigScope.FILE,
                     configFile = targetGitConfig
                 )
             } catch (ignore: Exception) {
