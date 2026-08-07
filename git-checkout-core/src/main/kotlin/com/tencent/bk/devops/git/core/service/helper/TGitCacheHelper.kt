@@ -140,7 +140,7 @@ class TGitCacheHelper : IGitCacheHelper {
             builder.header("Authorization", Credentials.basic(authInfo.username, authInfo.password))
         }
         val request = builder.build()
-        logger.info("tgit cache url:${request.url}")
+        logger.info("tgit cache url:${request.url}, Host:${hostName}")
         val length = HttpUtil.downloadFile(request, saveDirFile)
 
         val elapse = (System.currentTimeMillis() - startTime)
