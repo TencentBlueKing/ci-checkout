@@ -40,6 +40,7 @@ import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.handler.GitAuthHandler
 import com.tencent.bk.devops.git.core.service.handler.GitAuthPlaintextHandler
 import com.tencent.bk.devops.git.core.service.handler.GitCheckoutAndMergeHandler
+import com.tencent.bk.devops.git.core.service.handler.GitCleanUpHandler
 import com.tencent.bk.devops.git.core.service.handler.GitFetchHandler
 import com.tencent.bk.devops.git.core.service.handler.GitLfsHandler
 import com.tencent.bk.devops.git.core.service.handler.GitLogHandler
@@ -49,8 +50,6 @@ import com.tencent.bk.devops.git.core.service.handler.HandlerExecutionChain
 import com.tencent.bk.devops.git.core.service.handler.InitRepoHandler
 import com.tencent.bk.devops.git.core.service.handler.PrepareWorkspaceHandler
 import com.tencent.bk.devops.git.core.service.handler.WoaProxyHandler
-import com.tencent.bk.devops.git.core.service.helper.GitCacheHelperFactory
-import com.tencent.bk.devops.git.core.service.helper.auth.GitAuthHelperFactory
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
@@ -161,18 +160,11 @@ class GitSourceProvider(
                 return
             }
             val git = GitCommandManager(workingDirectory = workingDirectory, lfs = false)
-            val authHelper = GitAuthHelperFactory.getCleanUpAuthHelper(git = git, settings = settings)
-            if (settings.submodules && settings.persistCredentials) {
-                logger.groupStart("removing credentials for submodules")
-                authHelper.removeSubmoduleAuth()
-                logger.groupEnd("")
-            }
-            if (settings.persistCredentials) {
-                logger.groupStart("removing auth")
-                authHelper.removeAuth()
-                logger.groupEnd("")
-            }
-            GitCacheHelperFactory.getCacheHelper(settings, git)?.unsetConfig(settings = settings, git = git)
+            HandlerExecutionChain(
+                listOf(
+                    GitCleanUpHandler(settings, git)
+                )
+            ).doHandle()
         }
     }
 }

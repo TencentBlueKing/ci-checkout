@@ -42,6 +42,7 @@ import com.tencent.bk.devops.git.core.util.CommandUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.FileUtils
 import com.tencent.bk.devops.git.core.util.GitUtil
+import com.tencent.bk.devops.git.core.util.LockHelper
 import com.tencent.bk.devops.git.core.util.SubmoduleUtil
 import org.slf4j.LoggerFactory
 import java.io.File
@@ -62,6 +63,11 @@ abstract class AbGitAuthHelper(
     protected val authInfo = settings.authInfo
 
     override fun configGlobalAuth() {
+        // 在改写HOME之前,先抓真实全局的http代理配置
+        val globalHttpConfigs = git.tryConfigGetRegexp(
+            configKeyRegex = "^http\\.(.*\\.)?proxy$",
+            configScope = GitConfigScope.GLOBAL
+        )
         // 创建临时的.gitconfig文件
         val tempHomePath = Files.createTempDirectory("checkout")
         val newGitConfigPath = Paths.get(tempHomePath.toString(), ".gitconfig")
@@ -87,11 +93,25 @@ abstract class AbGitAuthHelper(
             git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
             insteadOf()
         }
+        // 把真实全局的http代理配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
+        copyGlobalHttpConfigs(globalHttpConfigs)
         configXdgAuthCommand()
         configureXDGConfig()
     }
 
     override fun removeGlobalAuth() {
+        /*
+         * 通过加锁来避免并发场景下误删其他构建正在使用的凭证。
+         *
+         * 原因:在 Linux 构建机上,cache 存储的凭证同样位于 $HOME/.checkout/$pipelineId/$jobId 目录下
+         * (参见 com.tencent.bk.devops.git.credential.storage.CacheSecureStore#cacheSocketPath)。
+         * 若并发构建间直接删除该目录,可能删除掉其他构建仍在使用的凭证,导致凭证失效。
+         *
+         * 因此仅当成功释放锁(即当前凭证由本次构建写入)时才继续执行删除逻辑。
+         */
+        if (!LockHelper.unlock()) {
+            return
+        }
         val gitXdgConfigHome = git.removeEnvironmentVariable(GitConstants.XDG_CONFIG_HOME)
         if (!gitXdgConfigHome.isNullOrBlank()) {
             val gitXdgConfigFile = Paths.get(gitXdgConfigHome, "git", "config")
@@ -275,6 +295,37 @@ abstract class AbGitAuthHelper(
                 configValue = "$protocol://$host/",
                 configScope = GitConfigScope.GLOBAL
             )
+        }
+    }
+
+    /**
+     * 将真实全局配置中的http代理配置复制到临时.gitconfig
+     *
+     * 拉取submodule时会用临时全局配置隔离用户的真实全局配置,
+     * 若用户在全局配置了http代理,不复制会导致submodule拉取无代理而网络超时。
+     *
+     * @param entries git config --get-regexp的输出,每项形如 "http.https://xxx.proxy value"
+     */
+    private fun copyGlobalHttpConfigs(entries: List<String>) {
+        entries.forEach { entry ->
+            val idx = entry.indexOf(' ')
+            if (idx <= 0) {
+                return@forEach
+            }
+            val key = entry.substring(0, idx)
+            val value = entry.substring(idx + 1).trim()
+            if (value.isEmpty()) {
+                return@forEach
+            }
+            try {
+                git.configAdd(
+                    configKey = key,
+                    configValue = value,
+                    configScope = GitConfigScope.GLOBAL
+                )
+            } catch (ignore: Exception) {
+                logger.warn("Failed to copy global http config: $key")
+            }
         }
     }
 
