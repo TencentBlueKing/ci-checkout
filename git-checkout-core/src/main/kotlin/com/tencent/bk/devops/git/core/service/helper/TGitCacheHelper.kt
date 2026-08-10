@@ -39,7 +39,7 @@ class TGitCacheHelper : IGitCacheHelper {
         return git.isAtLeastVersion(GitConstants.SUPPORT_PROTOCOL_2_0_GIT_VERSION) &&
                 (settings.enableTGitCache == true || settings.enableCacheByStrategy) &&
                 GitUtil.isHttpProtocol(settings.repositoryUrl) &&
-                (settings.scmType == ScmType.CODE_GIT || settings.scmType == ScmType.CODE_TGIT) &&
+                settings.scmType == ScmType.CODE_GIT &&
                 !settings.tGitCacheUrl.isNullOrBlank() &&
                 !settings.tGitCacheProxyUrl.isNullOrBlank() &&
                 // 办公区域不走代理
