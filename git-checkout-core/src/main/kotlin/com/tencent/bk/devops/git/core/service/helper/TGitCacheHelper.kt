@@ -72,7 +72,6 @@ class TGitCacheHelper : IGitCacheHelper {
             downloadFileToLocal(
                 proxyUrl = cacheUrl,
                 repositoryName = repositoryName,
-                hostName = serverInfo.hostName,
                 authInfo = settings.authInfo,
                 saveFilePath = tarFile.toString()
             )
@@ -124,23 +123,18 @@ class TGitCacheHelper : IGitCacheHelper {
     private fun downloadFileToLocal(
         proxyUrl: String,
         repositoryName: String,
-        hostName: String,
         authInfo: AuthInfo,
         saveFilePath: String
     ) {
         val startTime = System.currentTimeMillis()
         val saveDirFile = File(saveFilePath)
         val builder = Request.Builder().url("$proxyUrl/${repositoryName}.git/git-upload-pack?service=archive")
-        // 合作版场景下,边缘节点需要通过Host头识别真实的工蜂域名来路由
-        if (hostName.isNotBlank()) {
-            builder.header("Host", hostName)
-        }
         if (!authInfo.username.isNullOrBlank() && !authInfo.password.isNullOrBlank()) {
             // 设置用户名和密码
             builder.header("Authorization", Credentials.basic(authInfo.username, authInfo.password))
         }
         val request = builder.build()
-        logger.info("tgit cache url:${request.url}, Host:${hostName}")
+        logger.info("tgit cache url:${request.url}")
         val length = HttpUtil.downloadFile(request, saveDirFile)
 
         val elapse = (System.currentTimeMillis() - startTime)
