@@ -39,6 +39,7 @@ import com.tencent.bk.devops.git.core.exception.PermissionForbiddenException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.api.CommitData
 import com.tencent.bk.devops.git.core.pojo.api.CredentialInfo
+import com.tencent.bk.devops.git.core.pojo.api.ExternalLinkReportRequest
 import com.tencent.bk.devops.git.core.pojo.api.GitToken
 import com.tencent.bk.devops.git.core.pojo.api.GithubToken
 import com.tencent.bk.devops.git.core.pojo.api.PipelineBuildMaterial
@@ -262,6 +263,19 @@ class DevopsApi : IDevopsApi, BaseApi() {
 
     override fun getScmGitOauthUrl(userId: String, scmCode: String): Result<String> {
         return getOauthUrl("/repository/api/build/oauth/$scmCode/oauthUrl?userId=$userId")
+    }
+
+    override fun reportExternalLink(repositoryUrl: String) {
+        try {
+            val path = "/process/api/build/task/external_link"
+            val request = buildPost(path, getJsonRequest(ExternalLinkReportRequest(repositoryUrl)), mutableMapOf())
+            HttpUtil.retryRequest(
+                request = request,
+                errorMessage = "Failed to add repository commit information",
+                maxAttempts = 1
+            )
+        } catch (ignored: Exception) {
+        }
     }
 
     private fun getOauthUrl(url: String): Result<String> {

@@ -66,4 +66,6 @@ interface IDevopsApi {
     fun getScmGitOauthToken(repoHashId: String): Result<GitToken>
 
     fun getScmGitOauthUrl(userId: String, scmCode: String): Result<String>
+
+    fun reportExternalLink(repositoryUrl: String)
 }

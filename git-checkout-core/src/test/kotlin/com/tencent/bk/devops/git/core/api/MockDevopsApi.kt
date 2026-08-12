@@ -89,4 +89,6 @@ class MockDevopsApi : IDevopsApi {
     override fun getScmGitOauthUrl(userId: String, scmCode: String): Result<String> {
         return Result("true")
     }
+
+    override fun reportExternalLink(repositoryUrl: String) = Unit
 }
