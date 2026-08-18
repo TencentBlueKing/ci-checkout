@@ -68,6 +68,15 @@ abstract class AbGitAuthHelper(
             configKeyRegex = "^http\\.(.*\\.)?proxy$",
             configScope = GitConfigScope.GLOBAL
         )
+        // 仅当存在全局http代理时,才抓真实全局的insteadOf配置(通常是走代理的url改写规则)
+        val globalInsteadOfConfigs = if (globalHttpConfigs.isNotEmpty()) {
+            git.tryConfigGetRegexp(
+                configKeyRegex = "^url\\..*\\.insteadOf$",
+                configScope = GitConfigScope.GLOBAL
+            )
+        } else {
+            emptyList()
+        }
         // 创建临时的.gitconfig文件
         val tempHomePath = Files.createTempDirectory("checkout")
         val newGitConfigPath = Paths.get(tempHomePath.toString(), ".gitconfig")
@@ -95,6 +104,8 @@ abstract class AbGitAuthHelper(
         }
         // 把真实全局的http代理配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
         copyGlobalHttpConfigs(globalHttpConfigs)
+        // 有代理时,把配套的insteadOf改写规则也写回,保证走代理的url改写在submodule拉取时依然生效
+        copyGlobalHttpConfigs(globalInsteadOfConfigs)
         configXdgAuthCommand()
         configureXDGConfig()
     }
