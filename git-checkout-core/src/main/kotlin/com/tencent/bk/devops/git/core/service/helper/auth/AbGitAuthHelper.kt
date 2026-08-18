@@ -105,7 +105,7 @@ abstract class AbGitAuthHelper(
         // 把真实全局的http代理配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
         copyGlobalHttpConfigs(globalHttpConfigs)
         // 有代理时,把配套的insteadOf改写规则也写回,保证走代理的url改写在submodule拉取时依然生效
-        copyGlobalHttpConfigs(globalInsteadOfConfigs)
+        // copyGlobalHttpConfigs(globalInsteadOfConfigs)
         configXdgAuthCommand()
         configureXDGConfig()
     }
