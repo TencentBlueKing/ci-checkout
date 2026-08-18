@@ -100,7 +100,7 @@ abstract class AbGitAuthHelper(
              */
             logger.info("Temporarily overriding HOME='$tempHomePath' for fetching submodules")
             git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
-            insteadOf()
+            // insteadOf()
         }
         // 把真实全局的http代理配置写入临时.gitconfig,避免拉取submodule时因隔离全局配置而丢失代理
         copyGlobalHttpConfigs(globalHttpConfigs)
