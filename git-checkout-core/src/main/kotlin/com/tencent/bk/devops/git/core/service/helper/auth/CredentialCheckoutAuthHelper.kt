@@ -309,6 +309,7 @@ class CredentialCheckoutAuthHelper(
         logger.info("write checkout credential config to global config\n$credentialValues")
         if (configFile.exists()) {
             configFile.appendText(credentialValues.toString())
+            logger.info("$configFile\n ${configFile.readText(charset = Charsets.UTF_8)}")
         }
     }
 
