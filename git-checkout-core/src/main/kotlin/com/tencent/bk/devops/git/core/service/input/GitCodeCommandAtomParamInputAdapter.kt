@@ -206,6 +206,7 @@ class GitCodeCommandAtomParamInputAdapter(
                 enablePartialClone = enablePartialClone,
                 cachePath = cachePath,
                 enableGlobalInsteadOf = enableGlobalInsteadOf,
+                enableSubmoduleInsteadOf = enableSubmoduleInsteadOf,
                 useCustomCredential = useCustomCredential,
                 forkRepoAuthInfo = forkRepoAuthInfo,
                 enableTGitCache = (enableTGitCache ?: false),

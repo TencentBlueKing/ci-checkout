@@ -628,6 +628,28 @@
         ]
       }
     },
+    "enableSubmoduleInsteadOf": {
+      "label": "",
+      "default": true,
+      "placeholder": "",
+      "type": "atom-checkbox",
+      "text": "启用子模块协议替换（insteadOf）",
+      "desc": "勾选后，插件会通过insteadOf将协议(ssh/https)或域名与主库不一致的子模块URL统一改写为主库协议以复用凭证。若构建机已自行配置insteadOf、不希望被插件覆盖，可取消勾选；关闭后跨协议/跨域名子模块的可拉取性需由你自己的git配置保证。默认勾选。",
+      "required": false,
+      "disabled": false,
+      "hidden": false,
+      "isSensitive": false,
+      "groupName": "submodule",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "enableSubmodule",
+            "value": true
+          }
+        ]
+      }
+    },
     "enableSubmoduleRecursive": {
       "label": "",
       "default": true,

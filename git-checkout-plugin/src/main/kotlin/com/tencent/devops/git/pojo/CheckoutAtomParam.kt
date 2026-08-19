@@ -146,6 +146,11 @@ class CheckoutAtomParam : AtomBaseParam() {
     var enableSubmoduleRecursive: Boolean? = false
 
     /**
+     * 是否启用子模块insteadOf协议替换, 默认: true, 当 [enableSubmodule] = [true] 时生效
+     */
+    var enableSubmoduleInsteadOf: Boolean = true
+
+    /**
      * submodule并发拉取数量
      */
     val submoduleJobs: Int = 0

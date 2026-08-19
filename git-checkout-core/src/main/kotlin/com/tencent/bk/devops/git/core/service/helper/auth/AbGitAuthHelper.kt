@@ -69,14 +69,17 @@ abstract class AbGitAuthHelper(
         Files.createFile(newGitConfigPath)
         // 如果开启全局insteadOf,则insteadOf需要配置到全局配置中,否则应该只在插件中生效
         if (settings.enableGlobalInsteadOf && AgentEnv.isDocker()) {
-            unsetInsteadOf()
-            insteadOf()
+            // 是否由插件为子模块配置insteadOf协议改写,由enableSubmoduleInsteadOf控制
+            if (settings.enableSubmoduleInsteadOf) {
+                unsetInsteadOf()
+                insteadOf()
+            }
             configGlobalAuthCommand()
             logger.info("Temporarily overriding HOME='$tempHomePath' for fetching submodules")
             git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
         } else {
             // 如果构建机上已有的insteadOf.只清理docker构建机,第三方构建机不清理
-            if (AgentEnv.isDocker()) {
+            if (AgentEnv.isDocker() && settings.enableSubmoduleInsteadOf) {
                 // 卸载前备份insteadOf
                 backupInsteadOf()
                 unsetInsteadOf()
@@ -86,7 +89,9 @@ abstract class AbGitAuthHelper(
              */
             logger.info("Temporarily overriding HOME='$tempHomePath' for fetching submodules")
             git.setEnvironmentVariable(GitConstants.HOME, tempHomePath.toString())
-            // insteadOf()
+            if (settings.enableSubmoduleInsteadOf) {
+                insteadOf()
+            }
         }
         // 有代理时,把配套的insteadOf改写规则也写回,保证走代理的url改写在submodule拉取时依然生效
         // copyGlobalHttpConfigs(globalInsteadOfConfigs)
@@ -137,7 +142,8 @@ abstract class AbGitAuthHelper(
                     val commands = mutableListOf<String>()
                     configSubmoduleAuthCommand(moduleServerInfo, commands)
                     // 如果schema://HOSTNAME不相同,则统一转换成主库的协议拉取
-                    if (moduleServerInfo.origin != serverInfo.origin) {
+                    // 是否执行insteadOf协议改写由enableSubmoduleInsteadOf控制
+                    if (settings.enableSubmoduleInsteadOf && moduleServerInfo.origin != serverInfo.origin) {
                         submoduleInsteadOf(moduleServerInfo, commands)
                     }
                     CommandUtil.execute(
@@ -166,7 +172,7 @@ abstract class AbGitAuthHelper(
                 if (getHostList().contains(moduleServerInfo.hostName) && File(submodule.absolutePath).exists()) {
                     val commands = mutableListOf<String>()
                     removeSubmoduleAuthCommand(moduleServerInfo, commands)
-                    if (moduleServerInfo.origin != serverInfo.origin) {
+                    if (settings.enableSubmoduleInsteadOf && moduleServerInfo.origin != serverInfo.origin) {
                         submoduleUnsetInsteadOf(moduleServerInfo, commands)
                     }
                     CommandUtil.execute(
