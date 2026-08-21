@@ -118,6 +118,10 @@ data class GitCodeCommandAtomParamInput(
      */
     val enableGlobalInsteadOf: Boolean = false,
     /**
+     * 是否启用子模块insteadOf协议替换,关闭后插件不再为拉取子模块配置insteadOf协议改写
+     */
+    val enableSubmoduleInsteadOf: Boolean = true,
+    /**
      * 是否使用自定义凭证
      *
      * 只要是http[s]，都是用自定义的checkout凭证,不管有没有配置全局的凭证

@@ -59,6 +59,7 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 enableVirtualMergeBranch = enableVirtualMergeBranch,
                 enableSubmoduleRemote = enableSubmoduleRemote,
                 enableSubmoduleRecursive = enableSubmoduleRecursive,
+                enableSubmoduleInsteadOf = enableSubmoduleInsteadOf,
                 submoduleJobs = submoduleJobs,
                 submoduleDepth = submoduleDepth,
                 autoCrlf = autoCrlf,
