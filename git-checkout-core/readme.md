@@ -84,6 +84,7 @@ GitCheckoutRunner().run(inputAdapter = inputAdapter, atomContext = context)
 | BK_CI_GIT_REPO_BRANCH                | 当前代码库分支                       |
 | BK_CI_GIT_REPO_LAST_COMMIT_ID        | 拉取代码时，上次构建最后的commit id  |
 | BK_CI_GIT_REPO_HEAD_COMMIT_ID        | 拉取代码时，本次构建最后的commit id  |
+| BK_CI_GIT_REPO_HEAD_COMMIT_SHORT_ID  | 拉取代码时，本次构建最后的短commit id（完整commit的前7位） |
 | BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT   | 拉取代码时，本次构建最后的commit注释 |
 | BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR    | 本次产生的新的author                 |
 | BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER | 本次产生的新的committer              |

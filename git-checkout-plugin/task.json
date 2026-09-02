@@ -943,6 +943,10 @@
       "type": "string",
       "description": "拉取代码时，本次构建最后的commit id，如果启用pre-merge，则是合并完后的commitId"
     },
+    "BK_CI_GIT_REPO_HEAD_COMMIT_SHORT_ID": {
+      "type": "string",
+      "description": "拉取代码时，本次构建最后的短commit id（完整commit的前7位），如果启用pre-merge，则是合并完后的短commitId"
+    },
     "BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT": {
       "type": "string",
       "description": "拉取代码时，本次构建最后的commit注释"

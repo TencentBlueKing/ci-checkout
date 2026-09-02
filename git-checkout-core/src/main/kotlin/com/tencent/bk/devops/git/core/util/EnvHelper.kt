@@ -37,6 +37,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_ID
+import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_HEAD_COMMIT_SHORT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_GIT_REPO_LAST_COMMIT_ID
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_HEAD_COMMITS
 import com.tencent.bk.devops.git.core.constant.GitConstants.DEVOPS_GIT_REPO_CUR_COMMITS
@@ -82,6 +83,7 @@ object EnvHelper {
         env[BK_CI_GIT_REPO_CUR_COMMITS] = commitMaterial.commitIds.joinToString(PARAM_SEPARATOR)
         env[BK_CI_GIT_REPO_LAST_COMMIT_ID] = commitMaterial.lastCommitId ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_ID] = commitMaterial.newCommitId ?: ""
+        env[BK_CI_GIT_REPO_HEAD_COMMIT_SHORT_ID] = StringUtils.shortCommitId(commitMaterial.newCommitId)
         env[BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT] = commitMaterial.newCommitComment ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR] = commitMaterial.newCommitAuthor ?: ""
         env[BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER] = commitMaterial.newCommitAuthor ?: ""

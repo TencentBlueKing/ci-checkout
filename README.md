@@ -55,6 +55,7 @@ checkout插件为蓝盾平台提供基本的git拉取操作，可以拉取所有
 | BK_CI_GIT_REPO_CODE_PATH | 代码保存路径的值                                                                                                       | 
 | BK_CI_GIT_REPO_LAST_COMMIT_ID        | 拉取代码时，上次构建最后的commit id                                                                                         |
 | BK_CI_GIT_REPO_HEAD_COMMIT_ID        | 拉取代码时，本次构建最后的commit id,构建机上最新的commitId                                                                         |
+| BK_CI_GIT_REPO_HEAD_COMMIT_SHORT_ID  | 拉取代码时，本次构建最后的短commit id（完整commit的前7位）                                                                         |
 | BK_CI_GIT_REPO_HEAD_COMMIT_COMMENT   | 拉取代码时，本次构建最后的commit注释                                                                                          |
 | BK_CI_GIT_REPO_HEAD_COMMIT_AUTHOR    | 本次产生的新的author                                                                                                  |
 | BK_CI_GIT_REPO_HEAD_COMMIT_COMMITTER | 本次产生的新的committer                                                                                               |

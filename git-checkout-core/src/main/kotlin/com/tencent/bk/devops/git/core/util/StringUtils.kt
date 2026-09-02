@@ -32,8 +32,16 @@ import kotlin.math.min
 object StringUtils {
 
     private const val MAX_VAR_LENGTH = 4000
+    private const val SHORT_COMMIT_LENGTH = 7
 
     fun trimVariable(variable: String): String {
         return variable.substring(0, min(variable.length, MAX_VAR_LENGTH))
+    }
+
+    fun shortCommitId(commitId: String?, length: Int = SHORT_COMMIT_LENGTH): String {
+        if (commitId.isNullOrBlank()) {
+            return ""
+        }
+        return commitId.take(length)
     }
 }
