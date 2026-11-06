@@ -43,7 +43,7 @@ buildscript {
 
     ext {
         kotlinVersion = "1.6.0"
-        bouncyCastleVersion = "1.46"
+        bouncyCastleVersion = "1.78"
         commonExecVersion = "1.3"
     }
 
