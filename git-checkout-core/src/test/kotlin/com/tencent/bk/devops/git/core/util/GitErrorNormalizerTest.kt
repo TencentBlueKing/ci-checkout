@@ -19,7 +19,10 @@ class GitErrorNormalizerTest {
             "error: RPC 失败.curl 56 Recv failure",
             GitErrorNormalizer.normalize("错误：RPC 失败。curl 56 Recv failure")
         )
-        Assert.assertEquals("remote: Repository not found.", GitErrorNormalizer.normalize("remote: Repository not found."))
+        Assert.assertEquals(
+            "remote: Repository not found.",
+            GitErrorNormalizer.normalize("remote: Repository not found.")
+        )
     }
 
     @Test
