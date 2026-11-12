@@ -275,6 +275,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
                 maxAttempts = 1
             )
         } catch (ignored: Exception) {
+            logger.debug("Failed to report external link|${ignored.message}")
         }
     }
 
