@@ -61,7 +61,7 @@ subprojects {
     apply plugin: "org.jetbrains.kotlin.plugin.lombok"
     apply plugin: "application"
     group 'com.tencent.bk.devops.git'
-    version '2.0.17'
+    version '2.0.18'
     def coreVersion = System.getProperty("core_version")
     if (coreVersion != null) {
         version = coreVersion
