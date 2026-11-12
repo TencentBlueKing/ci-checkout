@@ -65,6 +65,7 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 autoCrlf = autoCrlf,
                 enableGitClean = enableGitClean,
                 enableGitCleanIgnore = enableGitCleanIgnore,
+                enableGitCleanNested = enableGitCleanNested,
                 includePath = includePath,
                 excludePath = excludePath,
 

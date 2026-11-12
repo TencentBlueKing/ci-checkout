@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode
 @EqualsAndHashCode(callSuper = true)
 class CheckoutAtomParam : AtomBaseParam() {
     /**
-     * 代码库, 必选, 默认: ID, options: 按代码库选择[ID] | 按代码库别名输入[NAME] | 按仓库URL输入[URL]
+     * 代码库, 必选, 默认: ID, options: 按代码库选择[ID] | 按代码库别名输入[NAME] | 按仓库URL输入[URL] | 拉取触发构建的代码库[SELF]
      */
     var repositoryType: String = "ID"
 
