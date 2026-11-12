@@ -150,6 +150,14 @@ class GitErrorsText : TranslationBundle() {
     var notSupportSparseCheckCone: String? = null
     var notSupportSparseCheckConeCause: String? = null
     var notSupportSparseCheckConeSolution: String? = null
+    var sslCertificateFailed: String? = null
+    var sslCertificateFailedCause: String? = null
+    var sslCertificateFailedSolution: String? = null
+    var sslCertificateFailedWiki: String? = null
+    var noSpaceLeftOnDevice: String? = null
+    var noSpaceLeftOnDeviceCause: String? = null
+    var noSpaceLeftOnDeviceSolution: String? = null
+    var noSpaceLeftOnDeviceWiki: String? = null
 
     companion object {
         fun get(): GitErrorsText {
