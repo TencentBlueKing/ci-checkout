@@ -76,7 +76,6 @@ object GitConstants {
     const val GIT_LFS_SKIP_SMUDGE = "GIT_LFS_SKIP_SMUDGE"
     const val GIT_LFS_FORCE_PROGRESS = "GIT_LFS_FORCE_PROGRESS"
     const val GIT_HTTP_USER_AGENT = "GIT_HTTP_USER_AGENT"
-    const val GIT_NO_LAZY_FETCH = "GIT_NO_LAZY_FETCH"
     const val GIT_CREDENTIAL_HELPER = "credential.helper"
     const val GIT_CREDENTIAL_USERNAME = "credential.username"
     const val GIT_CREDENTIAL_TASKID = "credential.taskId"
