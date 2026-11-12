@@ -29,6 +29,7 @@ package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.api.IDevopsApi
 import com.tencent.bk.devops.git.core.constant.ContextConstants
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import com.tencent.bk.devops.git.core.service.helper.GitLogHelper
@@ -49,9 +50,13 @@ class GitLogHandler(
         val startEpoch = System.currentTimeMillis()
         try {
             logger.groupStart("saving commit log info")
+            if (settings.enablePartialClone == true) {
+                git.setEnvironmentVariable(GitConstants.GIT_NO_LAZY_FETCH, "1")
+            }
             GitLogHelper(git, settings, devopsApi).saveGitCommit()
             logger.groupEnd("")
         } finally {
+            git.removeEnvironmentVariable(GitConstants.GIT_NO_LAZY_FETCH)
             EnvHelper.putContext(
                 key = ContextConstants.CONTEXT_LOG_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()
