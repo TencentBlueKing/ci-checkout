@@ -1,0 +1,26 @@
+# 正常的git输出,不能被识别成错误
+Cloning into 'demo'...
+正克隆到 'demo'...
+remote: Enumerating objects: 1024, done.
+remote: Counting objects: 100% (1024/1024), done.
+remote: Compressing objects: 100% (512/512), done.
+Receiving objects: 100% (1024/1024), 1.20 MiB | 10.00 MiB/s, done.
+接收对象中: 100% (1024/1024), 1.20 MiB | 10.00 MiB/s, 完成.
+Resolving deltas: 100% (256/256), done.
+From https://example.com/demo
+ * [new branch]      master     -> origin/master
+ * branch            master     -> FETCH_HEAD
+HEAD is now at 1234567 fix: something
+HEAD 现在位于 1234567 fix: something
+Switched to a new branch 'master'
+Already up to date.
+已经是最新的。
+Updating 1234567..89abcde
+Fast-forward
+Merge made by the 'ort' strategy.
+Submodule 'demo' (http://example.com/demo.git) registered for path 'demo'
+Submodule path 'demo': checked out '1234567'
+子模组路径 'demo'：检出 '1234567'
+Downloading LFS objects: 100% (3/3), 1.0 MB | 1.0 MB/s
+hint: Using 'master' as the name for the initial branch.
+warning: redirecting to https://example.com/demo.git/

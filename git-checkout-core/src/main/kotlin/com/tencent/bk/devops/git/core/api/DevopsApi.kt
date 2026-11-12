@@ -95,7 +95,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
     }
 
     override fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo> {
-        val path = "/ticket/api/build/credentials/$credentialId?publicKey=${encode(publicKey)}"
+        val path = "/ticket/api/build/credentials/$credentialId?publicKey=${encode(publicKey)}&padding=true"
         val request = buildGet(path)
         val responseContent = HttpUtil.retryRequest(
             request = request,
@@ -275,6 +275,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
                 maxAttempts = 1
             )
         } catch (ignored: Exception) {
+            logger.debug("Failed to report external link|${ignored.message}")
         }
     }
 

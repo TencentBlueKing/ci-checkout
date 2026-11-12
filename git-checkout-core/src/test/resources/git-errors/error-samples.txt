@@ -1,0 +1,195 @@
+# 格式: 期望的错误类型|git原始输出
+# 中文样本以git源码po/zh_CN.po为准,前缀是"致命错误："/"错误："
+
+# AuthenticationFailed
+AuthenticationFailed|fatal: Authentication failed for 'http://example.com/demo.git/'
+AuthenticationFailed|fatal: 'http://example.com/demo.git/' 鉴权失败
+AuthenticationFailed|致命错误：'http://example.com/demo.git/' 鉴权失败
+AuthenticationFailed|fatal: could not read Username for 'http://example.com': terminal prompts disabled
+AuthenticationFailed|致命错误：could not read Username for 'http://example.com': terminal prompts disabled
+AuthenticationFailed|fatal: could not read Password for 'http://user@example.com': No such device or address
+AuthenticationFailed|fatal: unable to access 'http://example.com/demo.git/': The requested URL returned error: 403
+AuthenticationFailed|致命错误：无法访问 'http://example.com/demo.git/'：The requested URL returned error: 403
+AuthenticationFailed|error: The requested URL returned error: 401 while accessing http://example.com/demo.git/info/refs
+AuthenticationFailed|error: RPC failed; HTTP 401 curl 22 The requested URL returned error: 401
+
+# SshAuthenticationFailed
+SshAuthenticationFailed|fatal: Could not read from remote repository.
+SshAuthenticationFailed|致命错误：无法读取远程仓库。
+SshAuthenticationFailed|git@example.com: Permission denied (publickey).
+
+# RepositoryNotFoundFailed
+RepositoryNotFoundFailed|fatal: repository 'http://example.com/demo.git/' not found
+RepositoryNotFoundFailed|致命错误：仓库 'http://example.com/demo.git/' 未找到
+RepositoryNotFoundFailed|remote: Repository not found.
+RepositoryNotFoundFailed|ERROR: Repository not found.
+RepositoryNotFoundFailed|fatal: remote error: Git repository not found
+RepositoryNotFoundFailed|致命错误：远程错误：Git repository not found
+RepositoryNotFoundFailed|fatal: 远程错误：Git:Project not found.
+
+# RemoteServerFailed
+RemoteServerFailed|fatal: the remote end hung up unexpectedly
+RemoteServerFailed|致命错误：远端意外挂断了
+RemoteServerFailed|fatal: early EOF
+RemoteServerFailed|致命错误：过早的文件结束符（EOF）
+RemoteServerFailed|fatal: index-pack failed
+RemoteServerFailed|fatal: index-pack 失败
+RemoteServerFailed|致命错误：fetch-pack：无效的 index-pack 输出
+RemoteServerFailed|fatal: protocol error: bad pack header
+RemoteServerFailed|致命错误：协议错误：无效的包头
+RemoteServerFailed|致命错误：协议错误：坏的包头
+RemoteServerFailed|error: RPC failed; curl 18 transfer closed with outstanding read data remaining
+RemoteServerFailed|错误：RPC 失败。curl 18 transfer closed with outstanding read data remaining
+RemoteServerFailed|error: RPC failed; curl 92 HTTP/2 stream 5 was not closed cleanly: CANCEL (err 8)
+RemoteServerFailed|fatal: unable to access 'http://example.com/demo.git/': The requested URL returned error: 502
+RemoteServerFailed|fatal: unable to access 'http://example.com/demo.git/': The requested URL returned error: 503
+RemoteServerFailed|fatal: unable to access 'http://example.com/demo.git/': The requested URL returned error: 429
+RemoteServerFailed|fatal: 远程错误：Internal server error
+RemoteServerFailed|fatal: remote error: Service unavailable
+RemoteServerFailed|fatal: remote error: Git:Server is busy, please try again later
+RemoteServerFailed|致命错误：远程错误：https://example.com/demo.git: too many request, your request was forbidden, strategy id is: [6644]
+RemoteServerFailed|fatal: unable to access 'http://example.com/demo.git/': Failed to connect to example.com port 80: Host is down
+
+# ConnectionTimeOut
+ConnectionTimeOut|ssh: connect to host example.com port 22: Connection timed out
+ConnectionTimeOut|ssh: connect to host example.com port 22: Operation timed out
+ConnectionTimeOut|fatal: unable to access 'http://example.com/demo.git/': Failed to connect to example.com port 80 after 21041 ms: Timed out
+ConnectionTimeOut|fatal: unable to access 'http://example.com/demo.git/': Failed to connect to example.com port 80: Connection timed out
+ConnectionTimeOut|fatal: unable to access 'http://example.com/demo.git/': Connection timed out after 300000 milliseconds
+ConnectionTimeOut|fatal: unable to access 'http://example.com/demo.git/': Could not resolve host: example.com
+ConnectionTimeOut|ssh: Could not resolve hostname example.com: Name or service not known
+
+# NoMatchingBranch
+NoMatchingBranch|fatal: couldn't find remote ref refs/heads/aaa
+NoMatchingBranch|致命错误：无法找到远程引用 refs/heads/aaa
+NoMatchingBranch|Your configuration specifies to merge with the ref 'refs/heads/aaa'
+NoMatchingBranch|您的配置中指定要合并远程的引用 'refs/heads/aaa'，
+NoMatchingBranch|fatal: 'origin/aaa' is not a commit and a branch 'aaa' cannot be created from it
+NoMatchingBranch|致命错误：'origin/aaa' 不是一个提交，无法基于它创建分支 'aaa'
+NoMatchingBranch|fatal: 'origin/aaa' 不是一个提交，不能基于它创建分支 'aaa'
+NoMatchingBranch|error: pathspec 'aaa' did not match any file(s) known to git
+NoMatchingBranch|错误：路径规格 'aaa' 未匹配任何 Git 已知文件
+NoMatchingBranch|fatal: reference is not a tree: b5a4cf350acdfae7d0afd2817dd83e7930f23197
+NoMatchingBranch|致命错误：引用不是一个树：b5a4cf350acdfae7d0afd2817dd83e7930f23197
+NoMatchingBranch|致命错误：无法读取树（b5a4cf350acdfae7d0afd2817dd83e7930f23197）
+NoMatchingBranch|致命错误：请求的上游分支 'origin/aaa' 不存在
+NoMatchingBranch|fatal: Cannot update paths and switch to branch 'aaa' at the same time.
+NoMatchingBranch|致命错误：不能同时更新路径并切换到分支 'aaa'。
+
+# EmptyBranch
+EmptyBranch|fatal: You are on a branch yet to be born
+EmptyBranch|致命错误：您位于一个尚未初始化的分支
+
+# SparseCheckoutLeavesNoEntry
+SparseCheckoutLeavesNoEntry|error: Sparse checkout leaves no entry on working directory
+
+# BranchOrPathNameConflicts
+BranchOrPathNameConflicts|fatal: 'test' could be both a local file and a tracking branch.
+BranchOrPathNameConflicts|致命错误：'test' 既可以是一个本地文件，也可以是一个跟踪分支。
+
+# MergeConflicts
+MergeConflicts|Automatic merge failed; fix conflicts and then commit the result.
+MergeConflicts|自动合并失败，修正冲突然后提交修正的结果。
+MergeConflicts|error: add_cacheinfo failed to refresh for path 'a.txt'; merge aborting.
+
+# InvalidMerge
+InvalidMerge|merge: origin/aaa - not something we can merge
+InvalidMerge|fatal: origin/aaa - not something we can merge
+InvalidMerge|致命错误：origin/aaa - 无法被合并
+InvalidMerge|merge：origin/aaa - 不能合并
+
+# CannotMergeUnrelatedHistories
+CannotMergeUnrelatedHistories|fatal: refusing to merge unrelated histories
+CannotMergeUnrelatedHistories|致命错误：拒绝合并无关的历史
+
+# LocalChangesOverwritten
+LocalChangesOverwritten|error: Your local changes to the following files would be overwritten by checkout:
+LocalChangesOverwritten|error: Your local changes to the following files would be overwritten by merge:
+LocalChangesOverwritten|错误：您对下列文件的本地修改将被检出操作覆盖：
+LocalChangesOverwritten|error: The following untracked working tree files would be overwritten by checkout:
+LocalChangesOverwritten|错误：工作区中下列未跟踪的文件将会因为检出操作而被覆盖：
+
+# NoSubmoduleMapping
+NoSubmoduleMapping|fatal: No url found for submodule path 'aaa' in .gitmodules
+NoSubmoduleMapping|fatal: no submodule mapping found in .gitmodules for path 'aaa'
+NoSubmoduleMapping|致命错误：在 .gitmodules 中未找到子模组路径 'aaa' 的 url
+NoSubmoduleMapping|致命错误：在 .gitmodules 中没有发现路径 'aaa' 的子模组映射
+
+# SubmoduleRepositoryDoesNotExist
+SubmoduleRepositoryDoesNotExist|fatal: clone of 'http://example.com/demo.git' into submodule path 'demo' failed
+SubmoduleRepositoryDoesNotExist|致命错误：无法克隆 'http://example.com/demo.git' 到子模组路径 'demo'
+
+# InvalidSubmoduleSHA
+InvalidSubmoduleSHA|fatal: Fetched in submodule path 'demo', but it did not contain abc123. Direct fetching of that commit failed.
+InvalidSubmoduleSHA|致命错误：获取了子模组路径 'demo'，但是它没有包含 abc123。直接获取该提交失败。
+InvalidSubmoduleSHA|fatal: Unable to find current revision in submodule path 'demo'
+InvalidSubmoduleSHA|致命错误：无法在子模组路径 'demo' 中找到当前版本
+InvalidSubmoduleSHA|fatal: Needed a single revision
+InvalidSubmoduleSHA|致命错误：需要一个单独的版本
+InvalidSubmoduleSHA|fatal: 需要一个单独的版本
+
+# LfsAttributeDoesNotMatch
+LfsAttributeDoesNotMatch|The "filter.lfs.clean" attribute should be "git-lfs clean -- %f" but is "git lfs clean %f"
+
+# ErrorDownloadingObject
+ErrorDownloadingObject|Error downloading object: a.bin (abc123): Smudge error: Error downloading a.bin
+ErrorDownloadingObject|LFS: Repository or object not found: https://example.com/demo.git/info/lfs/objects/batch
+
+# LfsNotInstall
+LfsNotInstall|git: 'lfs' is not a git command. See 'git --help'.
+LfsNotInstall|git：'lfs' 不是一个 git 命令。参见 'git --help'。
+
+# LockFileAlreadyExists
+LockFileAlreadyExists|Another git process seems to be running in this repository, e.g.
+LockFileAlreadyExists|另一 git 进程似乎正在此仓库中运行，或者锁文件可能已过期
+LockFileAlreadyExists|error: could not lock config file .git/config: File exists
+LockFileAlreadyExists|error: could not lock config file /root/.gitconfig: 文件已存在
+LockFileAlreadyExists|错误：无法锁定配置文件 .git/config：文件已存在
+LockFileAlreadyExists|fatal: Unable to create '/data/workspace/.git/index.lock': File exists.
+LockFileAlreadyExists|致命错误：无法创建 '/data/workspace/.git/index.lock'：文件已存在。
+
+# BadRevision
+BadRevision|fatal: bad revision 'aaa'
+BadRevision|致命错误：错误的版本 'aaa'
+
+# NotAGitRepository
+NotAGitRepository|fatal: not a git repository (or any of the parent directories): .git
+NotAGitRepository|fatal: Not a git repository (or any of the parent directories): .git
+NotAGitRepository|致命错误：不是 Git 仓库（或者任何父目录）：.git
+NotAGitRepository|致命错误：不是 git 仓库（或者直至挂载点 /data 的任何父目录）
+
+# LibcurlNotSupportHttps
+LibcurlNotSupportHttps|fatal: unable to access 'https://example.com/demo.git/': Protocol "https" not supported or disabled in libcurl
+
+# GitNotInstall
+GitNotInstall|Cannot run program "git" (in directory "C:\work"): CreateProcess error=2, 系统找不到指定的文件。
+GitNotInstall|Cannot run program "git" (in directory "C:\work"): CreateProcess error=2, The system cannot find the file specified
+GitNotInstall|Cannot run program "git" (in directory "/data/landun/workspace"): error=2, 没有那个文件或目录
+GitNotInstall|Cannot run program "git" (in directory "/data/landun/workspace"): error=2, No such file or directory
+GitNotInstall|'git' 不是内部或外部命令，也不是可运行的程序
+
+# NotFoundGitRemoteHttps
+NotFoundGitRemoteHttps|fatal: unable to find remote helper for 'https'
+NotFoundGitRemoteHttps|致命错误：无法为 'https' 找到远程助手
+NotFoundGitRemoteHttps|fatal: 无法为 'http' 找到远程助手
+NotFoundGitRemoteHttps|git: 'remote-https' is not a git command. See 'git --help'.
+
+# InvalidRefSpec
+InvalidRefSpec|fatal: invalid refspec '+refs/heads/ master:refs/remotes/origin/ master'
+InvalidRefSpec|fatal: 无效的引用规格：'+refs/heads/ master:refs/remotes/origin/ master'
+
+# MergeStashFail
+MergeStashFail|fatal: stash failed
+MergeStashFail|致命错误：储藏失败
+MergeStashFail|fatal: 贮藏失败
+
+# SslCertificateFailed
+SslCertificateFailed|fatal: unable to access 'https://example.com/demo.git/': SSL certificate problem: unable to get local issuer certificate
+SslCertificateFailed|fatal: unable to access 'https://example.com/demo.git/': server certificate verification failed. CAfile: none CRLfile: none
+SslCertificateFailed|fatal: unable to access 'https://example.com/demo.git/': SSL: no alternative certificate subject name matches target host name 'example.com'
+SslCertificateFailed|fatal: unable to access 'https://example.com/demo.git/': schannel: SEC_E_UNTRUSTED_ROOT (0x80090325) - 证书链是由不受信任的颁发机构颁发的。
+
+# NoSpaceLeftOnDevice
+NoSpaceLeftOnDevice|fatal: write error: No space left on device
+NoSpaceLeftOnDevice|error: unable to write file a.bin: No space left on device
+NoSpaceLeftOnDevice|致命错误：写错误：设备上没有空间

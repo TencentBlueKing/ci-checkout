@@ -69,7 +69,7 @@
     "repositoryType": {
       "label": "代码库",
       "default": "ID",
-      "desc": "值为ID/NAME/URL",
+      "desc": "值为ID/NAME/URL/SELF",
       "type": "enum-input",
       "required": true,
       "disabled": false,
@@ -87,8 +87,26 @@
         {
           "label": "按仓库URL输入",
           "value": "URL"
+        },
+        {
+          "label": "拉取触发构建的代码库",
+          "value": "SELF"
         }
       ]
+    },
+    "selfDesc": {
+      "label": "",
+      "type": "tips",
+      "tipStr": "代码库推送事件、合并请求事件、Tag事件触发的流水线，可以使用此方式。<br>- 代码库推送事件触发时，将拉取推送的 commit id<br>- 合并请求事件触发时，将拉取源分支（是否进行 Pre-Merge 等策略由下方配置项决定）<br>- Tag 事件触发时，将拉取对应的 Tag<br>- 其他事件触发时，拉取触发仓库的默认分支",
+      "rely": {
+        "operation": "AND",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "SELF"
+          }
+        ]
+      }
     },
     "repositoryHashId": {
       "label": "",
@@ -366,7 +384,16 @@
           "id": "COMMIT_ID",
           "name": "COMMIT_ID"
         }
-      ]
+      ],
+      "rely": {
+        "operation": "NOT",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "SELF"
+          }
+        ]
+      }
     },
     "refName": {
       "label": "分支/TAG/COMMIT",
@@ -377,7 +404,16 @@
       "required": true,
       "disabled": false,
       "hidden": false,
-      "isSensitive": false
+      "isSensitive": false,
+      "rely": {
+        "operation": "NOT",
+        "expression": [
+          {
+            "key": "repositoryType",
+            "value": "SELF"
+          }
+        ]
+      }
     },
     "localPath": {
       "label": "代码保存路径",

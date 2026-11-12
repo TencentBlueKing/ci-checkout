@@ -65,17 +65,21 @@ class GitLogHelper(
         if (!isSaveCommit()) {
             return
         }
-        val repositoryConfig = RepositoryUtils.buildConfig(settings.repositoryUrl)
-        val preCommitData = getLastCommitId(
-            pipelineId = settings.pipelineId,
-            elementId = settings.pipelineTaskId,
-            repositoryConfig = repositoryConfig
-        )
-
-        val commits = saveCommits(
-            preCommitData = preCommitData,
-            repositoryConfig = repositoryConfig
-        )
+        var preCommitData: CommitData? = null
+        var commits = emptyList<CommitData>()
+        // 部分克隆时,查询本地不存在的commit会触发git按需拉取全部历史导致卡住,所以不保存代码变更记录
+        if (settings.enablePartialClone != true) {
+            val repositoryConfig = RepositoryUtils.buildConfig(settings.repositoryUrl)
+            preCommitData = getLastCommitId(
+                pipelineId = settings.pipelineId,
+                elementId = settings.pipelineTaskId,
+                repositoryConfig = repositoryConfig
+            )
+            commits = saveCommits(
+                preCommitData = preCommitData,
+                repositoryConfig = repositoryConfig
+            )
+        }
         val commitIds = commits.map { it.commit }
         val commitMaterial = git.log().map { log ->
             CommitMaterial(

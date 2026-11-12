@@ -79,7 +79,7 @@ object CommandUtil {
         }
         val stdOuts = mutableListOf<String>()
         val errOuts = mutableListOf<String>()
-        var gitErrors: GitErrors? = null
+        val errorCollector = GitErrorCollector()
         var gitPackingPhase: GitPackingPhase? = null
         val outputStream = object : GitLogOutputStream(logType) {
             override fun processLine(line: String?, level: Int) {
@@ -90,11 +90,7 @@ object CommandUtil {
                 if (printLogger) {
                     printLog("  $tmpLine", logLevel)
                 }
-                val tmpGitErrors = parseError(line.trim())
-                if (tmpGitErrors != null) {
-                    gitErrors = tmpGitErrors
-                }
-                gitErrors = parseError(line.trim())
+                errorCollector.collect(line = line, fromStdOut = true)
                 stdOuts.add(line)
             }
         }
@@ -109,10 +105,7 @@ object CommandUtil {
                     if (printLogger && !allowAllExitCodes) {
                         System.err.println("  $tmpLine")
                     }
-                    val tmpGitErrors = parseError(line.trim())
-                    if (tmpGitErrors != null) {
-                        gitErrors = tmpGitErrors
-                    }
+                    errorCollector.collect(line = line, fromStdOut = false)
                     val tmpGitPackingPhase = RegexUtil.parseReport(tmpLine)
                     if (tmpGitPackingPhase != null) {
                         gitPackingPhase = tmpGitPackingPhase
@@ -145,24 +138,26 @@ object CommandUtil {
             val exitCode = executor.execute(command, env)
             return GitOutput(stdOuts = stdOuts, errOuts = errOuts, exitCode = exitCode)
         } catch (ignore: ExecuteException) {
-            val errorMsg = gitErrors?.title?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
-                ?: errOuts.firstOrNull() ?: stdOuts.firstOrNull() ?: ""
-            val cause = gitErrors?.cause?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) } ?: ""
-            val solution = gitErrors?.solution?.let { defaultResolver.resolveByMap(it, EnvHelper.getContextMap()) }
+            val gitErrors = errorCollector.getGitErrors()
+            val fallbackMsg = errorCollector.getErrorLine()
+                ?: (errOuts.lastOrNull() ?: stdOuts.lastOrNull())?.let { SensitiveLineParser.onParseLine(it) }
                 ?: ""
-            throw GitExecuteException(
-                errorType = gitErrors?.errorType ?: ErrorType.USER,
-                errorCode = gitErrors?.errorCode ?: GitConstants.CONFIG_ERROR,
-                errorMsg = errorMsg,
-                reason = cause,
-                solution = solution,
-                wiki = gitErrors?.wiki ?: ""
+            if (gitErrors == null) {
+                logger.debug("unmatched git error: $fallbackMsg")
+            }
+            throw buildGitExecuteException(
+                gitErrors = gitErrors,
+                errorType = ErrorType.USER,
+                errorCode = GitConstants.CONFIG_ERROR,
+                fallbackMsg = fallbackMsg
             )
         } catch (ignore: Throwable) {
-            throw GitExecuteException(
+            // 如git没有安装时,不会有输出,只能从异常信息中匹配
+            throw buildGitExecuteException(
+                gitErrors = ignore.message?.let { GitErrors.matchError(it) },
                 errorType = ErrorType.PLUGIN,
                 errorCode = GitConstants.DEFAULT_ERROR,
-                errorMsg = ignore.message ?: ""
+                fallbackMsg = ignore.message ?: ""
             )
         } finally {
             reportGitPackingPhase(gitPackingPhase)
@@ -226,8 +221,28 @@ object CommandUtil {
         }
     }
 
-    private fun parseError(message: String): GitErrors? {
-        return GitErrors.matchError(message)
+    private fun buildGitExecuteException(
+        gitErrors: GitErrors?,
+        errorType: ErrorType,
+        errorCode: Int,
+        fallbackMsg: String
+    ): GitExecuteException {
+        if (gitErrors == null) {
+            return GitExecuteException(
+                errorType = errorType,
+                errorCode = errorCode,
+                errorMsg = fallbackMsg
+            )
+        }
+        val contextMap = EnvHelper.getContextMap()
+        return GitExecuteException(
+            errorType = gitErrors.errorType,
+            errorCode = gitErrors.errorCode,
+            errorMsg = gitErrors.title?.let { defaultResolver.resolveByMap(it, contextMap) } ?: fallbackMsg,
+            reason = gitErrors.cause?.let { defaultResolver.resolveByMap(it, contextMap) } ?: "",
+            solution = gitErrors.solution?.let { defaultResolver.resolveByMap(it, contextMap) } ?: "",
+            wiki = gitErrors.wiki ?: ""
+        )
     }
 
     private fun reportGitPackingPhase(gitPackingPhase: GitPackingPhase?) {

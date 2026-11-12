@@ -31,434 +31,492 @@ import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_REPOSITO
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.api.RepositoryType
 import com.tencent.bk.devops.git.core.util.EnvHelper
+import com.tencent.bk.devops.git.core.util.GitErrorNormalizer
 import com.tencent.bk.devops.plugin.pojo.ErrorType
 
-@SuppressWarnings("LongParameterList")
+/**
+ * git错误规则
+ *
+ * patterns匹配的是GitErrorNormalizer归一化后的文本:全角标点已转半角,行首中文前缀已转成fatal:/error:/remote error:,
+ * 所以只需要写错误独有的关键片段,不需要写前缀,也不需要区分全角半角。中文片段以git源码po/zh_CN.po为准。
+ */
+@SuppressWarnings("LongParameterList", "LargeClass")
 enum class GitErrors(
-    val regex: Regex,
-    val title: String?,
-    val cause: String?,
-    val solution: String?,
+    patterns: List<String>,
+    private val titleText: () -> String?,
+    private val causeText: () -> String?,
+    private val solutionText: () -> String?,
+    private val wikiText: () -> String?,
     val errorType: ErrorType = ErrorType.USER,
     val errorCode: Int = 800001,
-    val wiki: String?
+    val priority: Int = GitErrorPriority.NORMAL,
+    /**
+     * 默认只匹配错误流,输出到标准输出的错误需要声明
+     */
+    val matchStdOut: Boolean = false
 ) {
     // fetch命令错误
     AuthenticationFailed(
-        regex = Regex(
-            "(The requested URL returned error: 403)|" +
-                "(fatal: could not read Username for '(.+)': terminal prompts disabled)|" +
-                "(fatal: could not read Password for '(.+)': terminal prompts disabled)|" +
-                "(fatal: Authentication failed for '(.+)')|" +
-                "(fatal: Authentication failed)|" +
-                "(fatal: '(.+)' 鉴权失败)|" +
-                "(fatal: could not read Username for '(.+)': No such device or address)|" +
-                "(fatal: could not read Password for '(.+)': No such device or address)|" +
-                "(error: The requested URL returned error: 401 Unauthorized while accessing .*)|" +
-                "(fatal: unable to access '(.+)': The requested URL returned error: 403)|" +
-                "(error: The requested URL returned error: 401 while accessing (.+))|" +
-                "(致命错误：could not read Username for '(.+)': terminal prompts disabled)"
+        patterns = listOf(
+            "The requested URL returned error: 40[13]\\b",
+            "could not read (Username|Password) for",
+            "Authentication failed",
+            "鉴权失败"
         ),
-        title = GitErrorsText.get().httpAuthenticationFailed,
-        cause = GitErrorsText.get().httpAuthenticationFailedCause,
-        solution = if (EnvHelper.getContext(CONTEXT_REPOSITORY_TYPE) == RepositoryType.URL.name) {
-            GitErrorsText.get().httpAuthenticationFailedUrlSolution
-        } else {
-            GitErrorsText.get().httpAuthenticationFailedRepositorySolution
-        },
+        titleText = { GitErrorsText.get().httpAuthenticationFailed },
+        causeText = { GitErrorsText.get().httpAuthenticationFailedCause },
+        solutionText = { httpAuthenticationFailedSolution() },
+        wikiText = { GitErrorsText.get().httpAuthenticationFailedWiki },
         errorCode = 800002,
-        wiki = GitErrorsText.get().httpAuthenticationFailedWiki
+        priority = GitErrorPriority.HIGH
     ),
 
     SshAuthenticationFailed(
-        regex = Regex(
-            "(fatal: Could not read from remote repository.)|" +
-                "(fatal: 无法读取远程仓库。)"
+        patterns = listOf(
+            "Could not read from remote repository",
+            "无法读取远程仓库",
+            "Permission denied \\(publickey"
         ),
-        title = GitErrorsText.get().sshAuthenticationFailed,
-        cause = GitErrorsText.get().sshAuthenticationFailedCause,
-        solution = GitErrorsText.get().sshAuthenticationFailedSolution,
+        titleText = { GitErrorsText.get().sshAuthenticationFailed },
+        causeText = { GitErrorsText.get().sshAuthenticationFailedCause },
+        solutionText = { GitErrorsText.get().sshAuthenticationFailedSolution },
+        wikiText = { GitErrorsText.get().sshAuthenticationFailedWiki },
         errorCode = 800003,
-        wiki = GitErrorsText.get().sshAuthenticationFailedWiki
+        priority = GitErrorPriority.LOW
     ),
 
     RepositoryNotFoundFailed(
-        regex = Regex(
-            "(fatal: repository '(.+)' not found)|" +
-                    "(fatal: .* Git repository not found)|" +
-                    "(fatal: 远程错误：Git repository not found)|" +
-                    "(ERROR: Repository not found)|" +
-                    "(remote: Repository not found.)|" +
-                    "(fatal: remote error: Git:Project not found.)|" +
-                    "(fatal: 远程错误：Git:Project not found.)|" +
-                    "(致命错误：远程错误：Git repository not found)"
+        patterns = listOf(
+            "repository '.+' not found",
+            "Repository not found",
+            "Git:Project not found",
+            "仓库 '.+' 未找到"
         ),
-        title = GitErrorsText.get().repositoryNotFoundFailed,
-        cause = GitErrorsText.get().httpAuthenticationFailedCause,
-        solution = if (EnvHelper.getContext(CONTEXT_REPOSITORY_TYPE) == RepositoryType.URL.name) {
-            GitErrorsText.get().httpAuthenticationFailedUrlSolution
-        } else {
-            GitErrorsText.get().httpAuthenticationFailedRepositorySolution
-        },
+        titleText = { GitErrorsText.get().repositoryNotFoundFailed },
+        causeText = { GitErrorsText.get().httpAuthenticationFailedCause },
+        solutionText = { httpAuthenticationFailedSolution() },
+        wikiText = { GitErrorsText.get().httpAuthenticationFailedWiki },
         errorCode = 800004,
-        wiki = GitErrorsText.get().httpAuthenticationFailedWiki
+        priority = GitErrorPriority.HIGH
     ),
 
     RemoteServerFailed(
-        regex = Regex(
-            "(fatal: (the|The) remote end hung up unexpectedly)|" +
-                    "(fatal: unable to access '(.+)': The requested URL returned error: 502)|" +
-                    "(fatal: 无法访问 '(.+)'：The requested URL returned error: 502)|" +
-                    "(fatal: 远程错误：Internal server error)|" +
-                    "(fatal: 远端意外挂断了)|" +
-                    "(fatal: the remote end hung up unexpectedly)|" +
-                    "(Git:Server is busy, please try again later)|" +
-                    "(fatal: unable to access '(.+)': Failed to connect to (.+): Host is down)|" +
-                    "(error: RPC failed; curl 56 Recv failure: Connection reset by peer)|" +
-                    "(fatal: 过早的文件结束符（EOF）)|" +
-                    "(致命错误：过早的文件结束符（EOF）)|" +
-                    "(fatal: index-pack 失败)|" +
-                    "(fatal: early EOF)|" +
-                    "(fatal: index-pack failed)|" +
-                    "(致命错误：fetch-pack：无效的 index-pack 输出)|" +
-                    "(fatal: unable to access '(.+)': The requested URL returned error: 429)|" +
-                    "(error: RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
-                    "(error: RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
-                    "(错误：RPC 失败。curl 18 transfer closed with outstanding read data remaining)|" +
-                    "(错误：RPC failed; curl 18 transfer closed with outstanding read data remaining)|" +
-                    "(fatal: 协议错误：坏的包头)|" +
-                    "(fatal: protocol error: bad pack header)|" +
-                    "(致命错误：协议错误：坏的包头)|" +
-                    "(致命错误：protocol error: bad pack header)|" +
-                    "(fatal: 远程错误：(.+) unavailable)|" +
-                    "(错误：RPC 失败。HTTP 500 curl 22 The requested URL returned error: 500)|" +
-                    "(error: RPC failed; HTTP 500 curl 22 The requested URL returned error: 500)|" +
-                    "(fatal: remote error: (.*)too many request, your request was forbidden(.*))|" +
-                    "(fatal: 远程错误：(.*)too many request, your request was forbidden(.*))|" +
-                    "(致命错误: remote error: (.*)too many request, your request was forbidden(.*))|" +
-                    "(致命错误：远程错误：(.*)too many request, your request was forbidden(.*))"
+        patterns = listOf(
+            "the remote end hung up unexpectedly",
+            "远端意外挂断了",
+            "The requested URL returned error: (429|50[0-4])\\b",
+            "remote error: Internal server error",
+            "remote error: .*unavailable",
+            "Server is busy, please try again later",
+            "too many request, your request was forbidden",
+            "Failed to connect to .+: Host is down",
+            "RPC (failed|失败)",
+            "early EOF",
+            "过早的文件结束符",
+            "index-pack (failed|失败|died|终止)",
+            "invalid index-pack output",
+            "无效的 index-pack 输出",
+            "bad pack header",
+            "(无效|坏)的包头"
         ),
-        title = GitErrorsText.get().remoteServerFailed,
-        cause = GitErrorsText.get().remoteServerFailedCause,
-        solution = GitErrorsText.get().remoteServerFailedSolution,
+        titleText = { GitErrorsText.get().remoteServerFailed },
+        causeText = { GitErrorsText.get().remoteServerFailedCause },
+        solutionText = { GitErrorsText.get().remoteServerFailedSolution },
+        wikiText = { GitErrorsText.get().remoteServerFailedWiki },
         errorType = ErrorType.THIRD_PARTY,
         errorCode = 800005,
-        wiki = GitErrorsText.get().remoteServerFailedWiki
+        priority = GitErrorPriority.HIGH
     ),
+
     ConnectionTimeOut(
-        regex = Regex(
-            "ssh: connect to host (.+) port (\\d+): Connection timed out"
+        patterns = listOf(
+            "ssh: connect to host .+ port \\d+: (Connection|Operation) timed out",
+            "Failed to connect to .+(Connection timed out|Operation timed out|Timed out)",
+            "Connection timed out after \\d+ milliseconds",
+            "Could not resolve (host|hostname)"
         ),
-        title = GitErrorsText.get().connectionTimeOut,
-        cause = GitErrorsText.get().connectionTimeOutCause,
-        solution = GitErrorsText.get().connectionTimeOutSolution,
+        titleText = { GitErrorsText.get().connectionTimeOut },
+        causeText = { GitErrorsText.get().connectionTimeOutCause },
+        solutionText = { GitErrorsText.get().connectionTimeOutSolution },
+        wikiText = { GitErrorsText.get().connectionTimeOutWiki },
         errorCode = 800006,
-        wiki = GitErrorsText.get().connectionTimeOutWiki
+        priority = GitErrorPriority.HIGH
     ),
 
     // checkout命令错误
     NoMatchingBranch(
-        regex = Regex(
-            pattern = "(fatal: couldn't find remote ref .+)|" +
-                    "(fatal: 无法找到远程引用 .+)|" +
-                    "(Your configuration specifies to merge with the ref '(.+)')|" +
-                    "(您的配置中指定要合并远程的引用 '(.+)')|" +
-                    "(fatal: '(.+)' is not a commit and a branch '(.+)' cannot be created from it)|" +
-                    "(fatal: '.+' 不是一个提交，不能基于它创建分支 '.+')|" +
-                    "(致命错误：'.+' 不是一个提交，不能基于它创建分支 '.+')|" +
-                    "(error: pathspec '(.+)' did not match any file\\(s\\) known to git\\.)|" +
-                    "(error: 路径规格 '(.+)' 未匹配任何 git 已知文件)|" +
-                    "(fatal: path '(.+)' does not exist .+)|" +
-                    "(fatal: 路径 '(.+)' 不存在)|" +
-                    "(fatal: 引用不是一个树：(.+))|" +
-                    "(致命错误：引用不是一个树：(.+))|" +
-                    "(致命错误：无法读取树（(.+)）)|" +
-                    "(fatal: reference is not a tree: (.+))|" +
-                    "(error: 请求的上游分支 '(.+)' 不存在)|" +
-                    "(致命错误：请求的上游分支 '(.+)' 不存在)|" +
-                    "(fatal: 不能同时更新路径并切换到分支'(.+)'。)|" +
-                    "(fatal: 不能同时更新路径并切换到分支'(.+)'。\\s+您是想要检出 '(.+)' 但其未能解析为提交么？)|" +
-                    "(fatal: Cannot update paths and switch to branch '(.+)' at the same time.)",
-            options = setOf(RegexOption.IGNORE_CASE)
+        patterns = listOf(
+            "couldn't find remote ref",
+            "无法找到远程引用",
+            "无法发现远程 HEAD 引用",
+            "Your configuration specifies to merge with the ref",
+            "您的配置中指定要合并远程的引用",
+            "is not a commit and a branch '.+' cannot be created from it",
+            "不是一个提交,(不能|无法)基于它创建分支",
+            "pathspec '.+' did not match any file\\(s\\) known to git",
+            "路径规格 '.+' 未匹配任何 git 已知文件",
+            "path '.+' does not exist",
+            "路径 '.+' 不存在",
+            "reference is not a tree",
+            "引用不是一个树",
+            "unable to read tree \\(",
+            "无法读取树\\(",
+            "requested upstream branch '.+' does not exist",
+            "请求的上游分支 '.+' 不存在",
+            "Cannot update paths and switch to branch",
+            "不能同时更新路径并切换到分支"
         ),
-        title = GitErrorsText.get().noMatchingBranch,
-        cause = GitErrorsText.get().noMatchingBranchCause,
-        solution = GitErrorsText.get().noMatchingBranchSolution,
-        errorCode = 800007,
-        wiki = GitErrorsText.get().noMatchingBranchWiki
+        titleText = { GitErrorsText.get().noMatchingBranch },
+        causeText = { GitErrorsText.get().noMatchingBranchCause },
+        solutionText = { GitErrorsText.get().noMatchingBranchSolution },
+        wikiText = { GitErrorsText.get().noMatchingBranchWiki },
+        errorCode = 800007
     ),
+
     EmptyBranch(
-        regex = Regex(
-            "(fatal: You are on a branch yet to be born)|" +
-                "(fatal: 您位于一个尚未初始化的分支)"
+        patterns = listOf(
+            "You are on a branch yet to be born",
+            "您位于一个尚未初始化的分支"
         ),
-        title = GitErrorsText.get().emptyBranch,
-        cause = GitErrorsText.get().emptyBranchCause,
-        solution = GitErrorsText.get().emptyBranchSolution,
-        errorCode = 800008,
-        wiki = GitErrorsText.get().emptyBranchWiki
+        titleText = { GitErrorsText.get().emptyBranch },
+        causeText = { GitErrorsText.get().emptyBranchCause },
+        solutionText = { GitErrorsText.get().emptyBranchSolution },
+        wikiText = { GitErrorsText.get().emptyBranchWiki },
+        errorCode = 800008
     ),
+
     SparseCheckoutLeavesNoEntry(
-        regex = Regex(
-            "(error: Sparse checkout leaves no entry on working directory)"
+        patterns = listOf(
+            "Sparse checkout leaves no entry on working directory"
         ),
-        title = GitErrorsText.get().sparseCheckoutLeavesNoEntry,
-        cause = GitErrorsText.get().sparseCheckoutLeavesNoEntryCause,
-        solution = GitErrorsText.get().sparseCheckoutLeavesNoEntrySolution,
-        errorCode = 800009,
-        wiki = GitErrorsText.get().sparseCheckoutLeavesNoEntryWiki
+        titleText = { GitErrorsText.get().sparseCheckoutLeavesNoEntry },
+        causeText = { GitErrorsText.get().sparseCheckoutLeavesNoEntryCause },
+        solutionText = { GitErrorsText.get().sparseCheckoutLeavesNoEntrySolution },
+        wikiText = { GitErrorsText.get().sparseCheckoutLeavesNoEntryWiki },
+        errorCode = 800009
     ),
+
     BranchOrPathNameConflicts(
-        regex = Regex(
-            "(fatal: '(.+)' 既可以是一个本地文件，也可以是一个跟踪分支。)"
+        patterns = listOf(
+            "could be both a local file and a tracking branch",
+            "既可以是一个本地文件,也可以是一个跟踪分支"
         ),
-        title = GitErrorsText.get().branchOrPathNameConflicts,
-        cause = GitErrorsText.get().branchOrPathNameConflictsCause,
-        solution = GitErrorsText.get().branchOrPathNameConflictsSolution,
-        errorCode = 800010,
-        wiki = GitErrorsText.get().branchOrPathNameConflictsWiki
+        titleText = { GitErrorsText.get().branchOrPathNameConflicts },
+        causeText = { GitErrorsText.get().branchOrPathNameConflictsCause },
+        solutionText = { GitErrorsText.get().branchOrPathNameConflictsSolution },
+        wikiText = { GitErrorsText.get().branchOrPathNameConflictsWiki },
+        errorCode = 800010
     ),
 
     // merge命令错误
     MergeConflicts(
-        regex = Regex(
-            "(Automatic merge failed; fix conflicts and then commit the result.)|" +
-                "(Automatischer Merge fehlgeschlagen; beheben Sie die Konflikte und committen Sie dann das Ergebnis)|" +
-                "(Resolve all conflicts manually, mark them as resolved with)|" +
-                "(自动合并失败，修正冲突然后提交修正的结果。)|" +
-                "(error: add_cacheinfo 无法刷新路径 '.+'，合并终止。)|" +
-                "(error: add_cacheinfo failed to refresh for path '.+'; merge aborting.)"
+        patterns = listOf(
+            "Automatic merge failed; fix conflicts and then commit the result",
+            "Automatischer Merge fehlgeschlagen; beheben Sie die Konflikte und committen Sie dann das Ergebnis",
+            "Resolve all conflicts manually, mark them as resolved with",
+            "自动合并失败,修正冲突然后提交修正的结果",
+            "add_cacheinfo failed to refresh for path '.+'; merge aborting",
+            "add_cacheinfo 无法刷新路径 '.+',合并终止"
         ),
-        title = GitErrorsText.get().mergeConflicts,
-        cause = GitErrorsText.get().mergeConflictsCause,
-        solution = GitErrorsText.get().mergeConflictsSolution,
+        titleText = { GitErrorsText.get().mergeConflicts },
+        causeText = { GitErrorsText.get().mergeConflictsCause },
+        solutionText = { GitErrorsText.get().mergeConflictsSolution },
+        wikiText = { GitErrorsText.get().mergeConflictsWiki },
         errorCode = 800011,
-        wiki = GitErrorsText.get().mergeConflictsWiki
+        matchStdOut = true
     ),
+
     InvalidMerge(
-        regex = Regex(
-            "(merge: (.+) - not something we can merge)|" +
-                    "(merge：.+ - 不能合并)|" +
-                    "(merge：.+ - 不是可以合并的东西)|" +
-                    "(fatal: .+ - not something we can merge)|" +
-                    "(fatal: .+ - 不能被合并)"
+        patterns = listOf(
+            "not something we can merge",
+            "不是可以合并的东西",
+            " - (不能|无法)被?合并"
         ),
-        title = GitErrorsText.get().invalidMerge,
-        cause = GitErrorsText.get().invalidMergeCause,
-        solution = GitErrorsText.get().invalidMergeSolution,
-        errorCode = 800012,
-        wiki = GitErrorsText.get().invalidMergeWiki
+        titleText = { GitErrorsText.get().invalidMerge },
+        causeText = { GitErrorsText.get().invalidMergeCause },
+        solutionText = { GitErrorsText.get().invalidMergeSolution },
+        wikiText = { GitErrorsText.get().invalidMergeWiki },
+        errorCode = 800012
     ),
+
     CannotMergeUnrelatedHistories(
-        regex = Regex(
-            "(fatal: refusing to merge unrelated histories)|" +
-                "(fatal: 拒绝合并无关的历史)"
+        patterns = listOf(
+            "refusing to merge unrelated histories",
+            "拒绝合并无关的历史"
         ),
-        title = GitErrorsText.get().cannotMergeUnrelatedHistories,
-        cause = GitErrorsText.get().cannotMergeUnrelatedHistoriesCause,
-        solution = GitErrorsText.get().cannotMergeUnrelatedHistoriesSolution,
-        errorCode = 800013,
-        wiki = GitErrorsText.get().cannotMergeUnrelatedHistoriesWiki
+        titleText = { GitErrorsText.get().cannotMergeUnrelatedHistories },
+        causeText = { GitErrorsText.get().cannotMergeUnrelatedHistoriesCause },
+        solutionText = { GitErrorsText.get().cannotMergeUnrelatedHistoriesSolution },
+        wikiText = { GitErrorsText.get().cannotMergeUnrelatedHistoriesWiki },
+        errorCode = 800013
     ),
+
     LocalChangesOverwritten(
-        regex = Regex(
-            "(error: Your local changes to the following files would be overwritten by merge:)|" +
-                "(error: Your local changes to the following files would be overwritten by checkout:)|" +
-                "(error: 您对下列文件的本地修改将被检出操作覆盖：)"
+        patterns = listOf(
+            "Your local changes to the following files would be overwritten by",
+            "您对下列文件的本地修改将被.+覆盖",
+            "untracked working tree files would be overwritten by",
+            "工作区中下列未跟踪的文件将会因为.+而被覆盖"
         ),
-        title = GitErrorsText.get().localChangesOverwritten,
-        cause = GitErrorsText.get().localChangesOverwrittenCause,
-        solution = GitErrorsText.get().localChangesOverwrittenSolution,
-        errorCode = 800014,
-        wiki = GitErrorsText.get().localChangesOverwrittenWiki
+        titleText = { GitErrorsText.get().localChangesOverwritten },
+        causeText = { GitErrorsText.get().localChangesOverwrittenCause },
+        solutionText = { GitErrorsText.get().localChangesOverwrittenSolution },
+        wikiText = { GitErrorsText.get().localChangesOverwrittenWiki },
+        errorCode = 800014
     ),
 
     // submodule命令错误
     NoSubmoduleMapping(
-        regex = Regex(
-            "(fatal: No submodule mapping found in .gitmodules for path '(.+)')|" +
-                "(fatal: 在 .gitmodules 中未找到子模组路径 '(.+)' 的 url)|" +
-                "(fatal: 在 .gitmodules 中没有发现路径 '(.+)' 的子模组映射)|" +
-                "(fatal: 在 .gitmodules 中未找到子模组 '(.+)' 的 url)|" +
-                "(fatal: No url found for submodule path '(.+)' in .gitmodules)|" +
-                "(No url found for submodule path '(.+)' in .gitmodules)"
+        patterns = listOf(
+            "No submodule mapping found in \\.gitmodules for path",
+            "No url found for submodule path '.+' in \\.gitmodules",
+            "在 \\.gitmodules 中未找到子模组(路径)? '.+' 的 url",
+            "在 \\.gitmodules 中没有发现路径 '.+' 的子模组映射"
         ),
-        title = GitErrorsText.get().noSubmoduleMapping,
-        cause = GitErrorsText.get().noSubmoduleMappingCause,
-        solution = GitErrorsText.get().noSubmoduleMappingSolution,
-        errorCode = 800015,
-        wiki = GitErrorsText.get().noSubmoduleMappingWiki
+        titleText = { GitErrorsText.get().noSubmoduleMapping },
+        causeText = { GitErrorsText.get().noSubmoduleMappingCause },
+        solutionText = { GitErrorsText.get().noSubmoduleMappingSolution },
+        wikiText = { GitErrorsText.get().noSubmoduleMappingWiki },
+        errorCode = 800015
     ),
+
     SubmoduleRepositoryDoesNotExist(
-        regex = Regex(
-            pattern = "(clone of '.+' into submodule path '(.+)' failed)|" +
-                "(fatal：无法克隆 '(.+)' 到子模组路径 '(.+)')",
-            options = setOf(RegexOption.IGNORE_CASE)
+        patterns = listOf(
+            "clone of '.+' into submodule path '.+' failed",
+            "无法克隆 '.+' 到子模组路径"
         ),
-        title = GitErrorsText.get().submoduleRepositoryDoesNotExist,
-        cause = GitErrorsText.get().submoduleRepositoryDoesNotExistCause,
-        solution = GitErrorsText.get().submoduleRepositoryDoesNotExistSolution,
-        errorCode = 800016,
-        wiki = GitErrorsText.get().submoduleRepositoryDoesNotExistWiki
+        titleText = { GitErrorsText.get().submoduleRepositoryDoesNotExist },
+        causeText = { GitErrorsText.get().submoduleRepositoryDoesNotExistCause },
+        solutionText = { GitErrorsText.get().submoduleRepositoryDoesNotExistSolution },
+        wikiText = { GitErrorsText.get().submoduleRepositoryDoesNotExistWiki },
+        errorCode = 800016
     ),
+
     InvalidSubmoduleSHA(
-        regex = Regex(
-            "(Fetched in submodule path '(.+)', but it did not contain (.+). " +
-                    "Direct fetching of that commit failed.)|" +
-                    "(获取了子模组路径 '(.+)'，但是它没有包含 (.+)。直接获取该提交失败。)|" +
-                    "(无法在子模组路径 '(.+)' 中找到当前版本)|" +
-                    "(fatal: Needed a single revision)|" +
-                    "(fatal: 需要一个单独的版本)" +
-                    "(fatal: Unable to find current revision in submodule path '.+')"
+        patterns = listOf(
+            "Fetched in submodule path '.+', but it did not contain",
+            "获取了子模组路径 '.+',但是它没有包含",
+            "Unable to find current revision in submodule path",
+            "无法在子模组路径 '.+' 中找到当前版本",
+            "Needed a single revision",
+            "需要一个单独的版本"
         ),
-        title = GitErrorsText.get().invalidSubmoduleSHA,
-        cause = GitErrorsText.get().invalidSubmoduleSHACause,
-        solution = GitErrorsText.get().invalidSubmoduleSHASolution,
-        errorCode = 800017,
-        wiki = GitErrorsText.get().invalidSubmoduleSHAWiki
+        titleText = { GitErrorsText.get().invalidSubmoduleSHA },
+        causeText = { GitErrorsText.get().invalidSubmoduleSHACause },
+        solutionText = { GitErrorsText.get().invalidSubmoduleSHASolution },
+        wikiText = { GitErrorsText.get().invalidSubmoduleSHAWiki },
+        errorCode = 800017
     ),
 
     // lfs命令错误
     LfsAttributeDoesNotMatch(
-        regex = Regex(
-            "The .+ attribute should be .+ but is .+"
+        patterns = listOf(
+            "The .+ attribute should be .+ but is"
         ),
-        title = GitErrorsText.get().lfsAttributeDoesNotMatch,
-        cause = GitErrorsText.get().lfsAttributeDoesNotMatchCause,
-        solution = GitErrorsText.get().lfsAttributeDoesNotMatchSolution,
-        errorCode = 800018,
-        wiki = GitErrorsText.get().lfsAttributeDoesNotMatchWiki
+        titleText = { GitErrorsText.get().lfsAttributeDoesNotMatch },
+        causeText = { GitErrorsText.get().lfsAttributeDoesNotMatchCause },
+        solutionText = { GitErrorsText.get().lfsAttributeDoesNotMatchSolution },
+        wikiText = { GitErrorsText.get().lfsAttributeDoesNotMatchWiki },
+        errorCode = 800018
     ),
+
     ErrorDownloadingObject(
-        regex = Regex(
-            "(Error downloading object: .*)|" +
-                "(LFS: Repository or object not found: .+)|" +
-                    "(.* batch response: Fatal error: We couldn't respond to your request in time. " +
-                    "Sorry about that. Please try resubmitting your request and contact us if the problem persists.)"
+        patterns = listOf(
+            "Error downloading object",
+            "LFS: Repository or object not found",
+            "batch response: Fatal error: We couldn't respond to your request in time"
         ),
-        title = GitErrorsText.get().errorDownloadingObject,
-        cause = GitErrorsText.get().errorDownloadingObjectCause,
-        solution = GitErrorsText.get().errorDownloadingObjectSolution,
-        errorCode = 800019,
-        wiki = GitErrorsText.get().errorDownloadingObjectWiki
+        titleText = { GitErrorsText.get().errorDownloadingObject },
+        causeText = { GitErrorsText.get().errorDownloadingObjectCause },
+        solutionText = { GitErrorsText.get().errorDownloadingObjectSolution },
+        wikiText = { GitErrorsText.get().errorDownloadingObjectWiki },
+        errorCode = 800019
     ),
+
     LfsNotInstall(
-        regex = Regex(
-            "(git: 'lfs' is not a git command. See 'git --help'.)|" +
-                "(git：'lfs' 不是一个 git 命令。参见 'git --help'。)"
+        patterns = listOf(
+            "'lfs' is not a git command",
+            "'lfs' 不是一个 git 命令"
         ),
-        title = GitErrorsText.get().lfsNotInstall,
-        cause = GitErrorsText.get().lfsNotInstallCause,
-        solution = GitErrorsText.get().lfsNotInstallSolution,
-        errorCode = 800020,
-        wiki = GitErrorsText.get().lfsNotInstallWiki
+        titleText = { GitErrorsText.get().lfsNotInstall },
+        causeText = { GitErrorsText.get().lfsNotInstallCause },
+        solutionText = { GitErrorsText.get().lfsNotInstallSolution },
+        wikiText = { GitErrorsText.get().lfsNotInstallWiki },
+        errorCode = 800020
     ),
 
     // 其他命令错误
     LockFileAlreadyExists(
-        regex = Regex(
-            "(Another git process seems to be running in this repository, e.g.)|" +
-                    "(error: could not lock config file (.+): File exists)|" +
-                    "(error: could not lock config file .+: 文件已存在)|" +
-                    "(fatal: 无法创建 '(.+)'：文件已存在。)|" +
-                    "(error: 无法创建 '(.+)'：文件已存在。)|" +
-                    "(错误：无法创建 '(.+)'：文件已存在。)"
+        patterns = listOf(
+            "Another git process seems to be running in this repository",
+            "另一 git 进程似乎正在此仓库中运行",
+            "(could not lock config file|无法锁定配置文件) .+:\\s*(File exists|文件已存在)",
+            "(Unable to create|无法创建) '.+':\\s*(File exists|文件已存在)"
         ),
-        title = GitErrorsText.get().lockFileAlreadyExists,
-        cause = GitErrorsText.get().lockFileAlreadyExistsCause,
-        solution = GitErrorsText.get().lockFileAlreadyExistsSolution,
-        errorCode = 800021,
-        wiki = GitErrorsText.get().lockFileAlreadyExistsWiki
+        titleText = { GitErrorsText.get().lockFileAlreadyExists },
+        causeText = { GitErrorsText.get().lockFileAlreadyExistsCause },
+        solutionText = { GitErrorsText.get().lockFileAlreadyExistsSolution },
+        wikiText = { GitErrorsText.get().lockFileAlreadyExistsWiki },
+        errorCode = 800021
     ),
+
     BadRevision(
-        regex = Regex(
-            "(fatal: bad revision '(.*)')|" +
-                    "(错误：坏的签名 (.*))"
+        patterns = listOf(
+            "bad revision '",
+            "(错误|坏)的版本 '"
         ),
-        title = GitErrorsText.get().badRevision,
-        cause = GitErrorsText.get().badRevisionCause,
-        solution = GitErrorsText.get().badRevisionSolution,
-        errorCode = 800022,
-        wiki = GitErrorsText.get().badRevisionWiki
+        titleText = { GitErrorsText.get().badRevision },
+        causeText = { GitErrorsText.get().badRevisionCause },
+        solutionText = { GitErrorsText.get().badRevisionSolution },
+        wikiText = { GitErrorsText.get().badRevisionWiki },
+        errorCode = 800022
     ),
+
     NotAGitRepository(
-        regex = Regex(
-            "(fatal: [Nn]ot a git repository \\(or any of the parent directories\\): .git)|" +
-                    "(致命错误：不是 git 仓库（或者直至挂载点 (.*)）)"
+        patterns = listOf(
+            "not a git repository \\(or any (of the parent directories|parent up to mount point)",
+            "不是 git 仓库\\(或者(任何父目录|直至挂载点)"
         ),
-        title = GitErrorsText.get().notAGitRepository,
-        cause = GitErrorsText.get().notAGitRepositoryCause,
-        solution = GitErrorsText.get().notAGitRepositorySolution,
-        errorCode = 800023,
-        wiki = GitErrorsText.get().notAGitRepositoryWiki
+        titleText = { GitErrorsText.get().notAGitRepository },
+        causeText = { GitErrorsText.get().notAGitRepositoryCause },
+        solutionText = { GitErrorsText.get().notAGitRepositorySolution },
+        wikiText = { GitErrorsText.get().notAGitRepositoryWiki },
+        errorCode = 800023
     ),
+
     LibcurlNotSupportHttps(
-        regex = Regex(
-            "fatal: unable to access '(.*)': Protocol \"https\" not supported or disabled in libcurl"
+        patterns = listOf(
+            "Protocol \"?https\"? not supported"
         ),
-        title = GitErrorsText.get().libcurlNotSupportHttps,
-        cause = GitErrorsText.get().libcurlNotSupportHttpsCause,
-        solution = GitErrorsText.get().libcurlNotSupportHttpsSolution,
-        errorCode = 800024,
-        wiki = GitErrorsText.get().libcurlNotSupportHttpsWiki
+        titleText = { GitErrorsText.get().libcurlNotSupportHttps },
+        causeText = { GitErrorsText.get().libcurlNotSupportHttpsCause },
+        solutionText = { GitErrorsText.get().libcurlNotSupportHttpsSolution },
+        wikiText = { GitErrorsText.get().libcurlNotSupportHttpsWiki },
+        errorCode = 800024
     ),
+
     GitNotInstall(
-        regex = Regex(
-            "(Cannot run program \"git\" \\(in directory (.*): CreateProcess error=2, " +
-                    "The system cannot find the file specified\\))|" +
-                    "('git' 不是内部或外部命令，也不是可运行的程序)|" +
-                    "(Cannot run program \"git\" \\(in directory (.*)\\): CreateProcess error=2, 系统找不到指定的文件。)|" +
-                    "(Cannot run program \"git\" \\(in directory (.*)\\): error=2, 没有那个文件或目录)"
+        patterns = listOf(
+            "Cannot run program \"git\"",
+            "'git' 不是内部或外部命令",
+            "'git' is not recognized as an internal or external command"
         ),
-        title = GitErrorsText.get().gitNotInstall,
-        cause = GitErrorsText.get().gitNotInstallCause,
-        solution = GitErrorsText.get().gitNotInstallSolution,
+        titleText = { GitErrorsText.get().gitNotInstall },
+        causeText = { GitErrorsText.get().gitNotInstallCause },
+        solutionText = { GitErrorsText.get().gitNotInstallSolution },
+        wikiText = { GitErrorsText.get().gitNotInstallWiki },
         errorCode = 800025,
-        wiki = GitErrorsText.get().gitNotInstallWiki
+        priority = GitErrorPriority.HIGH
     ),
+
     NotFoundGitRemoteHttps(
-        regex = Regex(
-            "(fatal: 无法为 'http' 找到远程助手)|" +
-                "(git: 'remote-https' is not a git command. See 'git --help'.)"
+        patterns = listOf(
+            "unable to find remote helper for 'https?'",
+            "无法为 'https?' 找到远程助手",
+            "'remote-https?' is not a git command",
+            "'remote-https?' 不是一个 git 命令"
         ),
-        title = GitErrorsText.get().notFoundGitRemoteHttps,
-        cause = GitErrorsText.get().notFoundGitRemoteHttpsCause,
-        solution = GitErrorsText.get().notFoundGitRemoteHttpsSolution,
-        errorCode = 800026,
-        wiki = GitErrorsText.get().notFoundGitRemoteHttpsWiki
+        titleText = { GitErrorsText.get().notFoundGitRemoteHttps },
+        causeText = { GitErrorsText.get().notFoundGitRemoteHttpsCause },
+        solutionText = { GitErrorsText.get().notFoundGitRemoteHttpsSolution },
+        wikiText = { GitErrorsText.get().notFoundGitRemoteHttpsWiki },
+        errorCode = 800026
     ),
+
     InvalidRefSpec(
-        regex = Regex(
-            "(fatal: 无效的引用规格：'(.*)')|" +
-                    "(fatal: invalid refspec '(.*)')"
+        patterns = listOf(
+            "invalid refspec",
+            "无效的引用规格"
         ),
-        title = GitErrorsText.get().invalidRefSpec,
-        cause = GitErrorsText.get().invalidRefSpecCause,
-        solution = GitErrorsText.get().invalidRefSpecSolution,
-        errorCode = 800027,
-        wiki = GitErrorsText.get().invalidRefSpecWiki
+        titleText = { GitErrorsText.get().invalidRefSpec },
+        causeText = { GitErrorsText.get().invalidRefSpecCause },
+        solutionText = { GitErrorsText.get().invalidRefSpecSolution },
+        wikiText = { GitErrorsText.get().invalidRefSpecWiki },
+        errorCode = 800027
     ),
+
     MergeStashFail(
-        regex = Regex(
-            "(fatal: stash failed)|" +
-                    "(fatal: 贮藏失败)"
+        patterns = listOf(
+            "stash failed",
+            "(储藏|贮藏)失败"
         ),
-        title = null,
-        cause = null,
-        solution = null,
-        errorCode = 800028,
-        wiki = null
+        titleText = { null },
+        causeText = { null },
+        solutionText = { null },
+        wikiText = { null },
+        errorCode = 800028
+    ),
+
+    SslCertificateFailed(
+        patterns = listOf(
+            "SSL certificate problem",
+            "server certificate verification failed",
+            "no alternative certificate subject name matches",
+            "SEC_E_UNTRUSTED_ROOT"
+        ),
+        titleText = { GitErrorsText.get().sslCertificateFailed },
+        causeText = { GitErrorsText.get().sslCertificateFailedCause },
+        solutionText = { GitErrorsText.get().sslCertificateFailedSolution },
+        wikiText = { GitErrorsText.get().sslCertificateFailedWiki },
+        errorCode = 800029,
+        priority = GitErrorPriority.HIGH
+    ),
+
+    NoSpaceLeftOnDevice(
+        patterns = listOf(
+            "No space left on device",
+            "There is not enough space on the disk",
+            "设备上没有空间",
+            "磁盘空间不足"
+        ),
+        titleText = { GitErrorsText.get().noSpaceLeftOnDevice },
+        causeText = { GitErrorsText.get().noSpaceLeftOnDeviceCause },
+        solutionText = { GitErrorsText.get().noSpaceLeftOnDeviceSolution },
+        wikiText = { GitErrorsText.get().noSpaceLeftOnDeviceWiki },
+        errorCode = 800030,
+        priority = GitErrorPriority.HIGH
+    );
+
+    val regex = Regex(
+        pattern = patterns.joinToString("|") { "(?:$it)" },
+        option = RegexOption.IGNORE_CASE
     )
-    ;
+
+    val title: String?
+        get() = titleText()
+
+    val cause: String?
+        get() = causeText()
+
+    val solution: String?
+        get() = solutionText()
+
+    val wiki: String?
+        get() = wikiText()
 
     companion object {
-        fun matchError(message: String): GitErrors? {
-            for (gitError in values()) {
-                if (gitError.regex.matches(message)) {
-                    return gitError
-                }
+        private val ALL = values()
+
+        /**
+         * 匹配单行git输出,一行同时匹配多个规则时取优先级最高的,同级取先定义的
+         *
+         * @param fromStdOut 是否来自标准输出,标准输出只匹配声明了matchStdOut的规则
+         */
+        fun matchError(message: String, fromStdOut: Boolean = false): GitErrors? {
+            val normalized = GitErrorNormalizer.normalize(message)
+            if (normalized.isEmpty()) {
+                return null
             }
-            return null
+            return ALL.filter { (!fromStdOut || it.matchStdOut) && it.regex.containsMatchIn(normalized) }
+                .maxByOrNull { it.priority }
+        }
+
+        private fun httpAuthenticationFailedSolution(): String? {
+            return if (EnvHelper.getContext(CONTEXT_REPOSITORY_TYPE) == RepositoryType.URL.name) {
+                GitErrorsText.get().httpAuthenticationFailedUrlSolution
+            } else {
+                GitErrorsText.get().httpAuthenticationFailedRepositorySolution
+            }
         }
     }
 }
