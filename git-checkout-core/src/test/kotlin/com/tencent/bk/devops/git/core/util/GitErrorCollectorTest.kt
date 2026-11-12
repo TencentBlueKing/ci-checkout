@@ -24,9 +24,17 @@ class GitErrorCollectorTest {
     @Test
     fun genericErrorOverriddenBySpecificError() {
         val collector = GitErrorCollector()
-        collector.collect("fatal: early EOF", false)
+        collector.collect("fatal: Could not read from remote repository.", false)
         collector.collect("fatal: Authentication failed for 'http://example.com/demo.git/'", false)
         Assert.assertEquals(GitErrors.AuthenticationFailed, collector.getGitErrors())
+    }
+
+    @Test
+    fun remoteServerFailedKeepFirstWithOtherHighPriorityError() {
+        val collector = GitErrorCollector()
+        collector.collect("fatal: early EOF", false)
+        collector.collect("fatal: Authentication failed for 'http://example.com/demo.git/'", false)
+        Assert.assertEquals(GitErrors.RemoteServerFailed, collector.getGitErrors())
     }
 
     @Test
