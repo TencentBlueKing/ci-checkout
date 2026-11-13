@@ -94,8 +94,8 @@ class DevopsApi : IDevopsApi, BaseApi() {
         return JsonUtil.to(responseContent, object : TypeReference<Result<Int>>() {})
     }
 
-    override fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo> {
-        val path = "/ticket/api/build/credentials/$credentialId?publicKey=${encode(publicKey)}&padding=true"
+    override fun getCredential(credentialId: String, publicKey: String, padding: Boolean): Result<CredentialInfo> {
+        val path = "/ticket/api/build/credentials/$credentialId?publicKey=${encode(publicKey)}&padding=$padding"
         val request = buildGet(path)
         val responseContent = HttpUtil.retryRequest(
             request = request,
