@@ -54,6 +54,7 @@ open class GitSubmodulesHandler(
                     return
                 }
                 logger.groupStart("Fetching submodules")
+                EnvHelper.putContext(ContextConstants.CONTEXT_SUBMODULE_UPDATING, "true")
                 checkSubmoduleParam()
                 git.submoduleSync(recursive = nestedSubmodules, path = submodulesPath)
                 if (pullStrategy == PullStrategy.REVERT_UPDATE) {
@@ -80,6 +81,7 @@ open class GitSubmodulesHandler(
                 logger.groupEnd("")
             }
         } finally {
+            EnvHelper.removeContext(ContextConstants.CONTEXT_SUBMODULE_UPDATING)
             EnvHelper.putContext(
                 key = ContextConstants.CONTEXT_SUBMODULE_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()

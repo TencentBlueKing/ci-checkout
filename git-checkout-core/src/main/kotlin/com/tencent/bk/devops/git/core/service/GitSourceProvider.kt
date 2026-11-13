@@ -67,7 +67,6 @@ class GitSourceProvider(
     fun getSource() {
         with(settings) {
             logger.info("Syncing repository: ${settings.repositoryUrl}")
-            devopsApi.reportExternalLink(repositoryUrl)
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_URL, settings.repositoryUrl)
             val repositoryName = GitUtil.getServerInfo(settings.repositoryUrl).repositoryName
             EnvHelper.addEnvVariable(BK_CI_GIT_REPO_NAME, repositoryName)
@@ -77,6 +76,7 @@ class GitSourceProvider(
             } else {
                 repositoryUrl
             }
+            devopsApi.reportExternalLink(repositoryHttpUrl)
             EnvHelper.putContext(CONTEXT_REPOSITORY_HTTP_URL, repositoryHttpUrl)
 
             logger.info("Working directory is: $repositoryPath")

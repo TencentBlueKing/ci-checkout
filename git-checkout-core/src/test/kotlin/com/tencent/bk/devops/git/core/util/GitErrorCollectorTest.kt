@@ -1,5 +1,7 @@
 package com.tencent.bk.devops.git.core.util
 
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_SUBMODULE_UPDATING
+import com.tencent.bk.devops.git.core.constant.ContextConstants.CONTEXT_SUBMODULE_URL
 import com.tencent.bk.devops.git.core.enums.GitErrors
 import org.junit.Assert
 import org.junit.Test
@@ -64,6 +66,53 @@ class GitErrorCollectorTest {
         val ignored = GitErrorCollector()
         ignored.collect("fatal: refusing to merge unrelated histories", true)
         Assert.assertNull(ignored.getGitErrors())
+    }
+
+    @Test
+    fun failedSubmoduleUrls() {
+        EnvHelper.removeContext(CONTEXT_SUBMODULE_URL)
+        val mainRepository = GitErrorCollector()
+        mainRepository.collect("fatal: remote error: Git repository not found", false)
+        mainRepository.collect("fatal: clone of 'git@git.example.com:sub/b.git' into submodule path 'b' failed", true)
+        mainRepository.getGitErrors()
+        Assert.assertNull(EnvHelper.getContext(CONTEXT_SUBMODULE_URL))
+
+        val collector = GitErrorCollector()
+        collector.collect("fatal: 远程错误：Git repository not found", false)
+        collector.collect(
+            "fatal: 无法克隆 'https://oauth2:token@git.example.com/sub/a.git' 到子模组路径 '/data/workspace/a'",
+            false
+        )
+        collector.collect("fatal: remote error: Git repository not found", false)
+        collector.collect("fatal: clone of 'git@git.example.com:sub/b.git' into submodule path 'b' failed", false)
+        collector.collect("fatal: 无法克隆 'https://git.example.com/sub/a.git' 到子模组路径 '/data/workspace/c'", false)
+        Assert.assertEquals(GitErrors.RepositoryNotFoundFailed, collector.getGitErrors())
+        Assert.assertEquals(
+            "https://git.example.com/sub/a.git, git@git.example.com:sub/b.git",
+            EnvHelper.getContext(CONTEXT_SUBMODULE_URL)
+        )
+        EnvHelper.removeContext(CONTEXT_SUBMODULE_URL)
+    }
+
+    @Test
+    fun submoduleUpdatingRepositoryError() {
+        try {
+            EnvHelper.putContext(CONTEXT_SUBMODULE_UPDATING, "true")
+            val notFound = GitErrorCollector()
+            notFound.collect("fatal: 远程错误：Git repository not found", false)
+            notFound.collect("fatal: Unable to fetch in submodule path 'a'", false)
+            Assert.assertEquals(GitErrors.SubmoduleRepositoryDoesNotExist, notFound.getGitErrors())
+
+            val authFailed = GitErrorCollector()
+            authFailed.collect("fatal: Authentication failed for 'https://git.example.com/sub/a.git/'", false)
+            Assert.assertEquals(GitErrors.SubmoduleRepositoryDoesNotExist, authFailed.getGitErrors())
+
+            val other = GitErrorCollector()
+            other.collect("fatal: Unable to find current revision in submodule path 'a'", false)
+            Assert.assertEquals(GitErrors.InvalidSubmoduleSHA, other.getGitErrors())
+        } finally {
+            EnvHelper.removeContext(CONTEXT_SUBMODULE_UPDATING)
+        }
     }
 
     @Test

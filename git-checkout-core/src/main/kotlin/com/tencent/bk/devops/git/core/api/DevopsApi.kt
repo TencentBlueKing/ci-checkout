@@ -271,7 +271,7 @@ class DevopsApi : IDevopsApi, BaseApi() {
             val request = buildPost(path, getJsonRequest(ExternalLinkReportRequest(repositoryUrl)), mutableMapOf())
             HttpUtil.retryRequest(
                 request = request,
-                errorMessage = "Failed to add repository commit information",
+                errorMessage = "Failed to report external link",
                 maxAttempts = 1
             )
         } catch (ignored: Exception) {
