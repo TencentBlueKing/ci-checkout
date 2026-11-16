@@ -41,6 +41,7 @@ import javax.crypto.interfaces.DHPublicKey
 import javax.crypto.spec.DHParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.slf4j.LoggerFactory
 
 @SuppressWarnings("MagicNumber")
 object DHUtil {
@@ -51,8 +52,20 @@ object DHUtil {
     private val p = BigInteger("16560215747140417249215968347342080587", 16)
     private val g = BigInteger("1234567890", 16)
 
+    // bcprov 1.46及以前生成的DH密钥不会填充,jre/lib/ext下的低版本bcprov会优先于插件自带的版本加载
+    private const val NO_PADDING_MAX_VERSION = 1.46
+
     init {
         Security.addProvider(BouncyCastleProvider())
+    }
+
+    private val logger = LoggerFactory.getLogger(DHUtil::class.java)
+
+    fun needPadding(): Boolean {
+        val provider = Security.getProvider(KEY_PROVIDER) ?: return true
+        val location = provider.javaClass.protectionDomain?.codeSource?.location
+        logger.debug("bouncy castle provider version: ${provider.version}, location: $location")
+        return provider.version > NO_PADDING_MAX_VERSION
     }
 
     fun initKey(): DHKeyPair {

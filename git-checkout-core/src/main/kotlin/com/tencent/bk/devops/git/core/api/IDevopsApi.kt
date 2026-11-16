@@ -49,7 +49,7 @@ interface IDevopsApi {
 
     fun saveBuildMaterial(materialList: List<PipelineBuildMaterial>): Result<Int>
 
-    fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo>
+    fun getCredential(credentialId: String, publicKey: String, padding: Boolean = true): Result<CredentialInfo>
 
     fun getOauthToken(userId: String): Result<GitToken>
 

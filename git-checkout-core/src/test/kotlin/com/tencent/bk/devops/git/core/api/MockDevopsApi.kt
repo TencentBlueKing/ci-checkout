@@ -54,7 +54,7 @@ class MockDevopsApi : IDevopsApi {
         return Result(0)
     }
 
-    override fun getCredential(credentialId: String, publicKey: String): Result<CredentialInfo> {
+    override fun getCredential(credentialId: String, publicKey: String, padding: Boolean): Result<CredentialInfo> {
         return Result(CredentialInfo(publicKey = "", credentialType = CredentialType.ACCESSTOKEN, v1 = ""))
     }
 

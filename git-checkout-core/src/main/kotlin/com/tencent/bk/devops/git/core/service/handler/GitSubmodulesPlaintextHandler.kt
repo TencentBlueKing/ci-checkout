@@ -56,10 +56,12 @@ class GitSubmodulesPlaintextHandler(
                     return
                 }
                 logger.groupStart("Fetching submodules")
+                EnvHelper.putContext(ContextConstants.CONTEXT_SUBMODULE_UPDATING, "true")
                 updateSubmodule(repoDir = File(repositoryPath), submodulesPath = submodulesPath)
                 logger.groupEnd("")
             }
         } finally {
+            EnvHelper.removeContext(ContextConstants.CONTEXT_SUBMODULE_UPDATING)
             EnvHelper.putContext(
                 key = ContextConstants.CONTEXT_SUBMODULE_COST_TIME,
                 value = (System.currentTimeMillis() - startEpoch).toString()

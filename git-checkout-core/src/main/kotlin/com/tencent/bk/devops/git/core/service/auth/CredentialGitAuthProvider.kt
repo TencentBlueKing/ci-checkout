@@ -38,6 +38,7 @@ import com.tencent.bk.devops.git.core.util.DHUtil
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import org.slf4j.LoggerFactory
 import java.util.Base64
+import javax.crypto.BadPaddingException
 
 class CredentialGitAuthProvider(
     private val credentialId: String?,
@@ -104,9 +105,22 @@ class CredentialGitAuthProvider(
             throw ParamInvalidException(errorMsg = "the credential Id is empty")
         }
         logger.info("Start to get the credential($credentialId)")
+        val padding = DHUtil.needPadding()
+        return try {
+            fetchCredential(credentialId, padding)
+        } catch (ignored: BadPaddingException) {
+            logger.warn(
+                "Fail to decrypt the credential($credentialId) with padding($padding), " +
+                    "retry with padding(${!padding})"
+            )
+            fetchCredential(credentialId, !padding)
+        }
+    }
+
+    private fun fetchCredential(credentialId: String, padding: Boolean): CredentialInfo {
         val pair = DHUtil.initKey()
         val encoder = Base64.getEncoder()
-        val result = devopsApi.getCredential(credentialId, encoder.encodeToString(pair.publicKey))
+        val result = devopsApi.getCredential(credentialId, encoder.encodeToString(pair.publicKey), padding)
         if (result.isNotOk() || result.data == null) {
             logger.error("Fail to get the credential($credentialId) because of ${result.message}")
             throw ApiException(errorMsg = result.message!!)

@@ -485,7 +485,9 @@ class GitCommandManager(
             // 第一次重试
             if (retryTime == 3) {
                 // 卸载oauth2凭证
-                if (e.errorCode == GitErrors.RepositoryNotFoundFailed.errorCode) {
+                if (e.errorCode == GitErrors.RepositoryNotFoundFailed.errorCode ||
+                    e.errorCode == GitErrors.SubmoduleRepositoryDoesNotExist.errorCode
+                ) {
                     eraseOauth2Credential()
                 }
                 // 如果使用镜像缓存，则回源
@@ -514,6 +516,7 @@ class GitCommandManager(
             GitErrors.RemoteServerFailed.errorCode,
             GitErrors.AuthenticationFailed.errorCode,
             GitErrors.RepositoryNotFoundFailed.errorCode,
+            GitErrors.SubmoduleRepositoryDoesNotExist.errorCode,
             GitErrors.LockFileAlreadyExists.errorCode,
             GitErrors.MergeStashFail.errorCode
         ).contains(errorCode)
