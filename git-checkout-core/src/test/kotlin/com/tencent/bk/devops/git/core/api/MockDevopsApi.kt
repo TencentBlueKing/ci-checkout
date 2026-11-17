@@ -62,6 +62,10 @@ class MockDevopsApi : IDevopsApi {
         return Result(GitToken())
     }
 
+    override fun getTGitOauthToken(userId: String): Result<GitToken> {
+        return Result(GitToken())
+    }
+
     override fun getGithubOauthToken(userId: String): Result<GithubToken> {
         return Result(GithubToken(accessToken = "", tokenType = "", scope = ""))
     }
@@ -75,6 +79,10 @@ class MockDevopsApi : IDevopsApi {
     }
 
     override fun getGitOauthUrl(userId: String): Result<String> {
+        return Result("true")
+    }
+
+    override fun getTGitOauthUrl(userId: String): Result<String> {
         return Result("true")
     }
 
