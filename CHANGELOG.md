@@ -1,5 +1,16 @@
 # Changelog
 
+# v2.0.20
+## 2026-11-17
+### 新增
+- feat: 支持工蜂合作版oauth #92 [链接](https://github.com/TencentBlueKing/ci-checkout/issues/92)
+
+# v2.0.19
+## 2026-11-16
+### 修复
+- bug: 子模块仓库没有权限或不存在时，错误提示成主仓库没有拉取权限 #98 [链接](https://github.com/TencentBlueKing/ci-checkout/issues/98)
+- bug: 构建机 jre/lib/ext 下存在低版本 bcprov 时，凭证解密偶发失败 #99 [链接](https://github.com/TencentBlueKing/ci-checkout/issues/99)
+
 # v2.0.18
 ## 2026-11-12
 ### 新增
