@@ -80,6 +80,11 @@ object GitConstants {
     const val GIT_CREDENTIAL_USERNAME = "credential.username"
     const val GIT_CREDENTIAL_TASKID = "credential.taskId"
     const val GIT_CREDENTIAL_INSTEADOF_KEY = "credential.insteadOfKey"
+    // github镜像全局insteadOf的key,post-action阶段卸载时使用
+    const val GIT_GITHUB_MIRROR_INSTEADOF_KEY = "devops.githubMirrorInsteadOfKey"
+    const val GITHUB_URL = "https://github.com/"
+    const val GITHUB_PUSH_INSTEADOF_KEY = "url.$GITHUB_URL.pushInsteadOf"
+    const val GITHUB_URL_VALUE_REGEX = "^https://github\\.com/$"
     const val GIT_CREDENTIAL_HELPER_VALUE_REGEX = "git-checkout.sh"
     const val GIT_CHECKOUT_CREDENTIAL_VALUE_REGEX = "git-checkout-credential.sh"
     const val GIT_TRACE = "GIT_TRACE"
@@ -201,9 +206,14 @@ object GitConstants {
 
     const val USER_NEED_PROJECT_X_PERMISSION = 2115025
 
+    // 插件私有配置key,通过GitSourceSettings.sensitiveConfInfo获取
     const val TGIT_CACHE_GRAY_WHITE_PROJECT = "TGIT_CACHE_GRAY_WHITE_PROJECT"
 
     const val TGIT_CACHE_GRAY_PROJECT = "TGIT_CACHE_GRAY_PROJECT"
 
     const val TGIT_CACHE_GRAY_WEIGHT = "TGIT_CACHE_GRAY_WEIGHT"
+
+    const val GITHUB_MIRROR_SITE = "GITHUB_MIRROR_SITE"
+
+    const val GITHUB_MIRROR_WHITE_PROJECT = "GITHUB_MIRROR_WHITE_PROJECT"
 }

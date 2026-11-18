@@ -27,6 +27,7 @@
 
 package com.tencent.bk.devops.git.core.pojo
 
+import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.PullStrategy
 import com.tencent.bk.devops.git.core.enums.PullType
 import com.tencent.bk.devops.git.core.enums.ScmType
@@ -236,18 +237,6 @@ data class GitSourceSettings(
      */
     val mainRepo: Boolean? = false,
     /**
-     * 工蜂cache灰度项目
-     */
-    val tGitCacheGrayProject: String? = null,
-    /**
-     * 工蜂cache灰度白名单项目
-     */
-    val tGitCacheGrayWhiteProject: String? = null,
-    /**
-     * 工蜂cache灰度权重
-     */
-    val tGitCacheGrayWeight: String? = null,
-    /**
      * 使用服务端预合并
      */
     var serverPreMerge: Boolean? = false,
@@ -260,13 +249,9 @@ data class GitSourceSettings(
      */
     val enableSparseCone: Boolean? = null,
     /**
-     * 镜像源灰度白名单项目
+     * 插件私有配置,key见GitConstants中的私有配置常量
      */
-    val mirrorGrayWhiteProject: String? = null,
-    /**
-     * 镜像源token
-     * */
-    val mirrorToken: String? = null
+    val sensitiveConfInfo: Map<String, String> = emptyMap()
 ) {
     val sourceRepoUrlEqualsRepoUrl: Boolean
         get() = GitUtil.isSameRepository(
@@ -290,8 +275,8 @@ data class GitSourceSettings(
     val enableCacheByStrategy: Boolean
         get() = GitUtil.enableCacheByStrategy(
             repositoryUrl = repositoryUrl,
-            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
-            tGitCacheGrayProject = tGitCacheGrayProject,
-            tGitCacheGrayWeight = tGitCacheGrayWeight
+            tGitCacheGrayWhiteProject = sensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_WHITE_PROJECT],
+            tGitCacheGrayProject = sensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_PROJECT],
+            tGitCacheGrayWeight = sensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_WEIGHT]
         )
 }

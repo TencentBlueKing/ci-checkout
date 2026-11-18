@@ -148,18 +148,6 @@ data class GitCodeCommandAtomParamInput(
      */
     val mainRepo: Boolean? = false,
     /**
-     * 工蜂cache灰度项目
-     */
-    val tGitCacheGrayProject: String? = null,
-    /**
-     * 工蜂cache灰度白名单项目
-     */
-    val tGitCacheGrayWhiteProject: String? = null,
-    /**
-     * 工蜂cache灰度权重
-     */
-    val tGitCacheGrayWeight: String? = null,
-    /**
      * 是否开启服务器预合并, 默认: false
      */
     val enableServerPreMerge: Boolean? = false,
@@ -168,13 +156,9 @@ data class GitCodeCommandAtomParamInput(
      */
     val enableSparseCone: Boolean? = null,
     /**
-     * 镜像缓存灰度白名单项目
+     * 插件私有配置,key见GitConstants中的私有配置常量
      */
-    val mirrorGrayWhiteProject: String? = null,
-    /**
-     * 镜像源token
-     * */
-    val mirrorToken: String? = null
+    val sensitiveConfInfo: Map<String, String> = emptyMap()
 ) {
     /**
      * 是否为post action

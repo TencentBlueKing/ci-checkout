@@ -46,6 +46,7 @@ import com.tencent.bk.devops.git.core.service.handler.GitLfsHandler
 import com.tencent.bk.devops.git.core.service.handler.GitLogHandler
 import com.tencent.bk.devops.git.core.service.handler.GitSubmodulesHandler
 import com.tencent.bk.devops.git.core.service.handler.GitSubmodulesPlaintextHandler
+import com.tencent.bk.devops.git.core.service.handler.GithubMirrorHandler
 import com.tencent.bk.devops.git.core.service.handler.HandlerExecutionChain
 import com.tencent.bk.devops.git.core.service.handler.InitRepoHandler
 import com.tencent.bk.devops.git.core.service.handler.PrepareWorkspaceHandler
@@ -97,6 +98,7 @@ class GitSourceProvider(
                     WoaProxyHandler(settings, git),
                     PrepareWorkspaceHandler(settings, git),
                     InitRepoHandler(settings, git),
+                    GithubMirrorHandler(settings, git),
                     GitAuthHandler(settings, git),
                     GitFetchHandler(settings, git),
                     GitCheckoutAndMergeHandler(settings, git),
