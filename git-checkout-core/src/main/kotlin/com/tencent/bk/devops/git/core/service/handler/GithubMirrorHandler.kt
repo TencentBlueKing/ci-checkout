@@ -38,52 +38,50 @@ class GithubMirrorHandler(
 
     override fun doHandle() {
         try {
-            configGithubMirror()
+            val mirrorSite = settings.sensitiveConfInfo[GITHUB_MIRROR_SITE]?.trim()
+            if (!mirrorSite.isNullOrBlank() && isSupport()) {
+                configGithubMirror(mirrorUrl = if (mirrorSite.endsWith("/")) mirrorSite else "$mirrorSite/")
+            }
         } catch (ignore: Throwable) {
             logger.warn("Failed to config github mirror: ${ignore.message}")
         }
     }
 
-    private fun configGithubMirror() {
-        val mirrorSite = settings.sensitiveConfInfo[GITHUB_MIRROR_SITE]?.trim()
-        if (mirrorSite.isNullOrBlank()) {
-            return
-        }
-        if (AgentEnv.isThirdParty() || AgentEnv.isThirdDocker()) {
-            return
-        }
-        // ssh的github主仓库,授权时会把https://github.com/改写成ssh,与镜像的insteadOf冲突
+    private fun isSupport(): Boolean {
         val serverInfo = GitUtil.getServerInfo(settings.repositoryUrl)
-        if (!serverInfo.httpProtocol && serverInfo.hostName == GITHUB_HOST) {
-            return
-        }
         val projectId = System.getenv(BK_CI_PROJECT_NAME)
         val whiteProjects = settings.sensitiveConfInfo[GITHUB_MIRROR_WHITE_PROJECT]?.split(",")
             ?.map { it.trim() }
             ?.filter { it.isNotBlank() }
-        if (projectId.isNullOrBlank() || whiteProjects.isNullOrEmpty() || !whiteProjects.contains(projectId)) {
-            return
+        return when {
+            AgentEnv.isThirdParty() || AgentEnv.isThirdDocker() -> false
+            // ssh的github主仓库,授权时会把https://github.com/改写成ssh,与镜像的insteadOf冲突
+            !serverInfo.httpProtocol && serverInfo.hostName == GITHUB_HOST -> false
+            projectId.isNullOrBlank() || whiteProjects.isNullOrEmpty() -> false
+            else -> whiteProjects.contains(projectId)
         }
-        val mirrorUrl = if (mirrorSite.endsWith("/")) mirrorSite else "$mirrorSite/"
+    }
+
+    private fun configGithubMirror(mirrorUrl: String) {
         val insteadOfKey = "url.$mirrorUrl.insteadOf"
         // 先清理同一个job中其他拉代码插件或前序构建配置的镜像,避免被误判为用户自己配置的insteadOf
         GitCleanUpHelper(settings, git).unsetGithubMirrorConfig(insteadOfKey)
         if (existGithubInsteadOf()) {
             logger.info("github insteadOf already configured on build machine, skip github mirror")
-            return
+        } else {
+            logger.info("Using github mirror $mirrorUrl")
+            git.configAdd(
+                configKey = insteadOfKey,
+                configValue = GITHUB_URL,
+                configScope = GitConfigScope.GLOBAL
+            )
+            git.configAdd(
+                configKey = GITHUB_PUSH_INSTEADOF_KEY,
+                configValue = GITHUB_URL,
+                configScope = GitConfigScope.GLOBAL
+            )
+            git.config(configKey = GIT_GITHUB_MIRROR_INSTEADOF_KEY, configValue = insteadOfKey)
         }
-        logger.info("Using github mirror $mirrorUrl")
-        git.configAdd(
-            configKey = insteadOfKey,
-            configValue = GITHUB_URL,
-            configScope = GitConfigScope.GLOBAL
-        )
-        git.configAdd(
-            configKey = GITHUB_PUSH_INSTEADOF_KEY,
-            configValue = GITHUB_URL,
-            configScope = GitConfigScope.GLOBAL
-        )
-        git.config(configKey = GIT_GITHUB_MIRROR_INSTEADOF_KEY, configValue = insteadOfKey)
     }
 
     /**
