@@ -34,8 +34,10 @@ import com.tencent.bk.devops.git.core.exception.ApiException
 import com.tencent.bk.devops.git.core.exception.ParamInvalidException
 import com.tencent.bk.devops.git.core.i18n.GitErrorsText
 import com.tencent.bk.devops.git.core.pojo.AuthInfo
+import com.tencent.bk.devops.git.core.pojo.api.GitToken
 import com.tencent.bk.devops.git.core.util.EnvHelper
 import com.tencent.bk.devops.git.core.util.PlaceholderResolver.Companion.defaultResolver
+import com.tencent.bk.devops.plugin.pojo.Result
 
 /**
  * 根据userId获取oauth2 token
@@ -54,17 +56,30 @@ class UserTokenGitAuthProvider(
         }
         val token = when(scmType) {
             ScmType.GITHUB -> getGithubOauthToken(userId)
+            ScmType.CODE_TGIT -> getGitOauthToken(
+                userId = userId,
+                getToken = devopsApi::getTGitOauthToken,
+                getOauthUrl = devopsApi::getTGitOauthUrl
+            )
             ScmType.SCM_GIT -> getScmRepoOauthToken(userId = userId, scmCode = scmCode, repoHashId = repoHashId)
-            else -> getGitOauthToken(userId)
+            else -> getGitOauthToken(
+                userId = userId,
+                getToken = devopsApi::getOauthToken,
+                getOauthUrl = devopsApi::getGitOauthUrl
+            )
         }
         EnvHelper.putContext(ContextConstants.CONTEXT_USER_ID, userId)
         return OauthGitAuthProvider(token = token, userId = userId).getAuthInfo()
     }
 
-    private fun getGitOauthToken(userId: String): String {
-        val result = devopsApi.getOauthToken(userId = userId)
+    private fun getGitOauthToken(
+        userId: String,
+        getToken: (String) -> Result<GitToken>,
+        getOauthUrl: (String) -> Result<String>
+    ): String {
+        val result = getToken(userId)
         if (result.isNotOk() || result.data == null) {
-            val oauthUrl = devopsApi.getGitOauthUrl(userId)
+            val oauthUrl = getOauthUrl(userId)
             throw ApiException(
                 errorMsg =
                 defaultResolver.resolveByMap(

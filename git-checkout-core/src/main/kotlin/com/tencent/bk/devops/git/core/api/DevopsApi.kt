@@ -138,12 +138,27 @@ class DevopsApi : IDevopsApi, BaseApi() {
     }
 
     override fun getOauthToken(userId: String): Result<GitToken> {
-        val path = "/repository/api/build/oauth/git/$userId"
+        return getGitOauthToken(
+            path = "/repository/api/build/oauth/git/$userId",
+            userId = userId,
+            errorMessage = "Failed to get oauth token"
+        )
+    }
+
+    override fun getTGitOauthToken(userId: String): Result<GitToken> {
+        return getGitOauthToken(
+            path = "/repository/api/build/oauth/tgit/$userId",
+            userId = userId,
+            errorMessage = "Failed to get tgit oauth token"
+        )
+    }
+
+    private fun getGitOauthToken(path: String, userId: String, errorMessage: String): Result<GitToken> {
         val request = buildGet(path)
         try {
             val responseContent = HttpUtil.retryRequest(
                 request = request,
-                errorMessage = "Failed to get oauth token information"
+                errorMessage = errorMessage
             )
             val result = JsonUtil.to(responseContent, object : TypeReference<Result<GitToken>>() {})
             return result
@@ -244,6 +259,10 @@ class DevopsApi : IDevopsApi, BaseApi() {
 
     override fun getGitOauthUrl(userId: String): Result<String> {
         return getOauthUrl("/repository/api/build/oauth/git/oauthUrl?userId=$userId")
+    }
+
+    override fun getTGitOauthUrl(userId: String): Result<String> {
+        return getOauthUrl("/repository/api/build/oauth/tgit/oauthUrl?userId=$userId")
     }
 
     override fun getGithubOauthUrl(userId: String): Result<String> {

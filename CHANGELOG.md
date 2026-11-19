@@ -1,8 +1,9 @@
 # Changelog
 
 # v2.0.20
-## 2026-11-19
+## 2026-11-17
 ### 新增
+- feat: 支持工蜂合作版oauth #92 [链接](https://github.com/TencentBlueKing/ci-checkout/issues/92)
 - feat: 支持github镜像功能 #103 [链接](https://github.com/TencentBlueKing/ci-checkout/issues/103)
 
 ### 修复
