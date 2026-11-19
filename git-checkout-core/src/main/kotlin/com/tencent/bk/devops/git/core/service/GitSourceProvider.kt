@@ -127,7 +127,8 @@ class GitSourceProvider(
         return listOf(
             GitErrors.AuthenticationFailed.errorCode,
             GitErrors.RepositoryNotFoundFailed.errorCode,
-            GitErrors.SshAuthenticationFailed.errorCode
+            GitErrors.SshAuthenticationFailed.errorCode,
+            GitErrors.SubmoduleRepositoryDoesNotExist.errorCode
         ).contains(errorCode) && gitClientApi.checkCredentials(
             repositoryUrl = settings.repositoryUrl,
             authInfo = settings.authInfo
