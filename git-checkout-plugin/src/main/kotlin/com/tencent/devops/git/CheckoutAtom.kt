@@ -97,11 +97,9 @@ class CheckoutAtom : TaskAtom<CheckoutAtomParam> {
                 tGitCacheProxyUrl = null,
                 setSafeDirectory = setSafeDirectory,
                 mainRepo = mainRepo,
-                tGitCacheGrayProject = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_PROJECT],
-                tGitCacheGrayWhiteProject = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_WHITE_PROJECT],
-                tGitCacheGrayWeight = this.bkSensitiveConfInfo[GitConstants.TGIT_CACHE_GRAY_WEIGHT],
                 enableServerPreMerge = enableServerPreMerge,
-                enableSparseCone = enableSparseCone
+                enableSparseCone = enableSparseCone,
+                sensitiveConfInfo = this.bkSensitiveConfInfo ?: emptyMap()
             )
         })
 

@@ -28,6 +28,7 @@
 package com.tencent.bk.devops.git.core.service.helper
 
 import com.tencent.bk.devops.git.core.constant.GitConstants
+import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
 import org.slf4j.LoggerFactory
@@ -54,6 +55,31 @@ class GitCleanUpHelper(
             cleanupPartialCloneConfig()
         }
         cleanupClientAgentConfig()
+        cleanupGithubMirrorConfig()
+    }
+
+    /**
+     * 清理github镜像的全局insteadOf配置,insteadOf的key从本地仓库配置中读取
+     */
+    fun cleanupGithubMirrorConfig() {
+        val insteadOfKey = git.tryConfigGet(configKey = GitConstants.GIT_GITHUB_MIRROR_INSTEADOF_KEY)
+        if (insteadOfKey.isBlank()) {
+            return
+        }
+        unsetGithubMirrorConfig(insteadOfKey)
+    }
+
+    fun unsetGithubMirrorConfig(insteadOfKey: String) {
+        git.tryConfigUnset(
+            configKey = insteadOfKey,
+            configScope = GitConfigScope.GLOBAL
+        )
+        git.tryConfigUnset(
+            configKey = GitConstants.GITHUB_PUSH_INSTEADOF_KEY,
+            configValueRegex = GitConstants.GITHUB_URL_VALUE_REGEX,
+            configScope = GitConfigScope.GLOBAL
+        )
+        git.tryConfigUnset(configKey = GitConstants.GIT_GITHUB_MIRROR_INSTEADOF_KEY)
     }
 
     /**

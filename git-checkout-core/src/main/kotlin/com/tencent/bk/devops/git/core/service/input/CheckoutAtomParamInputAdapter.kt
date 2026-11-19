@@ -129,13 +129,9 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheProxyUrl = tGitCacheProxyUrl,
             setSafeDirectory = setSafeDirectory,
             mainRepo = mainRepo,
-            tGitCacheGrayWeight = tGitCacheGrayWeight,
-            tGitCacheGrayProject = tGitCacheGrayProject,
-            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
             enableServerPreMerge = enableServerPreMerge,
             enableSparseCone = enableSparseCone,
-            mirrorGrayWhiteProject = mirrorGrayWhiteProject,
-            mirrorToken = mirrorToken
+            sensitiveConfInfo = sensitiveConfInfo
         )
     ).getInputs()
 
@@ -203,13 +199,9 @@ class CheckoutAtomParamInputAdapter(
             tGitCacheProxyUrl = tGitCacheProxyUrl,
             setSafeDirectory = setSafeDirectory,
             mainRepo = mainRepo,
-            tGitCacheGrayWeight = tGitCacheGrayWeight,
-            tGitCacheGrayProject = tGitCacheGrayProject,
-            tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
             enableServerPreMerge = enableServerPreMerge,
             enableSparseCone = enableSparseCone,
-            mirrorGrayWhiteProject = mirrorGrayWhiteProject,
-            mirrorToken = mirrorToken
+            sensitiveConfInfo = sensitiveConfInfo
         )
     ).getInputs()
 

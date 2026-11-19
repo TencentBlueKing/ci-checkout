@@ -504,7 +504,7 @@ class GitCommandManager(
                     Thread.sleep(LONG_RETRY_PERIOD_MILLS)
                 }
                 // 后续根据缓存使用情况，在这里补充重试逻辑，先卸载相关代理配置，再做重试
-                doRetry(args = args, retryTime = retryTime - 1)
+                doRetry(repoDir = repoDir, args = args, retryTime = retryTime - 1)
             } else {
                 throw e
             }

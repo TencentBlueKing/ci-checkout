@@ -4,6 +4,10 @@
 ## 2026-11-17
 ### 新增
 - feat: 支持工蜂合作版oauth #92 [链接](https://github.com/TencentBlueKing/ci-checkout/issues/92)
+- feat: 支持github镜像功能 #103 [链接](https://github.com/TencentBlueKing/ci-checkout/issues/103)
+
+### 修复
+- bug: 子模块仓库没有权限或不存在时，没有使用明文凭证重试，导致拉取子模块失败 #98 [链接](https://github.com/TencentBlueKing/ci-checkout/issues/98)
 
 # v2.0.19
 ## 2026-11-16

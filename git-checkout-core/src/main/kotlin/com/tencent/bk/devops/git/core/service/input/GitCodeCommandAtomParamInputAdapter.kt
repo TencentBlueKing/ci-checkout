@@ -214,14 +214,10 @@ class GitCodeCommandAtomParamInputAdapter(
                 tGitCacheProxyUrl = tGitCacheProxyUrl,
                 setSafeDirectory = setSafeDirectory,
                 mainRepo = mainRepo,
-                tGitCacheGrayProject = tGitCacheGrayProject,
-                tGitCacheGrayWeight = tGitCacheGrayWeight,
-                tGitCacheGrayWhiteProject = tGitCacheGrayWhiteProject,
                 serverPreMerge = serverPreMerge,
                 serverPreMergeCommit = serverPreMergeCommit,
                 enableSparseCone = enableSparseCone,
-                mirrorGrayWhiteProject = mirrorGrayWhiteProject,
-                mirrorToken = mirrorToken
+                sensitiveConfInfo = sensitiveConfInfo
             )
         }
     }
