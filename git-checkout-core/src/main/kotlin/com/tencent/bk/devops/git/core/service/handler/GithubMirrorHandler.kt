@@ -32,7 +32,6 @@ class GithubMirrorHandler(
 
     companion object {
         private const val GITHUB_HOST = "github.com"
-        private val GITHUB_URL_REGEX = Regex("^https?://github\\.com", RegexOption.IGNORE_CASE)
         private val logger = LoggerFactory.getLogger(GithubMirrorHandler::class.java)
     }
 
@@ -92,18 +91,14 @@ class GithubMirrorHandler(
     }
 
     /**
-     * system和global中是否存在改写https://github.com的insteadOf
+     * 是否存在改写github的insteadOf
      *
-     * git config --get-regexp 输出格式: url.https://mirror.example.com/.insteadof https://github.com/
+     * 不指定scope,读取system、global、xdg、local所有生效的配置
      */
     private fun existGithubInsteadOf(): Boolean {
-        return listOf(GitConfigScope.SYSTEM, GitConfigScope.GLOBAL).flatMap { scope ->
-            git.tryConfigGetRegexp(
-                configKeyRegex = "^url\\..*\\.insteadof$",
-                configScope = scope
-            )
-        }.any { line ->
-            GITHUB_URL_REGEX.containsMatchIn(line.substringAfter(" ", "").trim())
-        }
+        return git.tryConfigGetRegexp(
+            configKeyRegex = "^url\\..*\\.insteadof$",
+            configValueRegex = "^https?://github\\.com"
+        ).isNotEmpty()
     }
 }
