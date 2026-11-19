@@ -249,6 +249,7 @@ object GitUtil {
         return cacheStrategy
     }
 
+    fun getGithubMirrorInsteadOfKey(mirrorUrl: String) = "url.$mirrorUrl.insteadOf"
 
     @SuppressWarnings("LongParameterList")
     fun getServerPreMerge(

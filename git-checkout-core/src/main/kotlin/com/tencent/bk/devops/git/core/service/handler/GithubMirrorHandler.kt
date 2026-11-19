@@ -1,11 +1,12 @@
 package com.tencent.bk.devops.git.core.service.handler
 
 import com.tencent.bk.devops.git.core.constant.GitConstants.BK_CI_PROJECT_NAME
+import com.tencent.bk.devops.git.core.constant.GitConstants.GITHUB_HOST
 import com.tencent.bk.devops.git.core.constant.GitConstants.GITHUB_MIRROR_SITE
 import com.tencent.bk.devops.git.core.constant.GitConstants.GITHUB_MIRROR_WHITE_PROJECT
 import com.tencent.bk.devops.git.core.constant.GitConstants.GITHUB_PUSH_INSTEADOF_KEY
 import com.tencent.bk.devops.git.core.constant.GitConstants.GITHUB_URL
-import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_GITHUB_MIRROR_INSTEADOF_KEY
+import com.tencent.bk.devops.git.core.constant.GitConstants.GIT_GITHUB_MIRROR_URL
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
@@ -31,7 +32,6 @@ class GithubMirrorHandler(
 ) : IGitHandler {
 
     companion object {
-        private const val GITHUB_HOST = "github.com"
         private val logger = LoggerFactory.getLogger(GithubMirrorHandler::class.java)
     }
 
@@ -67,10 +67,10 @@ class GithubMirrorHandler(
     }
 
     private fun configGithubMirror(mirrorUrl: String) {
-        val insteadOfKey = "url.$mirrorUrl.insteadOf"
+        val insteadOfKey = GitUtil.getGithubMirrorInsteadOfKey(mirrorUrl)
         // 先清理同一个job中其他拉代码插件或前序构建配置的镜像,避免被误判为用户自己配置的insteadOf
         if (git.configExists(configKey = insteadOfKey, configScope = GitConfigScope.GLOBAL)) {
-            GitCleanUpHelper(settings, git).unsetGithubMirrorConfig(insteadOfKey)
+            GitCleanUpHelper(settings, git).unsetGithubMirrorConfig(mirrorUrl)
         }
         if (existGithubInsteadOf()) {
             logger.info("github insteadOf already configured on build machine, skip github mirror")
@@ -86,7 +86,7 @@ class GithubMirrorHandler(
                 configValue = GITHUB_URL,
                 configScope = GitConfigScope.GLOBAL
             )
-            git.config(configKey = GIT_GITHUB_MIRROR_INSTEADOF_KEY, configValue = insteadOfKey)
+            git.config(configKey = GIT_GITHUB_MIRROR_URL, configValue = mirrorUrl)
         }
     }
 

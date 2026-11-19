@@ -80,8 +80,9 @@ object GitConstants {
     const val GIT_CREDENTIAL_USERNAME = "credential.username"
     const val GIT_CREDENTIAL_TASKID = "credential.taskId"
     const val GIT_CREDENTIAL_INSTEADOF_KEY = "credential.insteadOfKey"
-    // github镜像全局insteadOf的key,post-action阶段卸载时使用
-    const val GIT_GITHUB_MIRROR_INSTEADOF_KEY = "devops.githubMirrorInsteadOfKey"
+    // github镜像地址,保存凭证和post-action阶段卸载镜像配置时使用
+    const val GIT_GITHUB_MIRROR_URL = "devops.githubMirrorUrl"
+    const val GITHUB_HOST = "github.com"
     const val GITHUB_URL = "https://github.com/"
     const val GITHUB_PUSH_INSTEADOF_KEY = "url.$GITHUB_URL.pushInsteadOf"
     const val GITHUB_URL_VALUE_REGEX = "^https://github\\.com/$"

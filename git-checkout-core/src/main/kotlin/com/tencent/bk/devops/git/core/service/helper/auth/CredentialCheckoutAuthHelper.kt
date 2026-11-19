@@ -183,7 +183,7 @@ class CredentialCheckoutAuthHelper(
                 ),
                 runtimeEnv = mapOf(
                     GIT_REPO_PATH to settings.repositoryPath,
-                    CREDENTIAL_COMPATIBLE_HOST to (settings.compatibleHostList?.joinToString(",") ?: "")
+                    CREDENTIAL_COMPATIBLE_HOST to getCredentialCompatibleHost()
                 ),
                 inputStream = CredentialArguments(
                     protocol = scheme,
@@ -225,6 +225,17 @@ class CredentialCheckoutAuthHelper(
         }
     }
 
+    /**
+     * 传给凭证管理的兼容域名,凭证管理只有在兼容域名包含主库域名时才会保存兼容域名的凭证
+     */
+    private fun getCredentialCompatibleHost(): String {
+        return if (githubMirrorHost == null) {
+            settings.compatibleHostList?.joinToString(",") ?: ""
+        } else {
+            getCredentialHostList().joinToString(",")
+        }
+    }
+
     private fun getJavaFilePath() = File(System.getProperty("java.home"), "/bin/java").absolutePath
 
     override fun removeAuth() {
@@ -253,7 +264,7 @@ class CredentialCheckoutAuthHelper(
                     ),
                     runtimeEnv = mapOf(
                         GIT_REPO_PATH to settings.repositoryPath,
-                        CREDENTIAL_COMPATIBLE_HOST to (settings.compatibleHostList?.joinToString(",") ?: "")
+                        CREDENTIAL_COMPATIBLE_HOST to getCredentialCompatibleHost()
                     ),
                     inputStream = CredentialArguments(
                         protocol = scheme,
