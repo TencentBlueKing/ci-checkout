@@ -31,6 +31,7 @@ import com.tencent.bk.devops.git.core.constant.GitConstants
 import com.tencent.bk.devops.git.core.enums.GitConfigScope
 import com.tencent.bk.devops.git.core.pojo.GitSourceSettings
 import com.tencent.bk.devops.git.core.service.GitCommandManager
+import com.tencent.bk.devops.git.core.util.GitUtil
 import org.slf4j.LoggerFactory
 
 /**
@@ -59,19 +60,19 @@ class GitCleanUpHelper(
     }
 
     /**
-     * 清理github镜像的全局insteadOf配置,insteadOf的key从本地仓库配置中读取
+     * 清理github镜像的全局insteadOf配置,镜像地址从本地仓库配置中读取
      */
     fun cleanupGithubMirrorConfig() {
-        val insteadOfKey = git.tryConfigGet(configKey = GitConstants.GIT_GITHUB_MIRROR_INSTEADOF_KEY)
-        if (insteadOfKey.isBlank()) {
+        val mirrorUrl = git.tryConfigGet(configKey = GitConstants.GIT_GITHUB_MIRROR_URL)
+        if (mirrorUrl.isBlank()) {
             return
         }
-        unsetGithubMirrorConfig(insteadOfKey)
+        unsetGithubMirrorConfig(mirrorUrl)
     }
 
-    fun unsetGithubMirrorConfig(insteadOfKey: String) {
+    fun unsetGithubMirrorConfig(mirrorUrl: String) {
         git.tryConfigUnset(
-            configKey = insteadOfKey,
+            configKey = GitUtil.getGithubMirrorInsteadOfKey(mirrorUrl),
             configScope = GitConfigScope.GLOBAL
         )
         git.tryConfigUnset(
@@ -79,7 +80,7 @@ class GitCleanUpHelper(
             configValueRegex = GitConstants.GITHUB_URL_VALUE_REGEX,
             configScope = GitConfigScope.GLOBAL
         )
-        git.tryConfigUnset(configKey = GitConstants.GIT_GITHUB_MIRROR_INSTEADOF_KEY)
+        git.tryConfigUnset(configKey = GitConstants.GIT_GITHUB_MIRROR_URL)
     }
 
     /**

@@ -165,7 +165,7 @@ abstract class HttpGitAuthHelper(
     }
 
     fun combinableHost(action: (protocol: String, host: String) -> Unit) {
-        getHostList().forEach { host ->
+        getCredentialHostList().forEach { host ->
             listOf("https", "http").forEach { protocol ->
                 action.invoke(protocol, host)
             }

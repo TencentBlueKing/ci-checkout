@@ -46,6 +46,7 @@ import com.tencent.bk.devops.git.core.util.LockHelper
 import com.tencent.bk.devops.git.core.util.SubmoduleUtil
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
 
@@ -260,6 +261,27 @@ abstract class AbGitAuthHelper(
             insteadOfHosts.addAll(compatibleHostList)
         }
         return insteadOfHosts
+    }
+
+    /**
+     * 凭证需要兼容的域名
+     *
+     * 开启github镜像后,github的拉取会被insteadOf改写到镜像域名,镜像域名也需要保存凭证。
+     * 镜像域名不能加到[getHostList]中,否则会生成或卸载镜像域名的insteadOf
+     */
+    protected fun getCredentialHostList(): MutableSet<String> {
+        val credentialHosts = getHostList()
+        githubMirrorHost?.let { credentialHosts.add(it) }
+        return credentialHosts
+    }
+
+    protected val githubMirrorHost: String? by lazy {
+        val mirrorUrl = if (serverInfo.hostName == GitConstants.GITHUB_HOST) {
+            git.tryConfigGet(configKey = GitConstants.GIT_GITHUB_MIRROR_URL)
+        } else {
+            ""
+        }
+        mirrorUrl.takeIf { it.isNotBlank() }?.let { runCatching { URI(it).host }.getOrNull() }
     }
 
     protected fun unsetGitInsteadOfHttp(host: String) {
