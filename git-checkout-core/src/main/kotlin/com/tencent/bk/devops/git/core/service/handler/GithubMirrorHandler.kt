@@ -40,7 +40,12 @@ class GithubMirrorHandler(
         try {
             val mirrorSite = settings.sensitiveConfInfo[GITHUB_MIRROR_SITE]?.trim()
             if (!mirrorSite.isNullOrBlank() && isSupport()) {
-                configGithubMirror(mirrorUrl = if (mirrorSite.endsWith("/")) mirrorSite else "$mirrorSite/")
+                logger.groupStart("Setting up github mirror")
+                try {
+                    configGithubMirror(mirrorUrl = if (mirrorSite.endsWith("/")) mirrorSite else "$mirrorSite/")
+                } finally {
+                    logger.groupEnd("")
+                }
             }
         } catch (ignore: Throwable) {
             logger.warn("Failed to config github mirror: ${ignore.message}")
@@ -65,7 +70,9 @@ class GithubMirrorHandler(
     private fun configGithubMirror(mirrorUrl: String) {
         val insteadOfKey = "url.$mirrorUrl.insteadOf"
         // 先清理同一个job中其他拉代码插件或前序构建配置的镜像,避免被误判为用户自己配置的insteadOf
-        GitCleanUpHelper(settings, git).unsetGithubMirrorConfig(insteadOfKey)
+        if (git.configExists(configKey = insteadOfKey, configScope = GitConfigScope.GLOBAL)) {
+            GitCleanUpHelper(settings, git).unsetGithubMirrorConfig(insteadOfKey)
+        }
         if (existGithubInsteadOf()) {
             logger.info("github insteadOf already configured on build machine, skip github mirror")
         } else {
