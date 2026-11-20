@@ -33,7 +33,8 @@ class GitErrorCollector {
     }
 
     /**
-     * 主仓库拉取成功后才会拉取子模块,所以拉取子模块时的仓库不存在、认证失败都是子模块仓库的错误
+     * 主仓库拉取成功后才会拉取子模块,所以拉取子模块时的仓库不存在、认证失败、ssh连接失败都是子模块仓库的错误,
+     * 转成子模块错误后才会用明文重试
      *
      * 克隆失败的子模块地址在这里写入上下文供错误信息使用,collect在读取输出流的子线程中执行,不能在那里写
      */
@@ -44,9 +45,7 @@ class GitErrorCollector {
         }
         val errors = gitErrors
         val submoduleUpdating = EnvHelper.getContext(CONTEXT_SUBMODULE_UPDATING) == "true"
-        if (submoduleUpdating &&
-            (errors == GitErrors.AuthenticationFailed || errors == GitErrors.RepositoryNotFoundFailed)
-        ) {
+        if (submoduleUpdating && errors in SUBMODULE_CLONE_ERRORS) {
             return GitErrors.SubmoduleRepositoryDoesNotExist
         }
         return errors
@@ -68,5 +67,11 @@ class GitErrorCollector {
             option = RegexOption.IGNORE_CASE
         )
         private val URL_USER_INFO_REGEX = Regex("^(https?://)[^/@]+@", RegexOption.IGNORE_CASE)
+        private val SUBMODULE_CLONE_ERRORS = setOf(
+            GitErrors.AuthenticationFailed,
+            GitErrors.RepositoryNotFoundFailed,
+            GitErrors.SshAuthenticationFailed,
+            GitErrors.ConnectionTimeOut
+        )
     }
 }

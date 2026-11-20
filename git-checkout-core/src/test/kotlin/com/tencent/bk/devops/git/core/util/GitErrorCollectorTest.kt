@@ -107,6 +107,24 @@ class GitErrorCollectorTest {
             authFailed.collect("fatal: Authentication failed for 'https://git.example.com/sub/a.git/'", false)
             Assert.assertEquals(GitErrors.SubmoduleRepositoryDoesNotExist, authFailed.getGitErrors())
 
+            val sshTimeout = GitErrorCollector()
+            sshTimeout.collect("ssh: connect to host git.example.com port 36000: Connection timed out", false)
+            sshTimeout.collect("fatal: Could not read from remote repository.", false)
+            sshTimeout.collect("无法克隆 'git.example.com:sub/a.git' 到子模组路径 'dep/a'", false)
+            Assert.assertEquals(GitErrors.SubmoduleRepositoryDoesNotExist, sshTimeout.getGitErrors())
+            Assert.assertEquals("git.example.com:sub/a.git", EnvHelper.getContext(CONTEXT_SUBMODULE_URL))
+            EnvHelper.removeContext(CONTEXT_SUBMODULE_URL)
+
+            val fetchTimeout = GitErrorCollector()
+            fetchTimeout.collect("ssh: connect to host git.example.com port 36000: Connection timed out", false)
+            fetchTimeout.collect("fatal: Unable to fetch in submodule path 'dep/a'", false)
+            Assert.assertEquals(GitErrors.SubmoduleRepositoryDoesNotExist, fetchTimeout.getGitErrors())
+
+            val noSpace = GitErrorCollector()
+            noSpace.collect("fatal: write error: No space left on device", false)
+            noSpace.collect("fatal: clone of 'git@git.example.com:sub/a.git' into submodule path 'dep/a' failed", false)
+            Assert.assertEquals(GitErrors.NoSpaceLeftOnDevice, noSpace.getGitErrors())
+
             val other = GitErrorCollector()
             other.collect("fatal: Unable to find current revision in submodule path 'a'", false)
             Assert.assertEquals(GitErrors.InvalidSubmoduleSHA, other.getGitErrors())
